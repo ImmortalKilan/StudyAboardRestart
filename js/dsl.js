@@ -4,7 +4,9 @@ const ALIASES = {
   IQ: 'INT', STR: 'PER', HEA: 'HLT',
   SCHOOL: 'school', PROF: 'profession', school: 'school', profession: 'profession',
   HS: 'hsType', hsType: 'hsType',
-  OVERSEAS: 'overseas', overseas: 'overseas'
+  OVERSEAS: 'overseas', overseas: 'overseas',
+  MAJOR: 'major', major: 'major',
+  STORYLINE: 'storyline', storyline: 'storyline'
 };
 
 function readVar(state, key) {
@@ -35,6 +37,11 @@ function evalAtom(state, atom) {
   const evtMatch = atom.match(/^EVT\?\[(\d+)\]$/);
   if (evtMatch) {
     return state.firedEvents && state.firedEvents.has(Number(evtMatch[1]));
+  }
+  // TLT?[id] — check if talent was picked
+  const tltMatch = atom.match(/^TLT\?\[(\d+)\]$/);
+  if (tltMatch) {
+    return state.talentIds && state.talentIds.has(Number(tltMatch[1]));
   }
   const m = atom.match(/^([A-Za-z_]+)\s*(>=|<=|!=|==|=|>|<)\s*(.+)$/);
   if (!m) return false;
@@ -107,7 +114,7 @@ function findClosingParen(expr, openIdx) {
 export function pickBranch(state, branches) {
   if (!branches || !branches.length) return null;
   for (const b of branches) {
-    const idx = b.indexOf('?');
+    const idx = b.lastIndexOf('?');
     if (idx < 0) continue;
     const cond = b.slice(0, idx).trim();
     const id = Number(b.slice(idx + 1).trim());

@@ -22,7 +22,13 @@ const PALETTE = {
   bagProp: '#3a2a1a',
   cheek: '#e88a8a',
   eyeNormal: '#1a1a1a',
-  bg: 'transparent'
+  bg: 'transparent',
+  stockGreen: '#2ecc71',
+  stockRed: '#e74c3c',
+  phoneProp: '#bdc3c7',
+  glassProp: '#a8d8ea',
+  testTube: '#3498db',
+  artProp: '#f1c40f'
 };
 
 function makeGrid() {
@@ -189,19 +195,78 @@ function drawAccessories(g, state, m) {
   else if (state.school === 'T50') fillRect(g, m.torsoX + 1, m.torsoY + 2, 2, 2, PALETTE.badgeT50);
   else if (state.school === 'T100+') fillRect(g, m.torsoX + 1, m.torsoY + 2, 2, 2, PALETTE.badgeT100);
 
-  const prop = state.profession;
-  if (prop === '本科生' || prop === '研究生') {
-    fillRect(g, m.torsoX + m.torsoW - 1, m.torsoY + m.torsoH - 4, 4, 3, PALETTE.bookProp);
-    px(g, m.torsoX + m.torsoW - 1, m.torsoY + m.torsoH - 5, PALETTE.outline);
-  } else if (prop === '理工生' || prop === '海外打工人') {
-    fillRect(g, m.torsoX + m.torsoW - 1, m.torsoY + m.torsoH - 4, 5, 3, PALETTE.laptopProp);
-  } else if (prop === '商科生' || prop === '海归') {
-    fillRect(g, m.torsoX - 3, m.torsoY + m.torsoH - 5, 3, 5, PALETTE.bagProp);
-    px(g, m.torsoX - 2, m.torsoY + m.torsoH - 6, PALETTE.outline);
-  }
-
   if (state.PER >= 7) {
     fillRect(g, m.torsoX, m.torsoY + 4, m.torsoW, 1, '#000');
+  }
+}
+
+function drawFinerProps(ctx, state, m) {
+  const subScale = SCALE / 3; // 3x resolution for props!
+  const baseX = (m.torsoX + m.torsoW - 2) * SCALE;
+  const baseY = (m.torsoY + m.torsoH - 6) * SCALE;
+
+  function fRect(sx, sy, sw, sh, color) {
+    ctx.fillStyle = color;
+    ctx.fillRect(baseX + sx * subScale, baseY + sy * subScale, sw * subScale, sh * subScale);
+  }
+
+  const major = state.major;
+  if (major === 'CS') {
+    // 3x finer laptop: much more detailed
+    fRect(2, 2, 14, 10, PALETTE.laptopProp); // casing
+    fRect(3, 3, 12, 6, '#111'); // screen bezel
+    fRect(4, 4, 10, 4, PALETTE.glassProp); // glowing screen
+    fRect(2, 10, 14, 2, '#222'); // keyboard base
+    fRect(3, 10, 2, 1, '#fff'); // keys
+    fRect(6, 10, 2, 1, '#fff');
+    fRect(9, 10, 2, 1, '#fff');
+  } else if (major === '商科') {
+    // 3x finer phone with candlestick chart
+    fRect(4, 1, 8, 14, PALETTE.phoneProp); // phone body
+    fRect(5, 2, 6, 12, '#111'); // screen
+    // Candlesticks (Green up, Red down)
+    fRect(6, 10, 1, 3, PALETTE.stockGreen);
+    fRect(7, 8, 1, 5, PALETTE.stockRed);
+    fRect(8, 5, 1, 4, PALETTE.stockGreen);
+    fRect(9, 4, 1, 2, PALETTE.stockRed);
+    // Grid lines
+    fRect(5, 6, 6, 1, '#333');
+    fRect(5, 10, 6, 1, '#333');
+  } else if (major === '理科') {
+    // Finer test tube with bubbling liquid
+    fRect(5, 1, 4, 12, PALETTE.glassProp); // glass tube
+    fRect(6, 6, 2, 6, PALETTE.testTube); // blue liquid
+    fRect(5, 12, 4, 2, PALETTE.glassProp); // bottom curve
+    fRect(6, 13, 2, 1, PALETTE.testTube); // bottom liquid
+    // Bubbles
+    fRect(6, 7, 1, 1, '#fff');
+    fRect(7, 9, 1, 1, '#fff');
+    fRect(6, 11, 1, 1, '#fff');
+  } else if (major === '文科' || major === '文艺') {
+    // Finer palette with multiple colors
+    fRect(2, 4, 12, 10, PALETTE.artProp); // wood palette
+    fRect(3, 5, 3, 3, '#fff'); // thumb hole
+    // Paint colors
+    fRect(8, 5, 3, 3, PALETTE.stockRed);
+    fRect(10, 9, 3, 3, PALETTE.testTube);
+    fRect(5, 10, 3, 3, PALETTE.stockGreen);
+    fRect(7, 7, 2, 2, '#fff'); // brush stroke mixing
+  } else {
+    const prop = state.profession;
+    if (prop === '本科生' || prop === '研究生') {
+      fRect(4, 4, 10, 8, PALETTE.bookProp);
+      fRect(5, 4, 8, 8, '#a02b1f'); // cover detail
+      fRect(4, 5, 10, 1, PALETTE.outline); // strap/binding
+    } else if (prop === '理工生' || prop === '海外打工人') {
+      fRect(2, 4, 14, 8, PALETTE.laptopProp);
+      fRect(3, 5, 12, 4, '#111'); // screen
+    } else if (prop === '商科生' || prop === '海归') {
+      fRect(2, 6, 10, 8, PALETTE.bagProp);
+      fRect(4, 4, 6, 2, PALETTE.bagProp); // handle
+      fRect(5, 5, 4, 1, '#fff'); // handle hole
+      fRect(2, 8, 10, 1, PALETTE.outline); // strap
+      fRect(6, 9, 2, 2, '#d4af37'); // gold buckle
+    }
   }
 }
 
@@ -227,4 +292,7 @@ export function renderAvatar(canvas, state) {
       }
     }
   }
+
+  // Draw high-resolution props over the base pixel art
+  drawFinerProps(ctx, state, m);
 }

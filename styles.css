@@ -10,10 +10,10 @@
   --warm: #c9a978;
   --card: #171d27;
   --card-2: #1d2533;
-  --grade-0: #6f7a8a;
-  --grade-1: #6f9b92;
-  --grade-2: #6f8fb8;
-  --grade-3: #8f7eb4;
+  --grade-0: #b0b8c4;
+  --grade-1: #4a9de5;
+  --grade-2: #a855f7;
+  --grade-3: #f5b642;
   --mono: "JetBrains Mono", "Sarasa Mono SC", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
 }
@@ -54,6 +54,49 @@ body.in-game #game-screen {
 
 .screen { display: none; }
 .screen.active { display: block; }
+
+/* Start Screen */
+.start-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 120px);
+  text-align: center;
+}
+
+.start-title {
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin: 0 0 16px;
+  color: var(--ink);
+}
+
+.start-sub {
+  font-size: 18px;
+  color: var(--ink-faint);
+  margin: 0 0 60px;
+  font-weight: 400;
+}
+
+.start-btn {
+  font-size: 18px;
+  padding: 14px 48px;
+  background: transparent;
+  color: var(--ink-soft);
+  border: 1px solid var(--ink-faint);
+  border-radius: 4px;
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  transition: all .2s ease;
+}
+
+.start-btn:hover {
+  color: var(--ink);
+  border-color: var(--ink-soft);
+  background: rgba(255, 255, 255, 0.04);
+}
 
 .screen-head h1 {
   font-size: 28px;
@@ -113,25 +156,43 @@ body.in-game #game-screen {
 .talent-card {
   background: var(--card);
   border: 1px solid var(--line);
-  border-left: 3px solid var(--grade-0);
+  border-left: 4px solid var(--grade-0);
   border-radius: 6px;
   padding: 12px 14px;
   cursor: pointer;
   transition: all .15s ease;
   user-select: none;
 }
-.talent-card.grade-1 { border-left-color: var(--grade-1); }
-.talent-card.grade-2 { border-left-color: var(--grade-2); }
-.talent-card.grade-3 { border-left-color: var(--grade-3); }
+.talent-card.grade-0 {
+  border-left-color: var(--grade-0);
+  background: linear-gradient(135deg, rgba(176,184,196,0.08) 0%, var(--card) 60%);
+}
+.talent-card.grade-1 {
+  border-left-color: var(--grade-1);
+  background: linear-gradient(135deg, rgba(74,157,229,0.12) 0%, var(--card) 60%);
+}
+.talent-card.grade-2 {
+  border-left-color: var(--grade-2);
+  background: linear-gradient(135deg, rgba(168,85,247,0.14) 0%, var(--card) 60%);
+}
+.talent-card.grade-3 {
+  border-left-color: var(--grade-3);
+  background: linear-gradient(135deg, rgba(245,182,66,0.16) 0%, var(--card) 60%);
+}
+.talent-card.grade-0 .t-name { color: var(--grade-0); }
+.talent-card.grade-1 .t-name { color: var(--grade-1); }
+.talent-card.grade-2 .t-name { color: var(--grade-2); }
+.talent-card.grade-3 .t-name { color: var(--grade-3); }
 .talent-card:hover {
-  background: var(--card-2);
   transform: translateY(-1px);
+  filter: brightness(1.15);
 }
 .talent-card.picked {
-  background: var(--accent);
-  color: #0f1420;
   border-color: var(--accent);
+  background: var(--accent) !important;
+  color: #0f1420;
 }
+.talent-card.picked .t-name { color: #0f1420 !important; }
 .talent-card.picked .t-desc { color: #d7dcd1; }
 .t-name {
   font-weight: 600;
@@ -335,6 +396,47 @@ body.in-game .left-panel {
   color: var(--ink);
   text-align: right;
   font-weight: 600;
+}
+
+.major-box {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: var(--card-2);
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.major-label {
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+.major-val {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--warm);
+}
+
+.storyline-box {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: linear-gradient(135deg, rgba(245,182,66,0.12) 0%, var(--card-2) 60%);
+  border: 1px solid rgba(245,182,66,0.25);
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.storyline-label {
+  font-size: 12px;
+  color: var(--grade-3);
+}
+.storyline-val {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--grade-3);
 }
 
 .right-panel {

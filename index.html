@@ -9,7 +9,15 @@
 <body>
   <main class="app">
 
-    <section id="talent-screen" class="screen active">
+    <section id="start-screen" class="screen active">
+      <div class="start-center">
+        <h1 class="start-title">留学重开模拟器</h1>
+        <p class="start-sub">这垃圾留学，一秒也不想学了！</p>
+        <button id="btn-start" class="start-btn">&#x21BB; 立即重开</button>
+      </div>
+    </section>
+
+    <section id="talent-screen" class="screen">
       <header class="screen-head">
         <h1>留学重开</h1>
         <p class="sub">你即将推翻现在的人生，重新从 15 岁开始。先决定你是谁。</p>
@@ -46,6 +54,7 @@
       </div>
 
       <div class="footer-actions">
+        <button id="alloc-random" class="ghost">随机分配</button>
         <button id="alloc-start" class="primary" disabled>开始人生</button>
       </div>
     </section>
@@ -62,6 +71,14 @@
             <span id="time-display" class="time-val">15岁1个月</span>
           </div>
           <div id="stats-panel" class="stats-panel"></div>
+          <div class="major-box">
+            <span class="major-label">专业</span>
+            <span id="major-display" class="major-val">未定</span>
+          </div>
+          <div id="storyline-box" class="storyline-box" style="display:none;">
+            <span class="storyline-label">隐藏剧情</span>
+            <span id="storyline-display" class="storyline-val"></span>
+          </div>
         </aside>
 
         <section class="right-panel">
