@@ -3,7 +3,8 @@ const ALIASES = {
   INT: 'INT', PER: 'PER', MNY: 'MNY', SOC: 'SOC', APP: 'APP', HLT: 'HLT', HAP: 'HAP',
   IQ: 'INT', STR: 'PER', HEA: 'HLT',
   SCHOOL: 'school', PROF: 'profession', school: 'school', profession: 'profession',
-  HS: 'hsType', hsType: 'hsType'
+  HS: 'hsType', hsType: 'hsType',
+  OVERSEAS: 'overseas', overseas: 'overseas'
 };
 
 function readVar(state, key) {

@@ -3,7 +3,7 @@
     "id": 10001,
     "text": "你正在念高一。父母和你商量未来的路。",
     "include": "AGE=15",
-    "branch": ["MNY>=5?10002", "?10005"]
+    "branch": ["MNY>=3?10002", "?10005"]
   },
   {
     "id": 10002,
@@ -211,16 +211,17 @@
   {
     "id": 10312,
     "text": "送机那天妈妈在机场哭了。你头也不敢回。",
-    "include": "AGE=18&school!=无",
+    "include": "AGE=18&HS==国际&school!=无",
     "happyDelta": -1,
+    "set": { "overseas": 1 },
     "effect": { "PER": 1 }
   },
 
   {
     "id": 10401,
     "text": "你正式落地海外，开启大一生活。",
-    "include": "AGE=19&school!=无",
-    "set": { "profession": "本科生" },
+    "include": "AGE=19&HS==国际&school!=无",
+    "set": { "profession": "本科生", "overseas": 1 },
     "branch": ["SOC>=6?10402", "SOC<=3?10403", "?10404"]
   },
   {
@@ -246,45 +247,45 @@
   {
     "id": 10410,
     "text": "高数挂科警告，你第一次去office hour。",
-    "include": "AGE=19&school!=无&INT<=5",
+    "include": "AGE=19&school!=无&HS==国际&INT<=5",
     "happyDelta": -2
   },
   {
     "id": 10411,
     "text": "你被教授在大课上点名表扬了答题思路。",
-    "include": "AGE=19&school!=无&INT>=8",
+    "include": "AGE=19&school!=无&HS==国际&INT>=8",
     "happyDelta": 2
   },
   {
     "id": 10412,
     "text": "你想家想到失眠，连续一周靠泡面度日。",
-    "include": "AGE=19&school!=无&PER<=3",
+    "include": "AGE=19&school!=无&HS==国际&PER<=3",
     "effect": { "HLT": -1 },
     "happyDelta": -3
   },
   {
     "id": 10413,
     "text": "你在派对上遇到了让你心动的人。",
-    "include": "AGE=19&school!=无&APP>=6&SOC>=5",
+    "include": "AGE=19&school!=无&HS==国际&APP>=6&SOC>=5",
     "happyDelta": 3
   },
   {
     "id": 10414,
     "text": "你被宿管警告深夜噪音，原因是同学聚会喝大了。",
-    "include": "AGE=19&school!=无&SOC>=7",
+    "include": "AGE=19&school!=无&HS==国际&SOC>=7",
     "happyDelta": -1
   },
   {
     "id": 10415,
     "text": "你打了份校内零工补贴生活费。",
-    "include": "AGE=19&school!=无&MNY<=4",
+    "include": "AGE=19&school!=无&HS==国际&MNY<=4",
     "effect": { "MNY": 1, "PER": 1 }
   },
 
   {
     "id": 10501,
     "text": "大二，专业课开始变难，你需要选定专业方向。",
-    "include": "AGE=20&school!=无",
+    "include": "AGE=20&school!=无&HS==国际",
     "branch": ["INT>=7?10502", "MNY>=7?10503", "?10504"]
   },
   {
@@ -309,28 +310,28 @@
   {
     "id": 10510,
     "text": "你做了第一份本地实习，加薪不多但写进了简历。",
-    "include": "AGE=20&school!=无&SOC>=5",
+    "include": "AGE=20&school!=无&HS==国际&SOC>=5",
     "effect": { "SOC": 1, "PER": 1 },
     "happyDelta": 2
   },
   {
     "id": 10511,
     "text": "你陷入了一段感情，但因为文化差异分手了。",
-    "include": "AGE=20&school!=无&APP>=5",
+    "include": "AGE=20&school!=无&HS==国际&APP>=5",
     "happyDelta": -2,
     "effect": { "PER": 1 }
   },
   {
     "id": 10512,
     "text": "你加入了中国学生会，认识了一群志同道合的人。",
-    "include": "AGE=20&school!=无&SOC>=4",
+    "include": "AGE=20&school!=无&HS==国际&SOC>=4",
     "effect": { "SOC": 1 },
     "happyDelta": 1
   },
   {
     "id": 10513,
     "text": "你被指控学术不端，差点被退学。",
-    "include": "AGE=20&school!=无&INT<=4&PER<=3",
+    "include": "AGE=20&school!=无&HS==国际&INT<=4&PER<=3",
     "happyDelta": -5,
     "effect": { "PER": -2 }
   },
@@ -338,7 +339,7 @@
   {
     "id": 10601,
     "text": "大三，开始考虑读研还是直接找工作。",
-    "include": "AGE=21&school!=无",
+    "include": "AGE=21&school!=无&HS==国际",
     "branch": ["INT>=8?10602", "MNY<=3?10603", "?10604"]
   },
   {
@@ -362,28 +363,28 @@
   {
     "id": 10610,
     "text": "你拿到了大厂的暑期实习offer。",
-    "include": "AGE=21&school!=无&INT>=7&SOC>=5",
+    "include": "AGE=21&school!=无&HS==国际&INT>=7&SOC>=5",
     "happyDelta": 4,
     "effect": { "MNY": 2 }
   },
   {
     "id": 10611,
     "text": "你被诊断出抑郁，开始看校内心理咨询。",
-    "include": "AGE=21&school!=无&HAP<=2",
+    "include": "AGE=21&school!=无&HS==国际&HAP<=2",
     "effect": { "HLT": -1 },
     "happyDelta": 1
   },
   {
     "id": 10612,
     "text": "签证又出了问题，你被困在海外回不了家。",
-    "include": "AGE=21&school!=无",
+    "include": "AGE=21&school!=无&HS==国际",
     "happyDelta": -2
   },
 
   {
     "id": 10701,
     "text": "毕业季到了。",
-    "include": "AGE=22&school!=无",
+    "include": "AGE=22&school!=无&HS==国际",
     "branch": [
       "INT>=8&SOC>=6?10702",
       "INT>=6?10703",
@@ -597,10 +598,11 @@
   },
   {
     "id": 11305,
-    "text": "分数线都没过。你决定复读，或者上个大专。",
+    "text": "分数线都没过。你上了一所大专，学了个实用技术。毕业后进了工厂，三班倒的日子里你偶尔会想，如果当年再努力一点……但人生没有如果。你的留学梦到此结束了。",
     "noRandom": true,
     "happyDelta": -4,
-    "set": { "school": "大专" }
+    "set": { "school": "大专", "profession": "蓝领" },
+    "end": true
   },
   {
     "id": 11310,
@@ -744,7 +746,7 @@
     "text": "你拿到了海外名校的研究生offer！还附带奖学金。",
     "noRandom": true,
     "happyDelta": 5,
-    "set": { "school": "海外硕", "profession": "准研究生" },
+    "set": { "school": "海外硕", "profession": "准研究生", "overseas": 1 },
     "effect": { "MNY": 1 }
   },
   {
@@ -752,7 +754,7 @@
     "text": "你被一所海外普通大学录取读研。学费不便宜，但好歹出去了。",
     "noRandom": true,
     "happyDelta": 2,
-    "set": { "school": "海外硕", "profession": "准研究生" },
+    "set": { "school": "海外硕", "profession": "准研究生", "overseas": 1 },
     "effect": { "MNY": -1 }
   },
   {
@@ -765,17 +767,19 @@
   },
   {
     "id": 11605,
-    "text": "考研落榜。400万考生里，你是被刷下去的那一半。",
+    "text": "考研落榜。400万考生里，你是被刷下去的那一半。你开始海投简历，最终进了一家小公司做着996的工作。出国的念头渐渐被房租和KPI埋没了。",
     "noRandom": true,
     "happyDelta": -4,
-    "set": { "profession": "待业" }
+    "set": { "profession": "打工人" },
+    "end": true
   },
   {
     "id": 11606,
-    "text": "你既没考研也没出国，开始海投简历。",
+    "text": "你既没考研也没出国，在招聘网站上投了三百份简历。最后进了一家还算体面的公司，过上了朝九晚六的生活。留学？那是另一个平行宇宙的事了。",
     "noRandom": true,
-    "set": { "profession": "求职中" },
-    "happyDelta": -2
+    "set": { "profession": "上班族" },
+    "happyDelta": -2,
+    "end": true
   },
   {
     "id": 11610,
@@ -812,30 +816,34 @@
   },
   {
     "id": 11703,
-    "text": "海外硕士毕业，你回国了。「海归」头衔让简历好看了不少。",
+    "text": "海外硕士毕业，你回国了。「海归」头衔让简历好看了不少，你在国内找到了一份不错的工作。虽然没能留在海外，但这段经历已经改变了你。你的留学故事到此告一段落。",
     "noRandom": true,
     "happyDelta": 2,
-    "set": { "profession": "海归" }
+    "set": { "profession": "海归" },
+    "end": true
   },
   {
     "id": 11704,
-    "text": "国内研究生在读，导师让你发论文。你开始怀疑人生。",
+    "text": "国内研究生在读，导师让你发论文。你开始怀疑人生。三年后你毕业了，进了一家国企，有编制有食堂。你终于理解了什么叫「稳定」。留学的梦，就留在梦里吧。",
     "noRandom": true,
     "happyDelta": -1,
-    "set": { "profession": "研究生" }
+    "set": { "profession": "国企员工" },
+    "end": true
   },
   {
     "id": 11705,
-    "text": "家里安排你进了一家不错的单位。你觉得这就是命。",
+    "text": "家里安排你进了一家不错的单位，朝九晚五，旱涝保收。同事们都羡慕你有这份安稳。你觉得这就是命。留学什么的，想想就好了。",
     "noRandom": true,
     "happyDelta": 1,
-    "set": { "profession": "体制内" }
+    "set": { "profession": "体制内" },
+    "end": true
   },
   {
     "id": 11706,
-    "text": "毕业即失业。你在出租屋里投了三百份简历。",
+    "text": "毕业即失业。你在出租屋里投了三百份简历，面了无数次试。半年后你终于找到了一份勉强糊口的工作。关于出国的念头，早就被现实磨平了。",
     "noRandom": true,
     "happyDelta": -4,
-    "set": { "profession": "待业" }
+    "set": { "profession": "待业" },
+    "end": true
   }
 ]
