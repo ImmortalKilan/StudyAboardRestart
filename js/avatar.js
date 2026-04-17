@@ -43,7 +43,7 @@ function px(g, x, y, c) {
 
 function drawBody(g, state) {
   const isFemale = state.sex === 1;
-  const skin = state.HEA >= 7 ? PALETTE.skinFlush : (state.HEA <= 3 ? PALETTE.skinPale : PALETTE.skinTan);
+  const skin = state.HLT >= 7 ? PALETTE.skinFlush : (state.HLT <= 3 ? PALETTE.skinPale : PALETTE.skinTan);
 
   let shirt = PALETTE.shirtPlain;
   if (state.MNY >= 7) shirt = PALETTE.shirtRich;
@@ -107,7 +107,7 @@ function drawHair(g, state, m) {
     fillRect(g, m.headX + m.headW, m.headTop, 1, 2, hair);
   }
 
-  if (state.STR <= 3) {
+  if (state.PER <= 3) {
     px(g, m.headX + 2, m.headTop - 2, PALETTE.outline);
     px(g, m.headX + 5, m.headTop - 2, PALETTE.outline);
   }
@@ -125,7 +125,7 @@ function drawFace(g, state, m) {
     px(g, eyeRX + 1, eyeY, PALETTE.eyeNormal);
   }
 
-  if (state.IQ >= 6) {
+  if (state.INT >= 6) {
     fillRect(g, eyeLX - 1, eyeY - 1, 4, 3, null);
     px(g, eyeLX - 1, eyeY, PALETTE.glasses);
     px(g, eyeLX - 1, eyeY - 1, PALETTE.glasses);
@@ -174,7 +174,7 @@ function drawFace(g, state, m) {
     px(g, m.headX + 5, mouthY, PALETTE.outline);
   }
 
-  if (state.HEA >= 7) {
+  if (state.HLT >= 7) {
     px(g, m.headX + 1, m.headTop + 7, PALETTE.cheek);
     px(g, m.headX + 8, m.headTop + 7, PALETTE.cheek);
   }
@@ -200,7 +200,7 @@ function drawAccessories(g, state, m) {
     px(g, m.torsoX - 2, m.torsoY + m.torsoH - 6, PALETTE.outline);
   }
 
-  if (state.STR >= 7) {
+  if (state.PER >= 7) {
     fillRect(g, m.torsoX, m.torsoY + 4, m.torsoW, 1, '#000');
   }
 }

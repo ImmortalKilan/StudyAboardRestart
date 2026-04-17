@@ -1,10 +1,10 @@
-import { evalCondition, pickBranch } from './dsl.js';
+import { evalCondition, pickBranch, pickWeightedBranch } from './dsl.js';
 import { renderAvatar } from './avatar.js';
 
-const STAT_KEYS = ['SOC', 'IQ', 'MNY', 'STR', 'HEA', 'APP'];
+const STAT_KEYS = ['SOC', 'INT', 'MNY', 'PER', 'HLT', 'APP'];
 const STAT_LABELS = {
-  SOC: '社交', IQ: '智力', MNY: '家境',
-  HAP: '快乐', HEA: '健康', STR: '毅力', APP: '颜值'
+  SOC: '社交', INT: '智力', MNY: '家境',
+  HAP: '快乐', HLT: '健康', PER: '毅力', APP: '颜值'
 };
 const ALLOC_TOTAL = 20;
 const MAX_PER_STAT = 10;
@@ -17,32 +17,42 @@ const DEFAULT_PROF_BY_AGE = [
 
 const state = {
   phase: 'talent',
-  alloc: { SOC: 0, IQ: 0, MNY: 0, STR: 0, HEA: 0, APP: 0 },
+  alloc: { SOC: 0, INT: 0, MNY: 0, PER: 0, HLT: 0, APP: 0 },
   talentsPool: [],
   talentsPicked: [],
   eventsMap: new Map(),
   agesMap: {},
   firedEvents: new Set(),
+  randomEvents: [],
   yearlyPlan: new Map(),
   log: [],
+  logRenderedCount: 0,
   sex: 0,
   age: 15,
   monthOfYear: 1,
   monthTotal: 1,
   school: '无',
+  hsType: '',
   profession: '高中生',
-  SOC: 0, IQ: 0, MNY: 0, STR: 0, HEA: 0, APP: 0,
+  SOC: 0, INT: 0, MNY: 0, PER: 0, HLT: 0, APP: 0,
   HAP: 5
 };
 
+let autoTimer = null;
+let autoMode = 0;
+
 async function loadData() {
-  const [talents, events, ages] = await Promise.all([
+  const [talents, events, ages, randomEvents] = await Promise.all([
     fetch('data/talents.json').then(r => r.json()),
     fetch('data/events.json').then(r => r.json()),
-    fetch('data/ages.json').then(r => r.json())
+    fetch('data/ages.json').then(r => r.json()),
+    fetch('data/random_events.json').then(r => r.json())
   ]);
   state.eventsMap = new Map(events.map(e => [e.id, e]));
   state.agesMap = ages;
+  state.randomEvents = randomEvents;
+  // Also index random events into eventsMap for branch lookups
+  for (const re of randomEvents) state.eventsMap.set(re.id, re);
   return talents;
 }
 
@@ -83,8 +93,7 @@ function applyTalentEffects() {
 }
 
 function clampStats() {
-  for (const k of STAT_KEYS) state[k] = Math.max(0, Math.min(20, state[k]));
-  state.HAP = Math.max(0, Math.min(10, state.HAP));
+  state.HAP = Math.min(10, state.HAP);
 }
 
 function syncProfessionByAge() {
@@ -117,21 +126,22 @@ function planYear(age) {
 
 function applyEvent(ev) {
   state.firedEvents.add(ev.id);
-  pushLog(ev.text);
+  pushLog(ev.text || ev.event);
 
   if (ev.effect) for (const [k, v] of Object.entries(ev.effect)) {
     if (STAT_KEYS.includes(k)) state[k] += v;
   }
   if (typeof ev.happyDelta === 'number') state.HAP += ev.happyDelta;
   if (ev.set) {
-    if (ev.set.school) state.school = ev.set.school;
-    if (ev.set.profession) state.profession = ev.set.profession;
+    for (const [k, v] of Object.entries(ev.set)) state[k] = v;
   }
 
   clampStats();
 
   if (ev.branch) {
-    const nextId = pickBranch(state, ev.branch);
+    // Detect weighted branch format ("id:weight") vs conditional ("cond?id")
+    const isWeighted = ev.branch.some(b => /^\d+:\d+$/.test(b));
+    const nextId = isWeighted ? pickWeightedBranch(ev.branch) : pickBranch(state, ev.branch);
     if (nextId) {
       const next = state.eventsMap.get(nextId);
       if (next) applyEvent(next);
@@ -141,8 +151,27 @@ function applyEvent(ev) {
 
 function pushLog(text) {
   const tag = `${state.age}岁${state.monthOfYear}月`;
-  state.log.unshift({ tag, text });
-  if (state.log.length > 200) state.log.pop();
+  state.log.push({ tag, text });
+  if (state.log.length > 200) {
+    state.log.shift();
+    state.logRenderedCount = Math.max(0, state.logRenderedCount - 1);
+  }
+}
+
+function drawRandomEvent() {
+  const pool = state.randomEvents
+    .filter(ev => !state.firedEvents.has(ev.id))
+    .filter(ev => !ev.include || evalCondition(state, ev.include))
+    .filter(ev => !ev.exclude || !evalCondition(state, ev.exclude));
+  if (!pool.length) return null;
+  const weights = pool.map(ev => ev.weight ?? 1);
+  const total = weights.reduce((a, b) => a + b, 0);
+  let r = Math.random() * total;
+  for (let i = 0; i < pool.length; i++) {
+    r -= weights[i];
+    if (r <= 0) return pool[i];
+  }
+  return pool[pool.length - 1];
 }
 
 function advanceMonth() {
@@ -165,10 +194,12 @@ function advanceMonth() {
     if (ok) applyEvent(ev);
     else pushLog('……');
   } else {
-    pushLog(seasonalFlavor());
+    const re = Math.random() < 0.4 ? drawRandomEvent() : null;
+    if (re) applyEvent(re);
+    else pushLog(seasonalFlavor());
   }
 
-  if (state.HEA <= 0) {
+  if (state.HLT <= 0) {
     pushLog('你的身体垮了，休学回国。');
     state.phase = 'ended';
   }
@@ -181,13 +212,56 @@ function advanceMonth() {
 }
 
 function seasonalFlavor() {
+  const pick = a => a[Math.floor(Math.random() * a.length)];
   const m = state.monthOfYear;
-  if (m <= 2) return '冬日寒假，窝在家刷剧。';
-  if (m <= 4) return '春季学期照常推进。';
-  if (m <= 6) return '期末周逼近。';
-  if (m <= 8) return '暑假，一边实习一边焦虑。';
-  if (m <= 10) return '秋季学期，新的课表。';
-  return '年关将至，准备冲刺下学期。';
+  if (m <= 2) return pick([
+    '冬日寒假，窝在家刷剧。',
+    '放假第一天就开始熬夜，生物钟彻底崩了。',
+    '被亲戚问「成绩怎么样」，笑而不语。',
+    '寒假余额不足，作业还没动。',
+    '窝在被子里刷手机，假期真是太快乐了。',
+    '在家每天睡到中午，感觉自己在坐牢。',
+  ]);
+  if (m <= 4) return pick([
+    '春季学期照常推进。',
+    '樱花开了，朋友圈全是打卡照。',
+    '新学期选了一门传说中的「水课」。',
+    '图书馆占座战争又开始了。',
+    '春困袭来，上课频频走神。',
+    '开学综合征还没好，作业已经堆成山。',
+  ]);
+  if (m <= 6) return pick([
+    '期末周逼近，图书馆一座难求。',
+    'DDL战士上线，咖啡续命中。',
+    '通宵复习，眼前的字已经开始跳舞。',
+    '考完一门感觉血槽已空，然而还有三门。',
+    '互相传阅「往年真题」，玄学押题环节。',
+    '期末复习群里有人发了锦鲤，疯狂转发。',
+  ]);
+  if (m <= 8) return pick([
+    '暑假，一边实习一边焦虑。',
+    '暑假打工攒钱，累但充实。',
+    '夏天太热，只想待在空调房不出门。',
+    '暑假过半才想起还有暑期作业。',
+    '朋友都在旅行，而你在搬砖。',
+    '收到下学期的课表，沉默了。',
+  ]);
+  if (m <= 10) return pick([
+    '秋季学期，新的课表。',
+    '开学第一周就想退学（不是）。',
+    '秋风起，食堂上了新菜。',
+    '社团招新，传单塞了一书包。',
+    '换季降温，感冒了一整周。',
+    '国庆长假之后，上课如上坟。',
+  ]);
+  return pick([
+    '年关将至，准备冲刺下学期。',
+    '双十一的快递终于到齐了。',
+    '天冷了，早起变成一种酷刑。',
+    '期末将至，又到了「学一学期不如学一晚上」的季节。',
+    '下雪了，校园里多了很多雪人。',
+    '年底总结：今年又白过了。',
+  ]);
 }
 
 function $(id) { return document.getElementById(id); }
@@ -226,14 +300,15 @@ function render() {
 
     const statsEl = $('stats-panel');
     statsEl.innerHTML = '';
-    const shown = ['SOC', 'IQ', 'MNY', 'HAP', 'HEA', 'STR', 'APP'];
+    const shown = ['SOC', 'INT', 'MNY', 'HAP', 'HLT', 'PER', 'APP'];
+    const dynamicMax = Math.max(1, ...shown.filter(k => k !== 'HAP').map(k => state[k]));
     for (const k of shown) {
       const row = document.createElement('div');
       row.className = 'stat-row';
       const label = STAT_LABELS[k];
       const val = state[k];
-      const max = k === 'HAP' ? 10 : 20;
-      const pct = Math.max(0, Math.min(100, (val / max) * 100));
+      const base = k === 'HAP' ? 10 : dynamicMax;
+      const pct = Math.max(0, Math.min(100, (val / base) * 100));
       row.innerHTML = `
         <span class="stat-label">${label}</span>
         <span class="stat-bar"><span class="stat-fill" style="width:${pct}%"></span></span>
@@ -245,17 +320,67 @@ function render() {
     $('time-display').textContent = `${state.age}岁${state.monthOfYear}个月`;
 
     const logEl = $('event-log');
-    logEl.innerHTML = '';
-    for (const entry of state.log.slice(0, 60)) {
+    if (state.logRenderedCount > state.log.length) {
+      state.logRenderedCount = 0;
+      logEl.innerHTML = '';
+    }
+    for (let i = state.logRenderedCount; i < state.log.length; i++) {
+      const entry = state.log[i];
       const div = document.createElement('div');
       div.className = 'log-entry';
       div.innerHTML = `<span class="log-tag">${entry.tag}</span><span class="log-text">${entry.text}</span>`;
       logEl.appendChild(div);
     }
-
-    $('btn-next').disabled = state.phase === 'ended';
-    $('btn-next').textContent = state.phase === 'ended' ? '人生结束' : '下一月';
+    state.logRenderedCount = state.log.length;
+    while (logEl.children.length > 60) {
+      logEl.removeChild(logEl.firstElementChild);
+    }
+    logEl.scrollTop = logEl.scrollHeight;
   }
+
+  updateAutoButtons();
+}
+
+function updateAutoButtons() {
+  const b1 = $('btn-auto-1x');
+  const b2 = $('btn-auto-2x');
+  if (!b1 || !b2) return;
+
+  b1.classList.toggle('active', autoMode === 1);
+  b2.classList.toggle('active', autoMode === 2);
+
+  const ended = state.phase === 'ended';
+  b1.disabled = ended;
+  b2.disabled = ended;
+}
+
+function stopAuto() {
+  if (autoTimer) {
+    clearInterval(autoTimer);
+    autoTimer = null;
+  }
+  autoMode = 0;
+  updateAutoButtons();
+}
+
+function startAuto(mode) {
+  if (state.phase === 'ended') return;
+  if (autoMode === mode) {
+    stopAuto();
+    return;
+  }
+
+  stopAuto();
+  autoMode = mode;
+  const ms = mode === 2 ? 500 : 1000;
+  autoTimer = setInterval(() => {
+    if (state.phase === 'ended') {
+      stopAuto();
+      return;
+    }
+    advanceMonth();
+  }, ms);
+  updateAutoButtons();
 }
 
 function initGame() {
@@ -284,6 +409,8 @@ function initGame() {
 function showScreen(id) {
   for (const s of document.querySelectorAll('.screen')) s.classList.remove('active');
   $(id).classList.add('active');
+  document.body.classList.toggle('in-game', id === 'game-screen');
+  if (id !== 'game-screen') stopAuto();
 }
 
 async function main() {
@@ -312,8 +439,18 @@ async function main() {
 
   $('alloc-start').addEventListener('click', initGame);
 
-  $('btn-next').addEventListener('click', () => {
-    if (state.phase !== 'ended') advanceMonth();
+  $('btn-auto-1x').addEventListener('click', () => {
+    startAuto(1);
+  });
+
+  $('btn-auto-2x').addEventListener('click', () => {
+    startAuto(2);
+  });
+
+  document.querySelector('.right-panel').addEventListener('click', (e) => {
+    if (state.phase === 'ended') return;
+    if (e.target.closest('button')) return;
+    advanceMonth();
   });
 
   $('btn-restart').addEventListener('click', () => location.reload());

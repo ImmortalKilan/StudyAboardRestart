@@ -1,67 +1,64 @@
 [
   {
     "id": 10001,
-    "text": "你正在念高一。父母问你要不要走留学路线。",
+    "text": "你正在念高一。父母和你商量未来的路。",
     "include": "AGE=15",
-    "branch": ["MNY>=6?10002", "MNY<=2?10003", "?10004"]
+    "branch": ["MNY>=5?10002", "?10005"]
   },
   {
     "id": 10002,
-    "text": "家里说预算管够，让你选个心仪的国家。你心里默默有了方向。",
+    "text": "家里有条件，你转入了国际高中。全英文授课，新世界的大门打开了。",
     "noRandom": true,
-    "effect": { "MNY": 0 },
-    "happyDelta": 1
+    "set": { "hsType": "国际" },
+    "happyDelta": 1,
+    "effect": { "INT": 1 }
   },
   {
-    "id": 10003,
-    "text": "父母叹了口气：留学太贵了，要不还是高考吧。你点点头。",
+    "id": 10005,
+    "text": "家境一般，你继续在体制内高中奋斗。教室墙上写着「提高一分，干掉千人」。",
     "noRandom": true,
-    "happyDelta": -2
-  },
-  {
-    "id": 10004,
-    "text": "父母说先看看你的成绩再决定。压力悄悄落到肩上。",
-    "noRandom": true,
-    "happyDelta": -1
+    "set": { "hsType": "体制内" },
+    "happyDelta": -1,
+    "effect": { "PER": 1 }
   },
 
   {
     "id": 10010,
     "text": "学校举行留学说明会，你认真做了笔记。",
-    "include": "AGE=15&IQ>=4"
+    "include": "AGE=15&HS==国际&INT>=4"
   },
   {
     "id": 10011,
     "text": "你被拉去补习班，每天回到家已是深夜。",
-    "include": "AGE=15&MNY>=4",
+    "include": "AGE=15&HS==国际&MNY>=4",
     "happyDelta": -1,
-    "effect": { "IQ": 1 }
+    "effect": { "INT": 1 }
   },
   {
     "id": 10012,
     "text": "你迷上了一部美剧，开始尝试用英文跟读。",
-    "include": "AGE=15",
-    "effect": { "IQ": 1, "SOC": 1 }
+    "include": "AGE=15&HS==国际",
+    "effect": { "INT": 1, "SOC": 1 }
   },
   {
     "id": 10013,
     "text": "校运会上你因为体能拉胯被同学笑话。",
-    "include": "AGE=15&HEA<=3",
+    "include": "AGE=15&HS==国际&HLT<=3",
     "happyDelta": -2
   },
 
   {
     "id": 10101,
     "text": "高二开始，托福班开课。第一次模考你看着分数沉默了。",
-    "include": "AGE=16",
-    "branch": ["IQ>=6?10102", "IQ<=3?10103", "?10104"]
+    "include": "AGE=16&HS==国际",
+    "branch": ["INT>=6?10102", "INT<=3?10103", "?10104"]
   },
   {
     "id": 10102,
     "text": "你居然一次就上了100，老师在群里点名表扬你。",
     "noRandom": true,
     "happyDelta": 2,
-    "effect": { "IQ": 1 }
+    "effect": { "INT": 1 }
   },
   {
     "id": 10103,
@@ -79,47 +76,47 @@
   {
     "id": 10110,
     "text": "学校组织短期夏校交流，你报名了。",
-    "include": "AGE=16&MNY>=5",
-    "effect": { "SOC": 2, "IQ": 1 },
+    "include": "AGE=16&HS==国际&MNY>=5",
+    "effect": { "SOC": 2, "INT": 1 },
     "happyDelta": 2
   },
   {
     "id": 10111,
     "text": "中介推销规划方案，开口就是十几万。爸妈表情凝固。",
-    "include": "AGE=16&MNY<=4",
+    "include": "AGE=16&HS==国际&MNY<=4",
     "happyDelta": -1
   },
   {
     "id": 10112,
     "text": "你在社团里组织了一次英文辩论，大家都说你台风稳。",
-    "include": "AGE=16&SOC>=5",
+    "include": "AGE=16&HS==国际&SOC>=5",
     "effect": { "SOC": 1 },
     "happyDelta": 1
   },
   {
     "id": 10113,
     "text": "因为长期熬夜刷题，你大病一场住院一周。",
-    "include": "AGE=16&HEA<=3",
-    "effect": { "HEA": -1 },
+    "include": "AGE=16&HS==国际&HLT<=3",
+    "effect": { "HLT": -1 },
     "happyDelta": -2
   },
   {
     "id": 10114,
     "text": "你暗恋的那个人也在准备出国。你心里一动。",
-    "include": "AGE=16&APP>=5"
+    "include": "AGE=16&HS==国际&APP>=5"
   },
 
   {
     "id": 10201,
     "text": "高三。申请季正式开始。",
-    "include": "AGE=17",
-    "branch": ["IQ>=8&STR>=6?10202", "IQ<=4|STR<=2?10203", "?10204"]
+    "include": "AGE=17&HS==国际",
+    "branch": ["INT>=8&PER>=6?10202", "INT<=4|PER<=2?10203", "?10204"]
   },
   {
     "id": 10202,
     "text": "你瞄准了Top30，文书写到凌晨三点也不觉得累。",
     "noRandom": true,
-    "effect": { "STR": 1 }
+    "effect": { "PER": 1 }
   },
   {
     "id": 10203,
@@ -136,37 +133,37 @@
   {
     "id": 10210,
     "text": "你考出了理想的标化成绩，朋友圈一片点赞。",
-    "include": "AGE=17&IQ>=7",
+    "include": "AGE=17&HS==国际&INT>=7",
     "happyDelta": 3
   },
   {
     "id": 10211,
     "text": "推荐信老师拖了三个月才动笔，你急到失眠。",
-    "include": "AGE=17&SOC<=3",
+    "include": "AGE=17&HS==国际&SOC<=3",
     "happyDelta": -2
   },
   {
     "id": 10212,
     "text": "妈妈把首付钱拿出来给你交了申请费。你沉默了很久。",
-    "include": "AGE=17&MNY<=3",
+    "include": "AGE=17&HS==国际&MNY<=3",
     "happyDelta": -2,
-    "effect": { "STR": 1 }
+    "effect": { "PER": 1 }
   },
   {
     "id": 10213,
     "text": "你拿到了一封藤校面试邀请。",
-    "include": "AGE=17&IQ>=9&SOC>=6",
+    "include": "AGE=17&HS==国际&INT>=9&SOC>=6",
     "happyDelta": 4
   },
 
   {
     "id": 10301,
     "text": "录取季陆续放榜。",
-    "include": "AGE=18",
+    "include": "AGE=18&HS==国际",
     "branch": [
-      "IQ>=9&MNY>=5?10302",
-      "IQ>=7?10303",
-      "IQ>=4?10304",
+      "INT>=9&MNY>=5?10302",
+      "INT>=7?10303",
+      "INT>=4?10304",
       "?10305"
     ]
   },
@@ -208,7 +205,7 @@
   {
     "id": 10311,
     "text": "签证被check，等了两个月才拿到。",
-    "include": "AGE=18&school!=无&STR<=4",
+    "include": "AGE=18&school!=无&PER<=4",
     "happyDelta": -2
   },
   {
@@ -216,7 +213,7 @@
     "text": "送机那天妈妈在机场哭了。你头也不敢回。",
     "include": "AGE=18&school!=无",
     "happyDelta": -1,
-    "effect": { "STR": 1 }
+    "effect": { "PER": 1 }
   },
 
   {
@@ -249,20 +246,20 @@
   {
     "id": 10410,
     "text": "高数挂科警告，你第一次去office hour。",
-    "include": "AGE=19&school!=无&IQ<=5",
+    "include": "AGE=19&school!=无&INT<=5",
     "happyDelta": -2
   },
   {
     "id": 10411,
     "text": "你被教授在大课上点名表扬了答题思路。",
-    "include": "AGE=19&school!=无&IQ>=8",
+    "include": "AGE=19&school!=无&INT>=8",
     "happyDelta": 2
   },
   {
     "id": 10412,
     "text": "你想家想到失眠，连续一周靠泡面度日。",
-    "include": "AGE=19&school!=无&STR<=3",
-    "effect": { "HEA": -1 },
+    "include": "AGE=19&school!=无&PER<=3",
+    "effect": { "HLT": -1 },
     "happyDelta": -3
   },
   {
@@ -281,14 +278,14 @@
     "id": 10415,
     "text": "你打了份校内零工补贴生活费。",
     "include": "AGE=19&school!=无&MNY<=4",
-    "effect": { "MNY": 1, "STR": 1 }
+    "effect": { "MNY": 1, "PER": 1 }
   },
 
   {
     "id": 10501,
     "text": "大二，专业课开始变难，你需要选定专业方向。",
     "include": "AGE=20&school!=无",
-    "branch": ["IQ>=7?10502", "MNY>=7?10503", "?10504"]
+    "branch": ["INT>=7?10502", "MNY>=7?10503", "?10504"]
   },
   {
     "id": 10502,
@@ -313,7 +310,7 @@
     "id": 10510,
     "text": "你做了第一份本地实习，加薪不多但写进了简历。",
     "include": "AGE=20&school!=无&SOC>=5",
-    "effect": { "SOC": 1, "STR": 1 },
+    "effect": { "SOC": 1, "PER": 1 },
     "happyDelta": 2
   },
   {
@@ -321,7 +318,7 @@
     "text": "你陷入了一段感情，但因为文化差异分手了。",
     "include": "AGE=20&school!=无&APP>=5",
     "happyDelta": -2,
-    "effect": { "STR": 1 }
+    "effect": { "PER": 1 }
   },
   {
     "id": 10512,
@@ -333,16 +330,16 @@
   {
     "id": 10513,
     "text": "你被指控学术不端，差点被退学。",
-    "include": "AGE=20&school!=无&IQ<=4&STR<=3",
+    "include": "AGE=20&school!=无&INT<=4&PER<=3",
     "happyDelta": -5,
-    "effect": { "STR": -2 }
+    "effect": { "PER": -2 }
   },
 
   {
     "id": 10601,
     "text": "大三，开始考虑读研还是直接找工作。",
     "include": "AGE=21&school!=无",
-    "branch": ["IQ>=8?10602", "MNY<=3?10603", "?10604"]
+    "branch": ["INT>=8?10602", "MNY<=3?10603", "?10604"]
   },
   {
     "id": 10602,
@@ -365,7 +362,7 @@
   {
     "id": 10610,
     "text": "你拿到了大厂的暑期实习offer。",
-    "include": "AGE=21&school!=无&IQ>=7&SOC>=5",
+    "include": "AGE=21&school!=无&INT>=7&SOC>=5",
     "happyDelta": 4,
     "effect": { "MNY": 2 }
   },
@@ -373,7 +370,7 @@
     "id": 10611,
     "text": "你被诊断出抑郁，开始看校内心理咨询。",
     "include": "AGE=21&school!=无&HAP<=2",
-    "effect": { "HEA": -1 },
+    "effect": { "HLT": -1 },
     "happyDelta": 1
   },
   {
@@ -388,8 +385,8 @@
     "text": "毕业季到了。",
     "include": "AGE=22&school!=无",
     "branch": [
-      "IQ>=8&SOC>=6?10702",
-      "IQ>=6?10703",
+      "INT>=8&SOC>=6?10702",
+      "INT>=6?10703",
       "MNY>=6?10704",
       "?10705"
     ]
@@ -418,6 +415,425 @@
   {
     "id": 10705,
     "text": "你毕业即失业，回国后开始啃老。",
+    "noRandom": true,
+    "happyDelta": -4,
+    "set": { "profession": "待业" }
+  },
+
+
+  {
+    "id": 11010,
+    "text": "体制内高中生活开始了。班主任第一天就立规矩：手机上交，早自习6点半。",
+    "include": "AGE=15&HS==体制内"
+  },
+  {
+    "id": 11011,
+    "text": "月考排名贴在教室后面，你盯着自己的名字看了很久。",
+    "include": "AGE=15&HS==体制内",
+    "branch": ["INT>=6?11012", "INT<=3?11013", "?11014"]
+  },
+  {
+    "id": 11012,
+    "text": "年级前五十，老师在班会上表扬了你。",
+    "noRandom": true,
+    "happyDelta": 2,
+    "effect": { "INT": 1 }
+  },
+  {
+    "id": 11013,
+    "text": "排名倒数，班主任找你谈话，你低着头不说话。",
+    "noRandom": true,
+    "happyDelta": -2
+  },
+  {
+    "id": 11014,
+    "text": "排名中游，不上不下。你觉得自己像透明人。",
+    "noRandom": true,
+    "happyDelta": -1
+  },
+  {
+    "id": 11015,
+    "text": "你偷偷在课桌下看小说，被老师收了。",
+    "include": "AGE=15&HS==体制内&PER<=3",
+    "happyDelta": -1
+  },
+  {
+    "id": 11016,
+    "text": "体育课被临时取消改上数学，全班哀嚎。",
+    "include": "AGE=15&HS==体制内",
+    "happyDelta": -1,
+    "effect": { "INT": 1 }
+  },
+
+  {
+    "id": 11101,
+    "text": "高二了，文理分科（或选科）。",
+    "include": "AGE=16&HS==体制内",
+    "branch": ["INT>=6?11102", "SOC>=6?11103", "?11104"]
+  },
+  {
+    "id": 11102,
+    "text": "你选了理科/物化生，班主任说你是好苗子。",
+    "noRandom": true,
+    "effect": { "INT": 1 },
+    "happyDelta": 1
+  },
+  {
+    "id": 11103,
+    "text": "你选了文科/史政地，作文模版开始背了。",
+    "noRandom": true,
+    "effect": { "SOC": 1 }
+  },
+  {
+    "id": 11104,
+    "text": "随大流选了理科，虽然物理已经开始听不懂了。",
+    "noRandom": true,
+    "happyDelta": -1
+  },
+  {
+    "id": 11110,
+    "text": "模考成绩出来了，你和同桌互相对答案，越对越沉默。",
+    "include": "AGE=16&HS==体制内&INT<=5",
+    "happyDelta": -2
+  },
+  {
+    "id": 11111,
+    "text": "你报了一个数学竞赛辅导班，每周末都在刷题。",
+    "include": "AGE=16&HS==体制内&INT>=7",
+    "effect": { "INT": 1, "PER": 1 },
+    "happyDelta": -1
+  },
+  {
+    "id": 11112,
+    "text": "班上开始有人谈恋爱了。你忍住了（或者没忍住）。",
+    "include": "AGE=16&HS==体制内&APP>=5",
+    "happyDelta": 1
+  },
+  {
+    "id": 11113,
+    "text": "晚自习偷偷刷手机被抓，家长被叫到学校。",
+    "include": "AGE=16&HS==体制内&PER<=3",
+    "happyDelta": -2
+  },
+
+  {
+    "id": 11201,
+    "text": "高三了。高考倒计时牌挂在黑板上方，全班进入战时状态。",
+    "include": "AGE=17&HS==体制内",
+    "branch": ["INT>=8&PER>=6?11202", "INT<=3|PER<=2?11203", "?11204"]
+  },
+  {
+    "id": 11202,
+    "text": "你是年级尖子，老师说你冲985没问题。你每天刷题到凌晨一点。",
+    "noRandom": true,
+    "effect": { "PER": 1 },
+    "happyDelta": -1
+  },
+  {
+    "id": 11203,
+    "text": "你已经彻底摆烂了，上课睡觉下课打游戏。",
+    "noRandom": true,
+    "happyDelta": -1,
+    "effect": { "PER": -1 }
+  },
+  {
+    "id": 11204,
+    "text": "你是中等生，稳扎稳打一轮复习。目标一本线。",
+    "noRandom": true
+  },
+  {
+    "id": 11210,
+    "text": "百日誓师大会，全年级在操场上宣誓。你热血沸腾了三分钟。",
+    "include": "AGE=17&HS==体制内",
+    "happyDelta": 1,
+    "effect": { "PER": 1 }
+  },
+  {
+    "id": 11211,
+    "text": "你妈给你炖了一个月的鸡汤，体重涨了五斤。",
+    "include": "AGE=17&HS==体制内",
+    "effect": { "HLT": 1 },
+    "happyDelta": 1
+  },
+  {
+    "id": 11212,
+    "text": "考前最后一次模考，你超常发挥了。",
+    "include": "AGE=17&HS==体制内&INT>=6",
+    "happyDelta": 2
+  },
+
+  {
+    "id": 11301,
+    "text": "高考成绩出来了。",
+    "include": "AGE=18&HS==体制内",
+    "branch": [
+      "INT>=9&PER>=6?11302",
+      "INT>=7?11303",
+      "INT>=4?11304",
+      "?11305"
+    ]
+  },
+  {
+    "id": 11302,
+    "text": "你考进了985名校！全家放鞭炮庆祝。亲戚群里你成了「别人家的孩子」。",
+    "noRandom": true,
+    "happyDelta": 5,
+    "set": { "school": "985" },
+    "effect": { "SOC": 1 }
+  },
+  {
+    "id": 11303,
+    "text": "你被211大学录取，稳稳上岸。不是最好的，但也不差。",
+    "noRandom": true,
+    "happyDelta": 3,
+    "set": { "school": "211" }
+  },
+  {
+    "id": 11304,
+    "text": "你上了一所普通一本。录取通知书到的那天，你心情复杂。",
+    "noRandom": true,
+    "happyDelta": 1,
+    "set": { "school": "普本" }
+  },
+  {
+    "id": 11305,
+    "text": "分数线都没过。你决定复读，或者上个大专。",
+    "noRandom": true,
+    "happyDelta": -4,
+    "set": { "school": "大专" }
+  },
+  {
+    "id": 11310,
+    "text": "填志愿的时候你一口气填了十个城市，最后被调剂到了最远的那个。",
+    "include": "AGE=18&HS==体制内&school!=大专",
+    "happyDelta": -1
+  },
+  {
+    "id": 11311,
+    "text": "开学前你在网上认识了未来室友，聊得还挺投机。",
+    "include": "AGE=18&HS==体制内&school!=大专&SOC>=4",
+    "happyDelta": 1,
+    "effect": { "SOC": 1 }
+  },
+
+  {
+    "id": 11401,
+    "text": "大一。你在国内大学报到了。室友来自五湖四海。",
+    "include": "AGE=19&HS==体制内&school!=大专",
+    "set": { "profession": "本科生" },
+    "branch": ["SOC>=6?11402", "SOC<=3?11403", "?11404"]
+  },
+  {
+    "id": 11402,
+    "text": "你很快融入了宿舍和班级，成了社交达人。",
+    "noRandom": true,
+    "effect": { "SOC": 2 },
+    "happyDelta": 3
+  },
+  {
+    "id": 11403,
+    "text": "你在宿舍里当了一个学期的隐形人。",
+    "noRandom": true,
+    "happyDelta": -2
+  },
+  {
+    "id": 11404,
+    "text": "和室友磨合了一阵，关系还算融洽。",
+    "noRandom": true,
+    "happyDelta": 1
+  },
+  {
+    "id": 11410,
+    "text": "你开始关注出国留学。室友说你疯了，但你默默收藏了一堆帖子。",
+    "include": "AGE=19&HS==体制内&INT>=6",
+    "happyDelta": 1,
+    "effect": { "INT": 1 }
+  },
+  {
+    "id": 11411,
+    "text": "大学英语四级一次过了，你觉得自己行。",
+    "include": "AGE=19&HS==体制内&INT>=5",
+    "happyDelta": 1,
+    "effect": { "INT": 1 }
+  },
+  {
+    "id": 11412,
+    "text": "你开始自学雅思/托福，图书馆里每天泡到闭馆。",
+    "include": "AGE=19&HS==体制内&PER>=5&INT>=5",
+    "effect": { "INT": 1, "PER": 1 },
+    "happyDelta": -1
+  },
+  {
+    "id": 11413,
+    "text": "食堂饭菜太难吃了，你开始天天点外卖。体重飙升。",
+    "include": "AGE=19&HS==体制内",
+    "effect": { "HLT": -1 },
+    "happyDelta": -1
+  },
+
+  {
+    "id": 11501,
+    "text": "大二。你开始认真考虑未来：考研、出国、还是就业？",
+    "include": "AGE=20&HS==体制内&school!=大专",
+    "branch": ["INT>=7&MNY>=4?11502", "INT>=7?11503", "MNY>=6?11504", "?11505"]
+  },
+  {
+    "id": 11502,
+    "text": "你决定出国读研，开始准备GRE/托福。",
+    "noRandom": true,
+    "set": { "profession": "准留学生" },
+    "effect": { "INT": 1 },
+    "happyDelta": -1
+  },
+  {
+    "id": 11503,
+    "text": "你决定考研，目标是国内名校。",
+    "noRandom": true,
+    "set": { "profession": "考研党" },
+    "effect": { "PER": 1 },
+    "happyDelta": -1
+  },
+  {
+    "id": 11504,
+    "text": "家里有关系，你打算毕业后直接进家族企业。",
+    "noRandom": true,
+    "set": { "profession": "少爷/千金" },
+    "happyDelta": 2
+  },
+  {
+    "id": 11505,
+    "text": "你还是先混着吧，车到山前必有路。",
+    "noRandom": true,
+    "set": { "profession": "迷茫大学生" }
+  },
+  {
+    "id": 11510,
+    "text": "你报了留学中介，一套方案下来花了三万块。",
+    "include": "AGE=20&HS==体制内&profession==准留学生&MNY>=4",
+    "effect": { "MNY": -1 },
+    "happyDelta": -1
+  },
+  {
+    "id": 11511,
+    "text": "你的GPA排到了年级前10%，保研有望。",
+    "include": "AGE=20&HS==体制内&INT>=8&PER>=6",
+    "happyDelta": 3,
+    "effect": { "INT": 1 }
+  },
+  {
+    "id": 11512,
+    "text": "考研大纲改了，你之前背的全白费了。",
+    "include": "AGE=20&HS==体制内&profession==考研党",
+    "happyDelta": -3
+  },
+
+  {
+    "id": 11601,
+    "text": "大三，申请季/考研冲刺。",
+    "include": "AGE=21&HS==体制内&school!=大专",
+    "branch": [
+      "profession==准留学生&INT>=8?11602",
+      "profession==准留学生&INT>=5?11603",
+      "profession==考研党&INT>=7&PER>=6?11604",
+      "profession==考研党?11605",
+      "?11606"
+    ]
+  },
+  {
+    "id": 11602,
+    "text": "你拿到了海外名校的研究生offer！还附带奖学金。",
+    "noRandom": true,
+    "happyDelta": 5,
+    "set": { "school": "海外硕", "profession": "准研究生" },
+    "effect": { "MNY": 1 }
+  },
+  {
+    "id": 11603,
+    "text": "你被一所海外普通大学录取读研。学费不便宜，但好歹出去了。",
+    "noRandom": true,
+    "happyDelta": 2,
+    "set": { "school": "海外硕", "profession": "准研究生" },
+    "effect": { "MNY": -1 }
+  },
+  {
+    "id": 11604,
+    "text": "考研上岸！你被国内985研究生录取。",
+    "noRandom": true,
+    "happyDelta": 4,
+    "set": { "profession": "研究生" },
+    "effect": { "INT": 1 }
+  },
+  {
+    "id": 11605,
+    "text": "考研落榜。400万考生里，你是被刷下去的那一半。",
+    "noRandom": true,
+    "happyDelta": -4,
+    "set": { "profession": "待业" }
+  },
+  {
+    "id": 11606,
+    "text": "你既没考研也没出国，开始海投简历。",
+    "noRandom": true,
+    "set": { "profession": "求职中" },
+    "happyDelta": -2
+  },
+  {
+    "id": 11610,
+    "text": "签证顺利拿到，你订好了机票。妈妈开始天天叮嘱你注意安全。",
+    "include": "AGE=21&HS==体制内&school==海外硕",
+    "happyDelta": 1,
+    "effect": { "PER": 1 }
+  },
+  {
+    "id": 11611,
+    "text": "研究生导师开题，你的选题被打回来三次。",
+    "include": "AGE=21&HS==体制内&profession==研究生",
+    "happyDelta": -2
+  },
+
+  {
+    "id": 11701,
+    "text": "大四/研一，人生岔路口。",
+    "include": "AGE=22&HS==体制内",
+    "branch": [
+      "school==海外硕&INT>=7&SOC>=5?11702",
+      "school==海外硕?11703",
+      "profession==研究生?11704",
+      "MNY>=6?11705",
+      "?11706"
+    ]
+  },
+  {
+    "id": 11702,
+    "text": "你在海外读研期间拿到了实习，毕业后转正留下。",
+    "noRandom": true,
+    "happyDelta": 5,
+    "set": { "profession": "海外打工人" }
+  },
+  {
+    "id": 11703,
+    "text": "海外硕士毕业，你回国了。「海归」头衔让简历好看了不少。",
+    "noRandom": true,
+    "happyDelta": 2,
+    "set": { "profession": "海归" }
+  },
+  {
+    "id": 11704,
+    "text": "国内研究生在读，导师让你发论文。你开始怀疑人生。",
+    "noRandom": true,
+    "happyDelta": -1,
+    "set": { "profession": "研究生" }
+  },
+  {
+    "id": 11705,
+    "text": "家里安排你进了一家不错的单位。你觉得这就是命。",
+    "noRandom": true,
+    "happyDelta": 1,
+    "set": { "profession": "体制内" }
+  },
+  {
+    "id": 11706,
+    "text": "毕业即失业。你在出租屋里投了三百份简历。",
     "noRandom": true,
     "happyDelta": -4,
     "set": { "profession": "待业" }
