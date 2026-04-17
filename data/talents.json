@@ -1,0 +1,38 @@
+[
+  { "id": 1001, "grade": 0, "name": "学渣", "description": "智力 -2", "effect": { "IQ": -2 } },
+  { "id": 1002, "grade": 1, "name": "好学生", "description": "智力 +2", "effect": { "IQ": 2 } },
+  { "id": 1003, "grade": 2, "name": "天才", "description": "智力 +5", "effect": { "IQ": 5 } },
+  { "id": 1004, "grade": 3, "name": "学神", "description": "智力 +7，毅力 +2", "effect": { "IQ": 7, "STR": 2 } },
+
+  { "id": 1101, "grade": 0, "name": "丑小鸭", "description": "颜值 -2", "effect": { "APP": -2 } },
+  { "id": 1102, "grade": 1, "name": "清秀", "description": "颜值 +2", "effect": { "APP": 2 } },
+  { "id": 1103, "grade": 2, "name": "校草级", "description": "颜值 +5", "effect": { "APP": 5 } },
+
+  { "id": 1201, "grade": 0, "name": "穷人家的孩子", "description": "家境 -3", "effect": { "MNY": -3 } },
+  { "id": 1202, "grade": 1, "name": "中产之家", "description": "家境 +2", "effect": { "MNY": 2 } },
+  { "id": 1203, "grade": 2, "name": "富二代", "description": "家境 +5", "effect": { "MNY": 5 } },
+  { "id": 1204, "grade": 3, "name": "豪门继承人", "description": "家境 +8", "effect": { "MNY": 8 } },
+
+  { "id": 1301, "grade": 0, "name": "玻璃心", "description": "毅力 -2", "effect": { "STR": -2 } },
+  { "id": 1302, "grade": 1, "name": "韧性", "description": "毅力 +2", "effect": { "STR": 2 } },
+  { "id": 1303, "grade": 2, "name": "钢铁意志", "description": "毅力 +5", "effect": { "STR": 5 } },
+
+  { "id": 1401, "grade": 0, "name": "病秧子", "description": "健康 -2", "effect": { "HEA": -2 } },
+  { "id": 1402, "grade": 1, "name": "好底子", "description": "健康 +2", "effect": { "HEA": 2 } },
+  { "id": 1403, "grade": 2, "name": "运动健将", "description": "健康 +4", "effect": { "HEA": 4 } },
+
+  { "id": 1501, "grade": 0, "name": "社恐", "description": "社交 -2", "effect": { "SOC": -2 } },
+  { "id": 1502, "grade": 1, "name": "外向", "description": "社交 +2", "effect": { "SOC": 2 } },
+  { "id": 1503, "grade": 2, "name": "社交达人", "description": "社交 +4", "effect": { "SOC": 4 } },
+
+  { "id": 2001, "grade": 2, "name": "海归子女", "description": "智力 +1，社交 +1，家境 +2", "effect": { "IQ": 1, "SOC": 1, "MNY": 2 } },
+  { "id": 2002, "grade": 2, "name": "外语天赋", "description": "智力 +2，社交 +1", "effect": { "IQ": 2, "SOC": 1 } },
+  { "id": 2003, "grade": 1, "name": "拖延症", "description": "毅力 -1", "effect": { "STR": -1 } },
+  { "id": 2004, "grade": 2, "name": "竞赛获奖者", "description": "智力 +3，毅力 +1", "effect": { "IQ": 3, "STR": 1 } },
+  { "id": 2005, "grade": 1, "name": "鸡娃式教养", "description": "智力 +1，快乐 -2", "effect": { "IQ": 1 }, "happyDelta": -2 },
+  { "id": 2006, "grade": 3, "name": "全奖申请者", "description": "智力 +4，毅力 +3，家境 -1", "effect": { "IQ": 4, "STR": 3, "MNY": -1 } },
+  { "id": 2007, "grade": 2, "name": "时差适应力", "description": "健康 +2", "effect": { "HEA": 2 } },
+  { "id": 2008, "grade": 2, "name": "ABC背景", "description": "社交 +3，颜值 +1", "effect": { "SOC": 3, "APP": 1 } },
+  { "id": 2009, "grade": 1, "name": "易乡愁", "description": "毅力 -1", "effect": { "STR": -1 } },
+  { "id": 2010, "grade": 3, "name": "天选之子", "description": "全部属性 +2", "effect": { "IQ": 2, "STR": 2, "MNY": 2, "SOC": 2, "APP": 2, "HEA": 2 } }
+]

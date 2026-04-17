@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>留学重开模拟器</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app">
+
+    <section id="talent-screen" class="screen active">
+      <header class="screen-head">
+        <h1>留学重开</h1>
+        <p class="sub">你即将推翻现在的人生，重新从 15 岁开始。先决定你是谁。</p>
+      </header>
+
+      <div class="sex-row">
+        <button id="sex-male" class="chip active">男</button>
+        <button id="sex-female" class="chip">女</button>
+      </div>
+
+      <h2 class="section-title">抽取天赋 <span class="hint">选 3 个</span></h2>
+      <div id="talent-list" class="talent-grid"></div>
+
+      <div class="footer-actions">
+        <button id="talent-confirm" class="primary" disabled>确认天赋</button>
+      </div>
+    </section>
+
+    <section id="alloc-screen" class="screen">
+      <header class="screen-head">
+        <h1>分配属性</h1>
+        <p class="sub">总共 <strong>20</strong> 点，单项上限 10。快乐不参与分配，局内从 5 开始。</p>
+      </header>
+
+      <div class="alloc-banner">剩余点数 <span id="alloc-remaining">20</span></div>
+
+      <div class="alloc-list">
+        <div class="alloc-row"><span>社交</span><button class="step" id="minus-SOC">−</button><span class="alloc-val" id="alloc-SOC">0</span><button class="step" id="plus-SOC">＋</button></div>
+        <div class="alloc-row"><span>智力</span><button class="step" id="minus-IQ">−</button><span class="alloc-val" id="alloc-IQ">0</span><button class="step" id="plus-IQ">＋</button></div>
+        <div class="alloc-row"><span>家境</span><button class="step" id="minus-MNY">−</button><span class="alloc-val" id="alloc-MNY">0</span><button class="step" id="plus-MNY">＋</button></div>
+        <div class="alloc-row"><span>健康</span><button class="step" id="minus-HEA">−</button><span class="alloc-val" id="alloc-HEA">0</span><button class="step" id="plus-HEA">＋</button></div>
+        <div class="alloc-row"><span>毅力</span><button class="step" id="minus-STR">−</button><span class="alloc-val" id="alloc-STR">0</span><button class="step" id="plus-STR">＋</button></div>
+        <div class="alloc-row"><span>颜值</span><button class="step" id="minus-APP">−</button><span class="alloc-val" id="alloc-APP">0</span><button class="step" id="plus-APP">＋</button></div>
+      </div>
+
+      <div class="footer-actions">
+        <button id="alloc-start" class="primary" disabled>开始人生</button>
+      </div>
+    </section>
+
+    <section id="game-screen" class="screen">
+      <div class="game-layout">
+
+        <aside class="left-panel">
+          <div class="avatar-wrap">
+            <canvas id="avatar-canvas"></canvas>
+          </div>
+          <div class="time-box">
+            <span class="time-label">当前时间</span>
+            <span id="time-display" class="time-val">15岁1个月</span>
+          </div>
+          <div id="stats-panel" class="stats-panel"></div>
+        </aside>
+
+        <section class="right-panel">
+          <div class="right-head">
+            <h2>事件流</h2>
+            <div class="right-actions">
+              <button id="btn-next" class="primary">下一月</button>
+              <button id="btn-restart" class="ghost">重开</button>
+            </div>
+          </div>
+          <div id="event-log" class="event-log"></div>
+        </section>
+
+      </div>
+    </section>
+
+  </main>
+
+  <script type="module" src="js/game.js"></script>
+</body>
+</html>
