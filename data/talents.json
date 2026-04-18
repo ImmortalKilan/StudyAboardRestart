@@ -34,7 +34,7 @@
   { "id": 2007, "grade": 2, "name": "时差适应力", "description": "健康 +2", "effect": { "HLT": 2 } },
   { "id": 2008, "grade": 2, "name": "ABC背景", "description": "社交 +3，颜值 +1", "effect": { "SOC": 3, "APP": 1 } },
   { "id": 2009, "grade": 1, "name": "易乡愁", "description": "毅力 -1", "effect": { "PER": -1 } },
-  { "id": 2010, "grade": 3, "name": "天选之子", "description": "全部属性 +2", "effect": { "INT": 2, "PER": 2, "MNY": 2, "SOC": 2, "APP": 2, "HLT": 2 } },
+  { "id": 2010, "grade": 3, "name": "天选之子", "description": "全部属性 +4", "effect": { "INT": 4, "PER": 4, "MNY": 4, "SOC": 4, "APP": 4, "HLT": 4 } },
 
   { "id": 3001, "grade": 0, "name": "左撇子", "description": "据说更聪明，但用剪刀总是不太方便。智力 +1，颜值 -1", "effect": { "INT": 1, "APP": -1 } },
   { "id": 3002, "grade": 0, "name": "干饭人", "description": "胃口好，吃嘛嘛香。健康 +1，家境 -1", "effect": { "HLT": 1, "MNY": -1 } },

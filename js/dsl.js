@@ -113,6 +113,44 @@ function findClosingParen(expr, openIdx) {
 
 export function pickBranch(state, branches) {
   if (!branches || !branches.length) return null;
+  
+  const isWeighted = branches.some(b => b.includes(':'));
+  
+  if (isWeighted) {
+    const validItems = [];
+    for (const b of branches) {
+      let cond = '';
+      let idStr = b;
+      let wStr = '1';
+      
+      const qIdx = b.lastIndexOf('?');
+      if (qIdx >= 0) {
+        cond = b.slice(0, qIdx).trim();
+        idStr = b.slice(qIdx + 1).trim();
+      }
+      
+      const cIdx = idStr.indexOf(':');
+      if (cIdx >= 0) {
+        wStr = idStr.slice(cIdx + 1).trim();
+        idStr = idStr.slice(0, cIdx).trim();
+      }
+      
+      if (cond === '' || evalCondition(state, cond)) {
+        validItems.push({ id: Number(idStr), weight: Number(wStr) });
+      }
+    }
+    
+    if (validItems.length === 0) return null;
+    const totalW = validItems.reduce((s, it) => s + it.weight, 0);
+    let roll = Math.random() * totalW;
+    for (const it of validItems) {
+      roll -= it.weight;
+      if (roll <= 0) return it.id;
+    }
+    return validItems[validItems.length - 1].id;
+  }
+  
+  // Standard priority branch (cond?id)
   for (const b of branches) {
     const idx = b.lastIndexOf('?');
     if (idx < 0) continue;

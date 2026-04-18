@@ -4,8 +4,10 @@ import { renderAvatar } from './avatar.js';
 const STAT_KEYS = ['SOC', 'INT', 'MNY', 'PER', 'HLT', 'APP'];
 const STAT_LABELS = {
   SOC: '社交', INT: '智力', MNY: '家境',
-  HAP: '快乐', HLT: '健康', PER: '毅力', APP: '颜值'
+  HAP: '快乐', HLT: '健康', PER: '毅力', APP: '颜值',
+  POP: '人气', POK: '牌技'
 };
+const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK']);
 const ALLOC_TOTAL = 20;
 const MAX_PER_STAT = 10;
 
@@ -55,7 +57,18 @@ const STORYLINE_NAMES = {
   spy: '国际特工',
   abyss: '深渊科技',
   meta: '第四面墙',
+  idol: '偶像出道',
+  superstar: '超级巨星',
+  streamer: '网红主播',
+  poker: '地下牌局',
+  triton: '赌神之路',
+  local_shark: '地头蛇',
+  party: '派对狂魔',
+  ceo: '最强合伙人',
+  wasted: '南柯一梦',
 };
+const HIDDEN_STORYLINES = new Set(['spy', 'abyss', 'meta']);
+const SPECIAL_STORYLINES = new Set(['idol', 'superstar', 'streamer', 'poker', 'triton', 'local_shark', 'party', 'ceo', 'wasted']);
 const STUDENT_PHASES = new Set([
   '高中生', '本科生', '理工生', '商科生', '文科生',
   '准留学生', '考研党', '迷茫大学生', '准研究生', '研究生',
@@ -87,7 +100,8 @@ const state = {
   storylineStartMonth: 0,
   profession: '高中生',
   SOC: 0, INT: 0, MNY: 0, PER: 0, HLT: 0, APP: 0,
-  HAP: 5
+  HAP: 5,
+  POP: 0, POK: 0
 };
 
 let autoTimer = null;
@@ -126,9 +140,9 @@ function gachaDraw(talents, n) {
   // Rarity roll thresholds: grade 0 (white) 80%, 1 (blue) 15%, 2 (purple) 4%, 3 (orange) 1%
   function rollGrade() {
     const r = Math.random() * 100;
-    if (r < 1) return 3;   // orange
-    if (r < 5) return 2;   // purple
-    if (r < 20) return 1;  // blue
+    if (r < 5) return 3;   // orange
+    if (r < 10) return 2;   // purple
+    if (r < 30) return 1;  // blue
     return 0;               // white
   }
 
@@ -236,8 +250,7 @@ function applyEvent(ev) {
   if (msg) pushLog(msg);
 
   if (ev.effect) for (const [k, v] of Object.entries(ev.effect)) {
-    if (STAT_KEYS.includes(k)) state[k] += v;
-    else if (k === 'HAP') state.HAP += v;
+    if (EFFECT_KEYS.has(k)) state[k] = (state[k] || 0) + v;
   }
   if (typeof ev.happyDelta === 'number') state.HAP += ev.happyDelta;
   if (ev.set) {
@@ -255,9 +268,7 @@ function applyEvent(ev) {
   }
 
   if (ev.branch) {
-    // Detect weighted branch format ("id:weight") vs conditional ("cond?id")
-    const isWeighted = ev.branch.some(b => /^\d+:\d+$/.test(b));
-    const nextId = isWeighted ? pickWeightedBranch(ev.branch) : pickBranch(state, ev.branch);
+    const nextId = pickBranch(state, ev.branch);
     if (nextId) {
       const next = state.eventsMap.get(nextId);
       if (next) applyEvent(next);
@@ -625,6 +636,8 @@ function render() {
     const statsEl = $('stats-panel');
     statsEl.innerHTML = '';
     const shown = ['SOC', 'INT', 'MNY', 'HAP', 'HLT', 'PER', 'APP'];
+    if (state.showPOP) shown.push('POP');
+    if (state.showPOK) shown.push('POK');
     const dynamicMax = Math.max(1, ...shown.filter(k => k !== 'HAP').map(k => state[k]));
     for (const k of shown) {
       const row = document.createElement('div');
@@ -654,6 +667,8 @@ function render() {
     const slBox = $('storyline-box');
     if (state.storyline) {
       slBox.style.display = '';
+      const slLabel = HIDDEN_STORYLINES.has(state.storyline) ? '隐藏剧情' : '特殊剧情';
+      slBox.querySelector('.storyline-label').textContent = slLabel;
       $('storyline-display').textContent = STORYLINE_NAMES[state.storyline] || state.storyline;
     } else {
       slBox.style.display = 'none';
