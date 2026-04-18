@@ -6,7 +6,10 @@ const ALIASES = {
   HS: 'hsType', hsType: 'hsType',
   OVERSEAS: 'overseas', overseas: 'overseas',
   MAJOR: 'major', major: 'major',
-  STORYLINE: 'storyline', storyline: 'storyline'
+  STORYLINE: 'storyline', storyline: 'storyline',
+  MMR: 'MMR', POP: 'POP', POK: 'POK',
+  match_fixing: 'match_fixing',
+  relationship: 'relationship', REL: 'relationship'
 };
 
 function readVar(state, key) {

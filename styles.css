@@ -428,15 +428,35 @@ body.in-game .left-panel {
   justify-content: space-between;
   align-items: baseline;
 }
+.storyline-box.hidden-storyline {
+  background: linear-gradient(135deg, rgba(220,50,50,0.12) 0%, var(--card-2) 60%);
+  border-color: rgba(220,50,50,0.25);
+}
+.storyline-box.special-storyline {
+  background: linear-gradient(135deg, rgba(245,182,66,0.12) 0%, var(--card-2) 60%);
+  border-color: rgba(245,182,66,0.25);
+}
 .storyline-label {
   font-size: 12px;
   color: var(--grade-3);
+}
+.hidden-storyline .storyline-label,
+.hidden-storyline .storyline-val {
+  color: #e04040;
 }
 .storyline-val {
   font-family: var(--mono);
   font-size: 15px;
   font-weight: 600;
   color: var(--grade-3);
+}
+
+/* Storyline log entry colors */
+.log-entry.log-hidden .log-text {
+  color: #e04040 !important;
+}
+.log-entry.log-special .log-text {
+  color: #f5b642 !important;
 }
 
 .right-panel {

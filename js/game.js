@@ -5,9 +5,9 @@ const STAT_KEYS = ['SOC', 'INT', 'MNY', 'PER', 'HLT', 'APP'];
 const STAT_LABELS = {
   SOC: '社交', INT: '智力', MNY: '家境',
   HAP: '快乐', HLT: '健康', PER: '毅力', APP: '颜值',
-  POP: '人气', POK: '牌技'
+  POP: '人气', POK: '牌技', MMR: '天梯分'
 };
-const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK']);
+const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK', 'MMR']);
 const ALLOC_TOTAL = 20;
 const MAX_PER_STAT = 10;
 
@@ -51,6 +51,79 @@ const STORYLINE_CFG = {
     ],
     flavor: () => metaFlavor(),
   },
+  party: {
+    gracePeriod: 6,
+    eventRate: 0.3,
+    deathChecks: [
+      { cond: s => s.INT < 4, event: 82020 },
+      { cond: s => s.HLT <= 2, event: 82021 },
+    ],
+    progressChecks: [
+      { cond: s => s.age - s.storylineStart >= 3, event: 82040 },
+    ],
+  },
+  poker: {
+    gracePeriod: 6,
+    eventRate: 0.3,
+    deathChecks: [
+      { cond: s => s.MNY <= 0, event: 81091 },
+    ],
+    progressChecks: [
+      { cond: s => s.age - s.storylineStart >= 3, event: 81040 },
+    ],
+  },
+  triton: {
+    gracePeriod: 6,
+    eventRate: 0.3,
+    deathChecks: [
+      { cond: s => s.POK < 0 || s.MNY <= 0, event: 81091 },
+    ],
+    progressChecks: [
+      { cond: s => s.POK >= 50, event: 81090 },
+    ],
+  },
+  local_shark: {
+    gracePeriod: 12,
+    eventRate: 0.3,
+    deathChecks: [
+      { cond: s => s.MNY <= 0, event: 81091 },
+    ],
+    progressChecks: [
+      { cond: s => s.POK >= 20, event: 81092 },
+      { cond: s => s.age >= 25, event: 81093 },
+    ],
+  },
+  esports: {
+    gracePeriod: 6,
+    eventRate: 0.3,
+    deathChecks: [
+      { cond: s => s.HLT <= 2, event: 83091 },
+    ],
+    progressChecks: [
+      { cond: s => s.match_fixing, event: 83092 },
+      { cond: s => s.age - s.storylineStart >= 3, event: 83040 },
+    ],
+  },
+  worlds: {
+    gracePeriod: 6,
+    eventRate: 0.3,
+    deathChecks: [
+      { cond: s => s.HLT <= 3, event: 83091 },
+    ],
+    progressChecks: [
+      { cond: s => s.match_fixing, event: 83092 },
+      { cond: s => s.MMR >= 40 && s.PER >= 10 && !s.match_fixing, event: 83090 },
+      { cond: s => s.age - s.storylineStart >= 5, event: 83093 },
+    ],
+  },
+  minor_league: {
+    gracePeriod: 6,
+    eventRate: 0.3,
+    progressChecks: [
+      { cond: s => s.match_fixing, event: 83092 },
+      { cond: s => s.age - s.storylineStart >= 4, event: 83094 },
+    ],
+  },
 };
 
 const STORYLINE_NAMES = {
@@ -66,9 +139,12 @@ const STORYLINE_NAMES = {
   party: '派对狂魔',
   ceo: '最强合伙人',
   wasted: '南柯一梦',
+  esports: '职业电竞',
+  worlds: '世界赛之路',
+  minor_league: '次级联赛',
 };
 const HIDDEN_STORYLINES = new Set(['spy', 'abyss', 'meta']);
-const SPECIAL_STORYLINES = new Set(['idol', 'superstar', 'streamer', 'poker', 'triton', 'local_shark', 'party', 'ceo', 'wasted']);
+const SPECIAL_STORYLINES = new Set(['idol', 'superstar', 'streamer', 'poker', 'triton', 'local_shark', 'party', 'ceo', 'wasted', 'esports', 'worlds', 'minor_league']);
 const STUDENT_PHASES = new Set([
   '高中生', '本科生', '理工生', '商科生', '文科生',
   '准留学生', '考研党', '迷茫大学生', '准研究生', '研究生',
@@ -95,6 +171,7 @@ const state = {
   hsType: '',
   overseas: 0,
   major: '',
+  relationship: '单身',
   storyline: '',
   storylineStart: 0,
   storylineStartMonth: 0,
@@ -102,7 +179,7 @@ const state = {
   pendingEvent: null,
   SOC: 0, INT: 0, MNY: 0, PER: 0, HLT: 0, APP: 0,
   HAP: 5,
-  POP: 0, POK: 0
+  POP: 0, POK: 0, MMR: 0
 };
 
 let autoTimer = null;
@@ -279,7 +356,11 @@ function applyEvent(ev) {
 
 function pushLog(text) {
   const tag = `${state.age}岁${state.monthOfYear}月`;
-  state.log.push({ tag, text });
+  let logType = '';
+  if (state.storyline) {
+    logType = HIDDEN_STORYLINES.has(state.storyline) ? 'hidden' : 'special';
+  }
+  state.log.push({ tag, text, logType });
   if (state.log.length > 200) {
     state.log.shift();
     state.logRenderedCount = Math.max(0, state.logRenderedCount - 1);
@@ -342,6 +423,14 @@ function advanceMonth() {
         const ev = state.eventsMap.get(cfg.successEvent);
         if (ev && !state.firedEvents.has(cfg.successEvent)) applyEvent(ev);
       }
+      // Check progress triggers (e.g., age-gated storyline transitions)
+      else if (cfg.progressChecks && cfg.progressChecks.some(pc => {
+        if (pc.cond(state)) {
+          const ev = state.eventsMap.get(pc.event);
+          if (ev && !state.firedEvents.has(pc.event)) { applyEvent(ev); return true; }
+        }
+        return false;
+      })) { /* handled */ }
       // Check death/fail conditions (skip during grace period)
       else if (cfg.deathChecks && state.monthTotal - (state.storylineStartMonth || 0) > (cfg.gracePeriod || 0) && cfg.deathChecks.some(dc => {
         if (dc.cond(state)) {
@@ -357,7 +446,7 @@ function advanceMonth() {
       }
     } else {
       // Generic storyline without config — just draw storyline events
-      const re = Math.random() < 0.8 ? drawRandomEvent() : null;
+      const re = Math.random() < 0.3 ? drawRandomEvent() : null;
       if (re) applyEvent(re);
       else pushLog(storylineFlavor());
     }
@@ -771,6 +860,9 @@ function storylineFlavor() {
     party:      ['你在组织下一场派对的细节。', '手机响个不停，全是派对邀请。', '你和朋友们在策划一个大活动。'],
     ceo:        ['你在咖啡厅里和合伙人讨论商业计划。', '投资人的电话一个接一个。', '你在白板上画着公司的未来蓝图。'],
     wasted:     ['你宿醉未醒，盯着天花板发呆。', '昨晚的记忆一片模糊。', '你翻了翻空空如也的钱包。'],
+    esports:    ['你坐在电竞椅上看着回放录像。', '训练赛打到凌晨三点，眼睛干涩发酸。', '你在练习瞄准，一遍又一遍。'],
+    worlds:     ['全世界的目光都聚焦在这里。', '你在后台调整着鼠标DPI。', '赛前的紧张感让你手心冒汗。'],
+    minor_league:['又是一场没人看的比赛。', '网吧的空调坏了，热得你心烦意乱。', '你刷着手机看顶级联赛的集锦，心里五味杂陈。'],
   };
   const pool = flavors[sl];
   if (pool) return pool[Math.floor(Math.random() * pool.length)];
@@ -816,6 +908,7 @@ function render() {
     const shown = ['SOC', 'INT', 'MNY', 'HAP', 'HLT', 'PER', 'APP'];
     if (state.showPOP) shown.push('POP');
     if (state.showPOK) shown.push('POK');
+    if (state.showMMR) shown.push('MMR');
     const dynamicMax = Math.max(1, ...shown.filter(k => k !== 'HAP').map(k => state[k]));
     for (const k of shown) {
       const row = document.createElement('div');
@@ -833,6 +926,7 @@ function render() {
     }
 
     $('major-display').textContent = state.major || '未定';
+    $('relationship-display').textContent = state.relationship || '单身';
 
     const profBox = $('profession-box');
     if (state.profession && !STUDENT_PHASES.has(state.profession)) {
@@ -845,8 +939,10 @@ function render() {
     const slBox = $('storyline-box');
     if (state.storyline) {
       slBox.style.display = '';
-      const slLabel = HIDDEN_STORYLINES.has(state.storyline) ? '隐藏剧情' : '特殊剧情';
-      slBox.querySelector('.storyline-label').textContent = slLabel;
+      const isHidden = HIDDEN_STORYLINES.has(state.storyline);
+      slBox.classList.toggle('hidden-storyline', isHidden);
+      slBox.classList.toggle('special-storyline', !isHidden);
+      slBox.querySelector('.storyline-label').textContent = isHidden ? '隐藏剧情' : '特殊剧情';
       $('storyline-display').textContent = STORYLINE_NAMES[state.storyline] || state.storyline;
     } else {
       slBox.style.display = 'none';
@@ -862,7 +958,7 @@ function render() {
     for (let i = state.logRenderedCount; i < state.log.length; i++) {
       const entry = state.log[i];
       const div = document.createElement('div');
-      div.className = 'log-entry';
+      div.className = 'log-entry' + (entry.logType === 'hidden' ? ' log-hidden' : entry.logType === 'special' ? ' log-special' : '');
       div.innerHTML = `<span class="log-tag">${entry.tag}</span><span class="log-text">${entry.text}</span>`;
       logEl.appendChild(div);
     }
