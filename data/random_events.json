@@ -532,9 +532,9 @@
       "HAP": 3,
       "INT": 2
     },
-    "include": "(AGE>=16)&(AGE<=18)&(INT>7)&(PER>6)",
+    "include": "(AGE>=16)&(AGE<=18)&(INT>7)&(PER>6)&(HS==国际)",
     "exclude": "EVT?[17004]",
-    "weight": 2
+    "weight": 4
   },
   {
     "id": 17005,
@@ -543,7 +543,7 @@
       "HAP": -3,
       "PER": -1
     },
-    "include": "(AGE>=16)&(AGE<=18)&(INT<5)",
+    "include": "(AGE>=16)&(AGE<=18)&(INT<5)&(HS==国际)",
     "exclude": "EVT?[17005]",
     "weight": 3,
     "branch": [
@@ -575,7 +575,7 @@
       "HAP": -1
     },
     "include": "(AGE<18)&(HLT<4)",
-    "weight": 4
+    "weight": 2
   },
   {
     "id": 17007,
@@ -585,7 +585,7 @@
       "HAP": 1
     },
     "include": "(AGE<18)&(SOC>3)",
-    "weight": 4
+    "weight": 2
   },
   {
     "id": 17008,
@@ -595,7 +595,7 @@
       "SOC": -1
     },
     "include": "(AGE<18)&(SOC<3)",
-    "weight": 4
+    "weight": 2
   },
   {
     "id": 17009,
@@ -604,9 +604,9 @@
       "PER": 1,
       "MNY": -1
     },
-    "include": "(AGE>=16)&(AGE<=18)&(MNY>3)",
+    "include": "(AGE>=16)&(AGE<=18)&(MNY>3)&(HS==国际)",
     "exclude": "EVT?[17009]",
-    "weight": 3
+    "weight": 4
   },
   {
     "id": 17010,
@@ -615,7 +615,7 @@
       "HAP": -3,
       "PER": 1
     },
-    "include": "(AGE>=16)&(AGE<=18)&(MNY<4)",
+    "include": "(AGE>=16)&(AGE<=18)&(MNY<4)&(HS==国际)",
     "weight": 3,
     "branch": [
       "17023:5",
@@ -646,7 +646,7 @@
       "INT": 2,
       "PER": 1
     },
-    "include": "(AGE<=16)&(PER>5)",
+    "include": "(AGE<=16)&(PER>5)&(HS==国际)",
     "weight": 4
   },
   {
@@ -666,7 +666,7 @@
       "INT": 1,
       "HAP": -1
     },
-    "include": "(AGE<=16)&(MNY>3)",
+    "include": "(AGE<=16)&(MNY>3)&(HS==国际)",
     "weight": 5
   },
   {
@@ -687,7 +687,7 @@
       "HLT": -1,
       "PER": 1
     },
-    "include": "(AGE>=16)&(AGE<18)&(PER>4)",
+    "include": "(AGE>=16)&(AGE<18)&(PER>4)&(HS==国际)",
     "weight": 4
   },
   {
@@ -710,7 +710,7 @@
       "PER": -1
     },
     "include": "(AGE<17)&(PER<4)",
-    "weight": 4
+    "weight": 2
   },
   {
     "id": 17018,
@@ -721,6 +721,179 @@
     },
     "include": "(AGE<=16)&(INT>6)",
     "weight": 3
+  },
+  {
+    "id": 17025,
+    "event": "你在学长学姐的留学分享会上第一次听说了你的梦校。回家后你把它的校徽设成了手机壁纸，暗暗发誓一定要去。",
+    "effect": {
+      "HAP": 2,
+      "PER": 1
+    },
+    "include": "(AGE>=15)&(AGE<=16)&(HS==国际)",
+    "exclude": "EVT?[17025]",
+    "weight": 5
+  },
+  {
+    "id": 17026,
+    "event": "刷到一个留学论坛帖子：「普高逆袭藤校」。你翻来覆去看了五遍，觉得自己也行。",
+    "effect": {
+      "HAP": 1,
+      "PER": 1
+    },
+    "include": "(AGE>=15)&(AGE<=16)&(INT>4)&(HS==国际)",
+    "weight": 4
+  },
+  {
+    "id": 17027,
+    "event": "你开始研究各种大学排名：QS、US News、THE……每个排名结果都不一样，你越看越迷茫。",
+    "effect": {
+      "HAP": -1
+    },
+    "include": "(AGE>=16)&(AGE<=17)&(HS==国际)",
+    "weight": 4
+  },
+  {
+    "id": 17028,
+    "event": "你咬牙选了三门AP课程，每天课后自学到深夜。同学说你疯了，但你知道这是简历上的硬通货。",
+    "effect": {
+      "INT": 2,
+      "HLT": -1,
+      "PER": 1
+    },
+    "include": "(AGE>=16)&(AGE<=17)&(INT>5)&(PER>4)&(HS==国际)",
+    "exclude": "EVT?[17028]",
+    "weight": 4
+  },
+  {
+    "id": 17029,
+    "event": "为了丰富课外活动列表，你同时参加了模联、辩论队和志愿者项目，忙到脚不沾地。",
+    "effect": {
+      "SOC": 2,
+      "HLT": -1,
+      "PER": 1
+    },
+    "include": "(AGE>=16)&(AGE<=17)&(SOC>4)&(HS==国际)",
+    "exclude": "EVT?[17029]",
+    "weight": 4
+  },
+  {
+    "id": 17030,
+    "event": "凌晨两点，你对着Common App的文书题目发呆——「描述一个塑造了你的经历」。你打了三百字又全删了。",
+    "effect": {
+      "HAP": -2,
+      "PER": 1
+    },
+    "include": "(AGE>=17)&(AGE<18)&(PER>3)&(HS==国际)",
+    "exclude": "EVT?[17030]",
+    "weight": 5
+  },
+  {
+    "id": 17031,
+    "event": "文书改到第七稿，你终于觉得满意了。中介老师说：「这版有灵魂了。」",
+    "effect": {
+      "HAP": 2,
+      "INT": 1
+    },
+    "include": "(AGE>=17)&(AGE<18)&(EVT?[17030])&(HS==国际)",
+    "exclude": "EVT?[17031]",
+    "weight": 5,
+    "noRandom": false
+  },
+  {
+    "id": 17032,
+    "event": "雅思口语考场上，考官突然问了一个完全没准备的话题。你大脑一片空白，硬着头皮编了两分钟。",
+    "effect": {
+      "HAP": -2
+    },
+    "include": "(AGE>=16)&(AGE<=17)&(INT<=6)&(HS==国际)",
+    "exclude": "EVT?[17032]",
+    "weight": 4
+  },
+  {
+    "id": 17033,
+    "event": "你和几个同学组了个背单词互助群，每天打卡。坚持了三个月，托福阅读从 18 涨到了 27。",
+    "effect": {
+      "INT": 2,
+      "SOC": 1,
+      "PER": 1
+    },
+    "include": "(AGE>=15)&(AGE<=17)&(SOC>3)&(PER>4)&(HS==国际)",
+    "exclude": "EVT?[17033]",
+    "weight": 4
+  },
+  {
+    "id": 17034,
+    "event": "距离申请截止还有两周。你列了一张选校清单：冲刺3所、匹配4所、保底2所，开始疯狂赶材料。",
+    "effect": {
+      "PER": 2,
+      "HAP": -1
+    },
+    "include": "(AGE>=17)&(AGE<18)&(HS==国际)",
+    "exclude": "EVT?[17034]",
+    "weight": 5
+  },
+  {
+    "id": 17035,
+    "event": "朋友圈刷到同学晒出的早申offer，你嘴上说恭喜，心里酸得不行。",
+    "effect": {
+      "HAP": -2,
+      "PER": 1
+    },
+    "include": "(AGE>=17)&(AGE<18)&(SOC>3)&(HS==国际)",
+    "weight": 4
+  },
+  {
+    "id": 17036,
+    "event": "学校请了一位在美国读研的学姐回来做分享。她说：「出国不是逃避，是选择一种更难的路。」你记了很久。",
+    "effect": {
+      "PER": 1,
+      "HAP": 1
+    },
+    "include": "(AGE>=15)&(AGE<=16)&(HS==国际)",
+    "weight": 4
+  },
+  {
+    "id": 17037,
+    "event": "爸妈带你去参加了一场国际教育展，你搜集了一书包的大学宣传册，回家研究到半夜。",
+    "effect": {
+      "HAP": 1,
+      "INT": 1
+    },
+    "include": "(AGE>=15)&(AGE<=16)&(MNY>3)&(HS==国际)",
+    "exclude": "EVT?[17037]",
+    "weight": 4
+  },
+  {
+    "id": 17038,
+    "event": "你收到了梦校的面试邀请邮件！手抖着点开，熬了一整晚准备面试稿。",
+    "effect": {
+      "HAP": 2,
+      "PER": 1
+    },
+    "include": "(AGE>=17)&(AGE<18)&(INT>6)&(PER>5)&(HS==国际)",
+    "exclude": "EVT?[17038]",
+    "weight": 3,
+    "branch": [
+      "17039:5",
+      "17040:5"
+    ]
+  },
+  {
+    "id": 17039,
+    "event": "面试那天你超常发挥，面试官最后笑着说了一句「Hope to see you on campus」。你挂掉视频后差点哭出来。",
+    "effect": {
+      "HAP": 3,
+      "SOC": 1
+    },
+    "noRandom": true
+  },
+  {
+    "id": 17040,
+    "event": "面试翻车了。面试官问的问题你一个都没准备过，结束后你把自己关在房间里沉默了一下午。",
+    "effect": {
+      "HAP": -3
+    },
+    "noRandom": true
   },
   {
     "id": 18001,
