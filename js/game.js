@@ -56,6 +56,10 @@ const STORYLINE_NAMES = {
   abyss: '深渊科技',
   meta: '第四面墙',
 };
+const STUDENT_PHASES = new Set([
+  '高中生', '本科生', '理工生', '商科生', '文科生',
+  '准留学生', '考研党', '迷茫大学生', '准研究生', '研究生',
+]);
 
 const state = {
   phase: 'talent',
@@ -186,6 +190,28 @@ function syncProfessionByAge() {
   }
 }
 
+function assignFallbackMajor() {
+  if (state.major) return;
+  const options = state.hsType === '体制内'
+    ? [['理科', 55], ['文科', 45]]
+    : [['CS', 40], ['商科', 35], ['文艺', 25]];
+  for (const opt of options) {
+    if (opt[0] === 'CS' && state.INT >= 6) opt[1] += 20;
+    if (opt[0] === '商科' && state.MNY >= 6) opt[1] += 20;
+    if (opt[0] === '文艺' && (state.APP >= 5 || state.SOC >= 6)) opt[1] += 15;
+    if (opt[0] === '理科' && state.INT >= 6) opt[1] += 20;
+    if (opt[0] === '文科' && state.SOC >= 6) opt[1] += 15;
+  }
+  const total = options.reduce((s, o) => s + o[1], 0);
+  let r = Math.random() * total;
+  for (const [name, w] of options) {
+    r -= w;
+    if (r <= 0) { state.major = name; break; }
+  }
+  if (!state.major) state.major = options[options.length - 1][0];
+  pushLog(`你最终确定了自己的专业方向：${state.major}。`);
+}
+
 function planYear(age) {
   const pool = (state.agesMap[age]?.event ?? [])
     .map(id => state.eventsMap.get(id))
@@ -261,7 +287,12 @@ function drawRandomEvent() {
     pool = pool.filter(ev => !ev.storyline);
   }
   if (!pool.length) return null;
-  const weights = pool.map(ev => ev.weight ?? 1);
+  const majorKey = state.major ? 'MAJOR==' + state.major : null;
+  const weights = pool.map(ev => {
+    let w = ev.weight ?? 1;
+    if (majorKey && ev.include && ev.include.includes(majorKey)) w *= 2;
+    return w;
+  });
   const total = weights.reduce((a, b) => a + b, 0);
   let r = Math.random() * total;
   for (let i = 0; i < pool.length; i++) {
@@ -278,6 +309,7 @@ function advanceMonth() {
     state.monthOfYear = 1;
     state.age += 1;
     syncProfessionByAge();
+    if (state.age >= 21 && !state.major) assignFallbackMajor();
   }
 
   if (state.storyline && state.phase !== 'ended') {
@@ -610,6 +642,14 @@ function render() {
     }
 
     $('major-display').textContent = state.major || '未定';
+
+    const profBox = $('profession-box');
+    if (state.profession && !STUDENT_PHASES.has(state.profession)) {
+      profBox.style.display = '';
+      $('profession-display').textContent = state.profession;
+    } else {
+      profBox.style.display = 'none';
+    }
 
     const slBox = $('storyline-box');
     if (state.storyline) {

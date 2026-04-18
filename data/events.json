@@ -838,57 +838,5 @@
     "text": "研究生导师开题，你的选题被打回来三次。",
     "include": "AGE=21&HS==体制内&profession==研究生",
     "happyDelta": -2
-  },
-
-  {
-    "id": 11701,
-    "text": "大四/研一，人生岔路口。",
-    "include": "AGE=22&HS==体制内",
-    "branch": [
-      "school==海外硕&INT>=7&SOC>=5?11702",
-      "school==海外硕?11703",
-      "profession==研究生?11704",
-      "MNY>=6?11705",
-      "?11706"
-    ]
-  },
-  {
-    "id": 11702,
-    "text": "你在海外读研期间拿到了实习，毕业后转正留下。",
-    "noRandom": true,
-    "happyDelta": 5,
-    "set": { "profession": "海外打工人" }
-  },
-  {
-    "id": 11703,
-    "text": "海外硕士毕业，你回国了。「海归」头衔让简历好看了不少，你在国内找到了一份不错的工作。虽然没能留在海外，但这段经历已经改变了你。你的留学故事到此告一段落。",
-    "noRandom": true,
-    "happyDelta": 2,
-    "set": { "profession": "海归" },
-    "end": true
-  },
-  {
-    "id": 11704,
-    "text": "国内研究生在读，导师让你发论文。你开始怀疑人生。三年后你毕业了，进了一家国企，有编制有食堂。你终于理解了什么叫「稳定」。留学的梦，就留在梦里吧。",
-    "noRandom": true,
-    "happyDelta": -1,
-    "set": { "profession": "国企员工" },
-    "end": true
-  },
-  {
-    "id": 11705,
-    "text": "家里安排你进了一家不错的单位，朝九晚五，旱涝保收。同事们都羡慕你有这份安稳。你觉得这就是命。留学什么的，想想就好了。",
-    "noRandom": true,
-    "happyDelta": 1,
-    "set": { "profession": "体制内" },
-    "end": true
-  },
-  {
-    "id": 11706,
-    "text": "毕业即失业。你在出租屋里投了三百份简历，面了无数次试。半年后你终于找到了一份勉强糊口的工作。关于出国的念头，早就被现实磨平了。",
-    "noRandom": true,
-    "happyDelta": -4,
-    "set": { "profession": "待业" },
-    "end": true
   }
 ]
