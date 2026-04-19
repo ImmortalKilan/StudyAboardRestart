@@ -7983,7 +7983,7 @@
     "id": 17404,
     "event": "「逆袭上位」你不甘心只做玩物。你利用TA的人脉和资源拼命提升自己。在TA打算甩掉你的时候，你反而先一步把TA给踹了！",
     "include": "(relationship==傍大款)&(INT>=10)&(PER>=8)",
-    "weight": 30,
+    "weight": 25,
     "set": {
       "relationship": "单身"
     },
