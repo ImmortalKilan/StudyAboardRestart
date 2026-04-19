@@ -23,70 +23,70 @@ const DEFAULT_PROF_BY_AGE = [
 // Storyline configurations: death checks, completion, event rate, flavor
 const STORYLINE_CFG = {
   spy: {
-    duration: 2,
-    gracePeriod: 6,
+    duration: 4,
+    gracePeriod: 12,
     successEvent: 50099,
     eventRate: 0.8,
     deathChecks: [
-      { cond: s => s.HLT <= -3, event: 50060 },
-      { cond: s => s.PER <= -1, event: 50061 },
-      { cond: s => s.SOC <= -2 && s.HAP <= 0, event: 50064 },
+      { cond: s => s.HLT <= -2, event: 50060 },
+      { cond: s => s.PER <= -2, event: 50061 },
+      { cond: s => s.SOC <= -2 && s.HAP <= -2, event: 50064 },
     ],
     flavor: () => spyFlavor(),
   },
   abyss: {
-    gracePeriod: 6,
+    gracePeriod: 12,
     eventRate: 0.8,
     deathChecks: [
-      { cond: s => s.HLT <= -3, event: 60091 },
-      { cond: s => s.HAP <= -8 && s.INT <= 0, event: 60091 },
+      { cond: s => s.HLT <= -7, event: 60091 },
+      { cond: s => s.HAP <= -12 && s.INT <= -4, event: 60091 },
     ],
     flavor: () => abyssFlavor(),
   },
   meta: {
-    gracePeriod: 6,
+    gracePeriod: 12,
     eventRate: 0.75,
     deathChecks: [
-      { cond: s => s.HAP <= -8, event: 70094 },
+      { cond: s => s.HAP <= -12, event: 70094 },
     ],
     flavor: () => metaFlavor(),
   },
   party: {
-    gracePeriod: 6,
-    eventRate: 0.3,
+    gracePeriod: 12,
+    eventRate: 0.7,
     deathChecks: [
-      { cond: s => s.INT < 4, event: 82020 },
-      { cond: s => s.HLT <= 2, event: 82021 },
+      { cond: s => s.INT < 0, event: 82020 },
+      { cond: s => s.HLT <= -2, event: 82021 },
     ],
     progressChecks: [
-      { cond: s => s.age - s.storylineStart >= 3, event: 82040 },
+      { cond: s => s.age - s.storylineStart >= 1, event: 82040 },
     ],
   },
   poker: {
-    gracePeriod: 6,
-    eventRate: 0.3,
+    gracePeriod: 12,
+    eventRate: 0.7,
     deathChecks: [
-      { cond: s => s.MNY <= 0, event: 81091 },
+      { cond: s => s.MNY <= -4, event: 81091 },
     ],
     progressChecks: [
-      { cond: s => s.age - s.storylineStart >= 3, event: 81040 },
+      { cond: s => s.age - s.storylineStart >= 1, event: 81040 },
     ],
   },
   triton: {
-    gracePeriod: 6,
-    eventRate: 0.3,
+    gracePeriod: 12,
+    eventRate: 0.7,
     deathChecks: [
-      { cond: s => s.POK < 0 || s.MNY <= 0, event: 81091 },
+      { cond: s => s.POK < -4 || s.MNY <= -4, event: 81091 },
     ],
     progressChecks: [
-      { cond: s => s.POK >= 50, event: 81090 },
+      { cond: s => s.POK >= 30, event: 81090 },
     ],
   },
   local_shark: {
     gracePeriod: 12,
-    eventRate: 0.3,
+    eventRate: 0.7,
     deathChecks: [
-      { cond: s => s.MNY <= 0, event: 81091 },
+      { cond: s => s.MNY <= -4, event: 81091 },
     ],
     progressChecks: [
       { cond: s => s.POK >= 20, event: 81092 },
@@ -94,34 +94,34 @@ const STORYLINE_CFG = {
     ],
   },
   esports: {
-    gracePeriod: 6,
-    eventRate: 0.3,
+    gracePeriod: 12,
+    eventRate: 0.7,
     deathChecks: [
-      { cond: s => s.HLT <= 2, event: 83091 },
+      { cond: s => s.HLT <= -2, event: 83091 },
     ],
     progressChecks: [
       { cond: s => s.match_fixing, event: 83092 },
-      { cond: s => s.age - s.storylineStart >= 3, event: 83040 },
+      { cond: s => s.age - s.storylineStart >= 1, event: 83040 },
     ],
   },
   worlds: {
-    gracePeriod: 6,
-    eventRate: 0.3,
+    gracePeriod: 12,
+    eventRate: 0.7,
     deathChecks: [
-      { cond: s => s.HLT <= 3, event: 83091 },
+      { cond: s => s.HLT <= -1, event: 83091 },
     ],
     progressChecks: [
       { cond: s => s.match_fixing, event: 83092 },
       { cond: s => s.MMR >= 40 && s.PER >= 10 && !s.match_fixing, event: 83090 },
-      { cond: s => s.age - s.storylineStart >= 5, event: 83093 },
+      { cond: s => s.age - s.storylineStart >= 1, event: 83093 },
     ],
   },
   minor_league: {
-    gracePeriod: 6,
-    eventRate: 0.3,
+    gracePeriod: 12,
+    eventRate: 0.7,
     progressChecks: [
       { cond: s => s.match_fixing, event: 83092 },
-      { cond: s => s.age - s.storylineStart >= 4, event: 83094 },
+      { cond: s => s.age - s.storylineStart >= 1, event: 83094 },
     ],
   },
 };
@@ -324,13 +324,8 @@ function planYear(age) {
 
 function applyEvent(ev) {
   state.firedEvents.add(ev.id);
-  const msg = ev.text || ev.event;
-  if (msg) pushLog(msg);
 
-  if (ev.effect) for (const [k, v] of Object.entries(ev.effect)) {
-    if (EFFECT_KEYS.has(k)) state[k] = (state[k] || 0) + v;
-  }
-  if (typeof ev.happyDelta === 'number') state.HAP += ev.happyDelta;
+  // Apply set before logging so storyline color is correct
   if (ev.set) {
     for (const [k, v] of Object.entries(ev.set)) state[k] = v;
     if (ev.set.storyline && !state.storylineStart) {
@@ -338,6 +333,15 @@ function applyEvent(ev) {
       state.storylineStartMonth = state.monthTotal;
     }
   }
+
+  const msg = ev.text || ev.event;
+  const evLogType = ev.romance ? 'romance' : ev.logType || undefined;
+  if (msg) pushLog(msg, evLogType);
+
+  if (ev.effect) for (const [k, v] of Object.entries(ev.effect)) {
+    if (EFFECT_KEYS.has(k)) state[k] = (state[k] || 0) + v;
+  }
+  if (typeof ev.happyDelta === 'number') state.HAP += ev.happyDelta;
 
   clampStats();
 
@@ -354,10 +358,10 @@ function applyEvent(ev) {
   }
 }
 
-function pushLog(text) {
+function pushLog(text, typeOverride) {
   const tag = `${state.age}岁${state.monthOfYear}月`;
-  let logType = '';
-  if (state.storyline) {
+  let logType = typeOverride || '';
+  if (!logType && state.storyline) {
     logType = HIDDEN_STORYLINES.has(state.storyline) ? 'hidden' : 'special';
   }
   state.log.push({ tag, text, logType });
@@ -411,7 +415,7 @@ function advanceMonth() {
     state.monthOfYear = 1;
     state.age += 1;
     syncProfessionByAge();
-    if (state.age >= 21 && !state.major) assignFallbackMajor();
+    if (state.age >= 21 && !state.major && !state.storyline) assignFallbackMajor();
   }
 
   if (state.storyline && state.phase !== 'ended') {
@@ -910,9 +914,11 @@ function render() {
     if (state.showPOK) shown.push('POK');
     if (state.showMMR) shown.push('MMR');
     const dynamicMax = Math.max(1, ...shown.filter(k => k !== 'HAP').map(k => state[k]));
+    const SPECIAL_STATS = new Set(['POP', 'POK', 'MMR']);
     for (const k of shown) {
       const row = document.createElement('div');
-      row.className = 'stat-row';
+      const isSpecial = SPECIAL_STATS.has(k);
+      row.className = 'stat-row' + (isSpecial ? ' stat-special' : '');
       const label = STAT_LABELS[k];
       const val = state[k];
       const base = k === 'HAP' ? 10 : dynamicMax;
@@ -958,7 +964,8 @@ function render() {
     for (let i = state.logRenderedCount; i < state.log.length; i++) {
       const entry = state.log[i];
       const div = document.createElement('div');
-      div.className = 'log-entry' + (entry.logType === 'hidden' ? ' log-hidden' : entry.logType === 'special' ? ' log-special' : '');
+      const logCls = entry.logType ? ' log-' + entry.logType : '';
+      div.className = 'log-entry' + logCls;
       div.innerHTML = `<span class="log-tag">${entry.tag}</span><span class="log-text">${entry.text}</span>`;
       logEl.appendChild(div);
     }

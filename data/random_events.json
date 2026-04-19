@@ -292,7 +292,7 @@
   },
   {
     "id": 14003,
-    "event": "春假 (Spring Break) 你去了坎昆旅游，享受阳光沙滩！",
+    "event": "你去了坎昆旅游，享受阳光沙滩！",
     "effect": {
       "MNY": -2,
       "SOC": 2,
@@ -317,7 +317,8 @@
     ],
     "set": {
       "relationship": "恋爱中"
-    }
+    },
+    "romance": true
   },
   {
     "id": 14006,
@@ -328,19 +329,21 @@
     "noRandom": true,
     "set": {
       "relationship": "单身"
-    }
+    },
+    "romance": true
   },
   {
     "id": 14007,
     "event": "你突然发现自己被绿了，心态大崩。",
     "effect": {
-      "HAP": -5,
-      "SOC": -2
+      "HAP": -3,
+      "SOC": -1
     },
     "noRandom": true,
     "set": {
       "relationship": "单身"
-    }
+    },
+    "romance": true
   },
   {
     "id": 14008,
@@ -350,20 +353,22 @@
     },
     "include": "(EVT?[17003])&(EVT?[14004])&((EVT?[14006])|(EVT?[14007]))&(AGE>=19)",
     "exclude": "EVT?[14008]",
-    "weight": 2,
+    "weight": 20,
     "branch": [
       "14009:5",
       "14010:5"
-    ]
+    ],
+    "romance": true
   },
   {
     "id": 14009,
     "event": "「听说你们分手了，是真的吗？」她的语气认真得不像在梦里。你还没来得及回答，她又往前迈了一步：「如果是真的……我们能不能重新开始？」你的心像被什么东西狠狠撞了一下。醒来时枕头是湿的，手机屏幕停在她的社交主页——你不知道什么时候点进去的。",
     "effect": {
-      "HAP": -2,
+      "HAP": -1,
       "SOC": -1
     },
-    "noRandom": true
+    "noRandom": true,
+    "romance": true
   },
   {
     "id": 14010,
@@ -372,7 +377,8 @@
       "HAP": -1,
       "PER": 1
     },
-    "noRandom": true
+    "noRandom": true,
+    "romance": true
   },
   {
     "id": 14005,
@@ -517,7 +523,8 @@
     ],
     "set": {
       "relationship": "早恋中"
-    }
+    },
+    "romance": true
   },
   {
     "id": 17019,
@@ -533,7 +540,8 @@
     "branch": [
       "PER>3?17050:4",
       "?17051:6"
-    ]
+    ],
+    "romance": true
   },
   {
     "id": 17020,
@@ -542,7 +550,8 @@
       "PER": 2,
       "HAP": 1
     },
-    "noRandom": true
+    "noRandom": true,
+    "romance": true
   },
   {
     "id": 17004,
@@ -1946,20 +1955,11 @@
     "noRandom": true
   },
   {
-    "id": 23004,
-    "event": "55岁时，你转型成为知名的天使投资人。当年留学的国际视野让你总能精准捕捉到下一个风口，被后辈尊称为行业教父。",
-    "include": "(OVERSEAS==1)",
-    "effect": {
-      "MNY": 15,
-      "SOC": 10
-    }
-  },
-  {
     "id": 23010,
     "event": "长期的高压工作和不规律的饮食终于压垮了身体，你在一次深夜加班时突然晕倒，被送进了急救室。",
     "effect": {
-      "HLT": -8,
-      "MNY": -5
+      "HLT": -4,
+      "MNY": -2
     },
     "include": "(AGE>=40)&(HLT<5)",
     "weight": 4,
@@ -3844,7 +3844,8 @@
     },
     "branch": [
       "?50002"
-    ]
+    ],
+    "logType": "hidden"
   },
   {
     "id": 50002,
@@ -3853,7 +3854,8 @@
     "branch": [
       "PER>=6?50003",
       "?50004"
-    ]
+    ],
+    "logType": "hidden"
   },
   {
     "id": 50003,
@@ -3864,7 +3866,8 @@
     },
     "set": {
       "storyline": "spy"
-    }
+    },
+    "logType": "hidden"
   },
   {
     "id": 50004,
@@ -3875,7 +3878,8 @@
     },
     "set": {
       "storyline": "spy"
-    }
+    },
+    "logType": "hidden"
   },
   {
     "id": 50010,
@@ -4120,7 +4124,6 @@
     "event": "「国际特工」你接到了第一个真正的任务——潜入一个跨国犯罪集团在迈阿密的据点，获取他们的资金流向数据。",
     "storyline": "spy",
     "weight": 5,
-    "include": "AGE>=20",
     "effect": {
       "HAP": -1
     },
@@ -4152,7 +4155,6 @@
     "event": "「国际特工」情报显示组织内部有一个内鬼。你被指派去调查——但嫌疑人名单上有你的搭档「猎鹰」。",
     "storyline": "spy",
     "weight": 4,
-    "include": "AGE>=21",
     "effect": {
       "HAP": -2
     },
@@ -4195,7 +4197,6 @@
     "event": "「国际特工」一次海外行动中，你的身份差点暴露。对方的反间谍部门已经开始调查你使用的假身份。",
     "storyline": "spy",
     "weight": 4,
-    "include": "AGE>=21",
     "effect": {
       "HAP": -2
     },
@@ -4227,7 +4228,6 @@
     "event": "「国际特工」你被派去执行一项暗杀任务。目标是一个军火贩子。这是你第一次被要求夺去一个人的生命。",
     "storyline": "spy",
     "weight": 3,
-    "include": "AGE>=22",
     "effect": {
       "HAP": -2
     },
@@ -4375,7 +4375,7 @@
   },
   {
     "id": 50099,
-    "event": "「国际特工」五年了。你活了下来。\n\n在一间没有窗户的办公室里，局长亲自为你颁发了一枚没有名字的勋章。「你是这一批里唯一一个走到最后的。」他说。\n\n你被授予FBI特别行动处最高荣誉——「幽灵勋章」，代号正式升级为「影子」。从今天起，你是FBI头号特工。\n\n你的名字不会出现在任何档案里，你的功绩不会被任何人知道。但在这个世界最黑暗的角落里，有人因为你而安全地活着。\n\n你站在天台上，看着华盛顿的夜景。远处的纪念碑在月光下泛着白光。你点了一根烟，想起五年前那个深夜——那个你徒手制服歹徒的街角。\n\n如果能重来，你还会接那个电话吗？\n\n你笑了笑，把烟掐灭了。答案不重要了。",
+    "event": "「国际特工」你活了下来。\n\n在一间没有窗户的办公室里，局长亲自为你颁发了一枚没有名字的勋章。「你是这一批里唯一一个走到最后的。」他说。\n\n你被授予FBI特别行动处最高荣誉——「幽灵勋章」，代号正式升级为「影子」。从今天起，你是FBI头号特工。\n\n你的名字不会出现在任何档案里，你的功绩不会被任何人知道。但在这个世界最黑暗的角落里，有人因为你而安全地活着。\n\n你站在天台上，看着华盛顿的夜景。远处的纪念碑在月光下泛着白光。你点了一根烟，想起五年前那个深夜——那个你徒手制服歹徒的街角。\n\n如果能重来，你还会接那个电话吗？\n\n你笑了笑，把烟掐灭了。答案不重要了。",
     "noRandom": true,
     "storyline": "spy",
     "effect": {
@@ -4396,7 +4396,8 @@
     },
     "branch": [
       "?60002"
-    ]
+    ],
+    "logType": "hidden"
   },
   {
     "id": 60002,
@@ -4405,7 +4406,8 @@
     "branch": [
       "PER>=5?60003",
       "?60004"
-    ]
+    ],
+    "logType": "hidden"
   },
   {
     "id": 60003,
@@ -4417,7 +4419,8 @@
     },
     "set": {
       "storyline": "abyss"
-    }
+    },
+    "logType": "hidden"
   },
   {
     "id": 60004,
@@ -4425,7 +4428,8 @@
     "noRandom": true,
     "effect": {
       "HAP": -1
-    }
+    },
+    "logType": "hidden"
   },
   {
     "id": 60010,
@@ -4433,9 +4437,9 @@
     "include": "EVT?[60003]",
     "weight": 12,
     "effect": {
-      "HLT": -2,
+      "HLT": -1,
       "INT": 3,
-      "HAP": -2
+      "HAP": -1
     },
     "storyline": "abyss"
   },
@@ -4457,7 +4461,7 @@
     "include": "EVT?[60003]",
     "weight": 10,
     "effect": {
-      "HLT": -2,
+      "HLT": -1,
       "PER": 1,
       "INT": 1
     },
@@ -4563,7 +4567,7 @@
     "include": "EVT?[60003]",
     "weight": 7,
     "effect": {
-      "HLT": -2,
+      "HLT": -1,
       "MNY": -2
     },
     "storyline": "abyss"
@@ -4708,7 +4712,8 @@
     },
     "branch": [
       "?70002"
-    ]
+    ],
+    "logType": "hidden"
   },
   {
     "id": 70002,
@@ -4721,7 +4726,8 @@
       "INT": 3,
       "SOC": -2,
       "HAP": -2
-    }
+    },
+    "logType": "hidden"
   },
   {
     "id": 70010,
@@ -5074,7 +5080,8 @@
     "branch": [
       "INT<5?80002:3",
       "?80003:7"
-    ]
+    ],
+    "logType": "special"
   },
   {
     "id": 80002,
@@ -5083,7 +5090,8 @@
     "effect": {
       "MNY": -3,
       "HAP": -5
-    }
+    },
+    "logType": "special"
   },
   {
     "id": 80003,
@@ -5097,7 +5105,8 @@
       "POP": 1,
       "SOC": 2,
       "HAP": 2
-    }
+    },
+    "logType": "special"
   },
   {
     "id": 80010,
@@ -5282,18 +5291,24 @@
     "id": 80092,
     "event": "「全网一哥」主播结局：你抓住了时代的风口，成为了带货界的顶流。虽然没有站上红毯，但你每天赚的钱比明星还要多。你用直播赚来的钱买下了几栋豪宅，提前实现了退休自由。",
     "storyline": "streamer",
-    "include": "POP>=60",
+    "include": "POP>=20",
     "weight": 100,
     "end": true
   },
   {
     "id": 80093,
-    "event": "「查无此人」平凡结局：直播间人气越来越低，你也厌倦了每天对着镜头强颜欢笑。你退掉了租来的灯光设备，注销了账号。你重新投递简历，成为了一名普通的打工人。那段绚烂的梦想，就像是一场宿醉后的梦。",
+    "event": "「查无此人」平凡结局：直播间人气越来越低，你也厌倦了每天对着镜头强颜欢笑。你退掉了租来的灯光设备，注销了账号。",
+    "logType": "special",
     "storyline": "streamer",
-    "include": "POP<20",
+    "include": "POP<10",
     "weight": 100,
-    "end": true,
-    "exclude": "EVT?[80092]"
+    "exclude": "EVT?[80092]",
+    "set": {
+      "storyline": "",
+      "storylineStart": 0,
+      "storylineStartMonth": 0,
+      "showPOP": false
+    }
   },
   {
     "id": 42100,
@@ -6528,7 +6543,8 @@
     "branch": [
       "PER<4?81002:3",
       "?81003:7"
-    ]
+    ],
+    "logType": "special"
   },
   {
     "id": 81002,
@@ -6537,7 +6553,8 @@
     "effect": {
       "MNY": -3,
       "HAP": -3
-    }
+    },
+    "logType": "special"
   },
   {
     "id": 81003,
@@ -6551,7 +6568,8 @@
       "POK": 5,
       "MNY": 3,
       "HAP": 2
-    }
+    },
+    "logType": "special"
   },
   {
     "id": 81010,
@@ -6612,8 +6630,8 @@
     "include": "(storyline==poker)&(AGE>=21)",
     "noRandom": true,
     "branch": [
-      "(MNY>=20)&(INT>=20)?81041:7",
-      "(MNY>=20)&(INT>=20)?81042:3",
+      "(MNY>=8)&(INT>=8)?81041:7",
+      "(MNY>=8)&(INT>=8)?81042:3",
       "?81043:10"
     ]
   },
@@ -6693,7 +6711,104 @@
     "id": 81053,
     "event": "「传奇扑克」高额桌的直播灯光烤得你有些出汗。你戴着墨镜和兜帽，一言不发地看着对手，试图不暴露任何身体马脚（Tells）。",
     "storyline": "triton",
-    "weight": 15
+    "weight": 5
+  },
+  {
+    "id": 81054,
+    "event": "「传奇扑克」你在一场高额现金局中，用一个教科书般的慢打（Slow Play）引诱对手把全部筹码推进来，然后翻出满堂红（Full House）清空了他。解说员直呼「大师级操作」。",
+    "storyline": "triton",
+    "weight": 12,
+    "effect": {
+      "POK": 8,
+      "MNY": 8,
+      "HAP": 3
+    }
+  },
+  {
+    "id": 81055,
+    "event": "「传奇扑克」你和一位中东石油大亨的单挑对决成了经典名局。你在关键手用一个精确的半池下注（Half-Pot Bet）诈唬成功，逼退了他的顶对。赛后他跟你握手：「你是我见过最难读的对手。」",
+    "storyline": "triton",
+    "weight": 10,
+    "effect": {
+      "POK": 6,
+      "SOC": 1,
+      "MNY": 5
+    }
+  },
+  {
+    "id": 81056,
+    "event": "「传奇扑克」连续三场比赛你都在泡沫期（Bubble）被淘汰，每次都差一个名次就能进钱圈。你开始怀疑自己的锦标赛策略是不是有根本性的问题。",
+    "storyline": "triton",
+    "weight": 8,
+    "effect": {
+      "POK": -3,
+      "MNY": -5,
+      "HAP": -3
+    }
+  },
+  {
+    "id": 81057,
+    "event": "「传奇扑克」你花了一整个月研究 GTO（博弈论最优策略）求解器的输出结果，把每一种常见牌面的最优打法刻进了肌肉记忆。回到牌桌后，你的胜率明显提升。",
+    "storyline": "triton",
+    "weight": 10,
+    "effect": {
+      "POK": 5,
+      "INT": 1
+    }
+  },
+  {
+    "id": 81058,
+    "event": "「传奇扑克」一个匿名账号在扑克论坛上发帖质疑你使用实时辅助软件（RTA）作弊。虽然调查结果还了你清白，但舆论风波让你压力很大。",
+    "storyline": "triton",
+    "weight": 6,
+    "effect": {
+      "HAP": -3,
+      "SOC": -2,
+      "POK": -2
+    }
+  },
+  {
+    "id": 81062,
+    "event": "「老哥俱乐部」你花了两周时间专门研究了对手的下注模式，发现了几个常客玩家的致命漏洞。回到牌桌后你精准收割，赢麻了。",
+    "storyline": "local_shark",
+    "weight": 12,
+    "effect": {
+      "POK": 4,
+      "MNY": 4,
+      "INT": 1
+    }
+  },
+  {
+    "id": 81063,
+    "event": "「老哥俱乐部」一个从拉斯维加斯来的职业牌手坐到了你的常规桌上，把包括你在内的所有常客打得体无完肤。你第一次意识到自己和真正的顶级之间还有多大的差距。",
+    "storyline": "local_shark",
+    "weight": 8,
+    "effect": {
+      "POK": -2,
+      "MNY": -3,
+      "HAP": -2
+    }
+  },
+  {
+    "id": 81064,
+    "event": "「老哥俱乐部」你开始在YouTube上看Daniel Negreanu的教学视频，学习高级读牌技巧。虽然你打的是小级别，但这些知识让你的盈利更加稳定。",
+    "storyline": "local_shark",
+    "weight": 10,
+    "effect": {
+      "POK": 3,
+      "INT": 1
+    }
+  },
+  {
+    "id": 81065,
+    "event": "「老哥俱乐部」赌场举办了一场小型锦标赛，你一路过关斩将拿到了冠军。虽然奖金不多，但你第一次举起了奖杯，感觉自己离职业牌手的梦想又近了一步。",
+    "storyline": "local_shark",
+    "weight": 8,
+    "effect": {
+      "POK": 5,
+      "MNY": 2,
+      "HAP": 3
+    }
   },
   {
     "id": 81060,
@@ -6712,7 +6827,8 @@
     "weight": 10,
     "effect": {
       "MNY": -2,
-      "HAP": -2
+      "HAP": -2,
+      "POK": -1
     }
   },
   {
@@ -6742,10 +6858,16 @@
   {
     "id": 81093,
     "event": "「水鱼退役」平凡结局：经历了无数次过山车般的输赢后，你意识到自己其实并不具备成为顶尖高手的心理素质。你把剩下的筹码换成现金，永久注销了赌场会员卡。你重新翻开落灰的课本，决定还是老老实实找份工作。",
+    "logType": "special",
     "storyline": "local_shark",
-    "include": "POK<20",
+    "include": "POK<10",
     "noRandom": true,
-    "end": true
+    "set": {
+      "storyline": "",
+      "storylineStart": 0,
+      "storylineStartMonth": 0,
+      "showPOK": false
+    }
   },
   {
     "id": 82001,
@@ -6758,7 +6880,8 @@
     },
     "branch": [
       "?82002"
-    ]
+    ],
+    "logType": "special"
   },
   {
     "id": 82002,
@@ -6768,8 +6891,9 @@
       "storyline": "party"
     },
     "effect": {
-      "HLT": -2
-    }
+      "HLT": -1
+    },
+    "logType": "special"
   },
   {
     "id": 82010,
@@ -6778,8 +6902,8 @@
     "weight": 10,
     "effect": {
       "SOC": 3,
-      "MNY": -3,
-      "HLT": -2,
+      "MNY": -1,
+      "HLT": -1,
       "HAP": 2
     }
   },
@@ -6789,8 +6913,7 @@
     "storyline": "party",
     "weight": 8,
     "effect": {
-      "HLT": -3,
-      "PER": -1
+      "HLT": -2
     }
   },
   {
@@ -6831,8 +6954,8 @@
     "weight": 2,
     "noRandom": true,
     "effect": {
-      "HAP": -10,
-      "SOC": -10
+      "HAP": -5,
+      "SOC": -6
     },
     "branch": [
       "?82091"
@@ -6841,11 +6964,11 @@
   {
     "id": 82021,
     "event": "「酒精地狱」突然死亡事件：在一次极其疯狂的拼酒游戏中，你一口气喝下了整整一瓶伏特加。你当场口吐白沫，失去了意识。救护车的警笛声是你听到的最后声音。",
-    "include": "(storyline==party)&(HLT<=2)",
+    "include": "(storyline==party)&(HLT<=-10)",
     "weight": 2,
     "noRandom": true,
     "effect": {
-      "HLT": -10
+      "HLT": -4
     },
     "branch": [
       "?82092"
@@ -6857,8 +6980,8 @@
     "include": "(storyline==party)&(AGE>=22)",
     "noRandom": true,
     "branch": [
-      "SOC>=25?82041:1",
-      "?82042:9"
+      "SOC>=20?82041:6",
+      "?82042:4"
     ]
   },
   {
@@ -6882,8 +7005,8 @@
       "storyline": "wasted"
     },
     "effect": {
-      "SOC": -10,
-      "HAP": -5
+      "SOC": -4,
+      "HAP": -3
     }
   },
   {
@@ -6970,16 +7093,21 @@
   },
   {
     "id": 82093,
-    "event": "「南柯一梦」平凡结局：你因为挂科太多没能拿到学位证，只能花钱找了个野鸡大学挂靠。你带着衰败的身体和空虚的灵魂回到国内，找了一份月薪五千的工作。每当你吹嘘自己当年在国外的光辉岁月时，同事们只会把你当成吹牛的笑话。",
+    "event": "「南柯一梦」平凡结局：你因为挂科太多没能拿到学位证，只能花钱找了个野鸡大学挂靠。",
+    "logType": "special",
     "storyline": "wasted",
     "include": "AGE>=24",
     "weight": 100,
-    "end": true
+    "set": {
+      "storyline": "",
+      "storylineStart": 0,
+      "storylineStartMonth": 0
+    }
   },
   {
     "id": 83001,
     "event": "「天梯狙击」凌晨三点，你在宿舍打cs2。在这个faceit10级对局中，你不仅拿了五杀，还连续三次单杀了对面的职业选手zywoo。赛后，一个带着战队认证的ID加了你：“兄弟，有兴趣试训打职业吗？”",
-    "include": "(AGE>=18)&(AGE<=22)&(INT>12)&(PER>12)",
+    "include": "(AGE>=16)&(AGE<=22)&(INT>12)&(PER>12)",
     "weight": 30,
     "effect": {
       "SOC": 1,
@@ -6988,7 +7116,8 @@
     "branch": [
       "?83002:2",
       "?83003:8"
-    ]
+    ],
+    "logType": "special"
   },
   {
     "id": 83002,
@@ -6996,11 +7125,12 @@
     "noRandom": true,
     "effect": {
       "INT": 1
-    }
+    },
+    "logType": "special"
   },
   {
     "id": 83003,
-    "event": "「基地报到」你办理了休学，提着行李箱来到了TYLAA俱乐部基地。面对一整排顶级外设和高刷显示器，你的血液沸腾了。屏幕上解锁了你的特殊属性：【天梯分(MMR)】。",
+    "event": "「基地报到」思考了一晚上，呆滞着望着不到3.0的gpa，拿着鼠标的手变得愈发沉重，在关闭学期报告页面的那一刻，你不再是平平无奇的学生，而是cs2电竞赛事中燃起的一颗新星。你办理了休学，提着行李箱来到了TYLAA俱乐部基地。面对一整排顶级外设和高刷显示器，你的血液沸腾了。屏幕上解锁了你的特殊属性：【天梯分(MMR)】。",
     "noRandom": true,
     "set": {
       "storyline": "esports",
@@ -7010,7 +7140,8 @@
       "MMR": 10,
       "HAP": 2,
       "HLT": -1
-    }
+    },
+    "logType": "special"
   },
   {
     "id": 83010,
@@ -7184,24 +7315,36 @@
   {
     "id": 83093,
     "event": "「饮恨退役」平凡结局：尽管你拼尽全力，但电子竞技是残酷的。随着年龄的增长，你的反应速度开始下滑，最终无奈宣布退役。你签了一家公会，成了一名偶尔吹嘘当年勇的退役主播。",
+    "logType": "special",
     "include": "(storyline==worlds)",
     "noRandom": true,
     "effect": {
       "MMR": -20,
       "MNY": 5
     },
-    "end": true
+    "set": {
+      "storyline": "",
+      "storylineStart": 0,
+      "storylineStartMonth": 0,
+      "showMMR": false
+    }
   },
   {
     "id": 83094,
     "event": "「网管人生」底层结局：你在次级联赛混迹了几年，连顶级联赛的地板都没摸到。俱乐部解散后，你无处可去，只能回到老家的一家网咖里当起了全职网管，偶尔帮客人上上分赚点烟钱。",
+    "logType": "special",
     "include": "(storyline==minor_league)",
     "noRandom": true,
     "effect": {
       "MNY": 2,
       "HAP": -5
     },
-    "end": true
+    "set": {
+      "storyline": "",
+      "storylineStart": 0,
+      "storylineStartMonth": 0,
+      "showMMR": false
+    }
   },
   {
     "id": 17050,
@@ -7213,7 +7356,8 @@
     "effect": {
       "HAP": 1,
       "PER": 1
-    }
+    },
+    "romance": true
   },
   {
     "id": 17051,
@@ -7222,55 +7366,60 @@
     "effect": {
       "HAP": -1,
       "PER": 1
-    }
+    },
+    "romance": true
   },
   {
     "id": 17052,
     "event": "地下恋第二次被发现了！这次是你妈翻了你的手机。她气得摔了你的手机，勒令你们断绝联系。这次是真的结束了。",
     "include": "(relationship==地下恋)&(AGE<18)",
     "exclude": "EVT?[17052]",
-    "weight": 3,
+    "weight": 10,
     "set": {
       "relationship": "单身"
     },
     "effect": {
-      "HAP": -4,
+      "HAP": -2,
       "SOC": -2
-    }
+    },
+    "romance": true
   },
   {
     "id": 17053,
     "event": "偷偷摸摸的恋爱反而让两个人更加珍惜在一起的时间。你们在放学后的便利店分享一副耳机听歌，觉得全世界只剩下彼此。",
     "include": "(relationship==地下恋)&(AGE<18)",
-    "weight": 3,
+    "weight": 15,
     "effect": {
       "HAP": 2,
       "PER": 1
-    }
+    },
+    "romance": true
   },
   {
     "id": 17055,
     "event": "你和TA窝在图书馆的角落一起复习。虽然效率一般，但有人陪着的感觉真好。",
     "include": "((relationship==早恋中)|(relationship==地下恋))&(AGE>=16)&(AGE<18)",
-    "weight": 3,
+    "weight": 15,
     "effect": {
       "INT": 1,
       "HAP": 1
-    }
+    },
+    "romance": true
   },
   {
     "id": 17056,
     "event": "你们大吵了一架。起因很小——可能是回消息太慢，也可能是和别人走得太近。冷战已经持续三天了。",
     "include": "((relationship==早恋中)|(relationship==地下恋))&(AGE>=16)&(AGE<18)",
     "exclude": "EVT?[17056]",
-    "weight": 3,
+    "weight": 15,
     "effect": {
       "HAP": -2
     },
     "branch": [
       "(SOC<3)&(PER<3)?17058:3",
       "?17057:7"
-    ]
+    ],
+    "romance": true
   },
   {
     "id": 17057,
@@ -7279,7 +7428,8 @@
     "effect": {
       "HAP": 2,
       "SOC": 1
-    }
+    },
+    "romance": true
   },
   {
     "id": 17058,
@@ -7289,39 +7439,42 @@
       "relationship": "单身"
     },
     "effect": {
-      "HAP": -3,
+      "HAP": -2,
       "SOC": -1
-    }
+    },
+    "romance": true
   },
   {
     "id": 17059,
     "event": "你们在校门口的奶茶店约会，被八卦的同学拍了照发到班级群里。虽然有点尴尬，但TA牵起了你的手说“就让他们看吧”。",
     "include": "((relationship==早恋中)|(relationship==地下恋))&(AGE<18)",
     "exclude": "EVT?[17059]",
-    "weight": 2,
+    "weight": 15,
     "effect": {
       "SOC": -1,
       "HAP": 1
-    }
+    },
+    "romance": true
   },
   {
     "id": 17060,
     "event": "你和TA约好每天晚上视频一起背单词。虽然大部分时间都在聊天和傻笑，但托福词汇竟然真的进步了不少。",
     "include": "((relationship==早恋中)|(relationship==地下恋))&(HS==国际)&(AGE>=16)&(AGE<18)",
     "exclude": "EVT?[17060]",
-    "weight": 3,
+    "weight": 15,
     "effect": {
       "INT": 1,
       "PER": 1,
       "HAP": 1
-    }
+    },
+    "romance": true
   },
   {
     "id": 17070,
     "event": "高中的最后一个学期，你和TA坐在天台上看夕阳。“我们以后怎么办？”这个问题终于被问出口了。",
     "include": "((relationship==早恋中)|(relationship==地下恋))&(AGE>=17)&(AGE<=18)",
     "exclude": "EVT?[17070]",
-    "weight": 8,
+    "weight": 15,
     "effect": {
       "HAP": -1
     },
@@ -7329,7 +7482,8 @@
       "(MNY>=6)|(INT>=6)?17071:3",
       "SOC<3?17073:2",
       "?17072:5"
-    ]
+    ],
+    "romance": true
   },
   {
     "id": 17071,
@@ -7341,7 +7495,8 @@
     "effect": {
       "HAP": 3,
       "PER": 1
-    }
+    },
+    "romance": true
   },
   {
     "id": 17072,
@@ -7352,7 +7507,8 @@
     },
     "effect": {
       "HAP": -2
-    }
+    },
+    "romance": true
   },
   {
     "id": 17073,
@@ -7364,6 +7520,7 @@
     "effect": {
       "HAP": -2,
       "PER": 1
-    }
+    },
+    "romance": true
   }
 ]

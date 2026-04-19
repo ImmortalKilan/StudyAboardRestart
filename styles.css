@@ -397,6 +397,13 @@ body.in-game .left-panel {
   text-align: right;
   font-weight: 600;
 }
+.stat-special .stat-label,
+.stat-special .stat-val {
+  color: #f5b642;
+}
+.stat-special .stat-fill {
+  background: linear-gradient(90deg, #f5b642, #e0a030);
+}
 
 .major-box {
   margin-top: 12px;
@@ -457,6 +464,9 @@ body.in-game .left-panel {
 }
 .log-entry.log-special .log-text {
   color: #f5b642 !important;
+}
+.log-entry.log-romance .log-text {
+  color: #f0a0b8 !important;
 }
 
 .right-panel {
