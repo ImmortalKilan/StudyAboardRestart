@@ -302,25 +302,6 @@
     "weight": 3
   },
   {
-    "id": 14004,
-    "event": "你谈了一段异国恋，甜蜜了几个月...",
-    "effect": {
-      "HAP": 2,
-      "SOC": 1
-    },
-    "include": "(SOC>5)&(AGE>=18)",
-    "exclude": "EVT?[14004]",
-    "weight": 3,
-    "branch": [
-      "14006:4",
-      "14007:6"
-    ],
-    "set": {
-      "relationship": "恋爱中"
-    },
-    "romance": true
-  },
-  {
     "id": 14006,
     "event": "但异地实在太难了，你们和平分手。一段美好的回忆。",
     "effect": {
@@ -522,7 +503,7 @@
       "17020:5"
     ],
     "set": {
-      "relationship": "早恋中"
+      "relationship": "早恋"
     },
     "romance": true
   },
@@ -5547,14 +5528,14 @@
   {
     "id": 42190,
     "event": "「技术大佬」传奇结局：在大厂摸爬滚打十余载，你凭借无数次力挽狂澜的架构重构和惊人的技术前瞻性，最终坐上了首席架构师/CTO的宝座。你的名字成为了业界的技术标杆，享受着无数程序员的顶礼膜拜。哪怕代价是你光秃秃的头顶。",
-    "include": "(profession==大厂核心)&(AGE>=35)&(INT>=12)",
+    "include": "(profession==大厂核心)&(((AGE>=35)&(INT>=12))|(INT>=30))",
     "weight": 100,
     "end": true
   },
   {
     "id": 42191,
     "event": "「敲钟狂欢」总裁结局：你经历了无数次濒临破产、合伙人背叛、被投资人刁难的至暗时刻，但你熬过来了。今天，你在纳斯达克敲响了上市的钟声，或者被大厂以数亿美元溢价收购。看着账户里多出的九个零，你终于露出了疲惫但狂妄的笑容。",
-    "include": "(profession==连续创业者)&(AGE>=35)&(MNY>=12)",
+    "include": "(profession==连续创业者)&(((AGE>=35)&(MNY>=12))|(MNY>=30))",
     "weight": 100,
     "end": true
   },
@@ -5568,7 +5549,7 @@
   {
     "id": 42193,
     "event": "「优化裁员」悲惨结局：科技圈没有温情。你步入了35岁的门槛，体力下降，学习能力大不如前，薪资却比年轻人高得多。在这一波行业寒冬里，你被公司以“优化结构”为由无情裁员。房贷、车贷和不再年轻的身体，让你在深夜的街头崩溃大哭。",
-    "include": "((profession==全栈开发)|(profession==外包码农)|(profession==大厂核心))&(AGE>=35)&(INT<7)",
+    "include": "((profession==全栈开发)|(profession==外包码农)|(profession==大厂核心))&(((AGE>=35)&(INT<7))|(INT<=2))",
     "weight": 100,
     "end": true
   },
@@ -5873,7 +5854,7 @@
   {
     "id": 43190,
     "event": "「华尔街之狼」传奇结局：35岁，你站在曼哈顿顶层办公室的落地窗前，俯瞰着这座被你用资本操纵的城市。你随意的一个签字，就能决定几千人的饭碗。你失去了真正的朋友和健康的肝脏，但你赢得了这个世界最世俗的胜利。",
-    "include": "((profession==投行精英)|(profession==风投巨鳄))&(AGE>=35)&(MNY>=17)&(SOC>=12)",
+    "include": "((profession==投行精英)|(profession==风投巨鳄))&(((AGE>=35)&(MNY>=17)&(SOC>=12))|(MNY>=30))",
     "weight": 100,
     "end": true
   },
@@ -5887,14 +5868,14 @@
   {
     "id": 43192,
     "event": "「铁窗泪」悲惨结局：常在河边走，哪有不湿鞋。由于做账手法太粗糙，你在 35 岁这天被经侦破门而入。曾经的狐朋狗友瞬间与你切割，你将在冰冷的铁窗里度过漫长的岁月，看着自己的名字登上财经新闻的耻辱柱。",
-    "include": "(profession==内幕黑手)&(AGE>=35)",
+    "include": "(profession==内幕黑手)&(HAP<=-2)",
     "weight": 100,
     "end": true
   },
   {
     "id": 43193,
     "event": "「耗材人生」过劳结局：35 岁，在连续的高强度出差和无止境的指标压力下，你突发心梗倒在了公司的电脑前。公司给了你家属一笔人道主义赔偿，第二天就换了一个更年轻的应届生坐你的工位。资本的机器一刻也没有停止运转。",
-    "include": "((profession==商业分析师)|(profession==基层销售)|(profession==投行精英))&(AGE>=35)&(HLT<2)",
+    "include": "((profession==商业分析师)|(profession==基层销售)|(profession==投行精英))&(((AGE>=35)&(HLT<2))|(HLT<=0))",
     "weight": 100,
     "end": true
   },
@@ -6178,7 +6159,7 @@
   {
     "id": 44190,
     "event": "「诺贝尔星光」终身教授结局：35岁，你在瑞典斯德哥尔摩的音乐厅接过了诺贝尔奖章。你将一生献给了冷板凳上的枯燥岁月，最终为人类文明拓展了一丝微小的边界。你的名字将被写进后世所有教科书的扉页，永垂不朽。",
-    "include": "(profession==全奖直博)&(AGE>=35)&(INT>=17)",
+    "include": "(profession==全奖直博)&(((AGE>=35)&(INT>=17))|(INT>=25))",
     "weight": 100,
     "end": true
   },
@@ -6192,7 +6173,7 @@
   {
     "id": 44192,
     "event": "「华尔街幽灵」隐形富豪结局：35岁，你成为了全美最神秘的量化基金经理。你没有社交，没有朋友，但你的模型每天在市场上吞吐着天文数字的美元。你在太平洋买了一个私人岛屿，打算在余生里和一堆服务器一起研究宇宙的终极真理。",
-    "include": "(profession==量化交易员)&(AGE>=35)&(MNY>=17)",
+    "include": "(profession==量化交易员)&(((AGE>=35)&(MNY>=17))|(MNY>=30))",
     "weight": 100,
     "end": true
   },
@@ -6491,7 +6472,7 @@
   {
     "id": 45190,
     "event": "「普利策之光」无国界先锋结局：35岁，你在枪林弹雨或极度贫困的泥沼中，完成了震惊世界的深度纪实/公益壮举。你获得了诺贝尔和平奖/普利策奖。你穷得只剩下了几件破衣服，但你的灵魂无比高贵，照亮了人类最黑暗的角落。",
-    "include": "(profession==理想主义者)&(AGE>=35)&(INT>=12)&(SOC>=7)",
+    "include": "(profession==理想主义者)&((INT>=12)&(SOC>=8))",
     "weight": 100,
     "end": true
   },
@@ -6512,7 +6493,7 @@
   {
     "id": 45193,
     "event": "「梵高之死」悲惨殉道结局：35岁，长期的贫困、偏执和无人理解，彻底摧毁了你的精神防线。在一个寒冷的冬夜，你烧毁了自己所有的手稿/画作，在一张破旧的单人床上孤独地离开了这个世界。或许一百年后，人们才会发现你的伟大，但那已经与你无关了。",
-    "include": "(profession==边缘创作者)&(AGE>=35)&(HAP<-8)",
+    "include": "(profession==边缘创作者)&(HAP<=-3)",
     "weight": 100,
     "end": true
   },
@@ -6678,10 +6659,10 @@
     "storyline": "triton",
     "weight": 8,
     "effect": {
-      "POK": 15,
+      "POK": 5,
       "SOC": 2,
       "INT": 1,
-      "HAP": 5
+      "HAP": 2
     }
   },
   {
@@ -6701,8 +6682,8 @@
     "storyline": "triton",
     "weight": 10,
     "effect": {
-      "MNY": -10,
-      "POK": -5,
+      "MNY": -5,
+      "POK": -10,
       "HAP": -5,
       "PER": -2
     }
@@ -6719,9 +6700,9 @@
     "storyline": "triton",
     "weight": 12,
     "effect": {
-      "POK": 8,
-      "MNY": 8,
-      "HAP": 3
+      "POK": 4,
+      "MNY": 2,
+      "HAP": 1
     }
   },
   {
@@ -6739,7 +6720,7 @@
     "id": 81056,
     "event": "「传奇扑克」连续三场比赛你都在泡沫期（Bubble）被淘汰，每次都差一个名次就能进钱圈。你开始怀疑自己的锦标赛策略是不是有根本性的问题。",
     "storyline": "triton",
-    "weight": 8,
+    "weight": 20,
     "effect": {
       "POK": -3,
       "MNY": -5,
@@ -6750,7 +6731,7 @@
     "id": 81057,
     "event": "「传奇扑克」你花了一整个月研究 GTO（博弈论最优策略）求解器的输出结果，把每一种常见牌面的最优打法刻进了肌肉记忆。回到牌桌后，你的胜率明显提升。",
     "storyline": "triton",
-    "weight": 10,
+    "weight": 20,
     "effect": {
       "POK": 5,
       "INT": 1
@@ -6760,7 +6741,7 @@
     "id": 81058,
     "event": "「传奇扑克」一个匿名账号在扑克论坛上发帖质疑你使用实时辅助软件（RTA）作弊。虽然调查结果还了你清白，但舆论风波让你压力很大。",
     "storyline": "triton",
-    "weight": 6,
+    "weight": 30,
     "effect": {
       "HAP": -3,
       "SOC": -2,
@@ -6771,10 +6752,10 @@
     "id": 81062,
     "event": "「老哥俱乐部」你花了两周时间专门研究了对手的下注模式，发现了几个常客玩家的致命漏洞。回到牌桌后你精准收割，赢麻了。",
     "storyline": "local_shark",
-    "weight": 12,
+    "weight": 30,
     "effect": {
-      "POK": 4,
-      "MNY": 4,
+      "POK": 2,
+      "MNY": 2,
       "INT": 1
     }
   },
@@ -6782,7 +6763,7 @@
     "id": 81063,
     "event": "「老哥俱乐部」一个从拉斯维加斯来的职业牌手坐到了你的常规桌上，把包括你在内的所有常客打得体无完肤。你第一次意识到自己和真正的顶级之间还有多大的差距。",
     "storyline": "local_shark",
-    "weight": 8,
+    "weight": 30,
     "effect": {
       "POK": -2,
       "MNY": -3,
@@ -6793,7 +6774,7 @@
     "id": 81064,
     "event": "「老哥俱乐部」你开始在YouTube上看Daniel Negreanu的教学视频，学习高级读牌技巧。虽然你打的是小级别，但这些知识让你的盈利更加稳定。",
     "storyline": "local_shark",
-    "weight": 10,
+    "weight": 30,
     "effect": {
       "POK": 3,
       "INT": 1
@@ -6803,9 +6784,9 @@
     "id": 81065,
     "event": "「老哥俱乐部」赌场举办了一场小型锦标赛，你一路过关斩将拿到了冠军。虽然奖金不多，但你第一次举起了奖杯，感觉自己离职业牌手的梦想又近了一步。",
     "storyline": "local_shark",
-    "weight": 8,
+    "weight": 30,
     "effect": {
-      "POK": 5,
+      "POK": 4,
       "MNY": 2,
       "HAP": 3
     }
@@ -6814,7 +6795,7 @@
     "id": 81060,
     "event": "「老哥俱乐部」你每天准时去 Local Casino 报到打 5/10 盲注的局。你把这当成了上班，每个月能稳定盈利几千刀，生活过得还算滋润。",
     "storyline": "local_shark",
-    "weight": 10,
+    "weight": 30,
     "effect": {
       "MNY": 3,
       "POK": 2
@@ -6824,18 +6805,18 @@
     "id": 81061,
     "event": "「老哥俱乐部」遇到个喝醉酒乱扔筹码的疯子玩家（Maniac），你毫无脾气地被他接连 BB（爆冷）了两把，白打了三天工。",
     "storyline": "local_shark",
-    "weight": 10,
+    "weight": 30,
     "effect": {
       "MNY": -2,
       "HAP": -2,
-      "POK": -1
+      "POK": -4
     }
   },
   {
     "id": 81090,
     "event": "「传奇金手链」大满贯结局：你击败了众多世界冠军，戴上了象征着扑克界最高荣誉的金手链。你的面前堆满了如山的百万美金现钞。你被奉为亚洲扑克界的新神，开启了全世界开私人游艇、打豪客赛的奢侈人生。",
     "storyline": "triton",
-    "include": "POK>=50",
+    "include": "POK>=65",
     "noRandom": true,
     "end": true
   },
@@ -7043,11 +7024,41 @@
   },
   {
     "id": 82090,
-    "event": "「最强合伙人」真结局：五年后，你在纳斯达克敲响了上市的钟声。虽然你不懂一行代码，连财报都要助理念给你听，但作为不可替代的“资源整合者”和 CEO，你身价过亿。你证明了，把交际花做到极致，也是一种无敌的天赋。",
-    "storyline": "ceo",
-    "include": "AGE>=27",
-    "weight": 100,
+    "event": "「最强合伙人」真结局：你在纳斯达克敲响了上市的钟声。虽然你不懂一行代码，连财报都要助理念给你听，但作为不可替代的「资源整合者」和 CEO，你身价过亿。你证明了，把交际花做到极致，也是一种无敌的天赋。",
+    "noRandom": true,
+    "effect": {
+      "MNY": 20,
+      "SOC": 10,
+      "HAP": 10
+    },
+    "end": true,
+    "include": "(storyline==ceo)&(MNY>=30)"
+  },
+  {
+    "id": 82095,
+    "event": "「资金链断裂」坏结局：公司账上最后一分钱也烧光了。投资人不接你的电话，合伙人带着核心代码跑路了。你看着空荡荡的办公室，桌上还摆着那天画的商业计划书。你欠了一屁股债，被列入了失信名单。曾经觥筹交错的酒肉朋友，一个都找不到了。",
+    "noRandom": true,
+    "effect": {
+      "MNY": -10,
+      "SOC": -10,
+      "HAP": -5
+    },
     "end": true
+  },
+  {
+    "id": 82096,
+    "event": "「平庸创业者」平凡结局：公司不温不火地活了几年，既没上市也没倒闭。你渐渐厌倦了每天画饼融资的日子，把股份低价转让给了合伙人，拿着一笔不多不少的钱离开了。你回头看了一眼那间小办公室，轻轻关上了门。",
+    "logType": "special",
+    "noRandom": true,
+    "set": {
+      "storyline": "",
+      "storylineStart": 0,
+      "storylineStartMonth": 0
+    },
+    "effect": {
+      "MNY": 3,
+      "HAP": -2
+    }
   },
   {
     "id": 82091,
@@ -7096,7 +7107,7 @@
     "event": "「南柯一梦」平凡结局：你因为挂科太多没能拿到学位证，只能花钱找了个野鸡大学挂靠。",
     "logType": "special",
     "storyline": "wasted",
-    "include": "AGE>=24",
+    "include": "(storyline==wasted)&((HAP<=0)&(SOC<=0))",
     "weight": 100,
     "set": {
       "storyline": "",
@@ -7374,7 +7385,7 @@
     "event": "地下恋第二次被发现了！这次是你妈翻了你的手机。她气得摔了你的手机，勒令你们断绝联系。这次是真的结束了。",
     "include": "(relationship==地下恋)&(AGE<18)",
     "exclude": "EVT?[17052]",
-    "weight": 10,
+    "weight": 60,
     "set": {
       "relationship": "单身"
     },
@@ -7388,7 +7399,7 @@
     "id": 17053,
     "event": "偷偷摸摸的恋爱反而让两个人更加珍惜在一起的时间。你们在放学后的便利店分享一副耳机听歌，觉得全世界只剩下彼此。",
     "include": "(relationship==地下恋)&(AGE<18)",
-    "weight": 15,
+    "weight": 60,
     "effect": {
       "HAP": 2,
       "PER": 1
@@ -7398,8 +7409,8 @@
   {
     "id": 17055,
     "event": "你和TA窝在图书馆的角落一起复习。虽然效率一般，但有人陪着的感觉真好。",
-    "include": "((relationship==早恋中)|(relationship==地下恋))&(AGE>=16)&(AGE<18)",
-    "weight": 15,
+    "include": "((relationship==早恋)|(relationship==地下恋))&(AGE>=16)&(AGE<18)",
+    "weight": 60,
     "effect": {
       "INT": 1,
       "HAP": 1
@@ -7409,9 +7420,9 @@
   {
     "id": 17056,
     "event": "你们大吵了一架。起因很小——可能是回消息太慢，也可能是和别人走得太近。冷战已经持续三天了。",
-    "include": "((relationship==早恋中)|(relationship==地下恋))&(AGE>=16)&(AGE<18)",
+    "include": "((relationship==早恋)|(relationship==地下恋))&(AGE>=16)&(AGE<18)",
     "exclude": "EVT?[17056]",
-    "weight": 15,
+    "weight": 60,
     "effect": {
       "HAP": -2
     },
@@ -7447,9 +7458,9 @@
   {
     "id": 17059,
     "event": "你们在校门口的奶茶店约会，被八卦的同学拍了照发到班级群里。虽然有点尴尬，但TA牵起了你的手说“就让他们看吧”。",
-    "include": "((relationship==早恋中)|(relationship==地下恋))&(AGE<18)",
+    "include": "((relationship==早恋)|(relationship==地下恋))&(AGE<18)",
     "exclude": "EVT?[17059]",
-    "weight": 15,
+    "weight": 60,
     "effect": {
       "SOC": -1,
       "HAP": 1
@@ -7459,9 +7470,9 @@
   {
     "id": 17060,
     "event": "你和TA约好每天晚上视频一起背单词。虽然大部分时间都在聊天和傻笑，但托福词汇竟然真的进步了不少。",
-    "include": "((relationship==早恋中)|(relationship==地下恋))&(HS==国际)&(AGE>=16)&(AGE<18)",
+    "include": "((relationship==早恋)|(relationship==地下恋))&(HS==国际)&(AGE>=16)&(AGE<18)",
     "exclude": "EVT?[17060]",
-    "weight": 15,
+    "weight": 60,
     "effect": {
       "INT": 1,
       "PER": 1,
@@ -7472,14 +7483,14 @@
   {
     "id": 17070,
     "event": "高中的最后一个学期，你和TA坐在天台上看夕阳。“我们以后怎么办？”这个问题终于被问出口了。",
-    "include": "((relationship==早恋中)|(relationship==地下恋))&(AGE>=17)&(AGE<=18)",
+    "include": "((relationship==早恋)|(relationship==地下恋))&(AGE>=17)&(AGE<=18)",
     "exclude": "EVT?[17070]",
-    "weight": 15,
+    "weight": 100,
     "effect": {
       "HAP": -1
     },
     "branch": [
-      "(MNY>=6)|(INT>=6)?17071:3",
+      "(MNY>=4)|(INT>=5)?17071:5",
       "SOC<3?17073:2",
       "?17072:5"
     ],
@@ -7520,6 +7531,466 @@
     "effect": {
       "HAP": -2,
       "PER": 1
+    },
+    "romance": true
+  },
+  {
+    "id": 14020,
+    "event": "大一开学几个月，你和高中那位的视频通话从每天变成了每周，从每周变成了「有空再说」。时差、课业、新朋友……你们之间的距离好像不只是地理上的。",
+    "include": "(relationship==异地恋)&(AGE>=18)",
+    "exclude": "EVT?[14020]",
+    "weight": 100,
+    "effect": {
+      "HAP": -1
+    },
+    "branch": [
+      "(PER>=3)&(SOC>=3)?14021:6",
+      "?14022:3"
+    ],
+    "romance": true
+  },
+  {
+    "id": 14021,
+    "event": "你们撑过来了。寒假见面的那一刻，你在机场出口看到TA举着一块手写的接机牌，眼眶一下就红了。异地恋最难的不是距离，是两个人都没有放弃。",
+    "noRandom": true,
+    "set": {
+      "relationship": "恋爱"
+    },
+    "effect": {
+      "HAP": 3,
+      "PER": 1
+    },
+    "romance": true
+  },
+  {
+    "id": 14022,
+    "event": "那天凌晨三点你接到了TA的电话。沉默了很久之后，TA说：「我们是不是……不太合适了。」你其实早就有预感了，但真正听到的时候，还是像被人在胸口捅了一刀。",
+    "noRandom": true,
+    "set": {
+      "relationship": "单身"
+    },
+    "effect": {
+      "HAP": -3,
+      "SOC": -1
+    },
+    "romance": true
+  },
+  {
+    "id": 14025,
+    "event": "一场华人组织的派对上，你扮成吸血鬼，对面一个扮成女巫的人冲你笑了一下。你们在后院聊了一整晚，从星座聊到人生的意义。第二天你发现手机里多了一个新联系人。",
+    "include": "(relationship==单身)&(SOC>4)&(AGE>=18)&(AGE<=21)",
+    "exclude": "EVT?[14025]",
+    "weight": 70,
+    "set": {
+      "relationship": "暧昧"
+    },
+    "effect": {
+      "HAP": 2,
+      "SOC": 1
+    },
+    "romance": true
+  },
+  {
+    "id": 14028,
+    "event": "考试前一周，你在图书馆占不到座位，硬着头皮问旁边的人能不能拼桌。没想到你们选了同一门课。从此你们成了固定的学习搭档，每次见面都会多聊一会儿。",
+    "include": "(relationship==单身)&(INT>5)&(AGE>=18)&(AGE<=21)",
+    "exclude": "EVT?[14028]",
+    "weight": 70,
+    "set": {
+      "relationship": "暧昧"
+    },
+    "effect": {
+      "HAP": 1,
+      "INT": 1
+    },
+    "romance": true
+  },
+  {
+    "id": 14030,
+    "event": "你们已经连续三个周末一起吃饭了。朋友们开始起哄：「你们到底在不在一起啊？」你看了TA一眼，TA也看了你一眼，都笑了。",
+    "include": "(relationship==暧昧)&(AGE>=18)",
+    "exclude": "EVT?[14030]",
+    "weight": 100,
+    "branch": [
+      "SOC>=4?14031:8",
+      "?14032:1"
+    ],
+    "romance": true
+  },
+  {
+    "id": 14031,
+    "event": "在一个下着小雨的傍晚，你们从食堂走回宿舍。你鼓起勇气说了那句话。TA没有说话，只是把头靠在了你的肩上。雨声突然变得很好听。",
+    "noRandom": true,
+    "set": {
+      "relationship": "恋爱"
+    },
+    "effect": {
+      "HAP": 3
+    },
+    "romance": true
+  },
+  {
+    "id": 14032,
+    "event": "你犹豫了太久。等你终于决定开口的时候，TA告诉你，已经和别人在一起了。你笑着说「恭喜」，回到宿舍关上门，盯着天花板看了一整晚。",
+    "noRandom": true,
+    "set": {
+      "relationship": "单身"
+    },
+    "effect": {
+      "HAP": -3,
+      "PER": -1
+    },
+    "romance": true
+  },
+  {
+    "id": 14035,
+    "event": "你们趁着假期租了一辆车，沿着一号公路开了三天。副驾上的人帮你拿着薯条，音响里放着你们共同的歌单。你觉得这就是人生最好的时候。幸福捏。",
+    "include": "(relationship==恋爱)&(AGE>=18)&(AGE<=22)",
+    "weight": 70,
+    "effect": {
+      "HAP": 2,
+      "MNY": -1
+    },
+    "romance": true
+  },
+  {
+    "id": 14036,
+    "event": "假期你没回家。TA也没回。你们窝在TA的公寓里，用YouTube教程做了一只烤鸡——虽然外焦里生，但你们笑着吃完了每一口。幸福捏。",
+    "include": "(relationship==恋爱)&(AGE>=18)&(AGE<=22)",
+    "exclude": "EVT?[14036]",
+    "weight": 70,
+    "effect": {
+      "HAP": 2
+    },
+    "romance": true
+  },
+  {
+    "id": 14037,
+    "event": "考试周，你们在图书馆占了一个角落的双人桌，面对面各写各的论文。偶尔抬头对视，交换一眼神。有人陪着熬夜的感觉，好像没那么累了。",
+    "include": "(relationship==恋爱)&(AGE>=18)&(AGE<=22)",
+    "weight": 70,
+    "effect": {
+      "HAP": 1,
+      "INT": 1
+    },
+    "romance": true
+  },
+  {
+    "id": 14038,
+    "event": "生日那天，TA在你宿舍门口放了一个纸箱。打开一看是你念叨了很久但舍不得买的球鞋和衣服，旁边还贴着一张手写的便签。你拍了照发了朋友圈，配文只有一个字：「爱。」",
+    "include": "(relationship==恋爱)&(AGE>=18)&(AGE<=22)",
+    "exclude": "EVT?[14038]",
+    "weight": 60,
+    "effect": {
+      "HAP": 2
+    },
+    "romance": true
+  },
+  {
+    "id": 14040,
+    "event": "你们因为一件小事吵了起来——其实都不记得是什么了。但话赶话越说越难听。TA摔门走了，你一个人坐在沙发上发呆。",
+    "include": "(relationship==恋爱)&(AGE>=18)&(AGE<=22)",
+    "exclude": "EVT?[14040]",
+    "weight": 50,
+    "effect": {
+      "HAP": -2
+    },
+    "branch": [
+      "(SOC>=4)|(PER>=4)?14041:7",
+      "?14042:3"
+    ],
+    "romance": true
+  },
+  {
+    "id": 14041,
+    "event": "冷战了两天之后，你先发了消息。TA秒回了。你们在学校的长椅上谈了很久，最后TA说：「以后吵架不准冷战超过一天。超过是小狗！」你笑着点了点头。",
+    "noRandom": true,
+    "effect": {
+      "HAP": 1,
+      "SOC": 1
+    },
+    "romance": true
+  },
+  {
+    "id": 14042,
+    "event": "谁也没有先低头。一周、两周、一个月……聊天记录永远停在那句「随便你」。你们没有正式分手，但都知道已经结束了。",
+    "noRandom": true,
+    "set": {
+      "relationship": "单身"
+    },
+    "effect": {
+      "HAP": -3,
+      "SOC": -1
+    },
+    "romance": true
+  },
+  {
+    "id": 14043,
+    "event": "你刷社交媒体的时候看到TA和一个你不认识的人的合照，笑得很开心。你告诉自己只是普通朋友，但还是忍不住把那条动态翻来覆去看了十几遍。",
+    "include": "(relationship==恋爱)&(AGE>=18)&(AGE<=22)",
+    "exclude": "EVT?[14043]",
+    "weight": 50,
+    "effect": {
+      "HAP": -1
+    },
+    "branch": [
+      "SOC>=8?14044:6",
+      "?14045:4"
+    ],
+    "romance": true
+  },
+  {
+    "id": 14044,
+    "event": "你直接问了TA。TA笑着说「你吃什么醋啊」，然后把你拉进了那个人的群聊——原来是TA的课题组同学。你假装若无其事，但心里偷偷松了口气。",
+    "noRandom": true,
+    "effect": {
+      "HAP": 1
+    },
+    "romance": true
+  },
+  {
+    "id": 14045,
+    "event": "你没有问。但从那天起你开始变得患得患失，TA晚回消息十分钟你就开始胡思乱想。你知道这样不好，但控制不住。",
+    "noRandom": true,
+    "effect": {
+      "HAP": -1,
+      "PER": -1
+    },
+    "romance": true
+  },
+  {
+    "id": 14046,
+    "event": "这个学期你太忙了——赶due、做project、准备面试。你已经连续三周取消了和TA的周末约会。TA终于忍不住了：「你眼里还有我吗？」",
+    "include": "(relationship==恋爱)&(AGE>=19)&(AGE<=22)",
+    "exclude": "EVT?[14046]",
+    "weight": 50,
+    "effect": {
+      "HAP": -2
+    },
+    "branch": [
+      "PER>=4?14047:7",
+      "?14048:3"
+    ],
+    "romance": true
+  },
+  {
+    "id": 14047,
+    "event": "你放下了手里的事，认认真真地道了歉。那个周末你关掉了电脑，带TA去了那家一直说要去但没去的餐厅。",
+    "noRandom": true,
+    "effect": {
+      "HAP": 2,
+      "INT": -1
+    },
+    "romance": true
+  },
+  {
+    "id": 14048,
+    "event": "你说「等我忙完这阵就好了」。但你们都知道，永远有忙不完的下一阵。",
+    "noRandom": true,
+    "effect": {
+      "HAP": -1,
+      "SOC": -1
+    },
+    "romance": true
+  },
+  {
+    "id": 14060,
+    "event": "你们坐在校园的草坪上。学士帽被风吹歪了，TA帮你扶正。「接下来怎么办？」四年前高中问过一次的问题，现在又摆到了面前。",
+    "include": "(relationship==恋爱)&(AGE>=22)",
+    "exclude": "EVT?[14060]",
+    "weight": 100,
+    "effect": {
+      "HAP": -1
+    },
+    "branch": [
+      "(MNY>=6)&(SOC>=4)?14061:4",
+      "PER>=5?14062:3",
+      "?14063:2"
+    ],
+    "romance": true
+  },
+  {
+    "id": 14061,
+    "event": "你们都拿到了同一座城市的offer。搬家那天你们一起组装了宜家的书桌，累得瘫在地板上，看着空荡荡的新公寓傻笑。新的生活开始了，而这次你们在一起。",
+    "noRandom": true,
+    "set": {
+      "relationship": "同居"
+    },
+    "effect": {
+      "HAP": 3,
+      "MNY": -1
+    },
+    "romance": true
+  },
+  {
+    "id": 14062,
+    "event": "你去了纽约，TA去了悉尼。你们说好每天视频，三个月见一次。你在机场安检口回头看了最后一眼，TA还站在那里冲你挥手。",
+    "noRandom": true,
+    "set": {
+      "relationship": "异地恋"
+    },
+    "effect": {
+      "HAP": -2,
+      "PER": 2
+    },
+    "romance": true
+  },
+  {
+    "id": 14063,
+    "event": "你们在学校旁边那家常去的咖啡店坐了最后一次。TA说：「谢谢你陪我走过这四年。」你说：「我爱你。」你们最后拥抱了很久，然后转身朝不同的方向走去。",
+    "noRandom": true,
+    "set": {
+      "relationship": "单身"
+    },
+    "effect": {
+      "HAP": -2,
+      "PER": 1
+    },
+    "romance": true
+  },
+  {
+    "id": 14065,
+    "event": "毕业季你打开TA的手机想帮忙叫外卖，看到了不该看到的聊天记录。你什么都没说，默默放下了手机。那天晚上你一个人喝了很多酒。",
+    "include": "(relationship==恋爱)&(AGE>=21)&(SOC<=4)",
+    "exclude": "EVT?[14065]",
+    "weight": 30,
+    "set": {
+      "relationship": "单身"
+    },
+    "effect": {
+      "HAP": -4,
+      "SOC": -2
+    },
+    "romance": true
+  },
+  {
+    "id": 17300,
+    "event": "「快餐爱情」国外的深夜太过孤独，你下载了Tinder，右滑匹配到了一个看起来很对胃口的人。",
+    "include": "(AGE>=18)&((APP>4)|(SOC>3))&(relationship==单身)",
+    "weight": 40,
+    "set": {
+      "relationship": "快餐恋"
+    },
+    "effect": {
+      "HAP": 2,
+      "SOC": 1
+    },
+    "romance": true
+  },
+  {
+    "id": 17301,
+    "event": "「快餐日常」约会了几次，关系升温极快。但你们的交集仅限于周末去酒吧喝酒和回公寓看Netflix & Chill。",
+    "include": "relationship==快餐恋",
+    "weight": 40,
+    "effect": {
+      "HAP": 1,
+      "HLT": -1
+    },
+    "romance": true
+  },
+  {
+    "id": 17302,
+    "event": "「快餐日常」在你们约会时，你发现对方的手机上还会弹出交友软件的消息提示。你装作没看见。",
+    "include": "relationship==快餐恋",
+    "weight": 40,
+    "effect": {
+      "HAP": -2
+    },
+    "romance": true
+  },
+  {
+    "id": 17303,
+    "event": "「断崖式分手」对方突然就不回消息了，连个理由都没有。你懂了这就是快餐恋爱的规矩，叹了口气卸载了软件。",
+    "include": "relationship==快餐恋",
+    "weight": 30,
+    "set": {
+      "relationship": "单身"
+    },
+    "effect": {
+      "HAP": -2,
+      "SOC": -1
+    },
+    "romance": true
+  },
+  {
+    "id": 17304,
+    "event": "「意外转正」你们意外地发现彼此灵魂极其契合。在一次深度长谈后，你们决定互相删掉软件，认真在一起。",
+    "include": "(relationship==快餐恋)&(INT>=6)",
+    "weight": 30,
+    "set": {
+      "relationship": "恋爱"
+    },
+    "effect": {
+      "HAP": 3,
+      "SOC": 1
+    },
+    "romance": true
+  },
+  {
+    "id": 17400,
+    "event": "「金钱攻势」一个极其高调的富二代开着跑车捧着花出现在你楼下。虽然你不是特别心动，但TA给的实在太多了。",
+    "include": "(AGE>=18)&(APP>=7)&(MNY<6)&(relationship==单身)",
+    "weight": 50,
+    "set": {
+      "relationship": "傍大款"
+    },
+    "effect": {
+      "MNY": 3,
+      "SOC": 2,
+      "HAP": 1
+    },
+    "romance": true
+  },
+  {
+    "id": 17401,
+    "event": "「钞能力」TA包下一家米其林三星给你过生日，还送了一个名牌包。你享受着周围同学嫉妒的目光，虚荣心极大满足。",
+    "include": "relationship==傍大款",
+    "weight": 40,
+    "effect": {
+      "MNY": 3,
+      "APP": 1,
+      "HAP": 2
+    },
+    "romance": true
+  },
+  {
+    "id": 17402,
+    "event": "「金丝雀」TA带你混迹在高端局里，但总是对你带着一种高高在上的语气，让你觉得自己像个附属品。你感到毫无尊严。",
+    "include": "relationship==傍大款",
+    "weight": 40,
+    "effect": {
+      "HAP": -3,
+      "PER": -1
+    },
+    "romance": true
+  },
+  {
+    "id": 17403,
+    "event": "「豪门梦碎」TA玩腻了，或者家里安排了商业联姻。TA扔给你一笔丰厚的分手费后潇洒离开。你拿着卡，不知道该哭该笑。",
+    "include": "relationship==傍大款",
+    "weight": 30,
+    "set": {
+      "relationship": "单身"
+    },
+    "effect": {
+      "MNY": 8,
+      "HAP": -4,
+      "APP": -1
+    },
+    "romance": true
+  },
+  {
+    "id": 17404,
+    "event": "「逆袭上位」你不甘心只做玩物。你利用TA的人脉和资源拼命提升自己。在TA打算甩掉你的时候，你反而先一步把TA给踹了！",
+    "include": "(relationship==傍大款)&(INT>=10)&(PER>=8)",
+    "weight": 30,
+    "set": {
+      "relationship": "单身"
+    },
+    "effect": {
+      "INT": 2,
+      "SOC": 3,
+      "HAP": 4
     },
     "romance": true
   }

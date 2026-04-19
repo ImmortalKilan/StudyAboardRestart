@@ -62,6 +62,17 @@ const STORYLINE_CFG = {
       { cond: s => s.age - s.storylineStart >= 1, event: 82040 },
     ],
   },
+  ceo: {
+    gracePeriod: 12,
+    eventRate: 0.7,
+    deathChecks: [
+      { cond: s => s.MNY <= -2, event: 82095 },
+    ],
+    progressChecks: [
+      { cond: s => s.age >= 27 && s.SOC >= 20 && s.MNY >= 15, event: 82090 },
+      { cond: s => s.age >= 30, event: 82096 },
+    ],
+  },
   poker: {
     gracePeriod: 12,
     eventRate: 0.7,
