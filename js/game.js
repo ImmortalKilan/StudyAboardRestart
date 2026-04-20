@@ -158,8 +158,9 @@ const HIDDEN_STORYLINES = new Set(['spy', 'abyss', 'meta']);
 const SPECIAL_STORYLINES = new Set(['idol', 'superstar', 'streamer', 'poker', 'triton', 'local_shark', 'party', 'ceo', 'wasted', 'esports', 'worlds', 'minor_league']);
 const STUDENT_PHASES = new Set([
   '高中生', '本科生', '理工生', '商科生', '文科生',
-  '准留学生', '考研党', '迷茫大学生', '准研究生', '研究生',
+  '准留学生', '考研党', '迷茫大学生', '准研究生', '研究生', '海外研究生',
 ]);
+const GRAD_SCHOOL_PHASES = new Set(['准研究生', '研究生', '海外研究生']);
 
 const state = {
   phase: 'talent',
@@ -188,6 +189,8 @@ const state = {
   storylineStart: 0,
   storylineStartMonth: 0,
   profession: '高中生',
+  gradEndAge: 0,
+  gradEndMonth: 0,
   pendingEvent: null,
 
   // ── Choice System State ──
@@ -306,6 +309,34 @@ function syncProfessionByAge() {
   }
 }
 
+function scheduleGraduateCompletion() {
+  if (state.gradEndAge && state.gradEndMonth) return;
+  const startAge = Math.max(23, state.age + (state.monthOfYear >= 9 ? 1 : 0));
+  const endAge = Math.min(25, startAge + Math.floor(Math.random() * Math.max(1, 26 - startAge)));
+  const endMonths = [5, 6, 7, 8, 9];
+  state.gradEndAge = endAge;
+  state.gradEndMonth = endMonths[Math.floor(Math.random() * endMonths.length)];
+}
+
+function maybeGraduateFromSchool() {
+  if (!GRAD_SCHOOL_PHASES.has(state.profession)) return false;
+  if (!state.gradEndAge || !state.gradEndMonth) scheduleGraduateCompletion();
+  const reached = state.age > state.gradEndAge
+    || (state.age === state.gradEndAge && state.monthOfYear >= state.gradEndMonth);
+  if (!reached) return false;
+
+  if (state.profession === '海外研究生') {
+    pushLog('研究生毕业了。答辩、修改、熬夜赶论文的日子终于结束，你拖着行李走出校园，开始认真投递人生的第一批正式岗位。');
+  } else {
+    pushLog('研究生毕业了。论文定稿、答辩通过、拍完毕业照之后，你忽然发现学生时代真的结束了。接下来，是找工作的阶段。');
+  }
+
+  state.profession = '求职中';
+  state.gradEndAge = 0;
+  state.gradEndMonth = 0;
+  return true;
+}
+
 function assignFallbackMajor() {
   if (state.major) return;
   const options = state.hsType === '体制内'
@@ -372,6 +403,9 @@ function applyEvent(ev) {
     if (ev.set.storyline && !state.storylineStart) {
       state.storylineStart = state.age;
       state.storylineStartMonth = state.monthTotal;
+    }
+    if (ev.set.profession && GRAD_SCHOOL_PHASES.has(ev.set.profession)) {
+      scheduleGraduateCompletion();
     }
   }
 
@@ -513,6 +547,11 @@ function advanceMonth() {
     state.age += 1;
     syncProfessionByAge();
     if (state.age >= 21 && !state.major && !state.storyline) assignFallbackMajor();
+  }
+
+  if (state.phase !== 'ended' && maybeGraduateFromSchool()) {
+    render();
+    return;
   }
 
   if (state.storyline && state.phase !== 'ended') {
@@ -750,8 +789,8 @@ function seasonalFlavor() {
     ]);
   }
 
-  // 大学时代 (18岁4月 - 25岁)
-  if (age <= 25) {
+  // 大学时代 (18岁4月起, 仅在校阶段)
+  if (age >= 18 && STUDENT_PHASES.has(state.profession)) {
     if (m <= 2) return pick([
       '冬日寒假，窝在家刷剧。',
       '放假第一天就开始熬夜，生物钟彻底崩了。',
@@ -802,7 +841,7 @@ function seasonalFlavor() {
     ]);
   }
 
-  // 打工时代 (26-39)
+  // 打工时代 (毕业/工作后 - 39岁)
   if (age <= 39) {
     if (m <= 2) return pick([
       '春节假期，抢票大战又开始了。',
@@ -1181,6 +1220,8 @@ function initGame() {
   state.phase = 'game';
   state.age = 15;
   state.monthOfYear = 1;
+  state.gradEndAge = 0;
+  state.gradEndMonth = 0;
   syncProfessionByAge();
   planYear(15);
 

@@ -5293,8 +5293,8 @@
   },
   {
     "id": 42100,
-    "event": "四年苦读终于熬出头。拿着 CS 的毕业证，你看着人才市场上眼花缭乱的岗位，面临着人生第一份全职工作的抉择。",
-    "include": "(AGE>=22)&(MAJOR==CS)",
+    "event": "毕业之后，你开始集中投递 CS 方向的岗位。看着招聘网站上密密麻麻的 JD 和面试流程表，你知道真正的考验才刚刚开始。",
+    "include": "(AGE>=22)&(MAJOR==CS)&(profession==求职中)",
     "exclude": "EVT?[42100]",
     "weight": 100,
     "branch": [
@@ -5564,7 +5564,7 @@
   {
     "id": 43100,
     "event": "商学院的毕业典礼结束了。穿着定制西装，你拿着简历站在曼哈顿或陆家嘴的十字街头，等待着资本市场的挑选。",
-    "include": "(AGE>=22)&(MAJOR==商科)",
+    "include": "(AGE>=22)&(MAJOR==商科)&(profession==求职中)",
     "exclude": "EVT?[43100]",
     "weight": 100,
     "branch": [
@@ -5898,7 +5898,7 @@
   {
     "id": 44100,
     "event": "理科的尽头是深造还是就业？拿着理学学士/硕士学位，你站在了实验室和写字楼的交叉口。",
-    "include": "(AGE>=22)&(MAJOR==理科)",
+    "include": "(AGE>=22)&(MAJOR==理科)&(profession==求职中)",
     "exclude": "EVT?[44100]",
     "weight": 100,
     "branch": [
@@ -6203,7 +6203,7 @@
   {
     "id": 45100,
     "event": "手里拿着文科/艺术学位，你深知前面的路不再有标准答案。理想与现实的鸿沟横亘在面前，你要如何填满它？",
-    "include": "(AGE>=22)&((MAJOR==文科)|(MAJOR==文艺))",
+    "include": "(AGE>=22)&((MAJOR==文科)|(MAJOR==文艺))&(profession==求职中)",
     "exclude": "EVT?[45100]",
     "weight": 100,
     "branch": [
