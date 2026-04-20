@@ -9601,5 +9601,263 @@
     "event": "长按图标，删除。那一瞬间你觉得世界安静了。晚上你破天荒地在十一点就睡了。",
     "effect": { "PER": 2, "HLT": 1, "HAP": -1 },
     "noRandom": true
+  },
+  {
+    "id": 14300,
+    "event": "你们花了一整天把家里打扫得一尘不染，然后瘫在沙发上吃着外卖看老电影。虽然累得腰酸背痛，但看着整洁的家，内心极其满足。",
+    "include": "((relationship==已婚)|(relationship==二婚))",
+    "weight": 50,
+    "effect": {
+      "HLT": -1,
+      "HAP": 2,
+      "PER": 1
+    },
+    "romance": true
+  },
+  {
+    "id": 14301,
+    "event": "你偶然发现 TA 的账单里有一笔不知去向的巨大开销。你深吸一口气，坐在沙发上等 TA 下班。",
+    "include": "((relationship==已婚)|(relationship==二婚))",
+    "exclude": "EVT?[14301]",
+    "weight": 25,
+    "branch": [
+      "SOC>=7?14302:6",
+      "?14303:3"
+    ],
+    "romance": true
+  },
+  {
+    "id": 14302,
+    "event": "你平和地沟通，发现是 TA 偷偷攒钱想给你一个周年惊喜。你有些愧疚地抱住了 TA，虚惊一场。",
+    "noRandom": true,
+    "effect": {
+      "SOC": 1,
+      "HAP": 2
+    },
+    "romance": true
+  },
+  {
+    "id": 14303,
+    "event": "你忍不住大发雷霆，甚至翻看了 TA 的手机。两人爆发了婚后最严重的一次信任危机，冷战了一整周。",
+    "noRandom": true,
+    "effect": {
+      "HAP": -3,
+      "SOC": -2
+    },
+    "romance": true
+  },
+  {
+    "id": 14304,
+    "event": "双方长辈在年夜饭上开始明里暗里地催生。你们敷衍过去后，深夜对着账户余额和职场晋升的时间表，陷入了漫长的沉默。",
+    "include": "((relationship==已婚)|(relationship==二婚))&(AGE>=27)",
+    "weight": 30,
+    "effect": {
+      "HAP": -2,
+      "PER": 1
+    },
+    "romance": true
+  },
+  {
+    "id": 14305,
+    "event": "你的事业到了最关键的上升期，连续一个月每晚 11 点回家。TA 抱怨这个家对你来说只是个旅馆。你感到深深的疲惫与愧疚。",
+    "include": "((relationship==已婚)|(relationship==二婚))&(AGE>=26)",
+    "weight": 50,
+    "effect": {
+      "HAP": -3,
+      "HLT": -2,
+      "SOC": -1
+    },
+    "romance": true
+  },
+  {
+    "id": 14306,
+    "event": "你们躺在同一张床上，背对背各自玩手机。明明距离不到半米，却仿佛隔着一片海。你们已经很久没有认真说过一句话了。",
+    "include": "((relationship==已婚)|(relationship==二婚))&(AGE>=28)",
+    "weight": 40,
+    "effect": {
+      "HAP": -2
+    },
+    "romance": true
+  },
+  {
+    "id": 14310,
+    "event": "在一次高规格的行业酒会上，一个极其优秀且懂你的人对你频频示好，甚至暗示可以给你提供巨大的资源。酒精的催化下，你动摇了。",
+    "include": "((relationship==已婚)|(relationship==二婚))&(AGE>=28)&(SOC>=6)",
+    "exclude": "EVT?[14310]",
+    "weight": 60,
+    "branch": [
+      "PER>=5?14311:5",
+      "?14312:3"
+    ],
+    "romance": true
+  },
+  {
+    "id": 14311,
+    "event": "你礼貌而坚决地拒绝了诱惑，提前离场。回家看着熟睡的 TA，你为自己的忠诚感到心安。",
+    "noRandom": true,
+    "effect": {
+      "PER": 2,
+      "HAP": 2
+    },
+    "romance": true
+  },
+  {
+    "id": 14312,
+    "event": "你犯了全天下人都会犯的错。东窗事发后，伴随而来的是伴侣撕心裂肺的哭喊、砸碎的相框和一地鸡毛。你们的婚姻名存实亡。",
+    "noRandom": true,
+    "effect": {
+      "SOC": -5,
+      "HAP": -6,
+      "PER": -2
+    },
+    "set": {
+      "relationship": "离异"
+    },
+    "romance": true
+  },
+  {
+    "id": 14320,
+    "event": "你们的婚姻走到了尽头。你们坐在律师事务所里，面无表情地分割着这几年共同打拼下来的财产。空气里只剩下冰冷的算计。",
+    "include": "(relationship==已婚)&(HAP<=-2)",
+    "exclude": "EVT?[14320]",
+    "weight": 150,
+    "branch": [
+      "INT>=8?14321:5",
+      "?14322:5"
+    ],
+    "romance": true
+  },
+  {
+    "id": 14321,
+    "event": "你凭借极高的理智，用放弃了大部分存款（或者房子）的代价，换来了最快的手续办理。你拖着行李箱站在街头，恢复了自由身。",
+    "noRandom": true,
+    "set": {
+      "relationship": "离异"
+    },
+    "effect": {
+      "MNY": -8,
+      "HAP": -3,
+      "INT": 2
+    },
+    "romance": true
+  },
+  {
+    "id": 14322,
+    "event": "为了争夺财产，你们撕破脸皮，互相在法庭上攻击对方最脆弱的地方。虽然保住了钱，但你对人性彻底绝望，身心俱疲。",
+    "noRandom": true,
+    "set": {
+      "relationship": "离异"
+    },
+    "effect": {
+      "HAP": -8,
+      "SOC": -4,
+      "HLT": -2
+    },
+    "romance": true
+  },
+  {
+    "id": 14401,
+    "event": "朋友给你介绍了一个条件相当不错的相亲对象。你们坐在咖啡馆里，像面试官一样互相盘问着对方的收入、房产和离异原因。你觉得有些可笑，但也无可奈何。",
+    "include": "(relationship==离异)",
+    "weight": 50,
+    "effect": {
+      "SOC": 1,
+      "HAP": -1
+    },
+    "romance": true
+  },
+  {
+    "id": 14402,
+    "event": "你以为自己不会再爱了，直到在一次普通的加班雨天里，有人递给了你一把伞和一杯热茶。久违的心跳感让你有些不知所措。",
+    "include": "(relationship==离异)",
+    "exclude": "EVT?[14402]",
+    "weight": 25,
+    "set": {
+      "relationship": "暧昧"
+    },
+    "effect": {
+      "HAP": 4,
+      "HLT": 1
+    },
+    "romance": true
+  },
+  {
+    "id": 14410,
+    "event": "在经历了一段极其克制且稳定的暧昧后，对方提出了结婚的请求。面对第二次步入围城的邀请，你握着笔，迟迟没有签字。",
+    "include": "(relationship==暧昧)&(EVT?[14320]|EVT?[14420])",
+    "exclude": "EVT?[14410]",
+    "weight": 50,
+    "branch": [
+      "INT>=8?14411:5",
+      "?14412:4"
+    ],
+    "romance": true
+  },
+  {
+    "id": 14411,
+    "event": "你吃一堑长一智，理智地拿出了律师起草的婚前财产协议。对方坦然签了字。你们带着绝对的清醒和坦诚，步入了第二段婚姻。",
+    "noRandom": true,
+    "set": {
+      "relationship": "二婚"
+    },
+    "effect": {
+      "INT": 2,
+      "HAP": 3,
+      "MNY": 2
+    },
+    "romance": true
+  },
+  {
+    "id": 14412,
+    "event": "你被一时的感动冲昏了头脑，觉得谈钱太伤感情，没做任何防备就领了证。看着红本本，你隐隐觉得这可能又是一场豪赌。",
+    "noRandom": true,
+    "set": {
+      "relationship": "二婚"
+    },
+    "effect": {
+      "HAP": 4,
+      "INT": -2
+    },
+    "romance": true
+  },
+  {
+    "id": 14420,
+    "event": "你们的二婚好像又走到了尽头。这一次没有一婚时那么轰轰烈烈的争吵，只有无休止的疲惫和“果然还是不行”的死心。你们甚至连架都懒得吵了。",
+    "include": "(relationship==二婚)&(HAP<=-2)",
+    "exclude": "EVT?[14420]",
+    "weight": 20,
+    "branch": [
+      "EVT?[14411]?14421:5",
+      "?14422:5"
+    ],
+    "romance": true
+  },
+  {
+    "id": 14421,
+    "event": "得益于当初签署的婚前财产协议，这次离婚办得异常顺利，没有任何财产纠纷。你平静地收拾好行李，再次回到了一个人的生活。",
+    "noRandom": true,
+    "set": {
+      "relationship": "离异"
+    },
+    "effect": {
+      "HAP": -2,
+      "INT": 1
+    },
+    "romance": true
+  },
+  {
+    "id": 14422,
+    "event": "因为当初没有签协议，二婚的财产分割极其复杂。对方的算计甚至超过了前任。经历了漫长且折磨的官司，你赔进去大半身家，发誓这辈子再也不碰婚姻了。",
+    "noRandom": true,
+    "set": {
+      "relationship": "单身"
+    },
+    "effect": {
+      "MNY": -10,
+      "HAP": -6,
+      "HLT": -2,
+      "SOC": -3
+    },
+    "romance": true
   }
 ]
