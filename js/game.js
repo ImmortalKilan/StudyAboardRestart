@@ -188,6 +188,17 @@ const state = {
   storylineStartMonth: 0,
   profession: '高中生',
   pendingEvent: null,
+
+  // ── Choice System State ──
+  // pendingChoice: 当前正在等待玩家选择的 choices 数组（来自事件的 choices 字段）
+  //   格式: [{ text: "按钮文字", next: 后续事件ID }, ...]
+  //   非 null 时游戏暂停推进，等待玩家点击按钮
+  // lastChoiceMonth: 上一次触发选择事件的 monthTotal，用于节流
+  //   两次选择至少间隔 18 个月，避免频繁打断游戏节奏
+  // _savedAutoMode: 选择弹出时保存的自动播放模式（0/1/2），选择完成后恢复
+  pendingChoice: null,
+  lastChoiceMonth: 0,
+  _savedAutoMode: 0,
   SOC: 0, INT: 0, MNY: 0, PER: 0, HLT: 0, APP: 0,
   HAP: 5,
   POP: 0, POK: 0, MMR: 0
@@ -195,6 +206,7 @@ const state = {
 
 let autoTimer = null;
 let autoMode = 0;
+let sessionPlayCount = 0;
 
 async function loadData() {
   const [talents, events, ages, randomEvents] = await Promise.all([
@@ -325,15 +337,32 @@ function planYear(age) {
     .filter(ev => !ev.exclude || !evalCondition(state, ev.exclude));
 
   if (!pool.length) return;
-  const count = Math.min(pool.length, 1 + Math.floor(Math.random() * 3));
-  const chosen = sample(pool, count);
-  const months = sample([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], count).sort((a, b) => a - b);
+
+  // Separate fixed-month events from flexible ones
+  const fixed = pool.filter(ev => ev.fixedMonth);
+  const flex = pool.filter(ev => !ev.fixedMonth);
+
   const plan = new Map();
+  for (const ev of fixed) plan.set(ev.fixedMonth, ev.id);
+
+  const count = Math.min(flex.length, 1 + Math.floor(Math.random() * 3));
+  const chosen = sample(flex, count);
+  const usedMonths = new Set(plan.keys());
+  const availMonths = [1,2,3,4,5,6,7,8,9,10,11,12].filter(m => !usedMonths.has(m));
+  const months = sample(availMonths, count).sort((a, b) => a - b);
   chosen.forEach((ev, i) => plan.set(months[i], ev.id));
   state.yearlyPlan.set(age, plan);
 }
 
 function applyEvent(ev) {
+  // Storyline replay: only show text, skip all side effects
+  if (ev._replay) {
+    delete ev._replay;
+    const msg = ev.text || ev.event;
+    if (msg) pushLog(msg);
+    return;
+  }
+
   state.firedEvents.add(ev.id);
 
   // Apply set before logging so storyline color is correct
@@ -358,6 +387,18 @@ function applyEvent(ev) {
 
   if (ev.end) {
     state.phase = 'ended';
+  }
+
+  // ── Choice System: 玩家交互选择 ──
+  // 如果事件定义了 choices 数组，暂停游戏让玩家从中选一个。
+  // 选择后执行 resolveChoice()，跳转到对应 next 事件。
+  // 优先级: choices > branch（两者互斥，choices 会 return 跳过 branch）
+  if (ev.choices && ev.choices.length > 0 && state.phase !== 'ended') {
+    state.pendingChoice = ev.choices;
+    state.lastChoiceMonth = state.monthTotal;
+    state._savedAutoMode = autoMode;  // 保存自动播放状态
+    stopAuto();                        // 暂停自动播放等待玩家操作
+    return;                            // 不再执行 branch
   }
 
   if (ev.branch) {
@@ -391,8 +432,24 @@ function drawRandomEvent() {
   // Storyline isolation: only draw matching events
   if (state.storyline) {
     pool = pool.filter(ev => ev.storyline === state.storyline);
+    // If all storyline events have fired, allow replaying them (text only)
+    // so the storyline doesn't devolve into repeating flavor text
+    if (!pool.length) {
+      pool = state.randomEvents
+        .filter(ev => !ev.noRandom)
+        .filter(ev => ev.storyline === state.storyline)
+        .filter(ev => !ev.include || evalCondition(state, ev.include))
+        .filter(ev => !ev.exclude || !evalCondition(state, ev.exclude));
+      pool.forEach(ev => { ev._replay = true; });
+    }
   } else {
     pool = pool.filter(ev => !ev.storyline);
+  }
+  // ── Choice 频率节流 ──
+  // 两次选择事件至少间隔 18 个月（约 1.5 年），
+  // 保证选择不会太频繁打断游戏节奏，让每次选择都有分量感。
+  if (state.lastChoiceMonth && state.monthTotal - state.lastChoiceMonth < 18) {
+    pool = pool.filter(ev => !ev.choices);
   }
   if (!pool.length) return null;
   const majorKey = state.major ? 'MAJOR==' + state.major : null;
@@ -410,7 +467,36 @@ function drawRandomEvent() {
   return pool[pool.length - 1];
 }
 
+/**
+ * resolveChoice(index) — 玩家点击选择按钮后的回调
+ *
+ * 流程:
+ *   1. 取出玩家选中的 choice 对象
+ *   2. 清除 pendingChoice（解除游戏暂停）
+ *   3. 如果 choice.next 指向一个事件 ID，执行该后续事件（可以继续 branch/choices 链）
+ *   4. 恢复之前保存的自动播放模式
+ */
+function resolveChoice(index) {
+  const choice = state.pendingChoice[index];
+  state.pendingChoice = null;
+
+  if (choice.next) {
+    const ev = state.eventsMap.get(choice.next);
+    if (ev) applyEvent(ev);
+  }
+
+  render();
+
+  // 恢复选择前的自动播放状态
+  const savedMode = state._savedAutoMode || 0;
+  state._savedAutoMode = 0;
+  if (savedMode > 0) startAuto(savedMode);
+}
+
 function advanceMonth() {
+  // 如果有待选择，阻塞推进（点击面板/自动播放均无效）
+  if (state.pendingChoice) return;
+
   // Fire pending event from previous branch before advancing
   if (state.pendingEvent) {
     const pe = state.pendingEvent;
@@ -498,8 +584,15 @@ function advanceMonth() {
   render();
 }
 
+let _lastFlavor = '';
+
 function seasonalFlavor() {
-  const pick = a => a[Math.floor(Math.random() * a.length)];
+  const pick = a => {
+    const pool = a.length > 1 ? a.filter(x => x !== _lastFlavor) : a;
+    const chosen = pool[Math.floor(Math.random() * pool.length)];
+    _lastFlavor = chosen;
+    return chosen;
+  };
   const m = state.monthOfYear;
   const age = state.age;
 
@@ -942,6 +1035,14 @@ function render() {
       statsEl.appendChild(row);
     }
 
+    const schoolBox = $('school-box');
+    if (state.school && state.school !== '无') {
+      schoolBox.style.display = '';
+      $('school-display').textContent = state.school;
+    } else {
+      schoolBox.style.display = 'none';
+    }
+
     $('major-display').textContent = state.major || '未定';
     $('relationship-display').textContent = state.relationship || '单身';
 
@@ -981,9 +1082,45 @@ function render() {
       logEl.appendChild(div);
     }
     state.logRenderedCount = state.log.length;
+
+    // ── Choice UI 渲染 ──
+    // 每次 render 先移除旧的选择按钮（避免重复）
+    const oldChoice = logEl.querySelector('.choice-container');
+    if (oldChoice) oldChoice.remove();
+
     while (logEl.children.length > 60) {
       logEl.removeChild(logEl.firstElementChild);
     }
+
+    // 如果 pendingChoice 非空，在事件流底部渲染选择按钮
+    // 点击任一按钮 → resolveChoice(i) → 跳转到 choice.next 事件
+    // 如果 next 事件有特殊颜色（romance/hidden/special），按钮文字也上色
+    if (state.pendingChoice) {
+      const choiceDiv = document.createElement('div');
+      choiceDiv.className = 'choice-container';
+      state.pendingChoice.forEach((c, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.textContent = c.text;
+        // Determine color from next event's type
+        const nextEv = c.next ? state.eventsMap.get(c.next) : null;
+        const colorType = nextEv
+          ? (nextEv.romance ? 'romance'
+            : nextEv.logType ? nextEv.logType
+            : nextEv.set && nextEv.set.storyline
+              ? (HIDDEN_STORYLINES.has(nextEv.set.storyline) ? 'hidden' : 'special')
+              : '')
+          : '';
+        if (colorType) btn.classList.add('choice-' + colorType);
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();  // 阻止冒泡到面板的 advanceMonth
+          resolveChoice(i);
+        });
+        choiceDiv.appendChild(btn);
+      });
+      logEl.appendChild(choiceDiv);
+    }
+
     logEl.scrollTop = logEl.scrollHeight;
   }
 
@@ -1022,6 +1159,7 @@ function startAuto(mode) {
   stopAuto();
   autoMode = mode;
   const ms = mode === 2 ? 500 : 1000;
+  advanceMonth();
   autoTimer = setInterval(() => {
     if (state.phase === 'ended') {
       stopAuto();
@@ -1044,9 +1182,8 @@ function initGame() {
   syncProfessionByAge();
   planYear(15);
 
-  const playCount = parseInt(localStorage.getItem('playCount') || '0', 10) + 1;
-  localStorage.setItem('playCount', playCount);
-  if (playCount <= 1) {
+  sessionPlayCount++;
+  if (sessionPlayCount <= 1) {
     pushLog('你重生了，重生在15岁的冬天。');
   } else {
     pushLog('你又重生了，重生在15岁的冬天。');
