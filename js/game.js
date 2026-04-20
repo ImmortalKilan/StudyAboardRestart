@@ -164,6 +164,7 @@ const STUDENT_PHASES = new Set([
 const state = {
   phase: 'talent',
   alloc: { SOC: 0, INT: 0, MNY: 0, PER: 0, HLT: 0, APP: 0 },
+  allocBase: { SOC: 0, INT: 0, MNY: 0, PER: 0, HLT: 0, APP: 0 },
   talentsPool: [],
   talentsPicked: [],
   talentIds: new Set(),
@@ -284,8 +285,8 @@ function gachaDraw(talents, n) {
 function applyTalentEffects() {
   for (const t of state.talentsPicked) {
     if (t.effect) for (const [k, v] of Object.entries(t.effect)) {
-      if (STAT_KEYS.includes(k)) state[k] += v;
-      else if (k === 'HAP') state.HAP += v;
+      // STAT_KEYS bonuses already baked into alloc via allocBase
+      if (k === 'HAP') state.HAP += v;
     }
     if (typeof t.happyDelta === 'number') state.HAP += t.happyDelta;
   }
@@ -446,9 +447,8 @@ function drawRandomEvent() {
     pool = pool.filter(ev => !ev.storyline);
   }
   // ── Choice 频率节流 ──
-  // 两次选择事件至少间隔 18 个月（约 1.5 年），
-  // 保证选择不会太频繁打断游戏节奏，让每次选择都有分量感。
-  if (state.lastChoiceMonth && state.monthTotal - state.lastChoiceMonth < 18) {
+  // 两次选择事件至少间隔 8 个月，约 2 年触发 3 次
+  if (state.lastChoiceMonth && state.monthTotal - state.lastChoiceMonth < 8) {
     pool = pool.filter(ev => !ev.choices);
   }
   if (!pool.length) return null;
@@ -718,14 +718,14 @@ function seasonalFlavor() {
       ]);
       return pick(isIntl ? [
         '秋季学期，新的课表。',
-        '开学第一周就想放假（不是）。',
+        '开学第一周就想放假。',
         '秋风起，食堂上了新菜。',
         '社团招新，传单塞了一书包。',
         '换季降温，感冒了一整周。',
         '国庆长假之后，上课如上坟。',
       ] : [
         '秋季学期，新的课表。',
-        '开学第一周就想放假（不是）。',
+        '开学第一周就想放假。',
         '秋风起，食堂上了新菜。',
         '月考又来了，卷子像雪花一样发下来。',
         '换季降温，感冒了一整周。',
@@ -999,7 +999,9 @@ function renderTalentSelect(talents) {
 }
 
 function renderAlloc() {
-  const remaining = ALLOC_TOTAL - Object.values(state.alloc).reduce((a, b) => a + b, 0);
+  const baseTotal = Object.values(state.allocBase).reduce((a, b) => a + b, 0);
+  const used = Object.values(state.alloc).reduce((a, b) => a + b, 0) - baseTotal;
+  const remaining = ALLOC_TOTAL - used;
   $('alloc-remaining').textContent = remaining;
   for (const k of STAT_KEYS) {
     $(`alloc-${k}`).textContent = state.alloc[k];
@@ -1213,25 +1215,37 @@ async function main() {
   $('sex-female').addEventListener('click', () => { state.sex = 1; $('sex-female').classList.add('active'); $('sex-male').classList.remove('active'); });
 
   $('talent-confirm').addEventListener('click', () => {
+    // 将天赋加成作为属性初始值
+    for (const k of STAT_KEYS) state.allocBase[k] = 0;
+    for (const t of state.talentsPicked) {
+      if (t.effect) for (const [k, v] of Object.entries(t.effect)) {
+        if (STAT_KEYS.includes(k)) state.allocBase[k] += v;
+      }
+    }
+    for (const k of STAT_KEYS) {
+      state.allocBase[k] = Math.min(MAX_PER_STAT, state.allocBase[k]);
+      state.alloc[k] = state.allocBase[k];
+    }
     showScreen('alloc-screen');
     renderAlloc();
   });
 
   for (const k of STAT_KEYS) {
     $(`plus-${k}`).addEventListener('click', () => {
-      const used = Object.values(state.alloc).reduce((a, b) => a + b, 0);
+      const baseTotal = Object.values(state.allocBase).reduce((a, b) => a + b, 0);
+      const used = Object.values(state.alloc).reduce((a, b) => a + b, 0) - baseTotal;
       if (used < ALLOC_TOTAL && state.alloc[k] < MAX_PER_STAT) {
         state.alloc[k] += 1;
         renderAlloc();
       }
     });
     $(`minus-${k}`).addEventListener('click', () => {
-      if (state.alloc[k] > 0) { state.alloc[k] -= 1; renderAlloc(); }
+      if (state.alloc[k] > state.allocBase[k]) { state.alloc[k] -= 1; renderAlloc(); }
     });
   }
 
   $('alloc-random').addEventListener('click', () => {
-    for (const k of STAT_KEYS) state.alloc[k] = 0;
+    for (const k of STAT_KEYS) state.alloc[k] = state.allocBase[k];
     let remaining = ALLOC_TOTAL;
     while (remaining > 0) {
       const availableKeys = STAT_KEYS.filter(k => state.alloc[k] < MAX_PER_STAT);
