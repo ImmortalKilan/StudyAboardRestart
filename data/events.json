@@ -270,6 +270,27 @@
   },
 
   {
+    "id": 10306,
+    "text": "你拿着新出的标化高分去找中介补交材料。焦急地等了两周后，收到了一封意想不到的邮件——更好的学校发来了录取通知！",
+    "include": "AGE=18&HS==国际&EVT?[17004]&school!=T20&school!=无",
+    "branch": ["school==T50?10307", "school==T100+?10308"]
+  },
+  {
+    "id": 10307,
+    "text": "补交成绩后，一所Top20名校向你抛来了橄榄枝！你激动得差点把手机摔了。",
+    "noRandom": true,
+    "happyDelta": 4,
+    "set": { "school": "T20" }
+  },
+  {
+    "id": 10308,
+    "text": "补交成绩后，一所Top50大学给了你offer。比之前的学校好了不少，你松了一口气。",
+    "noRandom": true,
+    "happyDelta": 3,
+    "set": { "school": "T50" }
+  },
+
+  {
     "id": 10310,
     "text": "签证一次过，你长舒一口气。",
     "include": "AGE=18&school!=无",
