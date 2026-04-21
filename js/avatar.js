@@ -183,6 +183,16 @@ function drawBgClub(g) {
 
 // ── Romance Partner Bubble ──
 
+function drawHltEffects(g, state, time) {
+  if (state.HLT > -2) return;
+  const isCoughing = (time % 4000) < 500;
+  // Panting cloud
+  const puffY = 20 + Math.round(Math.sin(time / 150) * 2);
+  fill(g, 10, puffY, 6, 4, '#e0e0e0');
+  fill(g, 11, puffY-1, 4, 6, '#e0e0e0');
+  fill(g, 7, puffY+1, 3, 2, '#d0d0d0');
+}
+
 function drawPartnerBubble(g, state, yOffset = 0) {
   const rel = state.relationship;
   if (!rel || rel === '单身' || rel === '离异') return;
@@ -304,6 +314,13 @@ function drawBody(g, state, yOffset = 0) {
     armColor = '#6a7888';
   }
 
+  // holes for low SOC
+  if (state.SOC <= -2 && state.storyline !== 'spy' && state.storyline !== 'abyss' && state.storyline !== 'meta') {
+    fill(g, torsoX + 6, torsoY + 10, 3, 3, skin);
+    fill(g, torsoX + 18, torsoY + 18, 4, 2, skin);
+    fill(g, torsoX + 10, torsoY + 22, 2, 3, skin);
+  }
+
   // outline torso
   for (let x = torsoX; x < torsoX + torsoW; x++) px(g, x, torsoY + torsoH, P.outline);
   for (let y = torsoY; y < torsoY + torsoH; y++) { px(g, torsoX - 1, y, P.outline); px(g, torsoX + torsoW, y, P.outline); }
@@ -356,6 +373,7 @@ function drawHair(g, state, m) {
   const isFemale = state.sex === 1;
   let hair = P.hairBlack;
   if (state.APP >= 8) hair = P.hairLight;
+  else if (state.APP <= 2) hair = '#202a20';
   else if (state.APP >= 5) hair = P.hairBrown;
   else if (state.APP >= 3) hair = P.hairDark;
 
@@ -378,6 +396,12 @@ function drawHair(g, state, m) {
       fill(g, m.headX + 14, m.headTop - 6, 3, 2, hair);
     }
   }
+
+  if (state.APP <= 2) {
+    px(g, m.headX - 3, m.headTop - 5, hair); px(g, m.headX + m.headW + 2, m.headTop - 3, hair);
+    px(g, m.headX + 4, m.headTop - 6, hair); px(g, m.headX + 12, m.headTop - 7, hair);
+    fill(g, m.headX + m.headW + 1, m.headTop + 5, 2, 1, hair);
+  }
 }
 
 // ── Face ──
@@ -389,9 +413,17 @@ function drawFace(g, state, m) {
 
   fill(g, eyeLX, eyeY, 3, 2, P.eyeWhite);
   fill(g, eyeRX, eyeY, 3, 2, P.eyeWhite);
-  px(g, eyeLX + 1, eyeY, P.eye); px(g, eyeLX + 1, eyeY + 1, P.eye);
-  px(g, eyeRX + 1, eyeY, P.eye); px(g, eyeRX + 1, eyeY + 1, P.eye);
-  px(g, eyeLX + 2, eyeY, P.eyeHighlight); px(g, eyeRX + 2, eyeY, P.eyeHighlight);
+  if (state.INT <= 2) {
+    // Derpy eyes
+    px(g, eyeLX + 2, eyeY, P.eye); px(g, eyeLX + 2, eyeY + 1, P.eye);
+    px(g, eyeRX, eyeY + 1, P.eye); px(g, eyeRX, eyeY + 2, P.eye);
+    // Drool
+    fill(g, m.headX + 11, m.headTop + 17, 2, 4, '#a0c0f0');
+  } else {
+    px(g, eyeLX + 1, eyeY, P.eye); px(g, eyeLX + 1, eyeY + 1, P.eye);
+    px(g, eyeRX + 1, eyeY, P.eye); px(g, eyeRX + 1, eyeY + 1, P.eye);
+    px(g, eyeLX + 2, eyeY, P.eyeHighlight); px(g, eyeRX + 2, eyeY, P.eyeHighlight);
+  }
 
   if (state.APP >= 6) {
     fill(g, eyeLX - 1, eyeY, 5, 3, P.eyeWhite); fill(g, eyeRX - 1, eyeY, 5, 3, P.eyeWhite);
@@ -418,6 +450,11 @@ function drawFace(g, state, m) {
   px(g, m.headX + 8, m.headTop + 13, P.outline); px(g, m.headX + 9, m.headTop + 13, P.outline); px(g, m.headX + 9, m.headTop + 14, P.outline);
 
   const mouthY = m.headTop + 17;
+  const isCoughing = state.HLT <= 2 && (Date.now() % 4000) < 500;
+  if (isCoughing) {
+    fill(g, m.headX + 5, mouthY, 4, 3, '#000');
+    return; // skip normal mouth
+  }
   const hap = state.HAP ?? 5;
   if (hap >= 7) {
     px(g, m.headX + 5, mouthY, P.mouth); fill(g, m.headX + 6, mouthY + 1, 6, 1, P.mouth); px(g, m.headX + 12, mouthY, P.mouth);
@@ -430,6 +467,12 @@ function drawFace(g, state, m) {
     px(g, m.headX + 5, mouthY + 1, P.outline); fill(g, m.headX + 6, mouthY, 6, 1, P.outline); px(g, m.headX + 12, mouthY + 1, P.outline);
   }
 
+  if (state.MNY <= -2) {
+    fill(g, m.headX + 2, m.headTop + 12, 3, 2, '#8a6a4a');
+    fill(g, m.headX + 13, m.headTop + 10, 2, 2, '#8a6a4a');
+    px(g, m.headX + 6, m.headTop + 15, '#8a6a4a');
+  }
+  
   if (state.HLT >= 7) {
     fill(g, m.headX + 1, m.headTop + 14, 3, 2, P.cheek); fill(g, m.headX + 14, m.headTop + 14, 3, 2, P.cheek);
   }
@@ -582,6 +625,24 @@ function drawFrame(time) {
   drawFace(g, lastState, m);
   drawAccessories(g, lastState, m);
   drawPartnerBubble(g, lastState, yOffset);
+  if (lastState.HAP <= 2) {
+    const cx = m.headX + 2;
+    const cy = m.headTop - 12 + Math.round(Math.sin(time / 200));
+    fill(g, cx, cy, 14, 6, '#606070');
+    fill(g, cx+2, cy-2, 10, 2, '#707080');
+    fill(g, cx-2, cy+2, 18, 2, '#505060');
+    // Rain
+    const rainOffset = Math.floor(time / 100) % 4;
+    for(let i=0; i<3; i++) {
+      fill(g, cx + 2 + i*5, cy + 8 + rainOffset + i*2, 1, 3, '#80a0e0');
+    }
+  }
+  drawHltEffects(g, lastState, time);
+  if (lastState.PER <= 2) {
+    const sweatY = 16 + Math.floor((time % 2000) / 200);
+    fill(g, m.headX + 14, sweatY + yOffset, 2, 3, '#80c0f0');
+    px(g, m.headX + 14, sweatY + yOffset - 1, '#80c0f0');
+  }
 
   lastCanvas.width = W * SCALE;
   lastCanvas.height = H * SCALE;
