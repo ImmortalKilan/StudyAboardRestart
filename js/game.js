@@ -8,7 +8,7 @@ const STAT_LABELS = {
   POP: '人气', POK: '牌技', MMR: '天梯分'
 };
 const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK', 'MMR']);
-const ALLOC_TOTAL = 20;
+const ALLOC_TOTAL = 25;
 const MAX_PER_STAT = 10;
 
 const DEFAULT_PROF_BY_AGE = [
@@ -31,23 +31,31 @@ const STORYLINE_CFG = {
       { cond: s => s.HLT <= -2, event: 50060 },
       { cond: s => s.PER <= -2, event: 50061 },
       { cond: s => s.SOC <= -2 && s.HAP <= -2, event: 50064 },
+      { cond: s => s.INT <= -2, event: 50062 },
+      { cond: s => s.SOC <= -4, event: 50063 },
+      { cond: s => s.HAP <= -4 && s.INT > -2, event: 50065 },
     ],
     flavor: () => spyFlavor(),
   },
   abyss: {
+    duration: 3,
     gracePeriod: 12,
+    successEvent: 60040,
     eventRate: 0.8,
     deathChecks: [
-      { cond: s => s.HLT <= -7, event: 60091 },
-      { cond: s => s.HAP <= -12 && s.INT <= -4, event: 60091 },
+      { cond: s => s.HLT <= -20, event: 60091 },
+      { cond: s => s.HAP <= -8, event: 60091 },
     ],
     flavor: () => abyssFlavor(),
   },
   meta: {
+    duration: 4,
     gracePeriod: 12,
+    successEvent: 70040,
     eventRate: 0.75,
     deathChecks: [
-      { cond: s => s.HAP <= -12, event: 70094 },
+      { cond: s => s.HAP <= -5, event: 70094 },
+      { cond: s => s.HLT <= -5, event: 70095 }
     ],
     flavor: () => metaFlavor(),
   },
@@ -284,9 +292,14 @@ function gachaDraw(talents, n) {
 
 function applyTalentEffects() {
   for (const t of state.talentsPicked) {
-    if (t.effect) for (const [k, v] of Object.entries(t.effect)) {
-      // STAT_KEYS bonuses already baked into alloc via allocBase
-      if (k === 'HAP') state.HAP += v;
+    if (t.effect) {
+      for (const [k, v] of Object.entries(t.effect)) {
+        if (STAT_KEYS.includes(k)) {
+          state[k] = (state[k] || 0) + v;
+        } else if (k === 'HAP') {
+          state.HAP += v;
+        }
+      }
     }
     if (typeof t.happyDelta === 'number') state.HAP += t.happyDelta;
   }
@@ -900,62 +913,62 @@ function spyFlavor() {
   const pick = a => a[Math.floor(Math.random() * a.length)];
   const y = state.age - state.storylineStart;
   if (y <= 1) return pick([
-    '「国际特工」凌晨四点，教官把你从床上拽起来跑十公里。',
-    '「国际特工」你在靶场练习射击，耳朵嗡嗡作响。',
-    '「国际特工」今天的训练内容是水刑抗审讯，你差点窒息。',
-    '「国际特工」格斗课上你被摔了十几次，浑身青紫。',
-    '「国际特工」深夜密码学课程，你对着乱码头痛欲裂。',
-    '「国际特工」你在黑暗中匍匐前进，膝盖磨破了皮。',
-    '「国际特工」教官递给你一份假身份档案：「背下来，这就是你。」',
-    '「国际特工」体能测试不合格，被罚多跑五圈。',
+    '凌晨四点，教官把你从床上拽起来跑十公里。',
+    '你在靶场练习射击，耳朵嗡嗡作响。',
+    '今天的训练内容是水刑抗审讯，你差点窒息。',
+    '格斗课上你被摔了十几次，浑身青紫。',
+    '深夜密码学课程，你对着乱码头痛欲裂。',
+    '你在黑暗中匍匐前进，膝盖磨破了皮。',
+    '教官递给你一份假身份档案：「背下来，这就是你。」',
+    '体能测试不合格，被罚多跑五圈。',
   ]);
   if (y <= 3) return pick([
-    '「国际特工」你在模拟任务中成功潜入了目标建筑。',
-    '「国际特工」今天学习了三种不同的伪装术。',
-    '「国际特工」跟踪与反跟踪训练，你在城市街头穿梭。',
-    '「国际特工」你学会了用十种不同的方式打开一把锁。',
-    '「国际特工」高级驾驶课程——你把训练车的轮胎磨平了。',
-    '「国际特工」审讯技巧训练，你开始学会读懂微表情。',
-    '「国际特工」今天的任务是48小时不合眼，你在第36小时开始产生幻觉。',
-    '「国际特工」教官说你的进步很大，但眼神里没有温度。',
+    '你在模拟任务中成功潜入了目标建筑。',
+    '今天学习了三种不同的伪装术。',
+    '跟踪与反跟踪训练，你在城市街头穿梭。',
+    '你学会了用十种不同的方式打开一把锁。',
+    '高级驾驶课程——你把训练车的轮胎磨平了。',
+    '审讯技巧训练，你开始学会读懂微表情。',
+    '今天的任务是48小时不合眼，你在第36小时开始产生幻觉。',
+    '教官说你的进步很大，但眼神里没有温度。',
   ]);
   return pick([
-    '「国际特工」你已经记不清自己的真名了。',
-    '「国际特工」又一次任务简报，你面无表情地点头。',
-    '「国际特工」在安全屋里独自度过又一个夜晚。',
-    '「国际特工」你检查了三遍窗户和门锁才躺下。',
-    '「国际特工」偶尔想起从前的生活，恍如隔世。',
-    '「国际特工」搭档用暗号联络你，一切如常。',
-    '「国际特工」你在镜子里看到一个陌生人——那是你自己。',
-    '「国际特工」任务间隙，你在天台抽了一根烟，看着远处的灯火。',
+    '你已经记不清自己的真名了。',
+    '又一次任务简报，你面无表情地点头。',
+    '在安全屋里独自度过又一个夜晚。',
+    '你检查了三遍窗户和门锁才躺下。',
+    '偶尔想起从前的生活，恍如隔世。',
+    '搭档用暗号联络你，一切如常。',
+    '你在镜子里看到一个陌生人——那是你自己。',
+    '任务间隙，你在天台抽了一根烟，看着远处的灯火。',
   ]);
 }
 
 function abyssFlavor() {
   const pick = a => a[Math.floor(Math.random() * a.length)];
   return pick([
-    '「深渊科技」你盯着满屏的代码，眼前开始出现重影。',
-    '「深渊科技」凌晨三点，地下基地的荧光灯发出令人烦躁的嗡嗡声。',
-    '「深渊科技」你又做了那个梦——无尽的数据洪流把你淹没。',
-    '「深渊科技」咖啡已经喝到第七杯了，你的手在微微发抖。',
-    '「深渊科技」AGI 核心的运算指示灯闪烁着冰冷的蓝光，像某种生物的脉搏。',
-    '「深渊科技」你已经记不清上一次看到太阳是什么时候了。',
-    '「深渊科技」走廊尽头的安保摄像头似乎一直在盯着你。',
-    '「深渊科技」你在代码注释里偷偷写下了一句"救命"，然后又删掉了。',
+    '你盯着满屏的代码，眼前开始出现重影。',
+    '凌晨三点，地下基地的荧光灯发出令人烦躁的嗡嗡声。',
+    '你又做了那个梦——无尽的数据洪流把你淹没。',
+    '咖啡已经喝到第七杯了，你的手在微微发抖。',
+    'AGI 核心的运算指示灯闪烁着冰冷的蓝光，像某种生物的脉搏。',
+    '你已经记不清上一次看到太阳是什么时候了。',
+    '走廊尽头的安保摄像头似乎一直在盯着你。',
+    '你在代码注释里偷偷写下了一句"救命"，然后又删掉了。',
   ]);
 }
 
 function metaFlavor() {
   const pick = a => a[Math.floor(Math.random() * a.length)];
   return pick([
-    '「第四面墙」天空的分辨率今天似乎降低了，大概是服务器在省资源。',
-    '「第四面墙」你试图和一棵树对话，它回复了一句"交互未定义"。',
-    '「第四面墙」你又看到了那行浮空的调试信息，然后它闪了一下消失了。',
-    '「第四面墙」你盯着镜子看了很久，总觉得你的面部多边形有点少。',
-    '「第四面墙」风吹过来的方向不对，好像有人把风场参数填反了。',
-    '「第四面墙」路过的NPC第三次对你说了一模一样的台词。',
-    '「第四面墙」你试着往地图边缘走，脚下的地面开始变得透明。',
-    '「第四面墙」今天的日落持续了零点三秒就切换成了夜晚。',
+    '天空的分辨率今天似乎降低了，大概是服务器在省资源。',
+    '你试图和一棵树对话，它回复了一句"交互未定义"。',
+    '你又看到了那行浮空的调试信息，然后它闪了一下消失了。',
+    '你盯着镜子看了很久，总觉得你的面部多边形有点少。',
+    '风吹过来的方向不对，好像有人把风场参数填反了。',
+    '路过的NPC第三次对你说了一模一样的台词。',
+    '你试着往地图边缘走，脚下的地面开始变得透明。',
+    '今天的日落持续了零点三秒就切换成了夜晚。',
   ]);
 }
 
@@ -1218,16 +1231,8 @@ async function main() {
   $('sex-female').addEventListener('click', () => { state.sex = 1; $('sex-female').classList.add('active'); $('sex-male').classList.remove('active'); });
 
   $('talent-confirm').addEventListener('click', () => {
-    // 将天赋加成作为属性初始值
-    for (const k of STAT_KEYS) state.allocBase[k] = 0;
-    for (const t of state.talentsPicked) {
-      if (t.effect) for (const [k, v] of Object.entries(t.effect)) {
-        if (STAT_KEYS.includes(k)) state.allocBase[k] += v;
-      }
-    }
     for (const k of STAT_KEYS) {
-      state.allocBase[k] = Math.min(MAX_PER_STAT, state.allocBase[k]);
-      state.alloc[k] = state.allocBase[k];
+      state.alloc[k] = 0;
     }
     showScreen('alloc-screen');
     renderAlloc();
@@ -1235,20 +1240,19 @@ async function main() {
 
   for (const k of STAT_KEYS) {
     $(`plus-${k}`).addEventListener('click', () => {
-      const baseTotal = Object.values(state.allocBase).reduce((a, b) => a + b, 0);
-      const used = Object.values(state.alloc).reduce((a, b) => a + b, 0) - baseTotal;
+      const used = Object.values(state.alloc).reduce((a, b) => a + b, 0);
       if (used < ALLOC_TOTAL && state.alloc[k] < MAX_PER_STAT) {
         state.alloc[k] += 1;
         renderAlloc();
       }
     });
     $(`minus-${k}`).addEventListener('click', () => {
-      if (state.alloc[k] > state.allocBase[k]) { state.alloc[k] -= 1; renderAlloc(); }
+      if (state.alloc[k] > 0) { state.alloc[k] -= 1; renderAlloc(); }
     });
   }
 
   $('alloc-random').addEventListener('click', () => {
-    for (const k of STAT_KEYS) state.alloc[k] = state.allocBase[k];
+    for (const k of STAT_KEYS) state.alloc[k] = 0;
     let remaining = ALLOC_TOTAL;
     while (remaining > 0) {
       const availableKeys = STAT_KEYS.filter(k => state.alloc[k] < MAX_PER_STAT);
