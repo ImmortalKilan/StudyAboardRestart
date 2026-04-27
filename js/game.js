@@ -143,6 +143,36 @@ const STORYLINE_CFG = {
       { cond: s => s.age - s.storylineStart >= 1, event: 83094 },
     ],
   },
+  idol: {
+    gracePeriod: 12,
+    eventRate: 0.6,
+    progressChecks: [
+      { cond: s => s.age - s.storylineStart >= 3, event: 80040 },
+    ],
+  },
+  superstar: {
+    gracePeriod: 12,
+    eventRate: 0.6,
+    progressChecks: [
+      { cond: s => s.POP >= 80, event: 80090 },
+      { cond: s => s.INT < 4, event: 80091 },
+    ],
+  },
+  streamer: {
+    gracePeriod: 12,
+    eventRate: 0.6,
+    progressChecks: [
+      { cond: s => s.age - s.storylineStart >= 2 && s.POP >= 20, event: 80092 },
+      { cond: s => s.age - s.storylineStart >= 2 && s.POP < 10, event: 80093 },
+    ],
+  },
+  wasted: {
+    gracePeriod: 12,
+    eventRate: 0.6,
+    progressChecks: [
+      { cond: s => s.age - s.storylineStart >= 2 && s.HAP <= 0 && s.SOC <= 0, event: 82093 },
+    ],
+  },
 };
 
 const STORYLINE_NAMES = {
@@ -412,8 +442,9 @@ function applyEvent(ev) {
 
   // Apply set before logging so storyline color is correct
   if (ev.set) {
+    const prevStoryline = state.storyline;
     for (const [k, v] of Object.entries(ev.set)) state[k] = v;
-    if (ev.set.storyline && !state.storylineStart) {
+    if (ev.set.storyline && (!state.storylineStart || ev.set.storyline !== prevStoryline)) {
       state.storylineStart = state.age;
       state.storylineStartMonth = state.monthTotal;
     }
@@ -1014,15 +1045,15 @@ function metaFlavor() {
 function storylineFlavor() {
   const sl = state.storyline;
   const flavors = {
-    idol:       ['你在练习室里反复排练舞步。', '经纪人给你排了一个新通告。', '你对着镜子练习微笑。'],
-    superstar:  ['粉丝在社交媒体上疯狂刷屏。', '你的日程被各种活动填满了。', '又是忙碌而充实的一天。'],
-    streamer:   ['你调试着直播间的灯光和设备。', '今天的直播数据还不错。', '你在构思下一期的内容选题。'],
+    idol:       ['你在练习室里反复排练舞步。', '经纪人给你排了一个新通告。', '你对着镜子练习微笑。', '化妆师又给你换了一个新造型。', '你在录音棚里反复 retake 同一句歌词。', '今天的体重秤数字让你心跳加速。', '你和队友一起练习队形走位到深夜。', '舞台监督叫你重新对一遍走位。', '你在评估表上又被打了 B 等级。', '粉丝群的小作文又一次让你失眠。'],
+    superstar:  ['粉丝在社交媒体上疯狂刷屏。', '你的日程被各种活动填满了。', '又是忙碌而充实的一天。', '助理递来一杯咖啡，你已经分不清是第几杯了。', '保镖小心翼翼地把你护送进酒店后门。', '你在飞往下一个城市的私人飞机上小憩。', '商务团队又递来一份七位数的代言合约。', '剧组在深夜给你加了三场补拍。', '你打开热搜，发现自己又上了榜首。', '走红毯前你被造型师围着改了第六版礼服。'],
+    streamer:   ['你调试着直播间的灯光和设备。', '今天的直播数据还不错。', '你在构思下一期的内容选题。', '中控让你今晚的下播时间再延后两个小时。', '你看了眼实时弹幕，刷屏的全是要求你跳舞。', '今天的礼物榜被一个新榜一刷上了百万。', '你回复完粉丝群里几百条消息，已经凌晨四点。', '剪辑师把你今天的高光镜头剪成了短视频。', '你在选品会议上挑选下场直播的 SKU。', '广告金主又寄来了一堆产品试用装。'],
     poker:      ['你在脑海中复盘昨晚的牌局。', '你默默计算着底池赔率。', '你研究着对手的下注模式。'],
     triton:     ['你的名字开始在牌圈里传开。', '你冷静地分析着每一手牌。', '高额桌的空气令人窒息。'],
     local_shark:['你在牌桌上不动声色。', '又是一个漫长的夜晚。', '你点了一杯威士忌，继续等待。'],
     party:      ['你在组织下一场派对的细节。', '手机响个不停，全是派对邀请。', '你和朋友们在策划一个大活动。'],
     ceo:        ['你在咖啡厅里和合伙人讨论商业计划。', '投资人的电话一个接一个。', '你在白板上画着公司的未来蓝图。'],
-    wasted:     ['你宿醉未醒，盯着天花板发呆。', '昨晚的记忆一片模糊。', '你翻了翻空空如也的钱包。'],
+    wasted:     ['你宿醉未醒，盯着天花板发呆。', '昨晚的记忆一片模糊。', '你翻了翻空空如也的钱包。', '出租屋的水电费又欠了一个月。', '你打开冰箱，里面只剩半瓶过期的啤酒。', '你发了个朋友圈，没人点赞。', '你点了一份最便宜的麦当劳外卖。', '你刷了一晚上短视频，太阳又升起来了。', '你想找老朋友聚聚，发现已经没人愿意接你电话。', '你看着窗外别人忙碌的身影，感到一种说不出的疲倦。'],
     esports:    ['你坐在电竞椅上看着回放录像。', '训练赛打到凌晨三点，眼睛干涩发酸。', '你在练习瞄准，一遍又一遍。'],
     worlds:     ['全世界的目光都聚焦在这里。', '你在后台调整着鼠标DPI。', '赛前的紧张感让你手心冒汗。'],
     minor_league:['又是一场没人看的比赛。', '网吧的空调坏了，热得你心烦意乱。', '你刷着手机看顶级联赛的集锦，心里五味杂陈。'],
