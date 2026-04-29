@@ -479,7 +479,10 @@ function applyEvent(ev) {
   }
 
   const msg = ev.text || ev.event;
-  const evLogType = ev.romance ? 'romance' : ev.logType || undefined;
+  let evLogType = ev.end ? 'ending' : (ev.romance ? 'romance' : ev.logType || undefined);
+  if (!evLogType && ev.include && /MAJOR==/.test(ev.include)) {
+    evLogType = 'major';
+  }
   if (msg) pushLog(msg, evLogType);
 
   if (ev.effect) for (const [k, v] of Object.entries(ev.effect)) {
@@ -498,7 +501,12 @@ function applyEvent(ev) {
   // 选择后执行 resolveChoice()，跳转到对应 next 事件。
   // 优先级: choices > branch（两者互斥，choices 会 return 跳过 branch）
   if (ev.choices && ev.choices.length > 0 && state.phase !== 'ended') {
-    state.pendingChoice = ev.choices;
+    let visible = ev.choices.filter(c => !c.showExpr || evalCondition(state, c.showExpr));
+    if (visible.length === 0) return;
+    if (ev.pickN && visible.length > ev.pickN) {
+      visible = sample(visible, ev.pickN);
+    }
+    state.pendingChoice = visible;
     state.lastChoiceMonth = state.monthTotal;
     state._savedAutoMode = autoMode;  // 保存自动播放状态
     stopAuto();                        // 暂停自动播放等待玩家操作
@@ -1114,9 +1122,58 @@ function renderAlloc() {
   const used = Object.values(state.alloc).reduce((a, b) => a + b, 0) - baseTotal;
   const remaining = ALLOC_TOTAL - used;
   $('alloc-remaining').textContent = remaining;
+
+  const bonusByStat = {};
+  for (const k of STAT_KEYS) bonusByStat[k] = 0;
+  for (const t of state.talentsPicked || []) {
+    if (!t.effect) continue;
+    for (const [k, v] of Object.entries(t.effect)) {
+      if (STAT_KEYS.includes(k)) bonusByStat[k] += v;
+    }
+  }
+
   for (const k of STAT_KEYS) {
     $(`alloc-${k}`).textContent = state.alloc[k];
+    const bEl = $(`bonus-${k}`);
+    if (bEl) {
+      const b = bonusByStat[k];
+      if (b) {
+        bEl.textContent = (b > 0 ? '+' : '') + b;
+        bEl.className = 'alloc-bonus ' + (b > 0 ? 'pos' : 'neg');
+      } else {
+        bEl.textContent = '';
+        bEl.className = 'alloc-bonus';
+      }
+    }
   }
+
+  const banner = $('talent-bonus-banner');
+  if (banner) {
+    const picks = state.talentsPicked || [];
+    if (picks.length === 0) {
+      banner.style.display = 'none';
+      banner.innerHTML = '';
+    } else {
+      banner.style.display = '';
+      const chips = picks.map(t => {
+        const parts = [];
+        if (t.effect) {
+          for (const [k, v] of Object.entries(t.effect)) {
+            const label = STAT_LABELS[k];
+            if (!label) continue;
+            parts.push(`<span class="tb-eff ${v > 0 ? 'pos' : 'neg'}">${v > 0 ? '+' : ''}${v}${label}</span>`);
+          }
+        }
+        if (typeof t.happyDelta === 'number' && t.happyDelta) {
+          parts.push(`<span class="tb-eff ${t.happyDelta > 0 ? 'pos' : 'neg'}">${t.happyDelta > 0 ? '+' : ''}${t.happyDelta}快乐</span>`);
+        }
+        const effHtml = parts.length ? parts.join('') : '<span class="tb-eff none">无属性加成</span>';
+        return `<span class="tb-chip grade-${t.grade}"><span class="tb-name">${t.name}</span>${effHtml}</span>`;
+      }).join('');
+      banner.innerHTML = `<span class="tb-label">已选天赋</span><div class="tb-chips">${chips}</div>`;
+    }
+  }
+
   $('alloc-start').disabled = remaining !== 0;
 }
 
@@ -1216,10 +1273,33 @@ function render() {
     if (state.pendingChoice) {
       const choiceDiv = document.createElement('div');
       choiceDiv.className = 'choice-container';
+      const isCardLayout = state.pendingChoice.some(c => c.title || c.desc);
+      if (isCardLayout) choiceDiv.classList.add('choice-cards');
       state.pendingChoice.forEach((c, i) => {
         const btn = document.createElement('button');
         btn.className = 'choice-btn';
-        btn.textContent = c.text;
+        if (c.title || c.desc) btn.classList.add('choice-card');
+        const locked = c.requireExpr && !evalCondition(state, c.requireExpr);
+        if (c.title || c.desc) {
+          const titleEl = document.createElement('div');
+          titleEl.className = 'choice-title';
+          titleEl.textContent = c.title || c.text || '';
+          btn.appendChild(titleEl);
+          if (c.desc) {
+            const descEl = document.createElement('div');
+            descEl.className = 'choice-desc';
+            descEl.textContent = c.desc;
+            btn.appendChild(descEl);
+          }
+          if (c.requireText) {
+            const reqEl = document.createElement('div');
+            reqEl.className = 'choice-req' + (locked ? ' locked' : ' met');
+            reqEl.textContent = (locked ? '🔒 ' : '✓ ') + c.requireText;
+            btn.appendChild(reqEl);
+          }
+        } else {
+          btn.textContent = c.text;
+        }
         // Determine color from next event's type
         const nextEv = c.next ? state.eventsMap.get(c.next) : null;
         const colorType = nextEv
@@ -1230,8 +1310,13 @@ function render() {
               : '')
           : '';
         if (colorType) btn.classList.add('choice-' + colorType);
+        if (locked) {
+          btn.classList.add('choice-locked');
+          btn.disabled = true;
+        }
         btn.addEventListener('click', (e) => {
           e.stopPropagation();  // 阻止冒泡到面板的 advanceMonth
+          if (locked) return;
           resolveChoice(i);
         });
         choiceDiv.appendChild(btn);
@@ -1333,11 +1418,17 @@ function showEndCinematic() {
   if (_endCinematicShown) return;
   _endCinematicShown = true;
 
-  // Pick the most "ending"-flavored log entry: prefer one with 「结局」 keyword, else last log
+  // Pick the actual ending log: prefer logType='ending' (set when ev.end=true),
+  // fallback to last entry with 「结局」 keyword, else last log
   const logs = state.log;
   let endingIdx = -1;
   for (let i = logs.length - 1; i >= 0; i--) {
-    if (logs[i].text && /结局/.test(logs[i].text)) { endingIdx = i; break; }
+    if (logs[i].logType === 'ending') { endingIdx = i; break; }
+  }
+  if (endingIdx < 0) {
+    for (let i = logs.length - 1; i >= 0; i--) {
+      if (logs[i].text && /结局/.test(logs[i].text)) { endingIdx = i; break; }
+    }
   }
   const endingLog = endingIdx >= 0 ? logs[endingIdx] : logs[logs.length - 1];
 
@@ -1407,10 +1498,10 @@ function renderSummary() {
     heroMeta.innerHTML = chips.join('');
   }
 
-  // 最终结局：取最后一条带 logType=hidden/special 或包含「结局」的 log
-  const endingLog = [...state.log].reverse().find(e =>
-    (e.text && /结局/.test(e.text)) || e.logType === 'hidden' || e.logType === 'special'
-  );
+  // 最终结局：优先 logType=ending（来自 ev.end=true），否则回退到 hidden/special/「结局」
+  const reversed = [...state.log].reverse();
+  const endingLog = reversed.find(e => e.logType === 'ending')
+    || reversed.find(e => (e.text && /结局/.test(e.text)) || e.logType === 'hidden' || e.logType === 'special');
   const endingEl = $('summary-ending');
   if (endingLog) {
     endingEl.innerHTML = `<div class="ending-tag">${endingLog.tag}</div><div class="ending-text">${endingLog.text}</div>`;

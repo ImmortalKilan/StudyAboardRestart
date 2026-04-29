@@ -7914,16 +7914,32 @@
   {
     "id": 14060,
     "event": "你们坐在校园的草坪上。学士帽被风吹歪了，TA帮你扶正。「接下来怎么办？」当年在一起时问过一次的问题，现在又摆到了面前。",
-    "include": "(relationship==恋爱)&(AGE>=22)&(AGE<=23)",
+    "include": "(relationship==恋爱)&(AGE>=22)&(AGE<=26)",
     "exclude": "EVT?[14060]",
     "weight": 100,
     "effect": {
       "HAP": -1
     },
-    "branch": [
-      "(MNY>=6)&(SOC>=4)?14061:4",
-      "PER>=5?14062:3",
-      "?14063:2"
+    "choices": [
+      {
+        "title": "去同一座城市，搬到一起住",
+        "desc": "押金、家具、宜家的下午，新生活的开始。",
+        "requireExpr": "MNY>=4",
+        "requireText": "需家境≥4",
+        "next": 14061
+      },
+      {
+        "title": "异地长跑，三个月一见",
+        "desc": "机票和视频电话维系的感情。",
+        "requireExpr": "PER>=3",
+        "requireText": "需毅力≥3",
+        "next": 14062
+      },
+      {
+        "title": "好聚好散",
+        "desc": "现实摆在面前，留不住就放手。",
+        "next": 14063
+      }
     ],
     "romance": true
   },
@@ -8093,14 +8109,41 @@
   },
   {
     "id": 14111,
-    "event": "同居多年，到了该给个交代的时候。是时候买一枚钻戒，走向人生的下一个阶段了。",
+    "event": "同居多年，到了该给个交代的时候。是把戒指掏出来，还是再等等，又或者就此散场？决定权在你。",
     "include": "(relationship==同居)&(AGE>=24)",
-    "exclude": "EVT?[14111]",
-    "weight": 80,
-    "branch": [
-      "MNY>=8?14112:8",
-      "?14113:2"
+    "weight": 40,
+    "choices": [
+      {
+        "title": "买戒指求婚",
+        "desc": "米其林、烛光、单膝下跪，该收尾了。",
+        "requireExpr": "MNY>=5",
+        "requireText": "需家境≥5",
+        "next": 14112
+      },
+      {
+        "title": "再等等，先攒钱",
+        "desc": "把这事先按下，TA 也没多说。",
+        "next": 14113
+      },
+      {
+        "title": "我们好像走不下去了",
+        "desc": "把话说开，互相消耗下去更糟。",
+        "next": 14114
+      }
     ],
+    "romance": true
+  },
+  {
+    "id": 14114,
+    "event": "你坐 TA 对面，认真说出了那句话。TA 沉默了很久，没哭，只是点点头：「我也想过。」你们清算了房租，分了行李，一段并不算短的同居就这样收尾了。",
+    "noRandom": true,
+    "set": {
+      "relationship": "单身"
+    },
+    "effect": {
+      "HAP": -4,
+      "PER": 1
+    },
     "romance": true
   },
   {
@@ -8119,15 +8162,10 @@
   },
   {
     "id": 14113,
-    "event": "你看了看卡里的余额，连个首付都凑不齐，更别提戒指了。你选择了沉默。没过多久，TA 留下一封信失望地搬走了。同居岁月就此落幕。",
+    "event": "你看了看卡里的余额，连个首付都凑不齐，更别提戒指了。你叹了口气，把这个念头先按了下去——再等等吧，等手头宽裕些再说。TA 也没多问，那晚你们一起加班到了凌晨。",
     "noRandom": true,
-    "set": {
-      "relationship": "单身"
-    },
     "effect": {
-      "HAP": -3,
-      "SOC": -2,
-      "PER": -2
+      "HAP": -1
     },
     "romance": true
   },
@@ -9854,14 +9892,42 @@
   },
   {
     "id": 14301,
-    "event": "你偶然发现 TA 的账单里有一笔不知去向的巨大开销。你深吸一口气，坐在沙发上等 TA 下班。",
+    "event": "你偶然发现 TA 的账单里有一笔不知去向的巨大开销。你深吸一口气，开始想该怎么处理。",
     "include": "((relationship==已婚)|(relationship==二婚))",
     "exclude": "EVT?[14301]",
     "weight": 25,
-    "branch": [
-      "SOC>=7?14302:6",
-      "?14303:3"
+    "choices": [
+      {
+        "title": "等 TA 下班，平和沟通",
+        "desc": "先听 TA 怎么说，别先入为主。",
+        "requireExpr": "SOC>=6",
+        "requireText": "需社交≥6",
+        "next": 14302
+      },
+      {
+        "title": "私下查账，弄清楚",
+        "desc": "悄悄翻翻流水，不打草惊蛇。",
+        "requireExpr": "INT>=6",
+        "requireText": "需智力≥6",
+        "next": 14309
+      },
+      {
+        "title": "当面质问，直接摊牌",
+        "desc": "等 TA 一进门就把账单拍桌上。",
+        "next": 14303
+      }
     ],
+    "romance": true
+  },
+  {
+    "id": 14309,
+    "event": "你翻了几天流水，发现是给 TA 父母的医疗费——TA 一直瞒着你不想让你担心。你假装什么都没看见，转头自己给那边补了一笔。",
+    "noRandom": true,
+    "effect": {
+      "HAP": 1,
+      "SOC": 1,
+      "MNY": -1
+    },
     "romance": true
   },
   {
@@ -9923,10 +9989,33 @@
     "include": "((relationship==已婚)|(relationship==二婚))&(AGE>=28)&(SOC>=6)",
     "exclude": "EVT?[14310]",
     "weight": 60,
-    "branch": [
-      "PER>=5?14311:5",
-      "?14312:3"
+    "choices": [
+      {
+        "title": "礼貌拒绝，提前回家",
+        "desc": "守住底线，回去陪 TA。",
+        "next": 14311
+      },
+      {
+        "title": "保留联系方式，私下聊聊",
+        "desc": "暧昧的灰色地带，谁也说不准会发展到哪。",
+        "next": 14313
+      },
+      {
+        "title": "越线一次",
+        "desc": "犯下天下人都会犯的错。",
+        "next": 14312
+      }
     ],
+    "romance": true
+  },
+  {
+    "id": 14313,
+    "event": "你们开始私下高频聊天。每条信息你都要先删除再回复，每次见 TA 都要找借口。表面什么都没发生，但你心里清楚，已经不一样了。",
+    "noRandom": true,
+    "effect": {
+      "HAP": -1,
+      "PER": -1
+    },
     "romance": true
   },
   {
@@ -10365,5 +10454,250 @@
       "PER": 2
     },
     "storyline": "meta"
+  },
+
+  {
+    "id": 14070,
+    "event": "假期带 TA 回家见父母。饭桌上空气越来越冷，吃完饭妈妈把你单独叫进房间，关上门：「这孩子，不行。」",
+    "include": "(relationship==恋爱)&(AGE>=23)&(AGE<=27)",
+    "exclude": "EVT?[14070]",
+    "weight": 50,
+    "choices": [
+      {
+        "title": "跟家里硬刚到底",
+        "desc": "我自己的婚自己定，先冷战几年再说。",
+        "requireExpr": "PER>=5",
+        "requireText": "需毅力≥5",
+        "next": 14071
+      },
+      {
+        "title": "听话，分手",
+        "desc": "孝字压顶，但你知道这不是 TA 的错。",
+        "next": 14072
+      },
+      {
+        "title": "再带 TA 回来几次，慢慢谈",
+        "desc": "用时间和耐心打动家里。",
+        "requireExpr": "SOC>=5",
+        "requireText": "需社交≥5",
+        "next": 14073
+      }
+    ],
+    "romance": true
+  },
+  {
+    "id": 14071,
+    "event": "你和家里大吵一架，搬出去住了半年。父母最终在 TA 一次发烧时来探望，僵局慢慢化开。但那道裂痕你和家里都记着。",
+    "noRandom": true,
+    "effect": {
+      "HAP": -2,
+      "PER": 1,
+      "SOC": -1
+    },
+    "romance": true
+  },
+  {
+    "id": 14072,
+    "event": "你发了一条很长的微信，又删掉，最后只发了「对不起」。TA 没回。一段感情就这样在父母的「为你好」里结束了。",
+    "noRandom": true,
+    "set": {
+      "relationship": "单身"
+    },
+    "effect": {
+      "HAP": -5,
+      "PER": -1
+    },
+    "romance": true
+  },
+  {
+    "id": 14073,
+    "event": "你换着花样安排家庭聚餐，TA 每次都准备得比上次更体面。半年后妈妈终于松口：「这孩子其实也还行。」",
+    "noRandom": true,
+    "effect": {
+      "HAP": 1,
+      "SOC": 2
+    },
+    "romance": true
+  },
+
+  {
+    "id": 14080,
+    "event": "一份诱人的 offer 摆在面前，唯一的问题是它在另一座城市。你看着 TA 还在加班的微信，捏着 offer 久久没回复。",
+    "include": "(relationship==同居)&(AGE>=25)&(AGE<=28)",
+    "exclude": "EVT?[14080]",
+    "weight": 50,
+    "choices": [
+      {
+        "title": "拒了，留下陪 TA",
+        "desc": "钱再赚，人没了就没了。",
+        "next": 14081
+      },
+      {
+        "title": "我去，TA 留",
+        "desc": "异地试三年，看能不能撑下来。",
+        "next": 14082
+      },
+      {
+        "title": "TA 跟我搬",
+        "desc": "拉 TA 一起重启，要点说服力。",
+        "requireExpr": "SOC>=5",
+        "requireText": "需社交≥5",
+        "next": 14083
+      }
+    ],
+    "romance": true
+  },
+  {
+    "id": 14081,
+    "event": "你婉拒了 offer。HR 在邮件里说「希望以后还有机会」，TA 那晚下班时给你带了一束花。",
+    "noRandom": true,
+    "effect": {
+      "HAP": 2,
+      "MNY": -2
+    },
+    "romance": true
+  },
+  {
+    "id": 14082,
+    "event": "搬家那天 TA 帮你把行李拖进高铁站。你们约好每月见一次。第三个月已经开始有人在你们群里默默不说话。",
+    "noRandom": true,
+    "set": {
+      "relationship": "异地恋"
+    },
+    "effect": {
+      "HAP": -3,
+      "MNY": 2,
+      "PER": 1
+    },
+    "romance": true
+  },
+  {
+    "id": 14083,
+    "event": "你说服了 TA。两人重新打包了同居四年的家当。新城市第一周一起吃了路边摊，TA 笑着说：「下次我说了算。」",
+    "noRandom": true,
+    "effect": {
+      "HAP": 1,
+      "MNY": 1,
+      "PER": 1
+    },
+    "romance": true
+  },
+
+  {
+    "id": 14130,
+    "event": "30 岁前夕，双方家里开始三天两头催。你们晚上躺在床上认真聊了一次：要孩子吗？",
+    "include": "((relationship==已婚)|(relationship==二婚))&(AGE>=28)",
+    "exclude": "EVT?[14130]",
+    "weight": 60,
+    "choices": [
+      {
+        "title": "准备要孩子",
+        "desc": "买叶酸、约产检、改饮食。",
+        "requireExpr": "MNY>=6&HLT>=4",
+        "requireText": "需家境≥6 健康≥4",
+        "next": 14131
+      },
+      {
+        "title": "丁克，享受二人世界",
+        "desc": "我们两个人就够了。",
+        "next": 14132
+      },
+      {
+        "title": "先拖几年再说",
+        "desc": "事业还没稳，再等等。",
+        "next": 14133
+      }
+    ],
+    "romance": true
+  },
+  {
+    "id": 14131,
+    "event": "TA 把验孕棒放到你面前。两条线。你们抱在一起激动了一会儿，然后开始查月子中心和学区房价。",
+    "noRandom": true,
+    "effect": {
+      "HAP": 3,
+      "MNY": -3,
+      "HLT": -1
+    },
+    "romance": true
+  },
+  {
+    "id": 14132,
+    "event": "你们达成了协议，一起做了不可逆的决定。家里炸了几次锅，但你们的小家从此安稳，每个周末都能睡到自然醒。",
+    "noRandom": true,
+    "effect": {
+      "HAP": 2,
+      "MNY": 1,
+      "SOC": -2
+    },
+    "romance": true
+  },
+  {
+    "id": 14133,
+    "event": "你们说「再过两年吧」。父母叹气，TA 也叹气。你心里清楚，「再过两年」往往就是再不会。",
+    "noRandom": true,
+    "effect": {
+      "HAP": -1
+    },
+    "romance": true
+  },
+
+  {
+    "id": 14140,
+    "event": "TA 最近频繁加班，回家也心不在焉。某天你看到 TA 手机锁屏闪过一个陌生头像，备注只有一个字母。",
+    "include": "((relationship==同居)|(relationship==已婚)|(relationship==二婚))&(AGE>=26)",
+    "exclude": "EVT?[14140]",
+    "weight": 35,
+    "choices": [
+      {
+        "title": "装没看见，等 TA 自己回来",
+        "desc": "也许只是同事。",
+        "next": 14141
+      },
+      {
+        "title": "主动摊牌，划清界限",
+        "desc": "让 TA 在你和那个人之间二选一。",
+        "requireExpr": "SOC>=4",
+        "requireText": "需社交≥4",
+        "next": 14142
+      },
+      {
+        "title": "你也找一个透透气",
+        "desc": "既然 TA 这样，你也不亏。",
+        "next": 14143
+      }
+    ],
+    "romance": true
+  },
+  {
+    "id": 14141,
+    "event": "你装作不知情，但每次 TA 加班你都会反复看群消息。两人之间多了一层薄薄的玻璃，谁都不去捅破。",
+    "noRandom": true,
+    "effect": {
+      "HAP": -2,
+      "PER": -1
+    },
+    "romance": true
+  },
+  {
+    "id": 14142,
+    "event": "你直接把话挑明。TA 没有解释，沉默了一晚后哭着抱住你说「就这一次，我把那个号删了」。你不知道该不该信，但还是选择再走一段。",
+    "noRandom": true,
+    "effect": {
+      "HAP": -1,
+      "SOC": 1,
+      "PER": 1
+    },
+    "romance": true
+  },
+  {
+    "id": 14143,
+    "event": "你也开始在外面找慰藉。表面上家还是那个家，实际上你们都在各自的房间里把锁拧紧。这段关系成了一具空壳。",
+    "noRandom": true,
+    "effect": {
+      "HAP": -3,
+      "PER": -2
+    },
+    "romance": true
   }
 ]

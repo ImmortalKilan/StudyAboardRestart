@@ -4,15 +4,66 @@
     "text": "中考结束了，漫长的暑假开始了。没有作业的日子里，你自然而然地把时间花在了自己真正感兴趣的事情上。",
     "include": "AGE=15",
     "fixedMonth": 6,
+    "pickN": 3,
     "choices": [
-      { "text": "跟着吴恩达的B站教程学写代码，做一个chatbot", "next": 98002 },
-      { "text": "在闲鱼上倒卖二手物品，赚点零花钱", "next": 98003 },
-      { "text": "画画/写小说/练吉他，沉浸在创作中", "next": 98004 }
+      {
+        "title": "跟吴恩达学 AI",
+        "desc": "B 站教程加 Python，做一个简陋 chatbot。",
+        "next": 98002
+      },
+      {
+        "title": "拆电脑折腾 Linux",
+        "desc": "把家里旧机器装上 Arch，折腾配置文件直到天亮。",
+        "next": 98005
+      },
+      {
+        "title": "GitHub 提 PR",
+        "desc": "给开源项目改 bug，等待 maintainer 的回复。",
+        "requireExpr": "INT>=4",
+        "requireText": "需智力≥4",
+        "next": 98006
+      },
+      {
+        "title": "闲鱼倒卖二手",
+        "desc": "低买高卖，每天蹲在评论区抢占价格。",
+        "next": 98003
+      },
+      {
+        "title": "街边摆摊",
+        "desc": "夜市卖手作或小吃，吆喝声里学会做生意。",
+        "next": 98007
+      },
+      {
+        "title": "A 股开户练手",
+        "desc": "用爸妈的账户练盘感，盈亏自负。",
+        "requireExpr": "MNY>=3",
+        "requireText": "需家境≥3",
+        "next": 98008
+      },
+      {
+        "title": "写小说 / 练吉他",
+        "desc": "画画、写作、玩乐器，沉浸在创作中。",
+        "next": 98004
+      },
+      {
+        "title": "做短视频",
+        "desc": "拍 vlog 或剧情号，剪辑到凌晨三点。",
+        "requireExpr": "APP>=3",
+        "requireText": "需颜值≥3",
+        "next": 98009
+      },
+      {
+        "title": "学古典乐器",
+        "desc": "钢琴/小提琴，请家教正经入门。",
+        "requireExpr": "MNY>=3",
+        "requireText": "需家境≥3",
+        "next": 98010
+      }
     ]
   },
   {
     "id": 98002,
-    "text": "你用Python写了能和你对话的模型，虽然简陋，但看着程序跑起来的那一刻，你觉得自己发现了一种魔法。",
+    "text": "你用 Python 写了能和你对话的模型，虽然简陋，但看着程序跑起来的那一刻，你觉得自己发现了一种魔法。",
     "noRandom": true,
     "set": { "hobby": "tech" },
     "effect": { "INT": 1 }
@@ -31,29 +82,131 @@
     "set": { "hobby": "art" },
     "effect": { "APP": 1 }
   },
+  {
+    "id": 98005,
+    "text": "你把家里那台积灰的旧台式机彻底拆了一遍又装回去，还成功在上面跑起了 Arch Linux。在 Stack Overflow 找到答案的那一刻，你觉得这比任何游戏都上头。",
+    "noRandom": true,
+    "set": { "hobby": "tech" },
+    "effect": { "INT": 1, "PER": 1 }
+  },
+  {
+    "id": 98006,
+    "text": "你给一个开源项目提了 PR，maintainer 回复了一句「LGTM」。第一次贡献被 merge 的那种成就感，跟期末考第一名完全不一样。",
+    "noRandom": true,
+    "set": { "hobby": "tech" },
+    "effect": { "INT": 1, "SOC": 1 }
+  },
+  {
+    "id": 98007,
+    "text": "夜市的霓虹灯下你支起一张折叠桌，从最初的拘谨到敢主动招呼路人。三个月后你已经能算清每一种货品的利润率。",
+    "noRandom": true,
+    "set": { "hobby": "business" },
+    "effect": { "MNY": 1, "SOC": 1 }
+  },
+  {
+    "id": 98008,
+    "text": "用爸妈给的本金小试身手，几次踩雷之后你开始研究 K 线、研报、行业逻辑。这场游戏比你想象的更有门道。",
+    "noRandom": true,
+    "set": { "hobby": "business" },
+    "effect": { "MNY": 1, "INT": 1 }
+  },
+  {
+    "id": 98009,
+    "text": "你拍的几条短视频意外火了一条，评论区刷满「哥/姐好帅」。你第一次感受到镜头给人的反馈是多么直接。",
+    "noRandom": true,
+    "set": { "hobby": "art" },
+    "effect": { "APP": 1, "SOC": 1 }
+  },
+  {
+    "id": 98010,
+    "text": "钢琴老师说你手指条件好，乐感也不错。每天两小时的练习虽然枯燥，但弹完一整首曲子的瞬间，整个夏天都安静了下来。",
+    "noRandom": true,
+    "set": { "hobby": "art" },
+    "effect": { "APP": 1, "INT": 1 }
+  },
 
   {
     "id": 10001,
-    "text": "你即将升入高中。父母和你商量未来的路。",
+    "text": "中考结束，父母把几所学校的资料铺在桌上，让你做选择。这一步将决定接下来三年的轨道。",
     "include": "AGE=15",
     "fixedMonth": 9,
-    "branch": ["MNY>=3?10002", "?10005"]
+    "choices": [
+      {
+        "title": "顶尖国际学校",
+        "desc": "国际化精英教育，留学资源拉满，学费昂贵。",
+        "requireExpr": "MNY>=4",
+        "requireText": "需家境≥4",
+        "next": 10003
+      },
+      {
+        "title": "普通国际高中",
+        "desc": "全英文授课，新世界的大门慢慢打开。",
+        "requireExpr": "MNY>=2",
+        "requireText": "需家境≥2",
+        "showExpr": "MNY<4",
+        "next": 10002
+      },
+      {
+        "title": "公立国际部",
+        "desc": "体制内的国际班，性价比高，学习压力不小。",
+        "requireExpr": "INT>=4",
+        "requireText": "需智力≥4",
+        "next": 10004
+      },
+      {
+        "title": "省重点中学",
+        "desc": "体制内尖子班，提高一分干掉千人。",
+        "requireExpr": "INT>=5",
+        "requireText": "需智力≥5",
+        "next": 10006
+      },
+      {
+        "title": "普通体制内高中",
+        "desc": "按部就班的高中三年，平凡是大多数人的轨道。",
+        "showExpr": "INT<5",
+        "next": 10005
+      }
+    ]
   },
   {
     "id": 10002,
-    "text": "家里有条件，你直接转入了国际高中。全英文授课，新世界的大门打开了。",
+    "text": "你转入了国际高中。全英文授课，新世界的大门打开了。",
     "noRandom": true,
     "set": { "hsType": "国际" },
     "happyDelta": 1,
     "effect": { "INT": 1 }
   },
   {
+    "id": 10003,
+    "text": "你进了顶尖国际学校。校园像欧美校园剧里的样子，同学非富即贵。这里的视野，是别处给不了的。",
+    "noRandom": true,
+    "set": { "hsType": "国际" },
+    "happyDelta": 2,
+    "effect": { "INT": 1, "APP": 1, "SOC": 1 }
+  },
+  {
+    "id": 10004,
+    "text": "你进了公立国际部。一边卷雅思托福，一边盯着体制内的应试节奏，鸡血与英文双管齐下。",
+    "noRandom": true,
+    "set": { "hsType": "国际" },
+    "happyDelta": 0,
+    "effect": { "INT": 1, "PER": 1 }
+  },
+  {
     "id": 10005,
-    "text": "家境一般，你继续在体制内高中奋斗。教室墙上写着「提高一分，干掉千人」。",
+    "text": "你继续在普通体制内高中奋斗。教室墙上写着「提高一分，干掉千人」。",
     "noRandom": true,
     "set": { "hsType": "体制内" },
     "happyDelta": -1,
     "effect": { "PER": 1 }
+  },
+  {
+    "id": 10006,
+    "text": "你进了省重点。年级前 50 才有上一本的可能。竞争从开学第一天就开始了。",
+    "noRandom": true,
+    "set": { "hsType": "体制内" },
+    "happyDelta": -1,
+    "effect": { "INT": 1, "PER": 1 }
   },
 
   {
@@ -371,9 +524,43 @@
   },
 
   {
+    "id": 10500,
+    "text": "大一快结束了，专业方向要在暑假前定下来。你翻着选课手册，反复掂量。",
+    "include": "AGE=19&HS==国际",
+    "fixedMonth": 9,
+    "choices": [
+      {
+        "title": "计算机科学（CS）",
+        "desc": "好就业、加班多，码农的人生从这里开始。",
+        "requireExpr": "INT>=4",
+        "requireText": "需智力≥4",
+        "next": 10502
+      },
+      {
+        "title": "商科 / 金融",
+        "desc": "Networking 是核心生产力，朋友圈晒的是西装与游艇。",
+        "requireExpr": "MNY>=3|SOC>=4",
+        "requireText": "需家境≥3 或社交≥4",
+        "next": 10503
+      },
+      {
+        "title": "文艺 / 艺术",
+        "desc": "热爱大于一切，做自己的作品胜过万贯家财。",
+        "requireExpr": "APP>=3",
+        "requireText": "需颜值≥3",
+        "next": 10504
+      },
+      {
+        "title": "随大流，先不定",
+        "desc": "拖到大二再说，有时候迷茫也是一种选择。",
+        "next": 10501
+      }
+    ]
+  },
+  {
     "id": 10501,
     "text": "大二，专业课开始变难。其实你心里早就有答案了——从那个暑假开始，方向就已经定了。",
-    "include": "AGE=20&school!=无&HS==国际",
+    "include": "AGE=20&school!=无&HS==国际&major!=CS&major!=商科&major!=文艺",
     "branch": ["hobby==tech?10505", "hobby==business?10506", "hobby==art?10507", "?10508"]
   },
   {
@@ -402,20 +589,23 @@
   },
   {
     "id": 10502,
-    "text": "你选了CS或工程，看准了好就业。",
+    "text": "你最终选了 CS。第一节算法课讲到指针时整个教室都在挠头，你却莫名兴奋——把抽象逻辑变成代码的过程，让你想起小时候第一次拼乐高。LeetCode 标签上的红点开始一天天减少。",
     "noRandom": true,
+    "logType": "major",
     "set": { "profession": "理工生", "major": "CS" }
   },
   {
     "id": 10503,
-    "text": "你选了商科，朋友圈晒着Networking照片。",
+    "text": "你选了商科 / 金融。Networking 是隐性必修课，西装和名片是入场券。你跟着学长跑了几场招聘宣讲会，回来时磨破了一双鞋——但你笑着说这才像样。",
     "noRandom": true,
+    "logType": "major",
     "set": { "profession": "商科生", "major": "商科" }
   },
   {
     "id": 10504,
-    "text": "你选了文艺，热爱大于一切。",
+    "text": "你选了文艺。教授在第一堂课说：「这门学科不会让你致富，但会让你看清世界。」你点点头，把那句话工工整整抄进了笔记本扉页。",
     "noRandom": true,
+    "logType": "major",
     "set": { "profession": "文科生", "major": "文艺" }
   },
 

@@ -351,7 +351,7 @@ button.ghost:active {
 }
 .alloc-row {
   display: grid;
-  grid-template-columns: 100px 40px 60px 40px;
+  grid-template-columns: 100px 40px 60px 40px 1fr;
   align-items: center;
   gap: 8px;
   background: var(--card);
@@ -359,6 +359,56 @@ button.ghost:active {
   padding: 10px 14px;
   border-radius: 6px;
 }
+.alloc-bonus {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 600;
+  padding-left: 6px;
+}
+.alloc-bonus.pos { color: #6dd49a; }
+.alloc-bonus.neg { color: #e07a7a; }
+
+.talent-bonus-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+}
+.talent-bonus-banner .tb-label {
+  font-size: 12px;
+  color: var(--ink-soft);
+  letter-spacing: 1px;
+  padding-top: 4px;
+}
+.talent-bonus-banner .tb-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1;
+}
+.tb-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--line);
+  font-size: 12px;
+}
+.tb-chip.grade-1 { border-color: rgba(120,180,250,0.45); }
+.tb-chip.grade-2 { border-color: rgba(200,150,240,0.45); }
+.tb-chip.grade-3 { border-color: rgba(240,200,120,0.6); }
+.tb-name { font-weight: 600; color: var(--ink); }
+.tb-eff { font-family: var(--mono); }
+.tb-eff.pos { color: #6dd49a; }
+.tb-eff.neg { color: #e07a7a; }
+.tb-eff.none { color: var(--ink-soft); font-style: italic; }
 .alloc-row span:first-child {
   font-weight: 500;
 }
@@ -551,6 +601,9 @@ body.in-game .left-panel {
 }
 .log-entry.log-romance .log-text {
   color: #f0a0b8 !important;
+}
+.log-entry.log-major .log-text {
+  color: #7ab8e0 !important;
 }
 
 .right-panel {
@@ -1217,6 +1270,57 @@ body.in-summary .app {
 .choice-btn:active {
   transform: translateY(0);
 }
+
+/* 卡面布局：标题/描述/门槛 */
+.choice-container.choice-cards {
+  flex-wrap: wrap;
+}
+.choice-btn.choice-card {
+  flex: 1 1 200px;
+  min-width: 180px;
+  text-align: left;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: linear-gradient(140deg, var(--card-2) 0%, rgba(255,255,255,0.02) 100%);
+}
+.choice-btn.choice-card .choice-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.3px;
+}
+.choice-btn.choice-card .choice-desc {
+  font-size: 12px;
+  color: var(--ink-soft);
+  line-height: 1.45;
+}
+.choice-btn.choice-card .choice-req {
+  font-size: 11px;
+  font-family: var(--mono);
+  margin-top: auto;
+  padding-top: 4px;
+}
+.choice-btn.choice-card .choice-req.met { color: #6dd49a; }
+.choice-btn.choice-card .choice-req.locked { color: #b8896d; }
+.choice-btn.choice-card:hover .choice-title { color: #0f1420; }
+.choice-btn.choice-card:hover .choice-desc { color: #2a2a2a; }
+.choice-btn.choice-card:hover .choice-req.met { color: #2d7a4d; }
+
+.choice-btn.choice-locked {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+.choice-btn.choice-locked:hover {
+  background: var(--card-2);
+  color: var(--accent);
+  transform: none;
+  box-shadow: none;
+}
+.choice-btn.choice-locked:hover .choice-title { color: var(--accent); }
+.choice-btn.choice-locked:hover .choice-desc { color: var(--ink-soft); }
 .choice-btn.choice-romance {
   color: #f0a0b8;
   border-color: #f0a0b8;
