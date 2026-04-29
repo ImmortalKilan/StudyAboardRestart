@@ -1367,3 +1367,92 @@ body.in-summary .app {
 
   .avatar-wrap { height: 240px; }
 }
+
+/* === Holdem Minigame Modal === */
+.holdem-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 10000;
+}
+.holdem-modal {
+  background: #14532d;
+  border: 2px solid #d4af37;
+  border-radius: 12px;
+  padding: 24px;
+  min-width: 480px;
+  max-width: 640px;
+  color: #fff;
+  font-family: -apple-system, sans-serif;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+.holdem-title {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: #d4af37;
+  margin-bottom: 16px;
+  letter-spacing: 2px;
+}
+.holdem-row {
+  display: flex; align-items: center; gap: 12px;
+  margin: 10px 0;
+}
+.holdem-label {
+  width: 60px; color: #aaa; font-size: 13px;
+}
+.card-row { display: flex; gap: 8px; }
+.poker-card {
+  width: 48px; height: 68px;
+  background: #fff;
+  color: #000;
+  border-radius: 6px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  transition: transform 0.2s;
+}
+.poker-card.card-back {
+  background: linear-gradient(135deg, #b91c1c, #7f1d1d);
+  color: transparent;
+}
+.poker-card .card-rank { font-size: 16px; }
+.poker-card .card-suit { font-size: 22px; }
+.holdem-info {
+  display: flex; gap: 16px;
+  background: rgba(0,0,0,0.3);
+  padding: 8px 12px; border-radius: 6px;
+  font-size: 13px;
+  margin: 12px 0;
+}
+.hand-key { color: #d4af37; font-weight: 700; }
+.holdem-bet { margin: 12px 0; }
+.holdem-bet label { display: block; margin-bottom: 6px; font-size: 13px; }
+.holdem-bet input[type="range"] { width: 100%; }
+.holdem-actions {
+  display: flex; gap: 12px; justify-content: flex-end;
+  margin-top: 16px;
+}
+.holdem-actions button {
+  padding: 8px 18px; border-radius: 6px;
+  border: 1px solid #555; cursor: pointer;
+  font-size: 14px;
+}
+.holdem-actions .primary {
+  background: #d4af37; color: #000; border-color: #d4af37;
+  font-weight: 600;
+}
+.holdem-actions .ghost {
+  background: transparent; color: #fff;
+}
+.holdem-actions button:disabled { opacity: 0.4; cursor: not-allowed; }
+.holdem-result {
+  margin-top: 12px; padding: 8px;
+  text-align: center; font-size: 14px;
+  border-radius: 6px;
+}
+.holdem-result.win { background: rgba(52,211,153,0.2); color: #6ee7b7; }
+.holdem-result.lose { background: rgba(239,68,68,0.2); color: #fca5a5; }
+.holdem-result.tie { background: rgba(180,180,180,0.2); color: #ddd; }

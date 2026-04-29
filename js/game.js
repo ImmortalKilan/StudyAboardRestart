@@ -1,5 +1,6 @@
 import { evalCondition, pickBranch, pickWeightedBranch } from './dsl.js';
 import { renderAvatar } from './avatar.js';
+import { runHoldemModal } from './minigame_holdem.js';
 
 const STAT_KEYS = ['SOC', 'INT', 'MNY', 'PER', 'HLT', 'APP'];
 const STAT_LABELS = {
@@ -86,9 +87,10 @@ const STORYLINE_CFG = {
     eventRate: 0.7,
     deathChecks: [
       { cond: s => s.MNY <= -4, event: 81091 },
+      { cond: s => (s.POK || 0) <= 0 && s.age - s.storylineStart >= 1, event: 81094 },
     ],
     progressChecks: [
-      { cond: s => s.age - s.storylineStart >= 1, event: 81040 },
+      { cond: s => (s.POK || 0) > 20 || s.age - s.storylineStart >= 2, event: 81040 },
     ],
   },
   triton: {
@@ -451,7 +453,7 @@ function applyEvent(ev) {
     return;
   }
 
-  state.firedEvents.add(ev.id);
+  if (!ev.repeatable) state.firedEvents.add(ev.id);
 
   // Apply set before logging so storyline color is correct
   if (ev.set) {
@@ -494,6 +496,34 @@ function applyEvent(ev) {
 
   if (ev.end) {
     state.phase = 'ended';
+  }
+
+  // ── Minigame: 弹 modal 暂停事件流，回调里结算 ──
+  if ((ev.minigame === 'holdem_allin' || ev.minigame === 'holdem_highroller') && state.phase !== 'ended') {
+    // POK 已为 0：直接走人，触发学徒爆仓
+    if ((state.POK || 0) <= 0) {
+      const bust = state.eventsMap.get(81094);
+      if (bust) { applyEvent(bust); return; }
+    }
+    const isHigh = ev.minigame === 'holdem_highroller';
+    const opts = isHigh
+      ? { title: '德州扑克 · 高客局', betMin: 3, loseMul: 3, foldPok: 5, foldMny: 2 }
+      : { title: '德州扑克 · 学徒局', betMin: 1, loseMul: 2, foldPok: 2, foldMny: 1 };
+    state.pendingMinigame = true;
+    state._savedAutoMode = autoMode;
+    stopAuto();
+    runHoldemModal(state, (result) => {
+      if (result.pokDelta) state.POK = (state.POK || 0) + result.pokDelta;
+      if (result.mnyDelta) state.MNY = (state.MNY || 0) + result.mnyDelta;
+      clampStats();
+      pushLog(result.log, 'special');
+      state.pendingMinigame = false;
+      render();
+      const savedMode = state._savedAutoMode || 0;
+      state._savedAutoMode = 0;
+      if (savedMode > 0) startAuto(savedMode);
+    }, opts);
+    return;
   }
 
   // ── Choice System: 玩家交互选择 ──
@@ -605,8 +635,8 @@ function resolveChoice(index) {
 }
 
 function advanceMonth() {
-  // 如果有待选择，阻塞推进（点击面板/自动播放均无效）
-  if (state.pendingChoice) return;
+  // 如果有待选择或正在玩 minigame，阻塞推进
+  if (state.pendingChoice || state.pendingMinigame) return;
 
   // Fire pending event from previous branch before advancing
   if (state.pendingEvent) {
