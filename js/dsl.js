@@ -13,6 +13,8 @@ const ALIASES = {
 };
 
 function readVar(state, key) {
+  if (key === 'AGE_AFTER_STORY') return (state.age || 0) - (state.storylineStart || 0);
+  if (key === 'MTH_AFTER_STORY') return (state.monthTotal || 0) - (state.storylineStartMonth || 0);
   const mapped = ALIASES[key] ?? key;
   return state[mapped];
 }

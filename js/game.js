@@ -1,6 +1,5 @@
 import { evalCondition, pickBranch, pickWeightedBranch } from './dsl.js';
 import { renderAvatar } from './avatar.js';
-import { runHoldemModal } from './minigame_holdem.js';
 
 const STAT_KEYS = ['SOC', 'INT', 'MNY', 'PER', 'HLT', 'APP'];
 const STAT_LABELS = {
@@ -498,34 +497,6 @@ function applyEvent(ev) {
     state.phase = 'ended';
   }
 
-  // ── Minigame: 弹 modal 暂停事件流，回调里结算 ──
-  if ((ev.minigame === 'holdem_allin' || ev.minigame === 'holdem_highroller') && state.phase !== 'ended') {
-    // POK 已为 0：直接走人，触发学徒爆仓
-    if ((state.POK || 0) <= 0) {
-      const bust = state.eventsMap.get(81094);
-      if (bust) { applyEvent(bust); return; }
-    }
-    const isHigh = ev.minigame === 'holdem_highroller';
-    const opts = isHigh
-      ? { title: '德州扑克 · 高客局', betMin: 3, loseMul: 3, foldPok: 5, foldMny: 2 }
-      : { title: '德州扑克 · 学徒局', betMin: 1, loseMul: 2, foldPok: 2, foldMny: 1 };
-    state.pendingMinigame = true;
-    state._savedAutoMode = autoMode;
-    stopAuto();
-    runHoldemModal(state, (result) => {
-      if (result.pokDelta) state.POK = (state.POK || 0) + result.pokDelta;
-      if (result.mnyDelta) state.MNY = (state.MNY || 0) + result.mnyDelta;
-      clampStats();
-      pushLog(result.log, 'special');
-      state.pendingMinigame = false;
-      render();
-      const savedMode = state._savedAutoMode || 0;
-      state._savedAutoMode = 0;
-      if (savedMode > 0) startAuto(savedMode);
-    }, opts);
-    return;
-  }
-
   // ── Choice System: 玩家交互选择 ──
   // 如果事件定义了 choices 数组，暂停游戏让玩家从中选一个。
   // 选择后执行 resolveChoice()，跳转到对应 next 事件。
@@ -572,14 +543,18 @@ function drawRandomEvent() {
     .filter(ev => !ev.include || evalCondition(state, ev.include))
     .filter(ev => !ev.exclude || !evalCondition(state, ev.exclude));
   // Storyline isolation: only draw matching events
+  const matchStoryline = (ev) => Array.isArray(ev.storyline)
+    ? ev.storyline.includes(state.storyline)
+    : ev.storyline === state.storyline;
   if (state.storyline) {
-    pool = pool.filter(ev => ev.storyline === state.storyline);
+    pool = pool.filter(matchStoryline);
     // If all storyline events have fired, allow replaying them (text only)
     // so the storyline doesn't devolve into repeating flavor text
     if (!pool.length) {
       pool = state.randomEvents
         .filter(ev => !ev.noRandom)
-        .filter(ev => ev.storyline === state.storyline)
+        .filter(matchStoryline)
+        .filter(ev => !ev.choices)
         .filter(ev => !ev.include || evalCondition(state, ev.include))
         .filter(ev => !ev.exclude || !evalCondition(state, ev.exclude));
       pool.forEach(ev => { ev._replay = true; });
@@ -588,8 +563,8 @@ function drawRandomEvent() {
     pool = pool.filter(ev => !ev.storyline);
   }
   // ── Choice 频率节流 ──
-  // 两次选择事件至少间隔 8 个月，约 2 年触发 3 次
-  if (state.lastChoiceMonth && state.monthTotal - state.lastChoiceMonth < 8) {
+  // 两次选择事件至少间隔 8 个月（剧情线内不限）
+  if (!state.storyline && state.lastChoiceMonth && state.monthTotal - state.lastChoiceMonth < 8) {
     pool = pool.filter(ev => !ev.choices);
   }
   if (!pool.length) return null;
@@ -635,8 +610,8 @@ function resolveChoice(index) {
 }
 
 function advanceMonth() {
-  // 如果有待选择或正在玩 minigame，阻塞推进
-  if (state.pendingChoice || state.pendingMinigame) return;
+  // 如果有待选择，阻塞推进
+  if (state.pendingChoice) return;
 
   // Fire pending event from previous branch before advancing
   if (state.pendingEvent) {

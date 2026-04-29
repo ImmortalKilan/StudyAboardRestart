@@ -4987,8 +4987,14 @@
     "storyline": "idol",
     "weight": 8,
     "choices": [
-      { "text": "做手术，为了梦想拼一把", "next": 80014 },
-      { "text": "拒绝手术，保持原样", "next": 80015 }
+      {
+        "text": "做手术，为了梦想拼一把",
+        "next": 80014
+      },
+      {
+        "text": "拒绝手术，保持原样",
+        "next": 80015
+      }
     ]
   },
   {
@@ -5053,8 +5059,14 @@
     "storyline": "idol",
     "weight": 10,
     "choices": [
-      { "text": "接综艺，趁热度走红", "next": 80020 },
-      { "text": "拒掉综艺，专心练舞冲 center", "next": 80021 }
+      {
+        "text": "接综艺，趁热度走红",
+        "next": 80020
+      },
+      {
+        "text": "拒掉综艺，专心练舞冲 center",
+        "next": 80021
+      }
     ]
   },
   {
@@ -5097,6 +5109,482 @@
       "POP": 4,
       "HAP": 3,
       "SOC": 1
+    }
+  },
+  {
+    "id": 80024,
+    "event": "你在直播里说错了一句话，截图被传到全网。工作室让你一小时内表态。",
+    "storyline": "idol",
+    "weight": 18,
+    "choices": [
+      {
+        "text": "真诚长文道歉",
+        "next": 80024001
+      },
+      {
+        "text": "装作没说过",
+        "next": 80024002
+      }
+    ]
+  },
+  {
+    "id": 80024001,
+    "event": "你写了一篇长文，态度恳切。粉丝心疼路人也买账。",
+    "noRandom": true,
+    "effect": {
+      "HAP": -2,
+      "POP": -3,
+      "SOC": 2
+    }
+  },
+  {
+    "id": 80024002,
+    "event": "工作室删评封号当作没事发生，但聪明人都看得出来。",
+    "noRandom": true,
+    "effect": {
+      "HAP": 1,
+      "POP": -6
+    },
+    "set": {
+      "cover_up": true
+    }
+  },
+  {
+    "id": 80032,
+    "event": "三个月前那段「装作没说过」的视频被网友扒了出来，对比图刷上热搜。三档综艺的合作方在群里催你给说法。",
+    "storyline": "idol",
+    "weight": 35,
+    "include": "cover_up=1",
+    "choices": [
+      {
+        "text": "工作室长文公关，主动退一档综艺",
+        "next": 80032001
+      },
+      {
+        "text": "亲自直播认错",
+        "next": 80032002
+      }
+    ]
+  },
+  {
+    "id": 80032001,
+    "event": "公关稿铺天盖地，但综艺资源还是被砍了一档。",
+    "noRandom": true,
+    "effect": {
+      "POP": -3,
+      "MNY": -2,
+      "HAP": -1
+    }
+  },
+  {
+    "id": 80032002,
+    "event": "你打开直播鞠了一躬，眼眶微红。骂声渐渐被「至少敢承认」盖过去。",
+    "noRandom": true,
+    "effect": {
+      "POP": 2,
+      "HAP": -3,
+      "SOC": 1
+    },
+    "set": {
+      "cover_up": false
+    }
+  },
+  {
+    "id": 80025,
+    "event": "两个粉头为站姐位置闹翻了，分别在群里@你站队。",
+    "storyline": "idol",
+    "weight": 12,
+    "include": "POP>=10",
+    "choices": [
+      {
+        "text": "力挺老粉头（粘性最高）",
+        "next": 80025001
+      },
+      {
+        "text": "力挺新粉头（财大气粗）",
+        "next": 80025002
+      },
+      {
+        "text": "谁也不站",
+        "next": 80025003
+      }
+    ]
+  },
+  {
+    "id": 80025001,
+    "event": "老粉头感动落泪，连夜组织了一场二创应援。",
+    "noRandom": true,
+    "effect": {
+      "POP": 2,
+      "SOC": 1
+    }
+  },
+  {
+    "id": 80025002,
+    "event": "新粉头很快为你刷了机场广告位，但老粉骂你忘本。",
+    "noRandom": true,
+    "effect": {
+      "POP": 5,
+      "MNY": 1,
+      "SOC": -2
+    }
+  },
+  {
+    "id": 80025003,
+    "event": "你在群里发了句「都是粉丝家人」，两边都不高兴。",
+    "noRandom": true,
+    "effect": {
+      "HAP": 1,
+      "POP": -2
+    }
+  },
+  {
+    "id": 80026,
+    "event": "一个三线奶茶品牌找你代言，预算 30 万，但产品形象偏 low。经纪人让你自己定。",
+    "storyline": "idol",
+    "weight": 12,
+    "include": "POP>=8",
+    "choices": [
+      {
+        "text": "接，先把钱拿了",
+        "next": 80026001
+      },
+      {
+        "text": "拒绝，等更好的",
+        "next": 80026002
+      }
+    ]
+  },
+  {
+    "id": 80026001,
+    "event": "广告投放后粉丝吐槽「咖位下跌」，但银行卡里的数字让你心安。",
+    "noRandom": true,
+    "effect": {
+      "MNY": 3,
+      "POP": -1,
+      "APP": -1
+    }
+  },
+  {
+    "id": 80026002,
+    "event": "你婉拒了，团队不满但你的咖位定位维持住了。",
+    "noRandom": true,
+    "effect": {
+      "MNY": -1,
+      "HAP": -1,
+      "PER": 1
+    }
+  },
+  {
+    "id": 80027,
+    "event": "公司给你提供去东京修行半年的机会，由一线舞蹈老师带练。但你会错过国内出道窗口。",
+    "storyline": "idol",
+    "weight": 10,
+    "include": "AGE<=22",
+    "choices": [
+      {
+        "text": "去东京",
+        "next": 80027001
+      },
+      {
+        "text": "留国内",
+        "next": 80027002
+      }
+    ]
+  },
+  {
+    "id": 80027001,
+    "event": "你拖着行李箱站在成田机场。新的环境，新的语言，从零开始。",
+    "noRandom": true,
+    "effect": {
+      "INT": 2,
+      "APP": 1,
+      "POP": -3
+    },
+    "set": {
+      "japan_training": true
+    }
+  },
+  {
+    "id": 80027002,
+    "event": "你留在练习室继续磨，看着同期出去的人在 ins 晒照片。",
+    "noRandom": true,
+    "effect": {
+      "POP": 1,
+      "HAP": -1
+    }
+  },
+  {
+    "id": 80033,
+    "event": "东京的事务所看上了你，开出长约：日本顶流路线，资源全包。但合约要求你彻底切断国内粉丝运营，专心做日韩市场。",
+    "storyline": "idol",
+    "weight": 30,
+    "include": "japan_training=1",
+    "choices": [
+      {
+        "text": "签日约，扎根海外",
+        "next": 80033001
+      },
+      {
+        "text": "婉拒，回国发展",
+        "next": 80033002
+      }
+    ]
+  },
+  {
+    "id": 80033001,
+    "event": "你签下了五年长约。东京的霓虹下，新的征程开始了。",
+    "noRandom": true,
+    "effect": {
+      "MNY": 5,
+      "POP": 5,
+      "SOC": -2
+    },
+    "set": {
+      "japan_path": true
+    }
+  },
+  {
+    "id": 80033002,
+    "event": "你婉拒了 offer，订了回国的机票。",
+    "noRandom": true,
+    "effect": {
+      "POP": 2,
+      "HAP": 1
+    }
+  },
+  {
+    "id": 80028,
+    "event": "同期队友拿到了一个独唱 OST，你也很想要这首。经纪人问你要不要争。",
+    "storyline": "idol",
+    "weight": 12,
+    "include": "POP>=8",
+    "choices": [
+      {
+        "text": "据理力争",
+        "next": 80028001
+      },
+      {
+        "text": "退让",
+        "next": 80028004
+      }
+    ]
+  },
+  {
+    "id": 80028001,
+    "branch": [
+      "?80028002:5",
+      "?80028003:5"
+    ]
+  },
+  {
+    "id": 80028002,
+    "event": "你拿到了 OST，单曲发布日热搜第三。但和那个队友再没说过话。",
+    "noRandom": true,
+    "effect": {
+      "POP": 5,
+      "MNY": 2
+    }
+  },
+  {
+    "id": 80028003,
+    "event": "你没争过，对方反而把抢资源的事捅到论坛。你被骂了两周。",
+    "noRandom": true,
+    "effect": {
+      "SOC": -3,
+      "HAP": -2
+    }
+  },
+  {
+    "id": 80028004,
+    "event": "你笑着说「她唱更合适」。队友请你吃了顿火锅。",
+    "noRandom": true,
+    "effect": {
+      "SOC": 2,
+      "PER": 1,
+      "HAP": -1
+    }
+  },
+  {
+    "id": 80029,
+    "event": "一档 idol 恋综邀请你参加，可以在两位嘉宾里挑一个搭 cp。流量诱人，但可能被绑死人设。",
+    "storyline": "idol",
+    "weight": 10,
+    "include": "POP>=12",
+    "choices": [
+      {
+        "text": "立 cp 卖人设",
+        "next": 80029001
+      },
+      {
+        "text": "走单身路线",
+        "next": 80029002
+      }
+    ]
+  },
+  {
+    "id": 80029001,
+    "event": "节目播出后 cp 超话冲上热搜第一。粉丝 24 小时催更互动物料。",
+    "noRandom": true,
+    "effect": {
+      "POP": 6,
+      "HAP": -2
+    },
+    "set": {
+      "ship_rumor": true
+    }
+  },
+  {
+    "id": 80029002,
+    "event": "你婉拒了 cp 设定，独自上了几期。流量平平但你睡得安稳。",
+    "noRandom": true,
+    "effect": {
+      "POP": -1,
+      "HAP": 2
+    }
+  },
+  {
+    "id": 80030,
+    "event": "恋综已经结束三个月，cp 粉每天催你和搭档官宣或解绑。话题度居高不下。",
+    "storyline": "idol",
+    "weight": 40,
+    "include": "ship_rumor=1",
+    "choices": [
+      {
+        "text": "官宣谈恋爱",
+        "next": 80030001
+      },
+      {
+        "text": "发文解绑澄清",
+        "next": 80030002
+      }
+    ]
+  },
+  {
+    "id": 80030001,
+    "event": "你发了一张牵手照，粉丝大量脱粉，但你和搭档真在一起了。",
+    "noRandom": true,
+    "effect": {
+      "POP": -8,
+      "HAP": 3
+    },
+    "set": {
+      "ship_rumor": false,
+      "dating": true
+    }
+  },
+  {
+    "id": 80030002,
+    "event": "你发文澄清「同事关系」，cp 粉哭着脱粉。",
+    "noRandom": true,
+    "effect": {
+      "POP": 2,
+      "HAP": -2
+    },
+    "set": {
+      "ship_rumor": false
+    }
+  },
+  {
+    "id": 80031,
+    "event": "隔壁顶流公司的副总私下约你喝咖啡，开出 5 倍违约金挖角，承诺 center 待遇。",
+    "storyline": "idol",
+    "weight": 8,
+    "include": "POP>=15",
+    "choices": [
+      {
+        "text": "跳槽签约",
+        "next": 80031001
+      },
+      {
+        "text": "留在原公司",
+        "next": 80031002
+      }
+    ]
+  },
+  {
+    "id": 80031001,
+    "event": "你按了手印。新公司很快放出 teaser，业内一片哗然。",
+    "noRandom": true,
+    "effect": {
+      "MNY": 8,
+      "POP": 3,
+      "SOC": -3
+    },
+    "set": {
+      "jumped_ship": true
+    }
+  },
+  {
+    "id": 80031002,
+    "event": "你婉拒了。原公司老板请你吃了顿日料，资源给得更足。",
+    "noRandom": true,
+    "effect": {
+      "SOC": 2,
+      "PER": 2
+    }
+  },
+  {
+    "id": 80034,
+    "event": "新东家给的 center 资源迟迟不落地。某天经纪人告诉你，原定主打曲被撤档，你被晾着。",
+    "storyline": "idol",
+    "weight": 50,
+    "include": "jumped_ship=1",
+    "choices": [
+      {
+        "text": "走法律程序追责",
+        "next": 80034001
+      },
+      {
+        "text": "自认倒霉签新约",
+        "next": 80034004
+      }
+    ]
+  },
+  {
+    "id": 80034001,
+    "branch": [
+      "?80034002:5",
+      "?80034003:5"
+    ]
+  },
+  {
+    "id": 80034002,
+    "event": "庭审录像在网络流出，你的硬气获得路人认可。",
+    "noRandom": true,
+    "effect": {
+      "MNY": 2,
+      "POP": 5,
+      "HAP": -1
+    },
+    "set": {
+      "jumped_ship": false
+    }
+  },
+  {
+    "id": 80034003,
+    "event": "败诉。违约金一分没拿到，咖位还掉了。",
+    "noRandom": true,
+    "effect": {
+      "MNY": -3,
+      "POP": -8,
+      "HAP": -3
+    },
+    "set": {
+      "jumped_ship": false
+    }
+  },
+  {
+    "id": 80034004,
+    "event": "你忍气吞声签了新约，下一档曲目排到一年以后。",
+    "noRandom": true,
+    "effect": {
+      "MNY": -3,
+      "POP": -3,
+      "HAP": -2
+    },
+    "set": {
+      "jumped_ship": false
     }
   },
   {
@@ -5163,8 +5651,14 @@
     "storyline": "superstar",
     "weight": 10,
     "choices": [
-      { "text": "接烂片，先把钱赚到手", "next": 80053 },
-      { "text": "接文艺片，赌一把口碑", "next": 80054 }
+      {
+        "text": "接烂片，先把钱赚到手",
+        "next": 80053
+      },
+      {
+        "text": "接文艺片，赌一把口碑",
+        "next": 80054
+      }
     ]
   },
   {
@@ -5247,8 +5741,14 @@
     "storyline": "streamer",
     "weight": 10,
     "choices": [
-      { "text": "擦边引流，先冲流量", "next": 80064 },
-      { "text": "做知识深度内容", "next": 80065 }
+      {
+        "text": "擦边引流，先冲流量",
+        "next": 80064
+      },
+      {
+        "text": "做知识深度内容",
+        "next": 80065
+      }
     ]
   },
   {
@@ -6901,28 +7401,883 @@
     }
   },
   {
-    "id": 81020,
-    "event": "今晚 5/10 的牌桌特别热闹。发牌员把两张底牌推到你面前，对面坐着一个戴墨镜的陌生人正盯着你。",
+    "id": 81030,
+    "event": "又一个周末。烟雾缭绕的牌室里，5/10 的桌子等着你坐下。",
     "storyline": "poker",
-    "weight": 80,
-    "minigame": "holdem_allin",
+    "weight": 70,
+    "repeatable": true,
+    "choices": [
+      {
+        "text": "紧凶（TAG）稳推",
+        "next": 81030001
+      },
+      {
+        "text": "激进（LAG）加压",
+        "showExpr": "INT>=6",
+        "next": 81030004
+      },
+      {
+        "text": "回家复盘录像",
+        "next": 81030007
+      }
+    ]
+  },
+  {
+    "id": 81030001,
+    "branch": [
+      "?81030002:6",
+      "?81030003:4"
+    ],
     "repeatable": true
   },
   {
-    "id": 81021,
-    "event": "Local Casino 的 25/50 桌坐了一圈熟面孔。发牌员叫到你的位置，筹码哗啦一声推到你面前。",
+    "id": 81030002,
+    "event": "你的紧凶节奏吃下了几个 fishy 玩家。",
+    "effect": {
+      "POK": 1
+    },
+    "repeatable": true
+  },
+  {
+    "id": 81030003,
+    "event": "对手用一手 set 把你顶出去，你皱着眉收筹码。",
+    "effect": {
+      "POK": -1
+    },
+    "repeatable": true
+  },
+  {
+    "id": 81030004,
+    "branch": [
+      "?81030005:5",
+      "?81030006:5"
+    ],
+    "repeatable": true
+  },
+  {
+    "id": 81030005,
+    "event": "你连开三个 3-bet 把全桌轰麻了，赢得很爽。",
+    "effect": {
+      "POK": 3,
+      "HAP": 1
+    },
+    "repeatable": true
+  },
+  {
+    "id": 81030006,
+    "event": "你的诈唬被一个老炮反 raise 抓个正着，下头。",
+    "effect": {
+      "POK": -2,
+      "HAP": -1
+    },
+    "repeatable": true
+  },
+  {
+    "id": 81030007,
+    "event": "你回宿舍把整晚的录像逐手过了一遍，记下了几个泄漏。",
+    "effect": {
+      "INT": 1,
+      "HAP": -1
+    },
+    "repeatable": true
+  },
+  {
+    "id": 81031,
+    "event": "翻牌圈你拿到顶对加卡顺听牌，对面一个亚裔大叔把 200 个红码全推了进来。这是你第一次面对全押决策。",
+    "storyline": "poker",
+    "weight": 30,
+    "include": "(POK>=3)&(AGE_AFTER_STORY>=1)",
+    "choices": [
+      {
+        "text": "跟注（call）",
+        "next": 81031001
+      },
+      {
+        "text": "弃牌（fold）",
+        "next": 81031004
+      }
+    ]
+  },
+  {
+    "id": 81031001,
+    "branch": [
+      "?81031002:5",
+      "?81031003:5"
+    ]
+  },
+  {
+    "id": 81031002,
+    "event": "你河牌打出顺子，把对手的两对吃干抹净。",
+    "effect": {
+      "POK": 5
+    }
+  },
+  {
+    "id": 81031003,
+    "event": "对面亮出暗三条，你呆坐五秒后默默推掉筹码。",
+    "effect": {
+      "POK": -4
+    }
+  },
+  {
+    "id": 81031004,
+    "event": "你深呼吸盖牌，写下这手的复盘笔记。",
+    "effect": {
+      "POK": -1,
+      "INT": 1
+    }
+  },
+  {
+    "id": 81032,
+    "event": "一个常年坐 25/50 的老炮约你喝咖啡，说看你有点天赋，愿意带你升级——条件是分他每月盈利 30%。",
+    "storyline": "poker",
+    "weight": 30,
+    "include": "POK>=8",
+    "choices": [
+      {
+        "text": "拜师（每月分账）",
+        "next": 81032001
+      },
+      {
+        "text": "我自己来",
+        "next": 81032002
+      }
+    ]
+  },
+  {
+    "id": 81032001,
+    "event": "你递上学费，老炮把笔记本一页页讲给你听。",
+    "effect": {
+      "INT": 2,
+      "POK": 2,
+      "MNY": -1
+    },
+    "set": {
+      "mentor": true
+    }
+  },
+  {
+    "id": 81032002,
+    "event": "你婉拒了，自己琢磨自己的牌路。",
+    "effect": {
+      "POK": 1,
+      "HAP": 1
+    }
+  },
+  {
+    "id": 81033,
+    "event": "你的牌账户见底，舍友也借遍了。一个戴金链的本地人递来名片：日息一分，要多少有多少。",
+    "storyline": "poker",
+    "weight": 50,
+    "include": "MNY<=2",
+    "choices": [
+      {
+        "text": "签字借 5 千",
+        "next": 81033001
+      },
+      {
+        "text": "收手休整",
+        "next": 81033002
+      }
+    ]
+  },
+  {
+    "id": 81033001,
+    "event": "你按了手印，金链子拍着你肩说欢迎合作。",
+    "effect": {
+      "MNY": 3
+    },
+    "set": {
+      "loan_shark": true
+    }
+  },
+  {
+    "id": 81033002,
+    "event": "你撕了名片，决定先稳住再说。",
+    "effect": {
+      "POK": -2,
+      "HAP": -2
+    }
+  },
+  {
+    "id": 81034,
+    "event": "你连续三周大杀四方，一个输红眼的常客拍桌子说你出千。荷官把你叫到一边，让你解释。",
+    "storyline": "poker",
+    "weight": 25,
+    "include": "POK>=10",
+    "choices": [
+      {
+        "text": "硬刚到底",
+        "next": 81034001
+      },
+      {
+        "text": "退一步给个面子",
+        "next": 81034002
+      }
+    ]
+  },
+  {
+    "id": 81034001,
+    "event": "你拍出录像和手牌记录，对方哑口无言。但你也得罪了一票常客。",
+    "effect": {
+      "HAP": -2,
+      "SOC": -1,
+      "POK": 1
+    }
+  },
+  {
+    "id": 81034002,
+    "event": "你笑笑递了根烟，把当晚的赢分还了一半回去。",
+    "effect": {
+      "POK": -3,
+      "SOC": 1
+    }
+  },
+  {
+    "id": 81035,
+    "event": "圈里的人攒局开了一场私人邀请赛，奖池 2 万刀。买入要 POK 5 点筹码 + MNY 1。",
+    "storyline": "poker",
+    "weight": 30,
+    "include": "(POK>=12)&(AGE_AFTER_STORY>=1)",
+    "choices": [
+      {
+        "text": "报名",
+        "next": 81035001
+      },
+      {
+        "text": "不去",
+        "next": 81035004
+      }
+    ]
+  },
+  {
+    "id": 81035001,
+    "branch": [
+      "?81035002:4",
+      "?81035003:6"
+    ]
+  },
+  {
+    "id": 81035002,
+    "event": "你一路打进决赛桌，最终加冕冠军。",
+    "effect": {
+      "POK": 8,
+      "MNY": 3
+    }
+  },
+  {
+    "id": 81035003,
+    "event": "泡沫期你的 AK 被人河杀，惨遭淘汰。",
+    "effect": {
+      "POK": -5,
+      "MNY": -1
+    }
+  },
+  {
+    "id": 81035004,
+    "event": "你看着群里晒的奖杯照片，咬了咬牙。",
+    "effect": {
+      "POK": 1,
+      "HAP": -1
+    }
+  },
+  {
+    "id": 81036,
+    "event": "你照例坐到熟悉的 25/50 桌。今晚的鱼看起来不少。",
     "storyline": "local_shark",
-    "weight": 80,
-    "minigame": "holdem_highroller",
+    "weight": 70,
+    "repeatable": true,
+    "choices": [
+      {
+        "text": "稳定吸血",
+        "next": 81036001
+      },
+      {
+        "text": "激进施压",
+        "showExpr": "INT>=8",
+        "next": 81036004
+      },
+      {
+        "text": "教年轻人打牌",
+        "next": 81036007
+      }
+    ]
+  },
+  {
+    "id": 81036001,
+    "branch": [
+      "?81036002:6",
+      "?81036003:4"
+    ],
     "repeatable": true
   },
   {
-    "id": 81022,
-    "event": "Triton 的边桌正好开了一局现金局，盲注 500/1000。你点头加入，对面是一个戴金链的俄罗斯富豪。",
-    "storyline": "triton",
-    "weight": 80,
-    "minigame": "holdem_highroller",
+    "id": 81036002,
+    "event": "你的踩点 c-bet 让两个新人乖乖弃牌。",
+    "effect": {
+      "POK": 2
+    },
     "repeatable": true
+  },
+  {
+    "id": 81036003,
+    "event": "一个老 reg 把你 4-bet 出去，你只能丢牌。",
+    "effect": {
+      "POK": -2
+    },
+    "repeatable": true
+  },
+  {
+    "id": 81036004,
+    "branch": [
+      "?81036005:5",
+      "?81036006:5"
+    ],
+    "repeatable": true
+  },
+  {
+    "id": 81036005,
+    "event": "你连续两手 over-bet 把全桌打懵，筹码堆成山。",
+    "effect": {
+      "POK": 5,
+      "HAP": 1
+    },
+    "repeatable": true
+  },
+  {
+    "id": 81036006,
+    "event": "你被人 cooler 走口袋对，盯着桌面发呆。",
+    "effect": {
+      "POK": -4,
+      "HAP": -1
+    },
+    "repeatable": true
+  },
+  {
+    "id": 81036007,
+    "event": "你给桌上的小白讲了几手 GTO 基础，对方请你吃了顿宵夜。",
+    "effect": {
+      "SOC": 1,
+      "POK": 1,
+      "MNY": -1
+    },
+    "repeatable": true
+  },
+  {
+    "id": 81037,
+    "event": "周中的 500/1000 现金局，桌上坐着两个上过 GP I 决赛桌的人。",
+    "storyline": "triton",
+    "weight": 70,
+    "repeatable": true,
+    "choices": [
+      {
+        "text": "紧握位置打 IP",
+        "next": 81037001
+      },
+      {
+        "text": "GTO 全压施压",
+        "showExpr": "INT>=10",
+        "next": 81037004
+      },
+      {
+        "text": "退到边桌休整",
+        "next": 81037007
+      }
+    ]
+  },
+  {
+    "id": 81037001,
+    "branch": [
+      "?81037002:55",
+      "?81037003:45"
+    ],
+    "repeatable": true
+  },
+  {
+    "id": 81037002,
+    "event": "你打完一个完美的 thin value，全桌点头。",
+    "effect": {
+      "POK": 3
+    },
+    "repeatable": true
+  },
+  {
+    "id": 81037003,
+    "event": "对面的 GTO 怪人把你的 bluff catch 抓得死死的。",
+    "effect": {
+      "POK": -3
+    },
+    "repeatable": true
+  },
+  {
+    "id": 81037004,
+    "branch": [
+      "?81037005:5",
+      "?81037006:5"
+    ],
+    "repeatable": true
+  },
+  {
+    "id": 81037005,
+    "event": "你 4-bet shove 一个 bluff range，对面深思后弃了 KK。",
+    "effect": {
+      "POK": 7,
+      "HAP": 1
+    },
+    "repeatable": true
+  },
+  {
+    "id": 81037006,
+    "event": "你 over-shove 了 AKs，对面用 QQ 跟你，公共牌没改命。",
+    "effect": {
+      "POK": -6,
+      "HAP": -2
+    },
+    "repeatable": true
+  },
+  {
+    "id": 81037007,
+    "event": "你坐到边桌喝了杯威士忌，看了几手再回神。",
+    "effect": {
+      "POK": 1,
+      "HAP": 1
+    },
+    "repeatable": true
+  },
+  {
+    "id": 81066,
+    "event": "赛事方邀请你打一场直播桌，盲注照旧但全程上电视。打好了出名，打砸了被剪进笑话集锦。",
+    "weight": 30,
+    "include": "((storyline=local_shark)|(storyline=triton))&(POK>=15)",
+    "choices": [
+      {
+        "text": "上桌应战",
+        "next": 81066001
+      },
+      {
+        "text": "婉拒",
+        "next": 81066004
+      }
+    ],
+    "storyline": [
+      "local_shark",
+      "triton"
+    ]
+  },
+  {
+    "id": 81066001,
+    "branch": [
+      "?81066002:5",
+      "?81066003:5"
+    ]
+  },
+  {
+    "id": 81066002,
+    "event": "你打出一手教科书级的 hero call，弹幕刷爆。",
+    "effect": {
+      "POK": 4,
+      "SOC": 3,
+      "HAP": 2
+    }
+  },
+  {
+    "id": 81066003,
+    "event": "你的 bluff 被反诈，慢动作回放配上鬼畜音效在 YouTube 流传。",
+    "effect": {
+      "POK": -3,
+      "SOC": -2,
+      "HAP": -3
+    }
+  },
+  {
+    "id": 81066004,
+    "event": "你说自己还没准备好，制片人耸耸肩。",
+    "effect": {
+      "POK": 1
+    }
+  },
+  {
+    "id": 81067,
+    "event": "一个明显刚中过比特币的醉汉坐进局里，乱甩筹码。所有人都盯着他口袋。",
+    "weight": 30,
+    "include": "((storyline=local_shark)|(storyline=triton))&(POK>=10)",
+    "choices": [
+      {
+        "text": "全力收割",
+        "next": 81067001
+      },
+      {
+        "text": "让一让让别人吃",
+        "next": 81067004
+      }
+    ],
+    "storyline": [
+      "local_shark",
+      "triton"
+    ]
+  },
+  {
+    "id": 81067001,
+    "branch": [
+      "?81067002:7",
+      "?81067003:3"
+    ]
+  },
+  {
+    "id": 81067002,
+    "event": "你精准识别他的 wide range，连吃三大手。",
+    "effect": {
+      "POK": 5,
+      "MNY": 3
+    }
+  },
+  {
+    "id": 81067003,
+    "event": "他河牌击中暗三条，你被反向收割。",
+    "effect": {
+      "POK": -3
+    }
+  },
+  {
+    "id": 81067004,
+    "event": "你让位给一个新晋 reg，他给你递了支雪茄。",
+    "effect": {
+      "SOC": 1,
+      "POK": 1
+    }
+  },
+  {
+    "id": 81068,
+    "event": "连输三天，你回到酒店盯着天花板。手机里是 Casino 24 小时局的链接。",
+    "weight": 40,
+    "include": "((storyline=local_shark)|(storyline=triton))&(HAP<=2)",
+    "choices": [
+      {
+        "text": "加钱再战",
+        "next": 81068001
+      },
+      {
+        "text": "收手休息一周",
+        "next": 81068004
+      }
+    ],
+    "storyline": [
+      "local_shark",
+      "triton"
+    ]
+  },
+  {
+    "id": 81068001,
+    "branch": [
+      "?81068002:4",
+      "?81068003:6"
+    ]
+  },
+  {
+    "id": 81068002,
+    "event": "你顶住 tilt 翻盘，把这周的亏空全捞回来。",
+    "effect": {
+      "POK": 6
+    }
+  },
+  {
+    "id": 81068003,
+    "event": "情绪化的下注让你又陷进去，账户雪上加霜。",
+    "effect": {
+      "POK": -8,
+      "HAP": -3
+    }
+  },
+  {
+    "id": 81068004,
+    "event": "你睡了三天，去公园跑了两个 5K，状态回来了。",
+    "effect": {
+      "HAP": 2,
+      "INT": 1,
+      "POK": -1
+    }
+  },
+  {
+    "id": 81069,
+    "event": "一个老朋友找你做扑克培训师，年薪 8 万刀，朝九晚五，不再熬夜。",
+    "weight": 25,
+    "include": "((storyline=local_shark)|(storyline=triton))&(MNY>=10)&(AGE>=24)",
+    "choices": [
+      {
+        "text": "接 offer 转岗",
+        "next": 81069001
+      },
+      {
+        "text": "拒绝继续打",
+        "next": 81069002
+      }
+    ],
+    "storyline": [
+      "local_shark",
+      "triton"
+    ]
+  },
+  {
+    "id": 81069001,
+    "event": "你把 Triton 的入场券扔进抽屉，搬进了培训机构的写字楼。生活回归正轨。",
+    "effect": {
+      "MNY": 5,
+      "HAP": 2
+    },
+    "set": {
+      "storyline": "",
+      "storylineStart": 0,
+      "storylineStartMonth": 0,
+      "showPOK": false
+    }
+  },
+  {
+    "id": 81069002,
+    "event": "你婉拒了，回到桌上继续打。",
+    "effect": {
+      "POK": 2
+    }
+  },
+  {
+    "id": 81070,
+    "event": "圈里的牌房老板要出让 10% 股权，开价 10 万刀。投了就有被动收入，但短期资金链紧张。",
+    "weight": 25,
+    "include": "((storyline=local_shark)|(storyline=triton))&(MNY>=15)&(POK>=18)",
+    "choices": [
+      {
+        "text": "投入",
+        "next": 81070001
+      },
+      {
+        "text": "不投",
+        "next": 81070002
+      }
+    ],
+    "storyline": [
+      "local_shark",
+      "triton"
+    ]
+  },
+  {
+    "id": 81070001,
+    "event": "你转账签字，从此多了一份非线性收入。",
+    "effect": {
+      "MNY": -8,
+      "POK": 3
+    },
+    "set": {
+      "club_owner": true
+    }
+  },
+  {
+    "id": 81070002,
+    "event": "你客气地拒了，老板拍拍你肩说理解。",
+    "effect": {
+      "POK": 1,
+      "HAP": -1
+    }
+  },
+  {
+    "id": 81071,
+    "event": "你师父被爆出和地下盘口有牵连，全圈在传他要被永久封桌。媒体打电话来问你的态度。",
+    "weight": 30,
+    "include": "((storyline=local_shark)|(storyline=triton))&(mentor=1)&(POK>=12)",
+    "choices": [
+      {
+        "text": "切割划清界限",
+        "next": 81071001
+      },
+      {
+        "text": "公开站队挺他",
+        "next": 81071002
+      }
+    ],
+    "storyline": [
+      "local_shark",
+      "triton"
+    ]
+  },
+  {
+    "id": 81071001,
+    "event": "你公开声明从未参与他的私局，舆论稍稍偏向你。",
+    "effect": {
+      "HAP": -2,
+      "SOC": 1,
+      "POK": -1
+    },
+    "set": {
+      "mentor": false
+    }
+  },
+  {
+    "id": 81071002,
+    "branch": [
+      "?81071003:5",
+      "?81071004:5"
+    ]
+  },
+  {
+    "id": 81071003,
+    "event": "你站队那篇推文意外获得圈内尊重，老牌手们认你这个义气。",
+    "effect": {
+      "SOC": -2,
+      "HAP": 1,
+      "POK": 3
+    }
+  },
+  {
+    "id": 81071004,
+    "event": "你被牵连进调查，账户被冻结调查了一阵。",
+    "effect": {
+      "SOC": -2,
+      "HAP": 1,
+      "POK": -4
+    }
+  },
+  {
+    "id": 81072,
+    "event": "师父把你引荐给一个常飞 Vegas 的私募大佬，对方下周开私局，邀你坐主桌。",
+    "weight": 25,
+    "include": "((storyline=local_shark)|(storyline=triton))&(mentor=1)&(POK>=15)",
+    "choices": [
+      {
+        "text": "上桌",
+        "next": 81072001
+      },
+      {
+        "text": "推掉",
+        "next": 81072004
+      }
+    ],
+    "storyline": [
+      "local_shark",
+      "triton"
+    ]
+  },
+  {
+    "id": 81072001,
+    "branch": [
+      "?81072002:5",
+      "?81072003:5"
+    ]
+  },
+  {
+    "id": 81072002,
+    "event": "你和大佬打了一晚上，他给了你不少高端局的入场券。",
+    "effect": {
+      "POK": 6,
+      "MNY": 2
+    }
+  },
+  {
+    "id": 81072003,
+    "event": "你被大佬的暴躁打法节奏带走，一夜回到解放前。",
+    "effect": {
+      "POK": -5
+    }
+  },
+  {
+    "id": 81072004,
+    "event": "你说档期不合适，师父表示理解但有点失望。",
+    "effect": {
+      "POK": 1,
+      "HAP": -1
+    }
+  },
+  {
+    "id": 81073,
+    "event": "当年签字借的钱本利滚到一万五。金链子带俩壮汉堵在你公寓门口，限你三天内还清。",
+    "weight": 60,
+    "include": "((storyline=local_shark)|(storyline=triton))&(loan_shark=1)",
+    "choices": [
+      {
+        "text": "凑钱还清",
+        "next": 81073001
+      },
+      {
+        "text": "拖延赖账",
+        "next": 81073002
+      }
+    ],
+    "storyline": [
+      "local_shark",
+      "triton"
+    ]
+  },
+  {
+    "id": 81073001,
+    "event": "你跑了一圈把钱凑齐，金链子收钱后拍拍你脸，说欢迎再来。",
+    "effect": {
+      "MNY": -6,
+      "POK": -2,
+      "HAP": 2
+    },
+    "set": {
+      "loan_shark": false
+    }
+  },
+  {
+    "id": 81073002,
+    "event": "你换了酒店换了号码，但他们找上你的牌友。事情很快失控。",
+    "effect": {
+      "MNY": -10,
+      "HAP": -3
+    }
+  },
+  {
+    "id": 81074,
+    "event": "牌房季度分红到账。你看了眼短信，嘴角微微上扬。",
+    "weight": 20,
+    "repeatable": true,
+    "include": "((storyline=local_shark)|(storyline=triton))&(club_owner=1)",
+    "effect": {
+      "MNY": 1,
+      "HAP": 1
+    },
+    "storyline": [
+      "local_shark",
+      "triton"
+    ]
+  },
+  {
+    "id": 81075,
+    "event": "合伙人深夜电话：上个月被一个老千刷了 8 万。要么所有股东补贴亏损，要么拍卖股权止损。",
+    "weight": 30,
+    "include": "((storyline=local_shark)|(storyline=triton))&(club_owner=1)&(MTH_AFTER_STORY>=12)",
+    "choices": [
+      {
+        "text": "兜底补亏",
+        "next": 81075001
+      },
+      {
+        "text": "卖股权跑路",
+        "next": 81075002
+      }
+    ],
+    "storyline": [
+      "local_shark",
+      "triton"
+    ]
+  },
+  {
+    "id": 81075001,
+    "event": "你转账补足缺口，老板在群里点名感谢。",
+    "effect": {
+      "MNY": -5,
+      "POK": 2,
+      "SOC": 1
+    }
+  },
+  {
+    "id": 81075002,
+    "event": "你以八折把股权卖回给老板，止损离场。",
+    "effect": {
+      "MNY": 3,
+      "HAP": -2
+    },
+    "set": {
+      "club_owner": false
+    }
   },
   {
     "id": 81094,
@@ -7198,8 +8553,14 @@
     "storyline": "wasted",
     "weight": 8,
     "choices": [
-      { "text": "借了，先撑过这个月", "next": 82064 },
-      { "text": "不借，硬扛", "next": 82065 }
+      {
+        "text": "借了，先撑过这个月",
+        "next": 82064
+      },
+      {
+        "text": "不借，硬扛",
+        "next": 82065
+      }
     ]
   },
   {
@@ -10497,7 +11858,6 @@
     },
     "storyline": "meta"
   },
-
   {
     "id": 14070,
     "event": "假期带 TA 回家见父母。饭桌上空气越来越冷，吃完饭妈妈把你单独叫进房间，关上门：「这孩子，不行。」",
@@ -10561,7 +11921,6 @@
     },
     "romance": true
   },
-
   {
     "id": 14080,
     "event": "一份诱人的 offer 摆在面前，唯一的问题是它在另一座城市。你看着 TA 还在加班的微信，捏着 offer 久久没回复。",
@@ -10624,7 +11983,6 @@
     },
     "romance": true
   },
-
   {
     "id": 14130,
     "event": "30 岁前夕，双方家里开始三天两头催。你们晚上躺在床上认真聊了一次：要孩子吗？",
@@ -10683,7 +12041,6 @@
     },
     "romance": true
   },
-
   {
     "id": 14140,
     "event": "TA 最近频繁加班，回家也心不在焉。某天你看到 TA 手机锁屏闪过一个陌生头像，备注只有一个字母。",
