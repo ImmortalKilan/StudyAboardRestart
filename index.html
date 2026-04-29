@@ -99,6 +99,7 @@
             <div class="right-actions">
               <button id="btn-auto-1x" class="ghost">自动播放</button>
               <button id="btn-auto-2x" class="ghost">自动播放 X2</button>
+              <button id="btn-summary" class="ghost" style="display:none;">查看总结</button>
               <button id="btn-restart" class="ghost">重开</button>
             </div>
           </div>
@@ -107,6 +108,75 @@
 
       </div>
     </section>
+
+    <section id="summary-screen" class="screen">
+      <div class="summary-wrap">
+        <header class="summary-head">
+          <div class="summary-title-row">
+            <h1 class="summary-title">人生总结</h1>
+            <span id="summary-subtitle" class="summary-subtitle"></span>
+          </div>
+          <div class="summary-actions">
+            <button id="btn-summary-back" class="ghost">返回事件流</button>
+            <button id="btn-summary-restart" class="primary">再来一次</button>
+          </div>
+        </header>
+
+        <div class="summary-hero">
+          <div class="hero-avatar-wrap">
+            <canvas id="summary-avatar" class="hero-avatar"></canvas>
+            <div id="summary-hero-meta" class="hero-meta"></div>
+          </div>
+          <div class="sum-card sum-card-ending hero-ending">
+            <div class="sum-card-label">最终结局</div>
+            <div id="summary-ending" class="sum-card-body"></div>
+          </div>
+        </div>
+
+        <div class="summary-grid">
+          <div class="sum-card sum-card-storylines">
+            <div class="sum-card-label">走过的剧情</div>
+            <div id="summary-storylines" class="sum-card-body"></div>
+          </div>
+
+          <div class="sum-card sum-card-stats">
+            <div class="sum-card-label">属性峰值 vs 终值</div>
+            <div id="summary-stats" class="sum-card-body"></div>
+          </div>
+
+          <div class="sum-card sum-card-talents">
+            <div class="sum-card-label">所选天赋</div>
+            <div id="summary-talents" class="sum-card-body"></div>
+          </div>
+
+          <div class="sum-card sum-card-meta">
+            <div class="sum-card-label">人生数据</div>
+            <div id="summary-meta" class="sum-card-body"></div>
+          </div>
+
+          <div class="sum-card sum-card-highlights">
+            <div class="sum-card-label">高光时刻</div>
+            <div id="summary-highlights" class="sum-card-body"></div>
+          </div>
+
+          <div class="sum-card sum-card-romance">
+            <div class="sum-card-label">恋爱史</div>
+            <div id="summary-romance" class="sum-card-body"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div id="end-overlay" class="end-overlay">
+      <div id="end-card" class="end-card">
+        <div class="end-card-tag" id="end-card-tag"></div>
+        <div class="end-card-text" id="end-card-text"></div>
+        <div class="end-card-actions">
+          <button id="btn-end-restart" class="ghost">再来一次</button>
+          <button id="btn-end-summary" class="primary">查看人生总结</button>
+        </div>
+      </div>
+    </div>
 
   </main>
 

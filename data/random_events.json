@@ -1001,7 +1001,7 @@
       "SOC": 2,
       "HAP": 1
     },
-    "include": "(AGE>=19)&(INT>6)&(SOC>4)",
+    "include": "(AGE>=19)&(AGE<=22)&(INT>6)&(SOC>4)",
     "exclude": "EVT?[18006]",
     "weight": 2
   },
@@ -3294,7 +3294,7 @@
   {
     "id": 42075,
     "event": "你参加了学校的AI创业大赛，用ChatGPT的API搭了一个有趣的应用。",
-    "include": "(AGE>=20)&(MAJOR==CS)&(INT>6)&(SOC>4)",
+    "include": "(AGE>=19)&(AGE<=22)&(MAJOR==CS)&(INT>6)&(SOC>4)",
     "exclude": "EVT?[42075]",
     "weight": 2,
     "branch": [
@@ -5311,6 +5311,19 @@
     "exclude": "EVT?[80090]"
   },
   {
+    "id": 80094,
+    "event": "二线结局：你没能成为顶流，但也没塌房。你成了一名稳定的二线艺人，靠综艺通告和小成本剧组维持着体面的生活。粉丝不多，但都很真心。在镜头前微笑成了你最熟练的肌肉记忆。",
+    "storyline": "superstar",
+    "logType": "special",
+    "noRandom": true,
+    "end": true,
+    "exclude": "EVT?[80090]|EVT?[80091]",
+    "effect": {
+      "MNY": 5,
+      "HAP": -1
+    }
+  },
+  {
     "id": 80092,
     "event": "主播结局：你抓住了时代的风口，成为了带货界的顶流。虽然没有站上红毯，但你每天赚的钱比明星还要多。你用直播赚来的钱买下了几栋豪宅，提前实现了退休自由。",
     "storyline": "streamer",
@@ -5323,7 +5336,7 @@
     "event": "平凡结局：直播间人气越来越低，你也厌倦了每天对着镜头强颜欢笑。你退掉了租来的灯光设备，注销了账号。",
     "logType": "special",
     "storyline": "streamer",
-    "include": "POP<10",
+    "include": "POP<20",
     "noRandom": true,
     "exclude": "EVT?[80092]",
     "set": {
@@ -7197,6 +7210,23 @@
     "storyline": "wasted",
     "include": "(storyline==wasted)&((HAP<=0)&(SOC<=0))",
     "noRandom": true,
+    "set": {
+      "storyline": "",
+      "storylineStart": 0,
+      "storylineStartMonth": 0
+    }
+  },
+  {
+    "id": 82094,
+    "event": "重新出发结局：你勉强凑够学分拿到了毕业证，灰溜溜地回了国。父母没多说什么，只是给你介绍了一份普通的工作。深夜你翻出当年派对上的照片，忽然觉得也没什么可怀念的。生活，总要继续。",
+    "logType": "special",
+    "storyline": "wasted",
+    "noRandom": true,
+    "exclude": "EVT?[82093]",
+    "effect": {
+      "HAP": 2,
+      "PER": 1
+    },
     "set": {
       "storyline": "",
       "storylineStart": 0,

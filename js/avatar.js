@@ -32,12 +32,14 @@ function makeGrid() {
 }
 
 function fill(g, x, y, w, h, c) {
+  x = Math.floor(x); y = Math.floor(y); w = Math.floor(w); h = Math.floor(h);
   for (let yy = y; yy < y + h; yy++)
     for (let xx = x; xx < x + w; xx++)
       if (yy >= 0 && yy < H && xx >= 0 && xx < W) g[yy][xx] = c;
 }
 
 function px(g, x, y, c) {
+  x = Math.floor(x); y = Math.floor(y);
   if (y >= 0 && y < H && x >= 0 && x < W) g[y][x] = c;
 }
 
@@ -670,13 +672,14 @@ function drawFrame(time) {
 export function renderAvatar(canvas, state) {
   lastCanvas = canvas;
   lastState = state;
-  
+
   // Cancel previous animation loop if exists to prevent speeding up
   if (animFrameId) {
     cancelAnimationFrame(animFrameId);
+    animFrameId = null;
   }
-  
-  // Start the animation loop
-  animFrameId = requestAnimationFrame(drawFrame);
+
+  // Synchronous first paint so the canvas is never empty
+  drawFrame(performance.now());
 }
 

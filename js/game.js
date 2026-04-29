@@ -156,6 +156,7 @@ const STORYLINE_CFG = {
     progressChecks: [
       { cond: s => s.POP >= 80, event: 80090 },
       { cond: s => s.INT < 4, event: 80091 },
+      { cond: s => s.age - s.storylineStart >= 3, event: 80094 },
     ],
   },
   streamer: {
@@ -163,7 +164,7 @@ const STORYLINE_CFG = {
     eventRate: 0.6,
     progressChecks: [
       { cond: s => s.age - s.storylineStart >= 2 && s.POP >= 20, event: 80092 },
-      { cond: s => s.age - s.storylineStart >= 2 && s.POP < 10, event: 80093 },
+      { cond: s => s.age - s.storylineStart >= 2 && s.POP < 20, event: 80093 },
     ],
   },
   wasted: {
@@ -171,6 +172,7 @@ const STORYLINE_CFG = {
     eventRate: 0.6,
     progressChecks: [
       { cond: s => s.age - s.storylineStart >= 2 && s.HAP <= 0 && s.SOC <= 0, event: 82093 },
+      { cond: s => s.age - s.storylineStart >= 3, event: 82094 },
     ],
   },
 };
@@ -223,6 +225,7 @@ const state = {
   overseas: 0,
   major: '',
   relationship: '单身',
+  relationshipHistory: [],
   storyline: '',
   storylineStart: 0,
   storylineStartMonth: 0,
@@ -243,7 +246,11 @@ const state = {
   _savedAutoMode: 0,
   SOC: 0, INT: 0, MNY: 0, PER: 0, HLT: 0, APP: 0,
   HAP: 5,
-  POP: 0, POK: 0, MMR: 0
+  POP: 0, POK: 0, MMR: 0,
+
+  // Summary tracking
+  statPeaks: {},
+  storylinesVisited: new Set(),
 };
 
 let autoTimer = null;
@@ -340,6 +347,12 @@ function applyTalentEffects() {
 
 function clampStats() {
   state.HAP = Math.min(10, state.HAP);
+  const trackKeys = ['SOC', 'INT', 'MNY', 'HAP', 'HLT', 'PER', 'APP', 'POP', 'POK', 'MMR'];
+  for (const k of trackKeys) {
+    const v = state[k] || 0;
+    if (state.statPeaks[k] === undefined || v > state.statPeaks[k]) state.statPeaks[k] = v;
+  }
+  if (state.storyline) state.storylinesVisited.add(state.storyline);
 }
 
 function syncProfessionByAge() {
@@ -443,7 +456,19 @@ function applyEvent(ev) {
   // Apply set before logging so storyline color is correct
   if (ev.set) {
     const prevStoryline = state.storyline;
+    const prevRel = state.relationship;
     for (const [k, v] of Object.entries(ev.set)) state[k] = v;
+    if (ev.set.relationship !== undefined && ev.set.relationship !== prevRel) {
+      if (!state.relationshipHistory) state.relationshipHistory = [];
+      const last = state.relationshipHistory[state.relationshipHistory.length - 1];
+      if (!last || last.rel !== ev.set.relationship) {
+        state.relationshipHistory.push({
+          rel: ev.set.relationship,
+          age: state.age,
+          month: state.monthOfYear,
+        });
+      }
+    }
     if (ev.set.storyline && (!state.storylineStart || ev.set.storyline !== prevStoryline)) {
       state.storylineStart = state.age;
       state.storylineStartMonth = state.monthTotal;
@@ -1161,6 +1186,7 @@ function render() {
       state.logRenderedCount = 0;
       logEl.innerHTML = '';
     }
+    const hadNew = state.log.length > state.logRenderedCount;
     for (let i = state.logRenderedCount; i < state.log.length; i++) {
       const entry = state.log[i];
       const div = document.createElement('div');
@@ -1170,6 +1196,10 @@ function render() {
       logEl.appendChild(div);
     }
     state.logRenderedCount = state.log.length;
+    for (const el of logEl.querySelectorAll('.log-entry.log-latest')) el.classList.remove('log-latest');
+    const last = logEl.lastElementChild;
+    if (last && last.classList.contains('log-entry')) last.classList.add('log-latest');
+    if (hadNew) logEl.scrollTop = logEl.scrollHeight;
 
     // ── Choice UI 渲染 ──
     // 每次 render 先移除旧的选择按钮（避免重复）
@@ -1224,8 +1254,13 @@ function updateAutoButtons() {
   b2.classList.toggle('active', autoMode === 2);
 
   const ended = state.phase === 'ended';
+  const sb = $('btn-summary');
+  if (sb) sb.style.display = ended ? '' : 'none';
   b1.disabled = ended;
   b2.disabled = ended;
+  if (ended && !_endCinematicShown && document.body.classList.contains('in-game')) {
+    setTimeout(showEndCinematic, 600);
+  }
 }
 
 function stopAuto() {
@@ -1262,6 +1297,9 @@ function initGame() {
   for (const k of STAT_KEYS) state[k] = state.alloc[k];
   state.HAP = 5;
   state.talentIds = new Set(state.talentsPicked.map(t => t.id));
+  state.statPeaks = {};
+  state.storylinesVisited = new Set();
+  _endCinematicShown = false;
   applyTalentEffects();
   clampStats();
   state.phase = 'game';
@@ -1289,10 +1327,196 @@ function initGame() {
   render();
 }
 
+let _endCinematicShown = false;
+
+function showEndCinematic() {
+  if (_endCinematicShown) return;
+  _endCinematicShown = true;
+
+  // Pick the most "ending"-flavored log entry: prefer one with 「结局」 keyword, else last log
+  const logs = state.log;
+  let endingIdx = -1;
+  for (let i = logs.length - 1; i >= 0; i--) {
+    if (logs[i].text && /结局/.test(logs[i].text)) { endingIdx = i; break; }
+  }
+  const endingLog = endingIdx >= 0 ? logs[endingIdx] : logs[logs.length - 1];
+
+  $('end-card-tag').textContent = endingLog ? endingLog.tag : '';
+  $('end-card-text').textContent = endingLog ? endingLog.text : '一段人生结束了。';
+
+  // Try to find the matching DOM log entry for the fly animation
+  const logEl = $('event-log');
+  let sourceEl = null;
+  if (endingIdx >= 0) {
+    const entries = logEl.querySelectorAll('.log-entry');
+    sourceEl = entries[endingIdx] || logEl.lastElementChild;
+  } else {
+    sourceEl = logEl.lastElementChild;
+  }
+
+  const overlay = $('end-overlay');
+  overlay.classList.add('active');
+
+  if (sourceEl) {
+    const rect = sourceEl.getBoundingClientRect();
+    const ghost = document.createElement('div');
+    ghost.className = 'end-ghost';
+    ghost.textContent = endingLog ? endingLog.text : '';
+    ghost.style.top = rect.top + 'px';
+    ghost.style.left = rect.left + 'px';
+    ghost.style.width = rect.width + 'px';
+    overlay.appendChild(ghost);
+    requestAnimationFrame(() => {
+      ghost.classList.add('ghost-flying');
+    });
+    setTimeout(() => ghost.remove(), 1700);
+  }
+
+  setTimeout(() => {
+    overlay.classList.add('show-card');
+  }, 1400);
+}
+
+function dismissEndOverlay() {
+  const overlay = $('end-overlay');
+  overlay.classList.remove('active', 'show-card');
+}
+
+function renderSummary() {
+  const ageY = state.age;
+  const ageM = state.monthOfYear;
+  $('summary-subtitle').textContent = `走过 ${ageY} 岁 ${ageM} 个月`;
+
+  // Hero avatar — render immediately, then redundantly to catch layout edge cases
+  const sumCanvas = $('summary-avatar');
+  if (sumCanvas) {
+    renderAvatar(sumCanvas, state);
+    setTimeout(() => renderAvatar(sumCanvas, state), 50);
+    setTimeout(() => renderAvatar(sumCanvas, state), 250);
+  }
+
+  // Hero meta (chips next to avatar)
+  const heroMeta = $('summary-hero-meta');
+  if (heroMeta) {
+    const chips = [];
+    chips.push(`<span class="hero-chip hero-chip-age">${ageY} 岁 ${ageM} 个月</span>`);
+    if (state.school && state.school !== '无') chips.push(`<span class="hero-chip">${state.school}</span>`);
+    if (state.major) chips.push(`<span class="hero-chip">${state.major}</span>`);
+    if (state.profession) chips.push(`<span class="hero-chip">${state.profession}</span>`);
+    if (state.relationship) chips.push(`<span class="hero-chip">${state.relationship}</span>`);
+    heroMeta.innerHTML = chips.join('');
+  }
+
+  // 最终结局：取最后一条带 logType=hidden/special 或包含「结局」的 log
+  const endingLog = [...state.log].reverse().find(e =>
+    (e.text && /结局/.test(e.text)) || e.logType === 'hidden' || e.logType === 'special'
+  );
+  const endingEl = $('summary-ending');
+  if (endingLog) {
+    endingEl.innerHTML = `<div class="ending-tag">${endingLog.tag}</div><div class="ending-text">${endingLog.text}</div>`;
+  } else {
+    endingEl.innerHTML = `<div class="ending-text">这一生平淡如水。</div>`;
+  }
+
+  // 剧情列表
+  const slEl = $('summary-storylines');
+  const visited = [...state.storylinesVisited];
+  if (visited.length === 0) {
+    slEl.innerHTML = `<div class="empty-hint">没有触发任何特殊剧情</div>`;
+  } else {
+    slEl.innerHTML = visited.map(sl => {
+      const cls = HIDDEN_STORYLINES.has(sl) ? 'storyline-chip hidden' : 'storyline-chip special';
+      return `<span class="${cls}">${STORYLINE_NAMES[sl] || sl}</span>`;
+    }).join('');
+  }
+
+  // 属性
+  const statsEl = $('summary-stats');
+  const keys = ['SOC', 'INT', 'MNY', 'HAP', 'HLT', 'PER', 'APP'];
+  if (state.statPeaks.POP !== undefined && state.statPeaks.POP > 0) keys.push('POP');
+  if (state.statPeaks.POK !== undefined && state.statPeaks.POK > 0) keys.push('POK');
+  if (state.statPeaks.MMR !== undefined && state.statPeaks.MMR > 0) keys.push('MMR');
+  statsEl.innerHTML = keys.map(k => {
+    const peak = state.statPeaks[k] ?? 0;
+    const cur = state[k] ?? 0;
+    const isSpec = ['POP','POK','MMR'].includes(k);
+    return `
+      <div class="stat-line ${isSpec ? 'spec' : ''}">
+        <span class="stat-line-label">${STAT_LABELS[k]}</span>
+        <span class="stat-line-cur">${cur}</span>
+        <span class="stat-line-peak">峰值 ${peak}</span>
+      </div>
+    `;
+  }).join('');
+
+  // 天赋
+  const talentEl = $('summary-talents');
+  if (state.talentsPicked && state.talentsPicked.length) {
+    talentEl.innerHTML = state.talentsPicked.map(t =>
+      `<div class="talent-line grade-${t.grade}"><span class="t-line-name">${t.name}</span><span class="t-line-desc">${t.description}</span></div>`
+    ).join('');
+  } else {
+    talentEl.innerHTML = `<div class="empty-hint">无天赋记录</div>`;
+  }
+
+  // 高光时刻：抽 hidden/special/romance 的 log，最多 6 条
+  const hlEl = $('summary-highlights');
+  const highlights = state.log.filter(e =>
+    e.logType === 'hidden' || e.logType === 'special' || e.logType === 'romance'
+  );
+  if (highlights.length === 0) {
+    hlEl.innerHTML = `<div class="empty-hint">没有特别记录</div>`;
+  } else {
+    hlEl.innerHTML = highlights.map(h =>
+      `<div class="highlight-row hl-${h.logType}"><span class="hl-tag">${h.tag}</span><span class="hl-text">${h.text}</span></div>`
+    ).join('');
+  }
+
+  // 恋爱史
+  const romEl = $('summary-romance');
+  if (romEl) {
+    const history = (state.relationshipHistory || []).filter(h => h.rel && h.rel !== '单身');
+    const finalRelation = state.relationship || '单身';
+    if (history.length === 0 && (finalRelation === '单身' || !finalRelation)) {
+      const taunts = [
+        '从 15 岁单身到现在，纯纯的单身狗一条 🐕',
+        '一辈子没人要，建议下辈子练练颜值。',
+        '情感经历：纯白一片。爱情？那是别人的故事。',
+        '连暧昧都没有过，这哪是留学生，这是修行僧。',
+      ];
+      const taunt = taunts[Math.floor(Math.random() * taunts.length)];
+      romEl.innerHTML = `<div class="romance-empty">${taunt}</div>`;
+    } else {
+      const chips = history.map((h, i) => {
+        const isLast = i === history.length - 1;
+        return `<span class="rom-stage${isLast ? ' rom-stage-final' : ''}">${h.rel}<span class="rom-stage-age">${h.age}岁</span></span>`;
+      }).join('<span class="rom-arrow">→</span>');
+      romEl.innerHTML = `<div class="romance-flow">${chips || `<span class="rom-stage">${finalRelation}</span>`}</div>`;
+    }
+  }
+
+  // 人生数据
+  const metaEl = $('summary-meta');
+  const totalEvents = state.log.length;
+  const ageDeath = state.HLT <= -5;
+  const finalProf = state.profession || '未定';
+  const finalSchool = state.school && state.school !== '无' ? state.school : '—';
+  const finalRel = state.relationship || '单身';
+  metaEl.innerHTML = `
+    <div class="meta-row"><span class="meta-k">事件总数</span><span class="meta-v">${totalEvents}</span></div>
+    <div class="meta-row"><span class="meta-k">最终学校</span><span class="meta-v">${finalSchool}</span></div>
+    <div class="meta-row"><span class="meta-k">最终职业</span><span class="meta-v">${finalProf}</span></div>
+    <div class="meta-row"><span class="meta-k">恋爱状态</span><span class="meta-v">${finalRel}</span></div>
+    <div class="meta-row"><span class="meta-k">触发剧情</span><span class="meta-v">${visited.length} 条</span></div>
+    <div class="meta-row"><span class="meta-k">死因</span><span class="meta-v">${ageDeath ? '健康崩溃' : (state.age >= 60 ? '善终退休' : '剧情结局')}</span></div>
+  `;
+}
+
 function showScreen(id) {
   for (const s of document.querySelectorAll('.screen')) s.classList.remove('active');
   $(id).classList.add('active');
   document.body.classList.toggle('in-game', id === 'game-screen');
+  document.body.classList.toggle('in-summary', id === 'summary-screen');
   if (id !== 'game-screen') stopAuto();
 }
 
@@ -1354,6 +1578,31 @@ async function main() {
 
   $('btn-restart').addEventListener('click', () => {
     showScreen('start-screen');
+    location.reload();
+  });
+
+  $('btn-summary').addEventListener('click', () => {
+    dismissEndOverlay();
+    showScreen('summary-screen');
+    renderSummary();
+  });
+
+  $('btn-end-summary').addEventListener('click', () => {
+    dismissEndOverlay();
+    showScreen('summary-screen');
+    renderSummary();
+  });
+
+  $('btn-end-restart').addEventListener('click', () => {
+    location.reload();
+  });
+
+  $('btn-summary-back').addEventListener('click', () => {
+    showScreen('game-screen');
+    render();
+  });
+
+  $('btn-summary-restart').addEventListener('click', () => {
     location.reload();
   });
 
