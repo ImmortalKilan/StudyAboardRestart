@@ -1,5 +1,6 @@
 import { evalCondition, pickBranch, pickWeightedBranch } from './dsl.js';
 import { renderAvatar } from './avatar.js';
+import { playStorylineIntro } from './cinematic.js';
 
 const STAT_KEYS = ['SOC', 'INT', 'MNY', 'PER', 'HLT', 'APP'];
 const STAT_LABELS = {
@@ -454,6 +455,8 @@ function applyEvent(ev) {
 
   if (!ev.repeatable) state.firedEvents.add(ev.id);
 
+  const prevStorylineForCinematic = state.storyline;
+
   // Apply set before logging so storyline color is correct
   if (ev.set) {
     const prevStoryline = state.storyline;
@@ -495,6 +498,28 @@ function applyEvent(ev) {
 
   if (ev.end) {
     state.phase = 'ended';
+  }
+
+  // Cinematic intro when entering a special/hidden storyline
+  if (ev.set && ev.set.storyline && ev.set.storyline !== prevStorylineForCinematic
+      && (HIDDEN_STORYLINES.has(ev.set.storyline) || SPECIAL_STORYLINES.has(ev.set.storyline))) {
+    state.pendingCinematic = true;
+    state._cineSavedAuto = autoMode;
+    stopAuto();
+    render();
+    const isHidden = HIDDEN_STORYLINES.has(state.storyline);
+    playStorylineIntro({
+      name: STORYLINE_NAMES[state.storyline] || state.storyline,
+      color: isHidden ? '#ff5252' : '#d4af37',
+      effect: ev.effect || {},
+      statLabels: STAT_LABELS,
+      onDone: () => {
+        state.pendingCinematic = false;
+        const saved = state._cineSavedAuto || 0;
+        state._cineSavedAuto = 0;
+        if (saved > 0) startAuto(saved);
+      }
+    });
   }
 
   // ── Choice System: 玩家交互选择 ──
@@ -611,7 +636,7 @@ function resolveChoice(index) {
 
 function advanceMonth() {
   // 如果有待选择，阻塞推进
-  if (state.pendingChoice) return;
+  if (state.pendingChoice || state.pendingCinematic) return;
 
   // Fire pending event from previous branch before advancing
   if (state.pendingEvent) {
@@ -1198,6 +1223,7 @@ function render() {
       const row = document.createElement('div');
       const isSpecial = SPECIAL_STATS.has(k);
       row.className = 'stat-row' + (isSpecial ? ' stat-special' : '');
+      row.dataset.stat = k;
       const label = STAT_LABELS[k];
       const val = state[k];
       const base = k === 'HAP' ? 10 : dynamicMax;

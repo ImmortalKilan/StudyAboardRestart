@@ -1367,3 +1367,46 @@ body.in-summary .app {
 
   .avatar-wrap { height: 240px; }
 }
+
+/* ── Cinematic storyline intro ── */
+.cinematic-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 18px;
+}
+.cinematic-title {
+  font-size: 64px;
+  font-weight: 800;
+  letter-spacing: 4px;
+  text-shadow: 0 0 16px rgba(0,0,0,0.6), 0 0 32px currentColor;
+  animation: cineFadeIn 250ms ease-out both;
+  will-change: transform, opacity;
+}
+.cinematic-attrs {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+  animation: cineFadeIn 200ms ease-out both;
+}
+.cinematic-attr {
+  font-size: 28px;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.55);
+  text-shadow: 0 0 8px rgba(0,0,0,0.8);
+  will-change: transform, opacity;
+}
+.cinematic-attr.pos { color: #4ade80; }
+.cinematic-attr.neg { color: #f87171; }
+@keyframes cineFadeIn {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
+}
