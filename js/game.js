@@ -100,7 +100,7 @@ const STORYLINE_CFG = {
       { cond: s => s.POK < -4 || s.MNY <= -4, event: 81091 },
     ],
     progressChecks: [
-      { cond: s => s.POK >= 30, event: 81090 },
+      { cond: s => s.POK >= 30, event: () => Math.random() < 0.75 ? 81090 : 81092 },
     ],
   },
   local_shark: {
@@ -133,7 +133,7 @@ const STORYLINE_CFG = {
     ],
     progressChecks: [
       { cond: s => s.match_fixing, event: 83092 },
-      { cond: s => s.MMR >= 40 && s.PER >= 10 && !s.match_fixing, event: 83090 },
+      { cond: s => s.MMR >= 40 && s.PER >= 10 && !s.match_fixing, event: () => Math.random() < 0.7 ? 83090 : 83094 },
       { cond: s => s.age - s.storylineStart >= 1, event: 83093 },
     ],
   },
@@ -157,7 +157,7 @@ const STORYLINE_CFG = {
     gracePeriod: 12,
     eventRate: 0.6,
     progressChecks: [
-      { cond: s => s.POP >= 80, event: 80090 },
+      { cond: s => s.POP >= 80, event: () => Math.random() < 0.7 ? 80090 : 80092 },
       { cond: s => s.INT < 4, event: 80091 },
       { cond: s => s.age - s.storylineStart >= 3, event: 80094 },
     ],
@@ -199,6 +199,11 @@ const STORYLINE_NAMES = {
 };
 const HIDDEN_STORYLINES = new Set(['spy', 'abyss', 'meta']);
 const SPECIAL_STORYLINES = new Set(['idol', 'superstar', 'streamer', 'poker', 'triton', 'local_shark', 'party', 'ceo', 'wasted', 'esports', 'worlds', 'minor_league']);
+const STORYLINE_UNLOCK_STAT = {
+  idol: 'POP', superstar: 'POP', streamer: 'POP',
+  poker: 'POK', triton: 'POK', local_shark: 'POK',
+  esports: 'MMR', worlds: 'MMR', minor_league: 'MMR',
+};
 const STUDENT_PHASES = new Set([
   '高中生', '本科生', '理工生', '商科生', '文科生',
   '准留学生', '考研党', '迷茫大学生', '准研究生', '研究生', '海外研究生',
@@ -484,10 +489,12 @@ function applyEvent(ev) {
   }
 
   const msg = ev.text || ev.event;
-  let evLogType = ev.end ? 'ending' : (ev.romance ? 'romance' : ev.logType || undefined);
-  if (!evLogType && ev.include && /MAJOR==/.test(ev.include)) {
-    evLogType = 'major';
-  }
+  let evLogType = ev.logType
+    || (ev.romance ? 'romance' : undefined)
+    || (ev.include && (/MAJOR==/.test(ev.include) || /profession==/.test(ev.include)) ? 'major' : undefined);
+  // ev.end without a more specific category: let pushLog apply storyline color when in storyline,
+  // otherwise stamp 'ending' as final fallback
+  if (!evLogType && ev.end && !state.storyline) evLogType = 'ending';
   if (msg) pushLog(msg, evLogType);
 
   if (ev.effect) for (const [k, v] of Object.entries(ev.effect)) {
@@ -509,10 +516,12 @@ function applyEvent(ev) {
     stopAuto();
     render();
     const isHidden = HIDDEN_STORYLINES.has(state.storyline);
+    const newStat = STORYLINE_UNLOCK_STAT[state.storyline];
+    const prevStat = STORYLINE_UNLOCK_STAT[prevStorylineForCinematic];
     playStorylineIntro({
       name: STORYLINE_NAMES[state.storyline] || state.storyline,
       color: isHidden ? '#ff5252' : '#d4af37',
-      effect: ev.effect || {},
+      unlockStat: (newStat && newStat !== prevStat) ? newStat : null,
       statLabels: STAT_LABELS,
       onDone: () => {
         state.pendingCinematic = false;
@@ -674,8 +683,9 @@ function advanceMonth() {
       // Check progress triggers (e.g., age-gated storyline transitions)
       else if (cfg.progressChecks && cfg.progressChecks.some(pc => {
         if (pc.cond(state)) {
-          const ev = state.eventsMap.get(pc.event);
-          if (ev && !state.firedEvents.has(pc.event)) { applyEvent(ev); return true; }
+          const eid = typeof pc.event === 'function' ? pc.event(state) : pc.event;
+          const ev = state.eventsMap.get(eid);
+          if (ev && !state.firedEvents.has(eid)) { applyEvent(ev); return true; }
         }
         return false;
       })) { /* handled */ }

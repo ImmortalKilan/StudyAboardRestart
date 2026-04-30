@@ -605,6 +605,10 @@ body.in-game .left-panel {
 .log-entry.log-major .log-text {
   color: #7ab8e0 !important;
 }
+.log-entry.log-ending .log-text {
+  color: #c0c0c0 !important;
+  font-style: italic;
+}
 
 .right-panel {
   background: var(--card);
@@ -1304,9 +1308,16 @@ body.in-summary .app {
 }
 .choice-btn.choice-card .choice-req.met { color: #6dd49a; }
 .choice-btn.choice-card .choice-req.locked { color: #b8896d; }
-.choice-btn.choice-card:hover .choice-title { color: #0f1420; }
-.choice-btn.choice-card:hover .choice-desc { color: #2a2a2a; }
-.choice-btn.choice-card:hover .choice-req.met { color: #2d7a4d; }
+.choice-btn.choice-card:hover {
+  background: linear-gradient(140deg, var(--card-2) 0%, rgba(255,255,255,0.02) 100%);
+  border-color: #d4af37;
+  box-shadow: 0 0 0 1px #d4af37, 0 0 16px rgba(212, 175, 55, 0.45);
+  transform: translateY(-1px);
+}
+.choice-btn.choice-card:hover { color: var(--ink); }
+.choice-btn.choice-card:hover .choice-desc { color: var(--ink-soft); }
+.choice-btn.choice-card:hover .choice-req.met { color: #6dd49a; }
+.choice-btn.choice-card:hover .choice-req.locked { color: #b8896d; }
 
 .choice-btn.choice-locked {
   opacity: 0.45;
@@ -1406,6 +1417,12 @@ body.in-summary .app {
 }
 .cinematic-attr.pos { color: #4ade80; }
 .cinematic-attr.neg { color: #f87171; }
+.cinematic-attr.unlock {
+  color: #ffd54f;
+  font-size: 36px;
+  letter-spacing: 2px;
+  text-shadow: 0 0 18px rgba(255, 213, 79, 0.6);
+}
 @keyframes cineFadeIn {
   from { opacity: 0; transform: scale(0.85); }
   to   { opacity: 1; transform: scale(1); }

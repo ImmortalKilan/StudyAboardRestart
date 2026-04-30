@@ -1,7 +1,7 @@
 // Storyline 进入时的动画：标题居中亮相 → 飞向左侧剧情位 → effect 数值居中亮相 → 飞向属性栏
 const wait = (ms) => new Promise(r => setTimeout(r, ms));
 
-export async function playStorylineIntro({ name, color, effect, statLabels, onDone }) {
+export async function playStorylineIntro({ name, color, unlockStat, statLabels, onDone }) {
   const overlay = document.createElement('div');
   overlay.className = 'cinematic-overlay';
   document.body.appendChild(overlay);
@@ -33,26 +33,21 @@ export async function playStorylineIntro({ name, color, effect, statLabels, onDo
   }
   title.remove();
 
-  // ③ effect 数值居中淡入
-  const entries = Object.entries(effect || {}).filter(([, v]) => typeof v === 'number' && v !== 0);
-  if (entries.length) {
+  // ③ 解锁新属性提示居中淡入
+  if (unlockStat) {
     const box = document.createElement('div');
     box.className = 'cinematic-attrs';
-    for (const [k, v] of entries) {
-      const tag = document.createElement('div');
-      tag.className = 'cinematic-attr ' + (v >= 0 ? 'pos' : 'neg');
-      tag.textContent = `${statLabels[k] || k} ${v >= 0 ? '+' : ''}${v}`;
-      tag.dataset.stat = k;
-      box.appendChild(tag);
-    }
+    const tag = document.createElement('div');
+    tag.className = 'cinematic-attr unlock';
+    tag.textContent = `解锁新属性：${statLabels[unlockStat] || unlockStat}`;
+    tag.dataset.stat = unlockStat;
+    box.appendChild(tag);
     overlay.appendChild(box);
-    await wait(400);
+    await wait(800);
 
-    // ④ 各 tag FLIP 飞向对应 stat-row
-    Array.from(box.children).forEach((tag) => {
-      const k = tag.dataset.stat;
-      const target = document.querySelector(`.stat-row[data-stat="${k}"]`);
-      if (!target) return;
+    // ④ FLIP 飞向对应 stat-row
+    const target = document.querySelector(`.stat-row[data-stat="${unlockStat}"]`);
+    if (target) {
       const tRect = target.getBoundingClientRect();
       const sRect = tag.getBoundingClientRect();
       const dx = tRect.left + tRect.width / 2 - (sRect.left + sRect.width / 2);
@@ -64,8 +59,8 @@ export async function playStorylineIntro({ name, color, effect, statLabels, onDo
         ],
         { duration: 900, easing: 'cubic-bezier(.4,.0,.2,1)', fill: 'forwards' }
       );
-    });
-    await wait(900);
+      await wait(900);
+    }
   }
 
   overlay.remove();
