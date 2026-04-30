@@ -5113,7 +5113,7 @@
   },
   {
     "id": 80024,
-    "event": "你在直播里说错了一句话，截图被传到全网。工作室让你一小时内表态。",
+    "event": "你在直播后台忘记关麦，说了一些不当言论，截图被传到全网。工作室让你一小时内表态。",
     "storyline": "idol",
     "weight": 18,
     "choices": [
@@ -5122,7 +5122,7 @@
         "next": 80024001
       },
       {
-        "text": "装作没说过",
+        "text": "装死，AI生成的视频",
         "next": 80024002
       }
     ]
@@ -5133,7 +5133,7 @@
     "noRandom": true,
     "effect": {
       "HAP": -2,
-      "POP": -3,
+      "POP": -1,
       "SOC": 2
     }
   },
@@ -5143,7 +5143,7 @@
     "noRandom": true,
     "effect": {
       "HAP": 1,
-      "POP": -6
+      "POP": -4
     },
     "set": {
       "cover_up": true
@@ -5151,7 +5151,7 @@
   },
   {
     "id": 80032,
-    "event": "三个月前那段「装作没说过」的视频被网友扒了出来，对比图刷上热搜。三档综艺的合作方在群里催你给说法。",
+    "event": "那段「装死」的视频被网友扒了出来，对比图刷上热搜。三档综艺的合作方在群里催你给说法。",
     "storyline": "idol",
     "weight": 35,
     "include": "cover_up=1",
@@ -5310,7 +5310,7 @@
     "event": "你留在练习室继续磨，看着同期出去的人在 ins 晒照片。",
     "noRandom": true,
     "effect": {
-      "POP": 1,
+      "POP": 2,
       "HAP": -1
     }
   },
@@ -5318,7 +5318,7 @@
     "id": 80033,
     "event": "东京的事务所看上了你，开出长约：日本顶流路线，资源全包。但合约要求你彻底切断国内粉丝运营，专心做日韩市场。",
     "storyline": "idol",
-    "weight": 30,
+    "weight": 5,
     "include": "japan_training=1",
     "choices": [
       {
@@ -5326,7 +5326,7 @@
         "next": 80033001
       },
       {
-        "text": "婉拒，回国发展",
+        "text": "心是中国心，婉拒，回国发展",
         "next": 80033002
       }
     ]
@@ -5351,6 +5351,333 @@
     "effect": {
       "POP": 2,
       "HAP": 1
+    },
+    "set": {
+      "returned_home": true
+    }
+  },
+  {
+    "id": 80100,
+    "event": "综艺录到一半，你听不懂主持人的玩笑接不上梗，笑场被剪进 NG 集锦。事务所开始讨论是不是要给你换路线。",
+    "storyline": "idol",
+    "weight": 14,
+    "include": "japan_path=1",
+    "choices": [
+      {
+        "text": "硬学日语，闭关三个月",
+        "next": 80100001
+      },
+      {
+        "text": "全程读卡保平安",
+        "next": 80100002
+      },
+      {
+        "text": "摆烂卖中国味人设",
+        "next": 80100003
+      }
+    ]
+  },
+  {
+    "id": 80100001,
+    "event": "你把自己关在公寓里啃日剧和教材，三个月后已经能 freestyle 接梗了。",
+    "noRandom": true,
+    "effect": {
+      "INT": 2,
+      "HAP": -2
+    },
+    "set": {
+      "jp_fluent": true
+    }
+  },
+  {
+    "id": 80100002,
+    "event": "你全程照着提词卡念，节目效果尴尬，事务所开始给你减通告。",
+    "noRandom": true,
+    "effect": {
+      "MNY": -2,
+      "POP": -1
+    }
+  },
+  {
+    "id": 80100003,
+    "event": "你干脆把「语言不通」做成卖点，蹩脚日语反而成了节目效果，#中国味偶像 上了推特趋势。",
+    "noRandom": true,
+    "effect": {
+      "POP": 2,
+      "SOC": -1
+    }
+  },
+  {
+    "id": 80101,
+    "event": "日方应援规则严格：禁止带荧光棒入场、禁止喊中文应援。国内粉丝在微博炎上，说事务所不尊重海外粉丝。",
+    "storyline": "idol",
+    "weight": 12,
+    "include": "japan_path=1",
+    "choices": [
+      {
+        "text": "配合事务所的规则",
+        "next": 80101001
+      },
+      {
+        "text": "私下开双语直播补偿粉丝",
+        "next": 80101002
+      }
+    ]
+  },
+  {
+    "id": 80101001,
+    "event": "你公开发文支持事务所规则。日本市场认可度上升，国内粉丝黑转粉一半，粉一半。",
+    "noRandom": true,
+    "effect": {
+      "POP": 2,
+      "HAP": -1
+    }
+  },
+  {
+    "id": 80101002,
+    "event": "你凌晨偷偷在小号开直播给国内粉丝唱歌，被事务所约谈但没处罚。",
+    "noRandom": true,
+    "effect": {
+      "SOC": 2,
+      "HLT": -2
+    }
+  },
+  {
+    "id": 80102,
+    "event": "事务所拿出一份恋爱禁止条款，违约金条款写得让你倒吸一口凉气。这时你刚好在和一个练习生暧昧。",
+    "storyline": "idol",
+    "weight": 10,
+    "include": "japan_path=1",
+    "choices": [
+      {
+        "text": "老老实实签，断了念想",
+        "next": 80102001
+      },
+      {
+        "text": "签了，但偷偷继续",
+        "next": 80102002
+      }
+    ]
+  },
+  {
+    "id": 80102001,
+    "event": "你签了字，删掉了对方所有联系方式。事务所很满意，给你加了资源。",
+    "noRandom": true,
+    "effect": {
+      "HAP": -2,
+      "POP": 1
+    }
+  },
+  {
+    "id": 80102002,
+    "event": "你以为很隐蔽，但日本周刊的镜头无孔不入。",
+    "noRandom": true,
+    "branch": [
+      "?80102003:6",
+      "?80102004:4"
+    ]
+  },
+  {
+    "id": 80102003,
+    "event": "Friday 杂志头版：你和练习生牵手出酒店的照片传遍全网。事务所当夜启动违约金诉讼，你被解约扫地出门。",
+    "noRandom": true,
+    "effect": {
+      "MNY": -8,
+      "POP": -10,
+      "HAP": -5
+    },
+    "set": {
+      "japan_path": false,
+      "scandal": true
+    }
+  },
+  {
+    "id": 80102004,
+    "event": "你侥幸没被拍到，但每天都在提心吊胆。",
+    "noRandom": true,
+    "effect": {
+      "HAP": -2
+    }
+  },
+  {
+    "id": 80103,
+    "event": "5ch 上有人翻出你五年前微博的争议言论，配上机翻全网传播。日本黑粉冲到你 ins 评论区。",
+    "storyline": "idol",
+    "weight": 10,
+    "include": "japan_path=1",
+    "choices": [
+      {
+        "text": "让公司发公关稿压下去",
+        "next": 80103001
+      },
+      {
+        "text": "自己开直播鞠躬道歉",
+        "next": 80103002
+      },
+      {
+        "text": "装死不回应",
+        "next": 80103003
+      }
+    ]
+  },
+  {
+    "id": 80103001,
+    "event": "公司花钱删帖压热搜，账面上风平浪静，但你欠了公司一笔人情债。",
+    "noRandom": true,
+    "effect": {
+      "MNY": -3,
+      "POP": 1
+    }
+  },
+  {
+    "id": 80103002,
+    "event": "你直播里 90 度鞠躬道歉，态度被日媒认可，「诚意感人」上了雅虎首页。",
+    "noRandom": true,
+    "effect": {
+      "PER": 1,
+      "POP": -1
+    }
+  },
+  {
+    "id": 80103003,
+    "event": "你选择不回应，结果黑料越发酵越大，几个代言悄悄换了人。",
+    "noRandom": true,
+    "effect": {
+      "POP": -3,
+      "MNY": -2
+    }
+  },
+  {
+    "id": 80104,
+    "event": "NHK 红白歌会向你发出邀请——年末压轴出场，全日本看着你。",
+    "storyline": "idol",
+    "weight": 30,
+    "include": "(japan_path=1)&(POP>=15)&(MTH_AFTER_STORY>=20)",
+    "noRandom": false,
+    "effect": {
+      "POP": 5,
+      "MNY": 3,
+      "HAP": 2
+    },
+    "set": {
+      "kohaku": true
+    }
+  },
+  {
+    "id": 80105,
+    "event": "武道馆 solo 结局：你独立 sold out 武道馆。万人荧光棒汇成银河，你站在中央，泪水模糊了视线。从中国留学生到日本一线 artist，这条路你走了五年。",
+    "storyline": "idol",
+    "logType": "hidden",
+    "noRandom": true,
+    "end": true
+  },
+  {
+    "id": 80107,
+    "event": "回国后空档期一过，综艺通告一堆找上门——真人秀、美食节目、相亲节目、明星运动会，挑哪个？",
+    "storyline": "idol",
+    "weight": 14,
+    "include": "returned_home=1",
+    "choices": [
+      {
+        "text": "什么都接，曝光最重要",
+        "next": 80107001
+      },
+      {
+        "text": "推掉综艺，深耕音乐",
+        "next": 80107002
+      }
+    ]
+  },
+  {
+    "id": 80107001,
+    "event": "你的脸出现在每个卫视的黄金档，但工作室的歌已经鸽了三个月。",
+    "noRandom": true,
+    "effect": {
+      "POP": 3,
+      "HAP": -2,
+      "INT": -1
+    }
+  },
+  {
+    "id": 80107002,
+    "event": "你推掉所有综艺关在录音棚里。新单曲发出来口碑很好，但热度只持续了两天。",
+    "noRandom": true,
+    "effect": {
+      "INT": 2,
+      "HAP": 1
+    }
+  },
+  {
+    "id": 80108,
+    "event": "原团 C 位顶替你的位置爆红，热搜挂了一周。粉丝在评论区互撕。",
+    "storyline": "idol",
+    "weight": 10,
+    "include": "returned_home=1",
+    "choices": [
+      {
+        "text": "主动提合作单曲",
+        "next": 80108001
+      },
+      {
+        "text": "发歌 diss 营销话题",
+        "next": 80108002
+      }
+    ]
+  },
+  {
+    "id": 80108001,
+    "event": "合作曲三天破亿播放，两边粉丝大和解，「格局」成了你的新标签。",
+    "noRandom": true,
+    "effect": {
+      "POP": 3,
+      "SOC": 1
+    }
+  },
+  {
+    "id": 80108002,
+    "event": "diss 单曲冲上热搜第三，话题是你掌握了，但圈内开始有人说你不好合作。",
+    "noRandom": true,
+    "effect": {
+      "POP": 2,
+      "SOC": -3
+    }
+  },
+  {
+    "id": 80109,
+    "event": "一位文艺片导演看了你的舞台 reaction 视频，觉得你眼神有戏，递来一个女二/男二剧本。",
+    "storyline": "idol",
+    "weight": 8,
+    "include": "returned_home=1",
+    "choices": [
+      {
+        "text": "接，转型演员",
+        "next": 80109001
+      },
+      {
+        "text": "拒，专心做偶像",
+        "next": 80109002
+      }
+    ]
+  },
+  {
+    "id": 80109001,
+    "event": "你试戏过了。开机第一场你紧张到 NG 二十多次，但导演说「是块料」。",
+    "noRandom": true,
+    "effect": {
+      "INT": 2,
+      "POP": -1
+    },
+    "set": {
+      "actor_path": true
+    }
+  },
+  {
+    "id": 80109002,
+    "event": "你婉拒了导演，回到练习室继续打磨舞台。同期已经在演电影了，但你不后悔。",
+    "noRandom": true,
+    "effect": {
+      "POP": 1,
+      "PER": 1
     }
   },
   {
@@ -5361,11 +5688,11 @@
     "include": "POP>=8",
     "choices": [
       {
-        "text": "据理力争",
+        "text": "据理力争，我肯定更优秀",
         "next": 80028001
       },
       {
-        "text": "退让",
+        "text": "队友先拿到的，让了吧",
         "next": 80028004
       }
     ]
@@ -5375,7 +5702,8 @@
     "branch": [
       "?80028002:5",
       "?80028003:5"
-    ]
+    ],
+    "noRandom": true
   },
   {
     "id": 80028002,
@@ -5392,7 +5720,8 @@
     "noRandom": true,
     "effect": {
       "SOC": -3,
-      "HAP": -2
+      "HAP": -2,
+      "POP": -3
     }
   },
   {
@@ -5410,7 +5739,7 @@
     "event": "一档 idol 恋综邀请你参加，可以在两位嘉宾里挑一个搭 cp。流量诱人，但可能被绑死人设。",
     "storyline": "idol",
     "weight": 10,
-    "include": "POP>=12",
+    "include": "POP>=15",
     "choices": [
       {
         "text": "立 cp 卖人设",
@@ -5440,7 +5769,7 @@
     "noRandom": true,
     "effect": {
       "POP": -1,
-      "HAP": 2
+      "HAP": 3
     }
   },
   {
@@ -5487,7 +5816,7 @@
   },
   {
     "id": 80031,
-    "event": "隔壁顶流公司的副总私下约你喝咖啡，开出 5 倍违约金挖角，承诺 center 待遇。",
+    "event": "隔壁顶流公司的副总私下约你喝咖啡，开出 5 倍违约金挖角，承诺C位待遇和全部的资源。",
     "storyline": "idol",
     "weight": 8,
     "include": "POP>=15",
@@ -5546,7 +5875,8 @@
     "branch": [
       "?80034002:5",
       "?80034003:5"
-    ]
+    ],
+    "noRandom": true
   },
   {
     "id": 80034002,
@@ -7428,7 +7758,8 @@
       "?81030002:6",
       "?81030003:4"
     ],
-    "repeatable": true
+    "repeatable": true,
+    "noRandom": true
   },
   {
     "id": 81030002,
@@ -7436,7 +7767,8 @@
     "effect": {
       "POK": 1
     },
-    "repeatable": true
+    "repeatable": true,
+    "noRandom": true
   },
   {
     "id": 81030003,
@@ -7444,7 +7776,8 @@
     "effect": {
       "POK": -1
     },
-    "repeatable": true
+    "repeatable": true,
+    "noRandom": true
   },
   {
     "id": 81030004,
@@ -7452,7 +7785,8 @@
       "?81030005:5",
       "?81030006:5"
     ],
-    "repeatable": true
+    "repeatable": true,
+    "noRandom": true
   },
   {
     "id": 81030005,
@@ -7461,7 +7795,8 @@
       "POK": 3,
       "HAP": 1
     },
-    "repeatable": true
+    "repeatable": true,
+    "noRandom": true
   },
   {
     "id": 81030006,
@@ -7470,7 +7805,8 @@
       "POK": -2,
       "HAP": -1
     },
-    "repeatable": true
+    "repeatable": true,
+    "noRandom": true
   },
   {
     "id": 81030007,
@@ -7479,7 +7815,8 @@
       "INT": 1,
       "HAP": -1
     },
-    "repeatable": true
+    "repeatable": true,
+    "noRandom": true
   },
   {
     "id": 81031,
@@ -7503,21 +7840,24 @@
     "branch": [
       "?81031002:5",
       "?81031003:5"
-    ]
+    ],
+    "noRandom": true
   },
   {
     "id": 81031002,
     "event": "你河牌打出顺子，把对手的两对吃干抹净。",
     "effect": {
       "POK": 5
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81031003,
     "event": "对面亮出暗三条，你呆坐五秒后默默推掉筹码。",
     "effect": {
       "POK": -4
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81031004,
@@ -7525,7 +7865,8 @@
     "effect": {
       "POK": -1,
       "INT": 1
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81032,
@@ -7554,7 +7895,8 @@
     },
     "set": {
       "mentor": true
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81032002,
@@ -7562,7 +7904,8 @@
     "effect": {
       "POK": 1,
       "HAP": 1
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81033,
@@ -7589,7 +7932,8 @@
     },
     "set": {
       "loan_shark": true
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81033002,
@@ -7597,7 +7941,8 @@
     "effect": {
       "POK": -2,
       "HAP": -2
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81034,
@@ -7623,7 +7968,8 @@
       "HAP": -2,
       "SOC": -1,
       "POK": 1
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81034002,
@@ -7631,7 +7977,8 @@
     "effect": {
       "POK": -3,
       "SOC": 1
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81035,
@@ -7655,7 +8002,8 @@
     "branch": [
       "?81035002:4",
       "?81035003:6"
-    ]
+    ],
+    "noRandom": true
   },
   {
     "id": 81035002,
@@ -7663,7 +8011,8 @@
     "effect": {
       "POK": 8,
       "MNY": 3
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81035003,
@@ -7671,7 +8020,8 @@
     "effect": {
       "POK": -5,
       "MNY": -1
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81035004,
@@ -7679,7 +8029,8 @@
     "effect": {
       "POK": 1,
       "HAP": -1
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81036,
@@ -7709,7 +8060,8 @@
       "?81036002:6",
       "?81036003:4"
     ],
-    "repeatable": true
+    "repeatable": true,
+    "noRandom": true
   },
   {
     "id": 81036002,
@@ -7717,7 +8069,8 @@
     "effect": {
       "POK": 2
     },
-    "repeatable": true
+    "repeatable": true,
+    "noRandom": true
   },
   {
     "id": 81036003,
@@ -7725,7 +8078,8 @@
     "effect": {
       "POK": -2
     },
-    "repeatable": true
+    "repeatable": true,
+    "noRandom": true
   },
   {
     "id": 81036004,
@@ -7733,7 +8087,8 @@
       "?81036005:5",
       "?81036006:5"
     ],
-    "repeatable": true
+    "repeatable": true,
+    "noRandom": true
   },
   {
     "id": 81036005,
@@ -7742,7 +8097,8 @@
       "POK": 5,
       "HAP": 1
     },
-    "repeatable": true
+    "repeatable": true,
+    "noRandom": true
   },
   {
     "id": 81036006,
@@ -7751,7 +8107,8 @@
       "POK": -4,
       "HAP": -1
     },
-    "repeatable": true
+    "repeatable": true,
+    "noRandom": true
   },
   {
     "id": 81036007,
@@ -7761,7 +8118,8 @@
       "POK": 1,
       "MNY": -1
     },
-    "repeatable": true
+    "repeatable": true,
+    "noRandom": true
   },
   {
     "id": 81037,
@@ -7791,7 +8149,8 @@
       "?81037002:55",
       "?81037003:45"
     ],
-    "repeatable": true
+    "repeatable": true,
+    "noRandom": true
   },
   {
     "id": 81037002,
@@ -7799,7 +8158,8 @@
     "effect": {
       "POK": 3
     },
-    "repeatable": true
+    "repeatable": true,
+    "noRandom": true
   },
   {
     "id": 81037003,
@@ -7807,7 +8167,8 @@
     "effect": {
       "POK": -3
     },
-    "repeatable": true
+    "repeatable": true,
+    "noRandom": true
   },
   {
     "id": 81037004,
@@ -7815,7 +8176,8 @@
       "?81037005:5",
       "?81037006:5"
     ],
-    "repeatable": true
+    "repeatable": true,
+    "noRandom": true
   },
   {
     "id": 81037005,
@@ -7824,7 +8186,8 @@
       "POK": 7,
       "HAP": 1
     },
-    "repeatable": true
+    "repeatable": true,
+    "noRandom": true
   },
   {
     "id": 81037006,
@@ -7833,7 +8196,8 @@
       "POK": -6,
       "HAP": -2
     },
-    "repeatable": true
+    "repeatable": true,
+    "noRandom": true
   },
   {
     "id": 81037007,
@@ -7842,7 +8206,8 @@
       "POK": 1,
       "HAP": 1
     },
-    "repeatable": true
+    "repeatable": true,
+    "noRandom": true
   },
   {
     "id": 81066,
@@ -7869,7 +8234,8 @@
     "branch": [
       "?81066002:5",
       "?81066003:5"
-    ]
+    ],
+    "noRandom": true
   },
   {
     "id": 81066002,
@@ -7878,7 +8244,8 @@
       "POK": 4,
       "SOC": 3,
       "HAP": 2
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81066003,
@@ -7887,14 +8254,16 @@
       "POK": -3,
       "SOC": -2,
       "HAP": -3
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81066004,
     "event": "你说自己还没准备好，制片人耸耸肩。",
     "effect": {
       "POK": 1
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81067,
@@ -7921,7 +8290,8 @@
     "branch": [
       "?81067002:7",
       "?81067003:3"
-    ]
+    ],
+    "noRandom": true
   },
   {
     "id": 81067002,
@@ -7929,14 +8299,16 @@
     "effect": {
       "POK": 5,
       "MNY": 3
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81067003,
     "event": "他河牌击中暗三条，你被反向收割。",
     "effect": {
       "POK": -3
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81067004,
@@ -7944,7 +8316,8 @@
     "effect": {
       "SOC": 1,
       "POK": 1
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81068,
@@ -7971,14 +8344,16 @@
     "branch": [
       "?81068002:4",
       "?81068003:6"
-    ]
+    ],
+    "noRandom": true
   },
   {
     "id": 81068002,
     "event": "你顶住 tilt 翻盘，把这周的亏空全捞回来。",
     "effect": {
       "POK": 6
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81068003,
@@ -7986,7 +8361,8 @@
     "effect": {
       "POK": -8,
       "HAP": -3
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81068004,
@@ -7995,7 +8371,8 @@
       "HAP": 2,
       "INT": 1,
       "POK": -1
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81069,
@@ -8029,14 +8406,16 @@
       "storylineStart": 0,
       "storylineStartMonth": 0,
       "showPOK": false
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81069002,
     "event": "你婉拒了，回到桌上继续打。",
     "effect": {
       "POK": 2
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81070,
@@ -8067,7 +8446,8 @@
     },
     "set": {
       "club_owner": true
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81070002,
@@ -8075,7 +8455,8 @@
     "effect": {
       "POK": 1,
       "HAP": -1
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81071,
@@ -8107,14 +8488,16 @@
     },
     "set": {
       "mentor": false
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81071002,
     "branch": [
       "?81071003:5",
       "?81071004:5"
-    ]
+    ],
+    "noRandom": true
   },
   {
     "id": 81071003,
@@ -8123,7 +8506,8 @@
       "SOC": -2,
       "HAP": 1,
       "POK": 3
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81071004,
@@ -8132,7 +8516,8 @@
       "SOC": -2,
       "HAP": 1,
       "POK": -4
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81072,
@@ -8159,7 +8544,8 @@
     "branch": [
       "?81072002:5",
       "?81072003:5"
-    ]
+    ],
+    "noRandom": true
   },
   {
     "id": 81072002,
@@ -8167,14 +8553,16 @@
     "effect": {
       "POK": 6,
       "MNY": 2
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81072003,
     "event": "你被大佬的暴躁打法节奏带走，一夜回到解放前。",
     "effect": {
       "POK": -5
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81072004,
@@ -8182,7 +8570,8 @@
     "effect": {
       "POK": 1,
       "HAP": -1
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81073,
@@ -8214,7 +8603,8 @@
     },
     "set": {
       "loan_shark": false
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81073002,
@@ -8222,7 +8612,8 @@
     "effect": {
       "MNY": -10,
       "HAP": -3
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81074,
@@ -8266,7 +8657,8 @@
       "MNY": -5,
       "POK": 2,
       "SOC": 1
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81075002,
@@ -8277,7 +8669,8 @@
     },
     "set": {
       "club_owner": false
-    }
+    },
+    "noRandom": true
   },
   {
     "id": 81094,
@@ -12046,7 +12439,7 @@
     "event": "TA 最近频繁加班，回家也心不在焉。某天你看到 TA 手机锁屏闪过一个陌生头像，备注只有一个字母。",
     "include": "((relationship==同居)|(relationship==已婚)|(relationship==二婚))&(AGE>=26)",
     "exclude": "EVT?[14140]",
-    "weight": 35,
+    "weight": 5,
     "choices": [
       {
         "title": "装没看见，等 TA 自己回来",

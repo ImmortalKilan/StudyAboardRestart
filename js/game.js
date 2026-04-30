@@ -149,6 +149,7 @@ const STORYLINE_CFG = {
     gracePeriod: 12,
     eventRate: 0.6,
     progressChecks: [
+      { cond: s => s.japan_path && s.jp_fluent && (s.POP || 0) >= 20 && s.age - s.storylineStart >= 3, event: 80105 },
       { cond: s => s.age - s.storylineStart >= 3, event: 80040 },
     ],
   },
