@@ -466,16 +466,16 @@ body.in-game .left-panel {
   justify-content: center;
   align-items: center;
   height: 300px;
-  background:
-    linear-gradient(180deg, #2b3648 0%, #1a2230 100%);
+  background: linear-gradient(180deg, #2b3648 0%, #1a2230 100%);
   border-radius: 6px;
+  overflow: hidden;
+  position: relative;
   image-rendering: pixelated;
 }
 #avatar-canvas {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
-
 .time-box {
   margin-top: 12px;
   padding: 10px 12px;
@@ -1427,3 +1427,156 @@ body.in-summary .app {
   from { opacity: 0; transform: scale(0.85); }
   to   { opacity: 1; transform: scale(1); }
 }
+
+/* ─── Action banner (idol debut / party CEO transition) ──────── */
+.action-banner {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin: 0 0 10px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(245,182,66,0.18) 0%, rgba(245,182,66,0.06) 100%);
+  border: 1px solid rgba(245,182,66,0.45);
+  border-radius: 10px;
+  box-shadow: 0 0 18px rgba(245,182,66,0.12);
+  animation: bannerPulse 2.4s ease-in-out infinite;
+}
+@keyframes bannerPulse {
+  0%, 100% { box-shadow: 0 0 18px rgba(245,182,66,0.12); }
+  50%      { box-shadow: 0 0 24px rgba(245,182,66,0.28); }
+}
+.banner-title-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 110px;
+}
+.banner-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #f5b642;
+  letter-spacing: 2px;
+}
+.banner-stage {
+  font-size: 11px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+.banner-prob-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 14px;
+  border-left: 1px dashed rgba(245,182,66,0.3);
+  border-right: 1px dashed rgba(245,182,66,0.3);
+}
+.banner-prob-label {
+  font-size: 11px;
+  color: var(--ink-soft);
+  margin-bottom: 2px;
+}
+.banner-prob {
+  font-family: var(--mono);
+  font-size: 26px;
+  font-weight: 700;
+  color: #f5b642;
+  line-height: 1;
+}
+.banner-warn {
+  flex: 1;
+  font-size: 11px;
+  color: var(--ink-faint);
+  line-height: 1.4;
+  min-height: 14px;
+}
+.banner-btn {
+  flex-shrink: 0;
+  padding: 10px 22px;
+  font-size: 14px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #f5b642 0%, #d68f1a 100%);
+  border: none;
+  color: #1a1208;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 10px rgba(245,182,66,0.35);
+}
+.banner-btn:hover:not(:disabled) {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+.banner-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: var(--card-2);
+  color: var(--ink-faint);
+  box-shadow: none;
+}
+@media (max-width: 720px) {
+  .action-banner {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .banner-warn {
+    flex: 1 1 100%;
+    order: 4;
+  }
+  .banner-btn {
+    order: 5;
+    width: 100%;
+  }
+}
+
+/* ── 修仙模式 / Xianxia Mode ── */
+@keyframes xianxia-erase {
+  0% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+  60% { opacity: 0.4; transform: translateY(-6px) scale(0.96); filter: blur(2px); }
+  100% { opacity: 0; transform: translateY(-18px) scale(0.92); filter: blur(8px); }
+}
+@keyframes xianxia-emerge {
+  0% { opacity: 0; transform: translateY(20px); filter: blur(8px); }
+  60% { opacity: 0.85; transform: translateY(-2px); filter: blur(1px); }
+  100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+@keyframes xianxia-glow {
+  0%, 100% { box-shadow: 0 0 0 rgba(255, 215, 100, 0); }
+  50% { box-shadow: 0 0 24px rgba(255, 215, 100, 0.4); }
+}
+#stats-panel.mode-shifting .stat-row {
+  animation: xianxia-erase 0.85s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+#stats-panel.mode-shifting .stat-row:nth-child(1) { animation-delay: 0s; }
+#stats-panel.mode-shifting .stat-row:nth-child(2) { animation-delay: 0.05s; }
+#stats-panel.mode-shifting .stat-row:nth-child(3) { animation-delay: 0.1s; }
+#stats-panel.mode-shifting .stat-row:nth-child(4) { animation-delay: 0.15s; }
+#stats-panel.mode-shifting .stat-row:nth-child(5) { animation-delay: 0.2s; }
+#stats-panel.mode-shifting .stat-row:nth-child(6) { animation-delay: 0.25s; }
+#stats-panel.mode-shifting .stat-row:nth-child(7) { animation-delay: 0.3s; }
+#stats-panel.mode-emerging .stat-row {
+  animation: xianxia-emerge 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+#stats-panel.mode-emerging .stat-row:nth-child(1) { animation-delay: 0s; }
+#stats-panel.mode-emerging .stat-row:nth-child(2) { animation-delay: 0.08s; }
+#stats-panel.mode-emerging .stat-row:nth-child(3) { animation-delay: 0.16s; }
+#stats-panel.mode-emerging .stat-row:nth-child(4) { animation-delay: 0.24s; }
+#stats-panel.mode-emerging .stat-row:nth-child(5) { animation-delay: 0.32s; }
+#stats-panel.mode-xianxia {
+  background: linear-gradient(180deg, rgba(60, 40, 20, 0.05), rgba(255, 215, 100, 0.04));
+  border-radius: 8px;
+  animation: xianxia-glow 4s ease-in-out infinite;
+}
+.stat-row.stat-xianxia .stat-label {
+  color: #c9a050;
+  font-weight: 600;
+}
+.stat-row.stat-xianxia .stat-fill {
+  background: linear-gradient(90deg, #d4a017, #f4d97a);
+}
+.stat-row.stat-xianxia .stat-realm {
+  color: #d4a017;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.stat-row.stat-xianxia .stat-val {
+  color: #c9a050;
+}
+

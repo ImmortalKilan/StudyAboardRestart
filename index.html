@@ -93,6 +93,7 @@
             <span class="storyline-label">隐藏剧情</span>
             <span id="storyline-display" class="storyline-val"></span>
           </div>
+
         </aside>
 
         <section class="right-panel">
@@ -105,6 +106,33 @@
               <button id="btn-restart" class="ghost">重开</button>
             </div>
           </div>
+
+          <div id="debut-box" class="action-banner" style="display:none;">
+            <div class="banner-title-col">
+              <span class="banner-title">出道</span>
+              <span id="debut-stage" class="banner-stage">练习生</span>
+            </div>
+            <div class="banner-prob-col">
+              <span class="banner-prob-label">成功率</span>
+              <span id="debut-prob" class="banner-prob">--</span>
+            </div>
+            <div id="debut-decay-warn" class="banner-warn"></div>
+            <button id="btn-try-debut" class="primary banner-btn" disabled>尝试出道</button>
+          </div>
+
+          <div id="party-box" class="action-banner" style="display:none;">
+            <div class="banner-title-col">
+              <span class="banner-title">转型</span>
+              <span id="party-stage" class="banner-stage">局长</span>
+            </div>
+            <div class="banner-prob-col">
+              <span class="banner-prob-label">成功率</span>
+              <span id="ceo-prob" class="banner-prob">--</span>
+            </div>
+            <div id="ceo-decay-warn" class="banner-warn"></div>
+            <button id="btn-try-ceo" class="primary banner-btn" disabled>尝试转型</button>
+          </div>
+
           <div id="event-log" class="event-log"></div>
         </section>
 

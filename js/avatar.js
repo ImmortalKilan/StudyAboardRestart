@@ -50,6 +50,7 @@ function drawBackground(g, state) {
   if (sl === 'spy') return drawBgSpy(g);
   if (sl === 'abyss') return drawBgAbyss(g);
   if (sl === 'meta') return drawBgMeta(g);
+  if (sl === 'xianxia') return drawBgXianxia(g, state);
   if (sl === 'idol' || sl === 'superstar') return drawBgStage(g);
   if (sl === 'poker' || sl === 'triton' || sl === 'local_shark') return drawBgCasino(g);
   if (sl === 'party') return drawBgClub(g);
@@ -154,6 +155,32 @@ function drawBgMeta(g) {
   fill(g, 48, 12, 10, 1, '#8040c0');
   fill(g, 0, 82, W, 14, '#0a0418');
   fill(g, 8, 84, 20, 1, P.bgMetaGlitch);
+}
+
+function drawBgXianxia(g, state) {
+  const cul = state.cul || 0;
+  // sky/mountain: deeper as cul rises
+  const sky = cul >= 300 ? '#1a0a30' : cul >= 60 ? '#0a1830' : '#101a2a';
+  fill(g, 0, 0, W, H, sky);
+  // distant peaks
+  for (let x = 0; x < W; x++) {
+    const h = 18 + Math.round(8 * Math.sin(x * 0.4)) + (x % 7);
+    fill(g, x, 40 - h/2, 1, h, '#1a2438');
+  }
+  // moon / sun
+  fill(g, 46, 8, 8, 8, cul >= 300 ? '#f0e8a0' : '#d8d0c0');
+  fill(g, 47, 7, 6, 1, cul >= 300 ? '#f0e8a0' : '#d8d0c0');
+  fill(g, 47, 16, 6, 1, cul >= 300 ? '#f0e8a0' : '#d8d0c0');
+  // stars
+  for (let i = 0; i < 12; i++) px(g, (i*7+3) % W, (i*5+2) % 36, '#f0f0d0');
+  // floor: clouds for immortal, ground otherwise
+  if (cul >= 300) {
+    fill(g, 0, 76, W, 20, '#2a2050');
+    for (let i = 0; i < 6; i++) fill(g, (i*12+2) % W, 78 + (i%3)*4, 10, 2, '#a090d0');
+  } else {
+    fill(g, 0, 76, W, 20, '#0a1018');
+    fill(g, 0, 76, W, 1, '#2a3848');
+  }
 }
 
 function drawBgStage(g) {
@@ -290,6 +317,16 @@ function drawBody(g, state, yOffset = 0) {
   } else if (state.storyline === 'meta') {
     fill(g, torsoX, torsoY, torsoW, torsoH, '#4a3a6a');
     armColor = '#4a3a6a';
+  } else if (state.storyline === 'xianxia') {
+    const cul = state.cul || 0;
+    let robe = '#3a2a4a', trim = '#a080d0';
+    if (cul >= 300) { robe = '#f0e8c0'; trim = '#f0c040'; }
+    else if (cul >= 60) { robe = '#d4a820'; trim = '#fff4a0'; }
+    else if (cul >= 18) { robe = '#2a4a6a'; trim = '#80c0e0'; }
+    fill(g, torsoX, torsoY, torsoW, torsoH, robe);
+    fill(g, torsoX + torsoW/2 - 1, torsoY, 2, torsoH, trim);
+    fill(g, torsoX, torsoY + 4, torsoW, 1, trim);
+    armColor = robe;
   } else if (state.storyline === 'idol' || state.storyline === 'superstar') {
     fill(g, torsoX, torsoY, torsoW, torsoH, '#ffffff'); 
     fill(g, torsoX+4, torsoY+4, torsoW-8, 4, '#ff0055'); 
@@ -511,6 +548,11 @@ function drawBubble(ctx, state) {
   if (state.storyline === 'spy') { icon = '🔫'; }
   else if (state.storyline === 'abyss') { icon = '💻'; }
   else if (state.storyline === 'meta') { icon = '🐛'; }
+  else if (state.storyline === 'xianxia') {
+    const cul = state.cul || 0;
+    icon = cul >= 300 ? '✨' : cul >= 60 ? '⚡' : '☯️';
+    color = cul >= 300 ? '#f0e8a0' : cul >= 60 ? '#f0c040' : '#a080d0';
+  }
   else if (state.storyline === 'idol' || state.storyline === 'superstar') { icon = '🎤'; }
   else if (state.storyline === 'poker' || state.storyline === 'triton') { icon = '♠️'; }
   else if (state.storyline === 'party') { icon = '🍾'; }
@@ -614,8 +656,11 @@ function drawFrame(time) {
   // Calculate a gentle breathing offset (sine wave)
   // Math.sin(time / speed) * amplitude
   // Using Math.round to keep it pixel-perfect
-  const yOffset = Math.round(Math.sin(time / 200) * 1.5); 
-  
+  const isImmortal = lastState.storyline === 'xianxia' && (lastState.cul || 0) >= 300;
+  const yOffset = isImmortal
+    ? Math.round(Math.sin(time / 350) * 2.5)
+    : Math.round(Math.sin(time / 200) * 1.5);
+
   const g = makeGrid();
 
   // Background is static (yOffset = 0)
@@ -626,6 +671,25 @@ function drawFrame(time) {
   drawHair(g, lastState, m);
   drawFace(g, lastState, m);
   drawAccessories(g, lastState, m);
+  if (lastState.storyline === 'xianxia') {
+    const cul = lastState.cul || 0;
+    if (cul >= 60) {
+      const aura = cul >= 300 ? '#f0e8a0' : '#f0c040';
+      // halo ring
+      const cx = m.headX + m.headW / 2;
+      const cy = m.headTop - 7;
+      for (let dx = -8; dx <= 8; dx++) {
+        const yy = cy + Math.round(Math.sin(dx * 0.4 + time / 300) * 1);
+        if (Math.abs(dx) >= 5) px(g, cx + dx, yy, aura);
+      }
+      // sparkles
+      for (let i = 0; i < 4; i++) {
+        const sx = cx - 14 + ((i * 9 + Math.floor(time / 120)) % 28);
+        const sy = m.headTop + ((i * 13 + Math.floor(time / 200)) % m.headH);
+        px(g, sx, sy, aura);
+      }
+    }
+  }
   drawPartnerBubble(g, lastState, yOffset);
   if (lastState.HAP <= 2) {
     const cx = m.headX + 2;

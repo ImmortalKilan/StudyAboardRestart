@@ -1,0 +1,942 @@
+[
+  {
+    "id": 99001,
+    "text": "你在旧书摊翻到一本封面斑驳的《仙脉图录》残卷，老板笑着说五块钱拿走。回家翻开第一页，墨迹竟在缓缓流动……你揉了揉眼睛，墨迹又静止了下来。",
+    "include": "TLT?[3029]&AGE>=16",
+    "weight": 100,
+    "set": {
+      "xianxiaSeed": 1
+    },
+    "logType": "hidden"
+  },
+  {
+    "id": 99002,
+    "text": "夜半三更，你照着残卷上的图打坐。那股若有若无的气流忽然在丹田处轰然炸响——你睁开眼，窗外的月亮变得格外清晰，你竟看清了月面环形山的纹路。从这一刻起，世界对你揭开了它真正的面目。",
+    "include": "xianxiaSeed=1",
+    "weight": 30,
+    "set": {
+      "storyline": "xianxia",
+      "cul": 1
+    },
+    "effect": {
+      "INT": 1
+    },
+    "logType": "hidden",
+    "branch": [
+      "?99003"
+    ]
+  },
+  {
+    "id": 99003,
+    "storyline": "xianxia",
+    "text": "你写了封信留给家人，告诉他们你要去远行。从此尘世种种，与你不再相干。",
+    "noRandom": true,
+    "set": {
+      "school": "无",
+      "profession": "修真者"
+    }
+  },
+  {
+    "id": 99010,
+    "storyline": "xianxia",
+    "text": "你按图引气入体。第一缕灵气循经而行，浑身毛孔像被春风吹开。",
+    "include": "cul<5",
+    "effect": {
+      "cul": 1,
+      "HLT": 1
+    },
+    "repeatable": true
+  },
+  {
+    "id": 99011,
+    "storyline": "xianxia",
+    "text": "经脉初通，灵气在体内开辟出第一条通道。",
+    "include": "cul<8",
+    "effect": {
+      "cul": 1
+    },
+    "repeatable": true
+  },
+  {
+    "id": 99012,
+    "storyline": "xianxia",
+    "text": "你贪功冒进，灵气逆冲经脉，吐了一口黑血。",
+    "include": "cul<15&INT<6",
+    "weight": 60,
+    "effect": {
+      "cul": -1,
+      "HAP": -1
+    }
+  },
+  {
+    "id": 99013,
+    "storyline": "xianxia",
+    "text": "你在山涧边偶遇一汪灵泉，掬起便饮，整个人神清气爽。",
+    "weight": 40,
+    "effect": {
+      "cul": 3,
+      "karma": 1
+    },
+    "repeatable": true
+  },
+  {
+    "id": 99014,
+    "storyline": "xianxia",
+    "text": "深山中一位拄杖老者递给你半本残卷，转身便消失在云雾里。你低头看时，那卷子已不见踪影，但内容已尽数记在脑中。",
+    "weight": 30,
+    "effect": {
+      "cul": 5,
+      "karma": 1,
+      "INT": 2
+    }
+  },
+  {
+    "id": 99015,
+    "storyline": "xianxia",
+    "text": "你引气大成，体内灵气如细流，已成涓涓之势。",
+    "include": "cul>=10",
+    "noRandom": true,
+    "effect": {
+      "cul": 3
+    }
+  },
+  {
+    "id": 99019,
+    "storyline": "xianxia",
+    "text": "你尝试冲击筑基。",
+    "include": "cul>=18",
+    "noRandom": true,
+    "branch": [
+      "PER>=5?99020",
+      "?99091"
+    ]
+  },
+  {
+    "id": 99020,
+    "storyline": "xianxia",
+    "text": "**突破·筑基**：经脉拓宽如河道，丹田内第一次诞生灵息。你正式踏入筑基期。",
+    "noRandom": true,
+    "effect": {
+      "cul": 5,
+      "karma": 1
+    },
+    "logType": "major"
+  },
+  {
+    "id": 99021,
+    "storyline": "xianxia",
+    "text": "周身淬炼，你皮下渗出黑色杂质，整个人轻盈了几分。",
+    "include": "cul>=20&cul<60",
+    "effect": {
+      "cul": 2,
+      "HLT": 2
+    }
+  },
+  {
+    "id": 99022,
+    "storyline": "xianxia",
+    "text": "黑市拍卖会上，你拍下一篇残破功法。",
+    "include": "cul>=20&cul<60&MNY>=5",
+    "weight": 40,
+    "effect": {
+      "cul": 5,
+      "MNY": -3
+    }
+  },
+  {
+    "id": 99023,
+    "storyline": "xianxia",
+    "text": "你在荒野中遇到一位同道。他递来一壶酒，邀你坐下闲聊。",
+    "include": "cul>=20&cul<60",
+    "weight": 50,
+    "choices": [
+      {
+        "text": "结伴同行",
+        "next": 99100
+      },
+      {
+        "text": "婉拒离去",
+        "next": 99101
+      },
+      {
+        "text": "出手试探",
+        "next": 99102
+      }
+    ]
+  },
+  {
+    "id": 99100,
+    "storyline": "xianxia",
+    "text": "你与他结伴几个月，互相印证道法，受益良多。",
+    "noRandom": true,
+    "effect": {
+      "cul": 3,
+      "INT": 1,
+      "SOC": 1
+    }
+  },
+  {
+    "id": 99101,
+    "storyline": "xianxia",
+    "text": "你抱拳告辞。修真路上，独行最稳。",
+    "noRandom": true,
+    "effect": {
+      "cul": 1
+    }
+  },
+  {
+    "id": 99102,
+    "storyline": "xianxia",
+    "text": "你出手试探，对方亦是筑基修士，一番交手不分高下，反成至交。",
+    "noRandom": true,
+    "effect": {
+      "cul": 4,
+      "PER": 1
+    }
+  },
+  {
+    "id": 99024,
+    "storyline": "xianxia",
+    "text": "梦中一座古塔自虚空浮现，塔上刻满古字，你看了一夜，醒来时已悟出几分。",
+    "include": "INT>=8&cul<150",
+    "weight": 50,
+    "effect": {
+      "cul": 4,
+      "INT": 1
+    }
+  },
+  {
+    "id": 99025,
+    "storyline": "xianxia",
+    "text": "一头筑基期妖兽自林中扑出。",
+    "include": "cul>=20&cul<60",
+    "weight": 50,
+    "branch": [
+      "cul>=30?99026",
+      "?99027"
+    ]
+  },
+  {
+    "id": 99026,
+    "storyline": "xianxia",
+    "text": "你一掌将妖兽拍碎，剥下兽皮，挖出内丹。",
+    "noRandom": true,
+    "effect": {
+      "cul": 5,
+      "karma": 1
+    }
+  },
+  {
+    "id": 99027,
+    "storyline": "xianxia",
+    "text": "你险胜妖兽，左肩被它一爪抓裂。",
+    "noRandom": true,
+    "effect": {
+      "cul": 1,
+      "HLT": -3
+    }
+  },
+  {
+    "id": 99028,
+    "storyline": "xianxia",
+    "text": "你参加了一个隐世宗派的入门大比，凭实力夺得外门第一。",
+    "include": "cul>=30&cul<60",
+    "weight": 30,
+    "effect": {
+      "cul": 8,
+      "karma": 1
+    }
+  },
+  {
+    "id": 99029,
+    "storyline": "xianxia",
+    "text": "你在静室中盘膝七日，体内灵息汇聚成丹海，又复归流转周身经脉，形成灵脉。",
+    "include": "cul>=40",
+    "weight": 40,
+    "effect": {
+      "cul": 5
+    }
+  },
+  {
+    "id": 99030,
+    "storyline": "xianxia",
+    "text": "心中泛起阴影，那是凡尘留下的牵挂。",
+    "include": "HAP<=3&cul<150",
+    "weight": 40,
+    "effect": {
+      "cul": -2,
+      "HAP": -1
+    }
+  },
+  {
+    "id": 99039,
+    "storyline": "xianxia",
+    "text": "你尝试冲击金丹。",
+    "include": "cul>=55",
+    "noRandom": true,
+    "branch": [
+      "PER>=7&INT>=7?99040",
+      "?99092"
+    ]
+  },
+  {
+    "id": 99040,
+    "storyline": "xianxia",
+    "text": "**突破·金丹**：丹田之中灵气凝结成一颗淡金色的丹丸。从此你便不再是凡夫。",
+    "noRandom": true,
+    "effect": {
+      "cul": 10,
+      "karma": 1
+    },
+    "logType": "major"
+  },
+  {
+    "id": 99041,
+    "storyline": "xianxia",
+    "text": "金丹愈发圆润，你呼吸间已能御气而行。",
+    "include": "cul>=60&cul<150",
+    "effect": {
+      "cul": 3
+    }
+  },
+  {
+    "id": 99042,
+    "storyline": "xianxia",
+    "text": "你云游四方，看见凡间种种悲欢，心境又精进一分。",
+    "include": "cul>=60",
+    "weight": 40,
+    "effect": {
+      "cul": 2,
+      "HAP": 1
+    }
+  },
+  {
+    "id": 99043,
+    "storyline": "xianxia",
+    "text": "你截杀一个魔修，从他储物袋里翻出整箱灵石。",
+    "include": "cul>=70&cul<150",
+    "weight": 30,
+    "effect": {
+      "cul": 5,
+      "MNY": 5,
+      "karma": 1
+    }
+  },
+  {
+    "id": 99044,
+    "storyline": "xianxia",
+    "text": "一位元婴大能在虚空中投来一道神识，问你借身。你心知不妙，奋力挣扎。",
+    "include": "cul>=80&cul<150",
+    "weight": 25,
+    "branch": [
+      "cul>=120?99045",
+      "?99301"
+    ]
+  },
+  {
+    "id": 99045,
+    "storyline": "xianxia",
+    "text": "你以金丹反震，神识一击崩散。原来那只是个垂死的元婴老怪。",
+    "noRandom": true,
+    "effect": {
+      "cul": 30,
+      "karma": 2,
+      "INT": 2
+    }
+  },
+  {
+    "id": 99050,
+    "storyline": "xianxia",
+    "text": "你打坐中悟出一丝**火之大道**，丹田周围隐有赤焰流转。",
+    "include": "INT>=9&cul>=60&dao<5",
+    "weight": 35,
+    "effect": {
+      "cul": 10,
+      "dao": 1
+    }
+  },
+  {
+    "id": 99051,
+    "storyline": "xianxia",
+    "text": "你于山顶观日出，悟出一丝**金之大道**。",
+    "include": "INT>=9&cul>=60&dao<5",
+    "weight": 35,
+    "effect": {
+      "cul": 10,
+      "dao": 1
+    }
+  },
+  {
+    "id": 99052,
+    "storyline": "xianxia",
+    "text": "你于深潭夜泳，悟出一丝**水之大道**。",
+    "include": "INT>=9&cul>=60&dao<5",
+    "weight": 35,
+    "effect": {
+      "cul": 10,
+      "dao": 1
+    }
+  },
+  {
+    "id": 99053,
+    "storyline": "xianxia",
+    "text": "你于古林老树下静坐三月，悟出一丝**木之大道**。",
+    "include": "INT>=9&cul>=60&dao<5",
+    "weight": 35,
+    "effect": {
+      "cul": 10,
+      "dao": 1
+    }
+  },
+  {
+    "id": 99054,
+    "storyline": "xianxia",
+    "text": "你在沙漠盘腿七日，悟出一丝**土之大道**。",
+    "include": "INT>=9&cul>=60&dao<5",
+    "weight": 35,
+    "effect": {
+      "cul": 10,
+      "dao": 1
+    }
+  },
+  {
+    "id": 99060,
+    "storyline": "xianxia",
+    "text": "你寻得灵药一株，服下整株。",
+    "include": "karma>=3&cul>=80",
+    "weight": 30,
+    "effect": {
+      "cul": 15,
+      "HLT": 2
+    }
+  },
+  {
+    "id": 99061,
+    "storyline": "xianxia",
+    "text": "你尝试冲击元婴。",
+    "include": "cul>=140",
+    "noRandom": true,
+    "branch": [
+      "dao>=2&PER>=8?99062",
+      "?99093"
+    ]
+  },
+  {
+    "id": 99062,
+    "storyline": "xianxia",
+    "text": "**突破·元婴**：金丹崩裂，化作一尊与你眉目一致的小人，端坐于丹田之中。这便是元婴。",
+    "noRandom": true,
+    "effect": {
+      "cul": 20,
+      "karma": 1,
+      "INT": 5
+    },
+    "logType": "major"
+  },
+  {
+    "id": 99063,
+    "storyline": "xianxia",
+    "text": "神识初醒，你能感知方圆十里的草木呼吸。",
+    "include": "cul>=150&cul<300",
+    "effect": {
+      "cul": 5,
+      "INT": 2
+    }
+  },
+  {
+    "id": 99064,
+    "storyline": "xianxia",
+    "text": "你回到当年的城市上空，看着熙攘的人群。一切都那么熟悉，却又与你无关。",
+    "include": "cul>=150",
+    "weight": 40,
+    "effect": {
+      "cul": 1,
+      "HAP": -1
+    }
+  },
+  {
+    "id": 99065,
+    "storyline": "xianxia",
+    "text": "你在远古战场遗迹中，拾得一枚带血的玉简。",
+    "include": "karma>=4&cul>=180",
+    "weight": 30,
+    "effect": {
+      "cul": 25,
+      "dao": 1
+    }
+  },
+  {
+    "id": 99066,
+    "storyline": "xianxia",
+    "text": "你斩杀一位渡劫期老怪，获得整座洞府的资源。",
+    "include": "cul>=250",
+    "weight": 75,
+    "effect": {
+      "cul": 50,
+      "karma": 2
+    }
+  },
+  {
+    "id": 99067,
+    "storyline": "xianxia",
+    "text": "心魔自识海浮起，化作你最亲近之人的面孔，对你冷笑。",
+    "include": "HAP<=4&cul>=150",
+    "weight": 30,
+    "branch": [
+      "PER>=9?99068",
+      "?99302"
+    ]
+  },
+  {
+    "id": 99068,
+    "storyline": "xianxia",
+    "text": "你长啸一声，剑光斩破心魔。从此心境澄澈如镜。",
+    "noRandom": true,
+    "effect": {
+      "cul": 10,
+      "PER": 2,
+      "HAP": 2
+    }
+  },
+  {
+    "id": 99070,
+    "storyline": "xianxia",
+    "text": "你于浩瀚星图下打坐，悟出一丝**空间大道**。",
+    "include": "INT>=11&cul>=200&dao<6",
+    "weight": 25,
+    "effect": {
+      "cul": 30,
+      "dao": 1
+    }
+  },
+  {
+    "id": 99079,
+    "storyline": "xianxia",
+    "text": "你尝试冲击化神。",
+    "include": "cul>=290",
+    "noRandom": true,
+    "branch": [
+      "dao>=4?99080",
+      "?99094"
+    ]
+  },
+  {
+    "id": 99080,
+    "storyline": "xianxia",
+    "text": "**突破·化神**：元婴神性大放，识海中开辟出一方小天地。你已脱离凡俗的桎梏。",
+    "noRandom": true,
+    "effect": {
+      "cul": 40,
+      "INT": 10,
+      "PER": 5
+    },
+    "logType": "major"
+  },
+  {
+    "id": 99081,
+    "storyline": "xianxia",
+    "text": "你于识海中撕裂一道虚空，从此可短距瞬移。",
+    "include": "cul>=300&cul<600",
+    "effect": {
+      "cul": 15
+    }
+  },
+  {
+    "id": 99082,
+    "storyline": "xianxia",
+    "text": "你环顾四下，发现自己已经百年没有照过镜子——而镜中人，依旧是当年那张脸。",
+    "include": "cul>=300",
+    "weight": 30,
+    "effect": {
+      "cul": 0,
+      "HAP": -1
+    }
+  },
+  {
+    "id": 99083,
+    "storyline": "xianxia",
+    "text": "你于时光长河边盘膝静坐，悟出一丝**时间大道**。",
+    "include": "INT>=13&cul>=400&dao<6",
+    "weight": 20,
+    "effect": {
+      "cul": 50,
+      "dao": 1
+    }
+  },
+  {
+    "id": 99084,
+    "storyline": "xianxia",
+    "text": "你闯入一处古修传承洞府，得到一篇真正的太古修行法门。",
+    "include": "karma>=5&cul>=350",
+    "weight": 20,
+    "effect": {
+      "cul": 50,
+      "INT": 3
+    }
+  },
+  {
+    "id": 99085,
+    "storyline": "xianxia",
+    "text": "一位魂修来犯，欲夺你舍。",
+    "include": "cul>=400&cul<600",
+    "weight": 50,
+    "branch": [
+      "PER>=10?99086",
+      "?99306"
+    ]
+  },
+  {
+    "id": 99086,
+    "storyline": "xianxia",
+    "text": "你识海震荡，反手将魂修困入一方小天地，慢慢炼化。",
+    "noRandom": true,
+    "effect": {
+      "cul": 30,
+      "INT": 5,
+      "karma": 1
+    }
+  },
+  {
+    "id": 99087,
+    "storyline": "xianxia",
+    "text": "你悟出一丝**混沌大道**。这是大道之源。",
+    "include": "INT>=14&cul>=500&dao>=4",
+    "weight": 50,
+    "effect": {
+      "cul": 80,
+      "dao": 1
+    }
+  },
+  {
+    "id": 99089,
+    "storyline": "xianxia",
+    "text": "你尝试冲击渡劫期。",
+    "include": "cul>=580",
+    "noRandom": true,
+    "branch": [
+      "?99160"
+    ]
+  },
+  {
+    "id": 99160,
+    "storyline": "xianxia",
+    "text": "你于山巅设阵，准备渡劫。九重雷劫已隐在云端。",
+    "noRandom": true,
+    "effect": {
+      "cul": 10
+    },
+    "logType": "major",
+    "branch": [
+      "?99161"
+    ]
+  },
+  {
+    "id": 99161,
+    "storyline": "xianxia",
+    "text": "九重雷劫·壹至叁——三道雷柱当头劈下。",
+    "noRandom": true,
+    "branch": [
+      "PER>=9&HLT>=8?99162",
+      "?99303"
+    ]
+  },
+  {
+    "id": 99162,
+    "storyline": "xianxia",
+    "text": "九重雷劫·肆至陆——天地变色，雷海覆下。",
+    "noRandom": true,
+    "effect": {
+      "cul": 5
+    },
+    "branch": [
+      "cul>=700?99163",
+      "?99303"
+    ]
+  },
+  {
+    "id": 99163,
+    "storyline": "xianxia",
+    "text": "九重雷劫·柒至玖——最后三道紫雷凝成一柄长剑，朝你斩来。",
+    "noRandom": true,
+    "effect": {
+      "cul": 10,
+      "tribulation": 1
+    },
+    "branch": [
+      "?99164"
+    ]
+  },
+  {
+    "id": 99164,
+    "storyline": "xianxia",
+    "text": "雷劫度过。元神劫·金落下。",
+    "noRandom": true,
+    "branch": [
+      "dao>=1?99165",
+      "?99304"
+    ]
+  },
+  {
+    "id": 99165,
+    "storyline": "xianxia",
+    "text": "元神劫·木落下。",
+    "noRandom": true,
+    "branch": [
+      "dao>=2?99166",
+      "?99304"
+    ]
+  },
+  {
+    "id": 99166,
+    "storyline": "xianxia",
+    "text": "元神劫·水火土三劫连袭。",
+    "noRandom": true,
+    "branch": [
+      "dao>=4?99167",
+      "?99304"
+    ]
+  },
+  {
+    "id": 99167,
+    "storyline": "xianxia",
+    "text": "元神劫·本源劫降下，要你舍弃曾经的一切。",
+    "noRandom": true,
+    "branch": [
+      "dao>=5?99168",
+      "?99304"
+    ]
+  },
+  {
+    "id": 99168,
+    "storyline": "xianxia",
+    "text": "心魔劫·终——你看见自己年少时的脸，那个还在为留学申请熬夜的少年。他问你：你后悔吗？",
+    "noRandom": true,
+    "branch": [
+      "HAP>=6?99169",
+      "?99302"
+    ]
+  },
+  {
+    "id": 99169,
+    "storyline": "xianxia",
+    "text": "你笑了笑，摇摇头。心魔散去，最后一道劫烟消云散。",
+    "noRandom": true,
+    "effect": {
+      "cul": 50,
+      "tribulation": 8
+    },
+    "branch": [
+      "dao>=6&cul>=1500?99170",
+      "cul>=1000?99171",
+      "?99503"
+    ]
+  },
+  {
+    "id": 99170,
+    "storyline": "xianxia",
+    "text": "**结局·羽化撕碎虚空** 你悟透全部本源大道，踏入羽化境，撕碎一方虚空而去，再无人见过你的踪迹。",
+    "noRandom": true,
+    "end": true
+  },
+  {
+    "id": 99171,
+    "storyline": "xianxia",
+    "text": "**结局·飞升仙界** 一道金桥自天垂下，你踏桥而上，回首望了一眼这个世界，然后消失在云端。",
+    "noRandom": true,
+    "end": true
+  },
+  {
+    "id": 99091,
+    "storyline": "xianxia",
+    "text": "**结局·灵根浊化** 你毅力不足，冲击筑基失败，灵气在经脉中逆冲。你昏迷七日，醒来时灵根已废，从此再难入道。",
+    "noRandom": true,
+    "end": true
+  },
+  {
+    "id": 99092,
+    "storyline": "xianxia",
+    "text": "**结局·金丹未成** 你冲丹失败，金丹半成半碎。你于洞府中盘膝百年，再也没能跨过那道槛。",
+    "noRandom": true,
+    "end": true
+  },
+  {
+    "id": 99093,
+    "storyline": "xianxia",
+    "text": "**结局·元婴破碎** 你冲击元婴时悟性不足，金丹崩裂，元婴未成。一道金光自天灵冲出，你的修为尽数散去。",
+    "noRandom": true,
+    "end": true
+  },
+  {
+    "id": 99094,
+    "storyline": "xianxia",
+    "text": "**结局·化神难凝** 你尚未悟出足够的大道，强行冲击化神，元婴崩溃，化作一缕青烟。",
+    "noRandom": true,
+    "end": true
+  },
+  {
+    "id": 99301,
+    "storyline": "xianxia",
+    "text": "**结局·魂飞魄散** 那位元婴老怪夺舍成功。你最后看见的，是自己手指弯起来掐了个奇怪的法诀。然后一切归于黑暗。",
+    "noRandom": true,
+    "end": true
+  },
+  {
+    "id": 99302,
+    "storyline": "xianxia",
+    "text": "**结局·心魔吞噬** 你被心魔反噬，从此疯癫。山中常有人见到一位散发狂笑的散修，自言自语，无人敢近。",
+    "noRandom": true,
+    "end": true
+  },
+  {
+    "id": 99303,
+    "storyline": "xianxia",
+    "text": "**结局·雷劫殒命** 紫雷当头劈下。你来不及哀叹，整个人化作一团飞灰，散落于山巅。",
+    "noRandom": true,
+    "end": true
+  },
+  {
+    "id": 99304,
+    "storyline": "xianxia",
+    "text": "**结局·元神劫败** 元神被天劫击碎，你魂魄不存。然而冥冥之中，似乎还有一丝执念顺着轮回飘去……（解锁彩蛋·转世重修）",
+    "noRandom": true,
+    "end": true
+  },
+  {
+    "id": 99305,
+    "storyline": "xianxia",
+    "text": "**结局·泯然众人** 修为停滞数十年，你终于死心，下山做了个普通人。偶尔夜里，你会想起那本残卷。",
+    "noRandom": true,
+    "end": true
+  },
+  {
+    "id": 99306,
+    "storyline": "xianxia",
+    "text": "**结局·身遭夺舍** 那位魂修撕开你的识海，鸠占鹊巢。你最后的意识只来得及说一句：原来如此。",
+    "noRandom": true,
+    "end": true
+  },
+  {
+    "id": 99503,
+    "storyline": "xianxia",
+    "text": "**结局·散仙人间** 渡劫部分通过，你失了飞升资格，却也得了人间长生。从此你执掌一座小山，偶尔点化有缘人，活成了传说里的真人。",
+    "noRandom": true,
+    "end": true
+  },
+  {
+    "id": 99200,
+    "storyline": "xianxia",
+    "text": "你在洞府中拾得一卷《元神不灭》。",
+    "include": "cul>=100&cul<300",
+    "weight": 75,
+    "effect": {
+      "cul": 5,
+      "INT": 2
+    },
+    "set": {
+      "yuanshen_book": 1
+    }
+  },
+  {
+    "id": 99201,
+    "storyline": "xianxia",
+    "text": "你在远海星图中发现一篇《星尘幻灭》——异界生命的修行法门。",
+    "include": "cul>=300&cul<600",
+    "weight": 50,
+    "effect": {
+      "cul": 10
+    },
+    "set": {
+      "xingchen_book": 1
+    }
+  },
+  {
+    "id": 99210,
+    "storyline": "xianxia",
+    "text": "你按《元神不灭》之法，将魂魄于体外凝实，初成脱胎之相。",
+    "include": "yuanshen_book=1&cul>=200",
+    "weight": 20,
+    "effect": {
+      "cul": 20,
+      "INT": 3
+    }
+  },
+  {
+    "id": 99211,
+    "storyline": "xianxia",
+    "text": "你尝试将丹海凝聚成太阳，金丹转化为太阴。这是异界生命的极险之路。",
+    "include": "xingchen_book=1&cul>=500",
+    "weight": 50,
+    "branch": [
+      "cul>=700?99212",
+      "?99305"
+    ]
+  },
+  {
+    "id": 99212,
+    "storyline": "xianxia",
+    "text": "你成功凝阳化阴，下一步——碎丹。但你犹豫了，碎丹之后实力将尽数散去，需千世轮回方可归来。",
+    "noRandom": true,
+    "effect": {
+      "cul": 50
+    },
+    "choices": [
+      {
+        "text": "勇敢碎丹，赌一把星尘境",
+        "next": 99213
+      },
+      {
+        "text": "保留金丹，走渡劫之路",
+        "next": 99214
+      }
+    ]
+  },
+  {
+    "id": 99213,
+    "storyline": "xianxia",
+    "text": "**结局·星尘超脱** 你毅然碎丹，意识坠入万千轮回。千世后再睁眼，你已不再是人，甚至不再是仙——你彻底从轮回之中超脱了。",
+    "noRandom": true,
+    "end": true
+  },
+  {
+    "id": 99214,
+    "storyline": "xianxia",
+    "text": "你保留金丹，继续走渡劫之路。",
+    "noRandom": true,
+    "effect": {
+      "cul": 5
+    }
+  },
+  {
+    "id": 99500,
+    "storyline": "xianxia",
+    "text": "你盘膝吐纳一月，灵气入体，修为又精进一分。",
+    "include": "cul<60",
+    "weight": 80,
+    "repeatable": true,
+    "effect": {
+      "cul": 1
+    }
+  },
+  {
+    "id": 99501,
+    "storyline": "xianxia",
+    "text": "你按图诀苦修，丹田内的气流愈发充盈。",
+    "include": "cul>=60&cul<300",
+    "weight": 80,
+    "repeatable": true,
+    "effect": {
+      "cul": 2
+    }
+  },
+  {
+    "id": 99502,
+    "storyline": "xianxia",
+    "text": "你于天地灵气中静修，神识与万物相通。",
+    "include": "cul>=300",
+    "weight": 80,
+    "repeatable": true,
+    "effect": {
+      "cul": 4
+    }
+  }
+]

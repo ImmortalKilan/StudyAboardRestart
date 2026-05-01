@@ -6,11 +6,27 @@ const STAT_KEYS = ['SOC', 'INT', 'MNY', 'PER', 'HLT', 'APP'];
 const STAT_LABELS = {
   SOC: '社交', INT: '智力', MNY: '家境',
   HAP: '快乐', HLT: '健康', PER: '毅力', APP: '颜值',
-  POP: '人气', POK: '牌技', MMR: '天梯分'
+  POP: '人气', POK: '牌技', MMR: '天梯分',
+  cul: '修为', dao: '大道', karma: '机缘', tribulation: '渡劫', realm: '境界'
 };
-const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK', 'MMR']);
+const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK', 'MMR', 'cul', 'dao', 'karma', 'tribulation']);
+const XIANXIA_KEYS = ['realm', 'cul', 'dao', 'karma', 'tribulation'];
+
+function deriveRealm(cul) {
+  cul = cul || 0;
+  if (cul < 1) return '凡人';
+  if (cul < 20) return `引气${'一二三四五六七八九'[Math.min(8, Math.floor((cul - 1) / 2))]}层`;
+  if (cul < 60) return ['筑基初期', '筑基中期', '筑基后期', '筑基巅峰'][Math.min(3, Math.floor((cul - 20) / 10))];
+  if (cul < 150) return `金丹${'一二三四五六七八九'[Math.min(8, Math.floor((cul - 60) / 10))]}层`;
+  if (cul < 300) return `元婴${'一二三四五六七八九'[Math.min(8, Math.floor((cul - 150) / 17))]}层`;
+  if (cul < 600) return '化神期';
+  if (cul < 1000) return '渡劫期';
+  if (cul < 1500) return '羽化境';
+  return '仙人境';
+}
 const ALLOC_TOTAL = 25;
 const MAX_PER_STAT = 10;
+
 
 const DEFAULT_PROF_BY_AGE = [
   { max: 18, prof: '高中生' },
@@ -67,9 +83,7 @@ const STORYLINE_CFG = {
       { cond: s => s.INT < 0, event: 82020 },
       { cond: s => s.HLT <= -2, event: 82021 },
     ],
-    progressChecks: [
-      { cond: s => s.age - s.storylineStart >= 1, event: 82040 },
-    ],
+    progressChecks: [],
   },
   ceo: {
     gracePeriod: 12,
@@ -147,10 +161,9 @@ const STORYLINE_CFG = {
   },
   idol: {
     gracePeriod: 12,
-    eventRate: 0.6,
+    eventRate: 0.7,
     progressChecks: [
-      { cond: s => s.japan_path && s.jp_fluent && (s.POP || 0) >= 20 && s.age - s.storylineStart >= 3, event: 80105 },
-      { cond: s => s.age - s.storylineStart >= 3, event: 80040 },
+      { cond: s => s.japan_path && s.jp_fluent && (s.POP || 0) >= 20 && s.age - s.storylineStart >= 4, event: 80105 },
     ],
   },
   superstar: {
@@ -178,7 +191,159 @@ const STORYLINE_CFG = {
       { cond: s => s.age - s.storylineStart >= 3, event: 82094 },
     ],
   },
+  xianxia: {
+    gracePeriod: 0,
+    eventRate: 0.55,
+    progressChecks: [
+      // 自动触发突破事件
+      { cond: s => (s.cul || 0) >= 18 && !s.firedEvents.has(99019) && !s.firedEvents.has(99020), event: 99019 },
+      { cond: s => (s.cul || 0) >= 55 && !s.firedEvents.has(99039) && !s.firedEvents.has(99040), event: 99039 },
+      { cond: s => (s.cul || 0) >= 140 && !s.firedEvents.has(99061) && !s.firedEvents.has(99062), event: 99061 },
+      { cond: s => (s.cul || 0) >= 290 && (s.dao || 0) >= 4 && !s.firedEvents.has(99079) && !s.firedEvents.has(99080), event: 99079 },
+      { cond: s => (s.cul || 0) >= 580 && !s.firedEvents.has(99089), event: 99089 },
+      // 40 岁仍未筑基 → 泯然众人
+      { cond: s => s.age >= 40 && (s.cul || 0) < 18, event: 99305 },
+    ],
+    deathChecks: [],
+    flavor: () => xianxiaFlavor(),
+  },
 };
+
+// ── Idol stage clock (System D) ─────────────────────────────────
+// Stages: 'training' (0-12 mo) → 'debut_window' (12-60 mo) → 'debuted'
+// During debut_window, success probability decays 5% every 3 months past
+// a 6-month grace, capped at -50%. Forced auto-attempt at month 60.
+const IDOL_TRAINING_LEN = 12;
+const IDOL_FORCE_LEN = 60;
+const IDOL_DECAY_GRACE = 6;
+const IDOL_DECAY_STEP = 3;
+const IDOL_DECAY_AMT = 5;
+const IDOL_DECAY_CAP = 50;
+const IDOL_PROB_CAP = 75;
+const IDOL_PROB_FLOOR = 5;
+
+function initIdolStage() {
+  state.idol_stage = 'training';
+  state.debut_decay = 0;
+  state.debut_attempted = false;
+  state.debut_window_start_month = null;
+}
+
+function updateIdolStage() {
+  if (state.storyline !== 'idol') return;
+  if (state.idol_stage === undefined || state.idol_stage === null) initIdolStage();
+  if (state.debut_attempted) return;
+  const monthsIn = state.monthTotal - (state.storylineStartMonth || 0);
+  if (state.idol_stage === 'training' && monthsIn >= IDOL_TRAINING_LEN) {
+    state.idol_stage = 'debut_window';
+    state.debut_window_start_month = state.monthTotal;
+  }
+  if (state.idol_stage === 'debut_window') {
+    const inWindow = state.monthTotal - (state.debut_window_start_month || state.monthTotal);
+    const decaySteps = Math.max(0, Math.floor((inWindow - IDOL_DECAY_GRACE) / IDOL_DECAY_STEP));
+    state.debut_decay = Math.min(IDOL_DECAY_CAP, decaySteps * IDOL_DECAY_AMT);
+    if (monthsIn >= IDOL_FORCE_LEN) attemptDebut(true);
+  }
+}
+
+function computeDebutProb(s) {
+  if (s.storyline !== 'idol') return 0;
+  let p = -10;
+  p += (s.POP || 0) * 1.8;
+  p += (s.APP || 0) * 1.5;
+  p += (s.PER || 0) * 0.8;
+  if (s.japan_path) p += 6;
+  if (s.jp_fluent) p += 4;
+  if (s.kohaku) p += 8;
+  if (s.scandal) p -= 20;
+  p -= (s.debut_decay || 0);
+  return Math.max(IDOL_PROB_FLOOR, Math.min(IDOL_PROB_CAP, Math.round(p)));
+}
+
+function attemptDebut(forced) {
+  if (state.debut_attempted) return;
+  state.debut_attempted = true;
+  state.idol_stage = 'debuted';
+  const prob = computeDebutProb(state);
+  const success = Math.random() * 100 < prob;
+  // mark legacy gate event as fired so its branch never auto-runs
+  state.firedEvents.add(80040);
+  const evId = success ? 80041 : 80042;
+  const ev = state.eventsMap.get(evId);
+  if (forced) {
+    pushLog(success
+      ? '事务所给出最后机会窗口，命运的骰子滚了一下——成了。'
+      : '机会窗口悄悄关上了，没人再找你试镜。');
+  }
+  if (ev) applyEvent(ev);
+  render();
+}
+
+// ── Party stage clock (mirror of idol) ──────────────────────────
+// Stages: 'settling' (0-12 mo) → 'ceo_window' (12-60 mo) → 'exited'
+const PARTY_SETTLE_LEN = 12;
+const PARTY_FORCE_LEN = 60;
+const PARTY_DECAY_GRACE = 6;
+const PARTY_DECAY_STEP = 3;
+const PARTY_DECAY_AMT = 5;
+const PARTY_DECAY_CAP = 50;
+const PARTY_PROB_CAP = 75;
+const PARTY_PROB_FLOOR = 5;
+
+function initPartyStage() {
+  state.party_stage = 'settling';
+  state.ceo_decay = 0;
+  state.ceo_attempted = false;
+  state.ceo_window_start_month = null;
+}
+
+function updatePartyStage() {
+  if (state.storyline !== 'party') return;
+  if (state.party_stage === undefined || state.party_stage === null) initPartyStage();
+  if (state.ceo_attempted) return;
+  const monthsIn = state.monthTotal - (state.storylineStartMonth || 0);
+  if (state.party_stage === 'settling' && monthsIn >= PARTY_SETTLE_LEN) {
+    state.party_stage = 'ceo_window';
+    state.ceo_window_start_month = state.monthTotal;
+  }
+  if (state.party_stage === 'ceo_window') {
+    const inWindow = state.monthTotal - (state.ceo_window_start_month || state.monthTotal);
+    const decaySteps = Math.max(0, Math.floor((inWindow - PARTY_DECAY_GRACE) / PARTY_DECAY_STEP));
+    state.ceo_decay = Math.min(PARTY_DECAY_CAP, decaySteps * PARTY_DECAY_AMT);
+    if (monthsIn >= PARTY_FORCE_LEN) attemptCeo(true);
+  }
+}
+
+function computeCeoProb(s) {
+  if (s.storyline !== 'party') return 0;
+  let p = -10;
+  p += (s.SOC || 0) * 2.0;
+  p += (s.MNY || 0) * 1.2;
+  p += (s.INT || 0) * 0.8;
+  if (s.party_clean) p += 8;
+  if (s.party_dirty) p -= 10;
+  if (s.academic_dishonesty) p -= 12;
+  p -= (s.ceo_decay || 0);
+  return Math.max(PARTY_PROB_FLOOR, Math.min(PARTY_PROB_CAP, Math.round(p)));
+}
+
+function attemptCeo(forced) {
+  if (state.ceo_attempted) return;
+  state.ceo_attempted = true;
+  state.party_stage = 'exited';
+  const prob = computeCeoProb(state);
+  const success = Math.random() * 100 < prob;
+  state.firedEvents.add(82040);
+  const evId = success ? 82041 : 82042;
+  const ev = state.eventsMap.get(evId);
+  if (forced) {
+    pushLog(success
+      ? '送别派对的酒桌上，你拍板了——成立公司。'
+      : '派对散场了，没人再叫你「局长」。');
+  }
+  if (ev) applyEvent(ev);
+  render();
+}
 
 const STORYLINE_NAMES = {
   spy: '国际特工',
@@ -196,8 +361,9 @@ const STORYLINE_NAMES = {
   esports: '职业电竞',
   worlds: '世界赛之路',
   minor_league: '次级联赛',
+  xianxia: '修真求道',
 };
-const HIDDEN_STORYLINES = new Set(['spy', 'abyss', 'meta']);
+const HIDDEN_STORYLINES = new Set(['spy', 'abyss', 'meta', 'xianxia']);
 const SPECIAL_STORYLINES = new Set(['idol', 'superstar', 'streamer', 'poker', 'triton', 'local_shark', 'party', 'ceo', 'wasted', 'esports', 'worlds', 'minor_league']);
 const STORYLINE_UNLOCK_STAT = {
   idol: 'POP', superstar: 'POP', streamer: 'POP',
@@ -255,6 +421,8 @@ const state = {
   SOC: 0, INT: 0, MNY: 0, PER: 0, HLT: 0, APP: 0,
   HAP: 5,
   POP: 0, POK: 0, MMR: 0,
+  cul: 0, dao: 0, karma: 0, tribulation: 0,
+  xianxiaSeed: 0, yuanshen_book: 0, xingchen_book: 0,
 
   // Summary tracking
   statPeaks: {},
@@ -266,17 +434,18 @@ let autoMode = 0;
 let sessionPlayCount = 0;
 
 async function loadData() {
-  const [talents, events, ages, randomEvents] = await Promise.all([
+  const [talents, events, ages, randomEvents, xianxiaEvents] = await Promise.all([
     fetch('data/talents.json').then(r => r.json()),
     fetch('data/events.json').then(r => r.json()),
     fetch('data/ages.json').then(r => r.json()),
-    fetch('data/random_events.json').then(r => r.json())
+    fetch('data/random_events.json').then(r => r.json()),
+    fetch('data/xianxia_events.json').then(r => r.json()).catch(() => [])
   ]);
   state.eventsMap = new Map(events.map(e => [e.id, e]));
   state.agesMap = ages;
-  state.randomEvents = randomEvents;
+  state.randomEvents = randomEvents.concat(xianxiaEvents);
   // Also index random events into eventsMap for branch lookups
-  for (const re of randomEvents) state.eventsMap.set(re.id, re);
+  for (const re of state.randomEvents) state.eventsMap.set(re.id, re);
   return talents;
 }
 
@@ -482,6 +651,8 @@ function applyEvent(ev) {
     if (ev.set.storyline && (!state.storylineStart || ev.set.storyline !== prevStoryline)) {
       state.storylineStart = state.age;
       state.storylineStartMonth = state.monthTotal;
+      if (ev.set.storyline === 'idol') initIdolStage();
+      if (ev.set.storyline === 'party') initPartyStage();
     }
     if (ev.set.profession && GRAD_SCHOOL_PHASES.has(ev.set.profession)) {
       scheduleGraduateCompletion();
@@ -576,7 +747,13 @@ function drawRandomEvent() {
     .filter(ev => !ev.noRandom)
     .filter(ev => !state.firedEvents.has(ev.id))
     .filter(ev => !ev.include || evalCondition(state, ev.include))
-    .filter(ev => !ev.exclude || !evalCondition(state, ev.exclude));
+    .filter(ev => !ev.exclude || !evalCondition(state, ev.exclude))
+    .filter(ev => {
+      if (!ev.stage || ev.stage === '*') return true;
+      if (state.storyline === 'idol') return ev.stage === state.idol_stage;
+      if (state.storyline === 'party') return ev.stage === state.party_stage;
+      return true;
+    });
   // Storyline isolation: only draw matching events
   const matchStoryline = (ev) => Array.isArray(ev.storyline)
     ? ev.storyline.includes(state.storyline)
@@ -607,6 +784,8 @@ function drawRandomEvent() {
   const weights = pool.map(ev => {
     let w = ev.weight ?? 1;
     if (majorKey && ev.include && ev.include.includes(majorKey)) w *= 2;
+    // System A: damp choice events so flavor dominates
+    if (ev.choices && ev.choices.length > 0) w *= 0.5;
     return w;
   });
   const total = weights.reduce((a, b) => a + b, 0);
@@ -672,6 +851,10 @@ function advanceMonth() {
   }
 
   if (state.storyline && state.phase !== 'ended') {
+    // Idol stage clock — must run before progress/death checks so debut may fire
+    updateIdolStage();
+    updatePartyStage();
+    if (state.phase === 'ended' || state.pendingChoice) { render(); return; }
     // === Storyline mode: skip normal events, only draw storyline events ===
     const cfg = STORYLINE_CFG[state.storyline];
     if (cfg) {
@@ -1131,10 +1314,15 @@ function storylineFlavor() {
     esports:    ['你坐在电竞椅上看着回放录像。', '训练赛打到凌晨三点，眼睛干涩发酸。', '你在练习瞄准，一遍又一遍。'],
     worlds:     ['全世界的目光都聚焦在这里。', '你在后台调整着鼠标DPI。', '赛前的紧张感让你手心冒汗。'],
     minor_league:['又是一场没人看的比赛。', '网吧的空调坏了，热得你心烦意乱。', '你刷着手机看顶级联赛的集锦，心里五味杂陈。'],
+    xianxia:    ['你于洞府中盘膝吐纳，岁月如水流过。', '山雨过后，林间灵气格外稠密。', '你抬头看天，一只白鹤掠过云端。', '你打坐时，听见远处有人在念诵经文。', '你拈起一片落叶，叶上灵息流转。', '你在溪边写了几个字，又被风吹散。', '你试着以神识扫过山林，鸟兽四散。', '你想起当年那本残卷，墨迹仍在脑海中流动。'],
   };
   const pool = flavors[sl];
   if (pool) return pool[Math.floor(Math.random() * pool.length)];
   return '……';
+}
+
+function xianxiaFlavor() {
+  return storylineFlavor();
 }
 
 function $(id) { return document.getElementById(id); }
@@ -1220,31 +1408,78 @@ function renderAlloc() {
 
 function render() {
   if (state.phase === 'game' || state.phase === 'ended') {
-    renderAvatar($('avatar-canvas'), state);
+    const avatarCanvas = $('avatar-canvas');
+    if (avatarCanvas) renderAvatar(avatarCanvas, state);
 
     const statsEl = $('stats-panel');
+    const isXianxia = state.storyline === 'xianxia';
+    const wasXianxia = statsEl.classList.contains('mode-xianxia');
+
+    // 进入修仙模式：触发抹除→新属性出现的动画
+    if (isXianxia && !wasXianxia && !statsEl.classList.contains('mode-shifting')) {
+      statsEl.classList.add('mode-shifting');
+      setTimeout(() => {
+        statsEl.classList.remove('mode-shifting');
+        statsEl.classList.add('mode-xianxia', 'mode-emerging');
+        render();
+        setTimeout(() => statsEl.classList.remove('mode-emerging'), 1200);
+      }, 900);
+      return;
+    }
+    if (statsEl.classList.contains('mode-shifting')) return;
+    if (!isXianxia) statsEl.classList.remove('mode-xianxia');
+
     statsEl.innerHTML = '';
-    const shown = ['SOC', 'INT', 'MNY', 'HAP', 'HLT', 'PER', 'APP'];
-    if (state.showPOP) shown.push('POP');
-    if (state.showPOK) shown.push('POK');
-    if (state.showMMR) shown.push('MMR');
-    const dynamicMax = Math.max(1, ...shown.filter(k => k !== 'HAP').map(k => state[k]));
-    const SPECIAL_STATS = new Set(['POP', 'POK', 'MMR']);
-    for (const k of shown) {
-      const row = document.createElement('div');
-      const isSpecial = SPECIAL_STATS.has(k);
-      row.className = 'stat-row' + (isSpecial ? ' stat-special' : '');
-      row.dataset.stat = k;
-      const label = STAT_LABELS[k];
-      const val = state[k];
-      const base = k === 'HAP' ? 10 : dynamicMax;
-      const pct = Math.max(0, Math.min(100, (val / base) * 100));
-      row.innerHTML = `
-        <span class="stat-label">${label}</span>
-        <span class="stat-bar"><span class="stat-fill" style="width:${pct}%"></span></span>
-        <span class="stat-val">${val}</span>
-      `;
-      statsEl.appendChild(row);
+
+    if (isXianxia) {
+      const realm = deriveRealm(state.cul);
+      const cul = state.cul || 0;
+      const culMax = cul < 20 ? 20 : cul < 60 ? 60 : cul < 150 ? 150 : cul < 300 ? 300 : cul < 600 ? 600 : cul < 1000 ? 1000 : cul < 1500 ? 1500 : Math.max(2000, cul);
+      const rows = [
+        { label: '境界', val: realm, isText: true },
+        { label: '修为', val: cul, max: culMax },
+        { label: '大道', val: state.dao || 0, max: 6 },
+        { label: '机缘', val: state.karma || 0, max: 10 },
+        { label: '渡劫', val: state.tribulation || 0, max: 9 },
+      ];
+      for (const r of rows) {
+        const row = document.createElement('div');
+        row.className = 'stat-row stat-xianxia';
+        if (r.isText) {
+          row.innerHTML = `<span class="stat-label">${r.label}</span><span class="stat-realm">${r.val}</span>`;
+        } else {
+          const pct = Math.max(0, Math.min(100, (r.val / r.max) * 100));
+          row.innerHTML = `
+            <span class="stat-label">${r.label}</span>
+            <span class="stat-bar"><span class="stat-fill" style="width:${pct}%"></span></span>
+            <span class="stat-val">${r.val}</span>
+          `;
+        }
+        statsEl.appendChild(row);
+      }
+    } else {
+      const shown = ['SOC', 'INT', 'MNY', 'HAP', 'HLT', 'PER', 'APP'];
+      if (state.showPOP) shown.push('POP');
+      if (state.showPOK) shown.push('POK');
+      if (state.showMMR) shown.push('MMR');
+      const dynamicMax = Math.max(1, ...shown.filter(k => k !== 'HAP').map(k => state[k]));
+      const SPECIAL_STATS = new Set(['POP', 'POK', 'MMR']);
+      for (const k of shown) {
+        const row = document.createElement('div');
+        const isSpecial = SPECIAL_STATS.has(k);
+        row.className = 'stat-row' + (isSpecial ? ' stat-special' : '');
+        row.dataset.stat = k;
+        const label = STAT_LABELS[k];
+        const val = state[k];
+        const base = k === 'HAP' ? 10 : dynamicMax;
+        const pct = Math.max(0, Math.min(100, (val / base) * 100));
+        row.innerHTML = `
+          <span class="stat-label">${label}</span>
+          <span class="stat-bar"><span class="stat-fill" style="width:${pct}%"></span></span>
+          <span class="stat-val">${val}</span>
+        `;
+        statsEl.appendChild(row);
+      }
     }
 
     const schoolBox = $('school-box');
@@ -1276,6 +1511,84 @@ function render() {
       $('storyline-display').textContent = STORYLINE_NAMES[state.storyline] || state.storyline;
     } else {
       slBox.style.display = 'none';
+    }
+
+    const debutBox = $('debut-box');
+    if (state.storyline === 'idol' && !state.debut_attempted) {
+      debutBox.style.display = '';
+      const stageEl = $('debut-stage');
+      const probEl = $('debut-prob');
+      const warnEl = $('debut-decay-warn');
+      const btn = $('btn-try-debut');
+      const monthsIn = state.monthTotal - (state.storylineStartMonth || 0);
+      if (state.idol_stage === 'training' || state.idol_stage == null) {
+        const remaining = Math.max(0, IDOL_TRAINING_LEN - monthsIn);
+        stageEl.textContent = `练习生 · 还剩 ${remaining} 个月`;
+        probEl.textContent = '--';
+        warnEl.textContent = '满 12 个月后开放出道窗口';
+        btn.disabled = true;
+      } else if (state.idol_stage === 'debut_window') {
+        const prob = computeDebutProb(state);
+        const inWin = state.monthTotal - (state.debut_window_start_month || state.monthTotal);
+        const monthsToForce = Math.max(0, IDOL_FORCE_LEN - monthsIn);
+        stageEl.textContent = `出道窗口 · 强制结算还剩 ${monthsToForce} 个月`;
+        probEl.textContent = prob + '%';
+        probEl.style.color = prob >= 50 ? '#7ed7a0' : prob >= 25 ? '#f5b642' : '#e06060';
+        const inGrace = inWin < IDOL_DECAY_GRACE;
+        const monthsToNextDecay = inGrace
+          ? IDOL_DECAY_GRACE - inWin
+          : (IDOL_DECAY_STEP - ((inWin - IDOL_DECAY_GRACE) % IDOL_DECAY_STEP)) || IDOL_DECAY_STEP;
+        if ((state.debut_decay || 0) >= IDOL_DECAY_CAP) {
+          warnEl.textContent = `衰减已封顶（-${IDOL_DECAY_CAP}%），再拖也不会更低`;
+        } else if (inGrace) {
+          warnEl.textContent = `${monthsToNextDecay} 个月后开始衰减（每 3 个月 -5%）`;
+        } else {
+          warnEl.textContent = `已衰减 ${state.debut_decay || 0}% · ${monthsToNextDecay} 个月后再 -5%`;
+        }
+        btn.disabled = false;
+      }
+    } else {
+      debutBox.style.display = 'none';
+    }
+
+    const partyBox = $('party-box');
+    if (partyBox) {
+      if (state.storyline === 'party' && !state.ceo_attempted) {
+        partyBox.style.display = '';
+        const stageEl = $('party-stage');
+        const probEl = $('ceo-prob');
+        const warnEl = $('ceo-decay-warn');
+        const btn = $('btn-try-ceo');
+        const monthsIn = state.monthTotal - (state.storylineStartMonth || 0);
+        if (state.party_stage === 'settling' || state.party_stage == null) {
+          const remaining = Math.max(0, PARTY_SETTLE_LEN - monthsIn);
+          stageEl.textContent = `局长 · 还剩 ${remaining} 个月`;
+          probEl.textContent = '--';
+          warnEl.textContent = '满 12 个月后开放转型窗口';
+          btn.disabled = true;
+        } else if (state.party_stage === 'ceo_window') {
+          const prob = computeCeoProb(state);
+          const inWin = state.monthTotal - (state.ceo_window_start_month || state.monthTotal);
+          const monthsToForce = Math.max(0, PARTY_FORCE_LEN - monthsIn);
+          stageEl.textContent = `转型窗口 · 强制结算还剩 ${monthsToForce} 个月`;
+          probEl.textContent = prob + '%';
+          probEl.style.color = prob >= 50 ? '#7ed7a0' : prob >= 25 ? '#f5b642' : '#e06060';
+          const inGrace = inWin < PARTY_DECAY_GRACE;
+          const monthsToNextDecay = inGrace
+            ? PARTY_DECAY_GRACE - inWin
+            : (PARTY_DECAY_STEP - ((inWin - PARTY_DECAY_GRACE) % PARTY_DECAY_STEP)) || PARTY_DECAY_STEP;
+          if ((state.ceo_decay || 0) >= PARTY_DECAY_CAP) {
+            warnEl.textContent = `衰减已封顶（-${PARTY_DECAY_CAP}%），再拖也不会更低`;
+          } else if (inGrace) {
+            warnEl.textContent = `${monthsToNextDecay} 个月后开始衰减（每 3 个月 -5%）`;
+          } else {
+            warnEl.textContent = `已衰减 ${state.ceo_decay || 0}% · ${monthsToNextDecay} 个月后再 -5%`;
+          }
+          btn.disabled = false;
+        }
+      } else {
+        partyBox.style.display = 'none';
+      }
     }
 
     $('time-display').textContent = `${state.age}岁${state.monthOfYear}个月`;
@@ -1713,6 +2026,31 @@ async function main() {
     showScreen('start-screen');
     location.reload();
   });
+
+  $('btn-try-debut').addEventListener('click', () => {
+    if (state.storyline !== 'idol') return;
+    if (state.idol_stage !== 'debut_window') return;
+    if (state.debut_attempted) return;
+    const prob = computeDebutProb(state);
+    const ok = confirm(`当前出道成功率 ${prob}%。确定要尝试出道吗？\n（成功 → 明星之路；失败 → 网红主播）`);
+    if (!ok) return;
+    stopAuto();
+    attemptDebut(false);
+  });
+
+  const btnTryCeo = $('btn-try-ceo');
+  if (btnTryCeo) {
+    btnTryCeo.addEventListener('click', () => {
+      if (state.storyline !== 'party') return;
+      if (state.party_stage !== 'ceo_window') return;
+      if (state.ceo_attempted) return;
+      const prob = computeCeoProb(state);
+      const ok = confirm(`当前转型成功率 ${prob}%。确定要尝试退出派对、合伙创业吗？\n（成功 → CEO 之路；失败 → 派对散场，沦为废人）`);
+      if (!ok) return;
+      stopAuto();
+      attemptCeo(false);
+    });
+  }
 
   $('btn-summary').addEventListener('click', () => {
     dismissEndOverlay();
