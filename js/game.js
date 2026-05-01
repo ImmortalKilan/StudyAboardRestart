@@ -136,7 +136,6 @@ const STORYLINE_CFG = {
     ],
     progressChecks: [
       { cond: s => s.match_fixing, event: 83092 },
-      { cond: s => s.age - s.storylineStart >= 1, event: 83040 },
     ],
   },
   worlds: {
@@ -156,7 +155,7 @@ const STORYLINE_CFG = {
     eventRate: 0.7,
     progressChecks: [
       { cond: s => s.match_fixing, event: 83092 },
-      { cond: s => s.age - s.storylineStart >= 1, event: 83094 },
+      { cond: s => s.monthTotal - (s.storylineStartMonth || 0) >= 36, event: 83094 },
     ],
   },
   idol: {
@@ -340,6 +339,69 @@ function attemptCeo(forced) {
     pushLog(success
       ? '送别派对的酒桌上，你拍板了——成立公司。'
       : '派对散场了，没人再叫你「局长」。');
+  }
+  if (ev) applyEvent(ev);
+  render();
+}
+
+// ── Esports stage clock (mirror of idol/party) ──────────────────
+// Stages: 'rookie' (0-12 mo) → 'qualifier_window' (12-60 mo) → 'qualified'
+const ESPORTS_ROOKIE_LEN = 12;
+const ESPORTS_FORCE_LEN = 60;
+const ESPORTS_DECAY_GRACE = 6;
+const ESPORTS_DECAY_STEP = 3;
+const ESPORTS_DECAY_AMT = 5;
+const ESPORTS_DECAY_CAP = 50;
+const ESPORTS_PROB_CAP = 80;
+const ESPORTS_PROB_FLOOR = 5;
+
+function initEsportsStage() {
+  state.esports_stage = 'rookie';
+  state.qualifier_decay = 0;
+  state.qualifier_attempted = false;
+  state.qualifier_window_start_month = null;
+}
+
+function updateEsportsStage() {
+  if (state.storyline !== 'esports') return;
+  if (state.esports_stage === undefined || state.esports_stage === null) initEsportsStage();
+  if (state.qualifier_attempted) return;
+  const monthsIn = state.monthTotal - (state.storylineStartMonth || 0);
+  if (state.esports_stage === 'rookie' && monthsIn >= ESPORTS_ROOKIE_LEN) {
+    state.esports_stage = 'qualifier_window';
+    state.qualifier_window_start_month = state.monthTotal;
+  }
+  if (state.esports_stage === 'qualifier_window') {
+    const inWindow = state.monthTotal - (state.qualifier_window_start_month || state.monthTotal);
+    const decaySteps = Math.max(0, Math.floor((inWindow - ESPORTS_DECAY_GRACE) / ESPORTS_DECAY_STEP));
+    state.qualifier_decay = Math.min(ESPORTS_DECAY_CAP, decaySteps * ESPORTS_DECAY_AMT);
+    if (monthsIn >= ESPORTS_FORCE_LEN) attemptQualifier(true);
+  }
+}
+
+function computeQualifierProb(s) {
+  if (s.storyline !== 'esports') return 0;
+  let p = -10;
+  p += (s.MMR || 0) * 1.5;
+  p += (s.PER || 0) * 1.0;
+  p += (s.INT || 0) * 0.5;
+  p -= (s.qualifier_decay || 0);
+  return Math.max(ESPORTS_PROB_FLOOR, Math.min(ESPORTS_PROB_CAP, Math.round(p)));
+}
+
+function attemptQualifier(forced) {
+  if (state.qualifier_attempted) return;
+  state.qualifier_attempted = true;
+  state.esports_stage = 'qualified';
+  const prob = computeQualifierProb(state);
+  const success = Math.random() * 100 < prob;
+  state.firedEvents.add(83040);
+  const evId = success ? 83041 : 83042;
+  const ev = state.eventsMap.get(evId);
+  if (forced) {
+    pushLog(success
+      ? '常规赛打到最后一刻——你们挤进了世界赛门票名单。'
+      : '常规赛收官，名次卡在升降机里，没人再叫你们顶级队伍。');
   }
   if (ev) applyEvent(ev);
   render();
@@ -653,6 +715,7 @@ function applyEvent(ev) {
       state.storylineStartMonth = state.monthTotal;
       if (ev.set.storyline === 'idol') initIdolStage();
       if (ev.set.storyline === 'party') initPartyStage();
+      if (ev.set.storyline === 'esports') initEsportsStage();
     }
     if (ev.set.profession && GRAD_SCHOOL_PHASES.has(ev.set.profession)) {
       scheduleGraduateCompletion();
@@ -854,6 +917,7 @@ function advanceMonth() {
     // Idol stage clock — must run before progress/death checks so debut may fire
     updateIdolStage();
     updatePartyStage();
+    updateEsportsStage();
     if (state.phase === 'ended' || state.pendingChoice) { render(); return; }
     // === Storyline mode: skip normal events, only draw storyline events ===
     const cfg = STORYLINE_CFG[state.storyline];
@@ -1591,6 +1655,46 @@ function render() {
       }
     }
 
+    const esportsBox = $('esports-box');
+    if (esportsBox) {
+      if (state.storyline === 'esports' && !state.qualifier_attempted) {
+        esportsBox.style.display = '';
+        const stageEl = $('esports-stage');
+        const probEl = $('esports-prob');
+        const warnEl = $('esports-decay-warn');
+        const btn = $('btn-try-qualifier');
+        const monthsIn = state.monthTotal - (state.storylineStartMonth || 0);
+        if (state.esports_stage === 'rookie' || state.esports_stage == null) {
+          const remaining = Math.max(0, ESPORTS_ROOKIE_LEN - monthsIn);
+          stageEl.textContent = `新秀期 · 还剩 ${remaining} 个月`;
+          probEl.textContent = '--';
+          warnEl.textContent = '满 12 个月后开放出线窗口';
+          btn.disabled = true;
+        } else if (state.esports_stage === 'qualifier_window') {
+          const prob = computeQualifierProb(state);
+          const inWin = state.monthTotal - (state.qualifier_window_start_month || state.monthTotal);
+          const monthsToForce = Math.max(0, ESPORTS_FORCE_LEN - monthsIn);
+          stageEl.textContent = `出线窗口 · 强制结算还剩 ${monthsToForce} 个月`;
+          probEl.textContent = prob + '%';
+          probEl.style.color = prob >= 50 ? '#7ed7a0' : prob >= 25 ? '#f5b642' : '#e06060';
+          const inGrace = inWin < ESPORTS_DECAY_GRACE;
+          const monthsToNextDecay = inGrace
+            ? ESPORTS_DECAY_GRACE - inWin
+            : (ESPORTS_DECAY_STEP - ((inWin - ESPORTS_DECAY_GRACE) % ESPORTS_DECAY_STEP)) || ESPORTS_DECAY_STEP;
+          if ((state.qualifier_decay || 0) >= ESPORTS_DECAY_CAP) {
+            warnEl.textContent = `衰减已封顶（-${ESPORTS_DECAY_CAP}%），再拖也不会更低`;
+          } else if (inGrace) {
+            warnEl.textContent = `${monthsToNextDecay} 个月后开始衰减（每 3 个月 -5%）`;
+          } else {
+            warnEl.textContent = `已衰减 ${state.qualifier_decay || 0}% · ${monthsToNextDecay} 个月后再 -5%`;
+          }
+          btn.disabled = false;
+        }
+      } else {
+        esportsBox.style.display = 'none';
+      }
+    }
+
     $('time-display').textContent = `${state.age}岁${state.monthOfYear}个月`;
 
     const logEl = $('event-log');
@@ -1665,6 +1769,7 @@ function render() {
               : '')
           : '';
         if (colorType) btn.classList.add('choice-' + colorType);
+        if (c.gold) btn.classList.add('choice-gold');
         if (locked) {
           btn.classList.add('choice-locked');
           btn.disabled = true;
@@ -2049,6 +2154,20 @@ async function main() {
       if (!ok) return;
       stopAuto();
       attemptCeo(false);
+    });
+  }
+
+  const btnTryQualifier = $('btn-try-qualifier');
+  if (btnTryQualifier) {
+    btnTryQualifier.addEventListener('click', () => {
+      if (state.storyline !== 'esports') return;
+      if (state.esports_stage !== 'qualifier_window') return;
+      if (state.qualifier_attempted) return;
+      const prob = computeQualifierProb(state);
+      const ok = confirm(`当前出线成功率 ${prob}%。确定要打常规赛收官、争取世界赛门票吗？\n（成功 → 世界赛之路；失败 → 次级联赛）`);
+      if (!ok) return;
+      stopAuto();
+      attemptQualifier(false);
     });
   }
 

@@ -1359,6 +1359,16 @@ body.in-summary .app {
   color: #0f1420;
   box-shadow: 0 2px 8px rgba(245, 182, 66, 0.3);
 }
+.choice-btn.choice-gold {
+  color: #ffd76a;
+  border-color: #ffd76a;
+  box-shadow: inset 0 0 0 1px rgba(255, 215, 106, 0.25);
+}
+.choice-btn.choice-gold:hover {
+  background: linear-gradient(135deg, #ffd76a, #f5b642);
+  color: #0f1420;
+  box-shadow: 0 2px 12px rgba(255, 215, 106, 0.45);
+}
 
 @media (max-width: 760px) {
   .app { padding: 10px 10px 12px; }
