@@ -610,6 +610,59 @@ body.in-game .left-panel {
   font-style: italic;
 }
 
+/* Non-terminal storyline exit — gold frame + sweep highlight */
+.log-entry.log-storyline-exit {
+  position: relative;
+  border: 1px solid #ffd76a;
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin: 6px 0;
+  background: linear-gradient(90deg, rgba(255, 215, 106, 0.08), rgba(255, 215, 106, 0.02));
+  box-shadow: 0 0 0 1px rgba(255, 215, 106, 0.15), 0 0 12px rgba(255, 215, 106, 0.18);
+  overflow: hidden;
+  animation: storyline-exit-frame 1.2s ease-out;
+}
+.log-entry.log-storyline-exit .log-text {
+  color: #ffd76a !important;
+  position: relative;
+  z-index: 1;
+}
+.log-entry.log-storyline-exit::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -60%;
+  width: 50%; height: 100%;
+  background: linear-gradient(110deg,
+    transparent 0%,
+    rgba(255, 215, 106, 0.0) 30%,
+    rgba(255, 215, 106, 0.45) 50%,
+    rgba(255, 215, 106, 0.0) 70%,
+    transparent 100%);
+  animation: storyline-exit-sweep 1.6s ease-out 0.15s 1;
+  pointer-events: none;
+  z-index: 0;
+}
+@keyframes storyline-exit-frame {
+  0% {
+    border-color: rgba(255, 215, 106, 0);
+    box-shadow: 0 0 0 1px rgba(255, 215, 106, 0), 0 0 0 rgba(255, 215, 106, 0);
+    transform: scale(0.99);
+  }
+  40% {
+    border-color: #fff1b8;
+    box-shadow: 0 0 0 1px rgba(255, 215, 106, 0.5), 0 0 22px rgba(255, 215, 106, 0.55);
+  }
+  100% {
+    border-color: #ffd76a;
+    box-shadow: 0 0 0 1px rgba(255, 215, 106, 0.15), 0 0 12px rgba(255, 215, 106, 0.18);
+    transform: scale(1);
+  }
+}
+@keyframes storyline-exit-sweep {
+  0% { left: -60%; }
+  100% { left: 120%; }
+}
+
 .right-panel {
   background: var(--card);
   border: 1px solid var(--line);

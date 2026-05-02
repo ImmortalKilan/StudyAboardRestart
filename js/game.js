@@ -729,6 +729,10 @@ function applyEvent(ev) {
   // ev.end without a more specific category: let pushLog apply storyline color when in storyline,
   // otherwise stamp 'ending' as final fallback
   if (!evLogType && ev.end && !state.storyline) evLogType = 'ending';
+  // Non-terminal storyline exit: storyline cleared but life continues
+  const isStorylineExit = ev.set && ev.set.storyline === ''
+    && prevStorylineForCinematic && !ev.end;
+  if (isStorylineExit) evLogType = 'storyline-exit';
   if (msg) pushLog(msg, evLogType);
 
   if (ev.effect) for (const [k, v] of Object.entries(ev.effect)) {
@@ -1850,6 +1854,10 @@ function initGame() {
   state.phase = 'game';
   state.age = 15;
   state.monthOfYear = 1;
+  state.faceVariant = Math.floor(Math.random() * 3);
+  state.topVariant = Math.floor(Math.random() * 4);
+  state.bottomVariant = Math.floor(Math.random() * 3);
+  state.outfitColorId = Math.floor(Math.random() * 5);
   state.gradEndAge = 0;
   state.gradEndMonth = 0;
   syncProfessionByAge();
