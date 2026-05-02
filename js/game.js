@@ -1,5 +1,5 @@
 import { evalCondition, pickBranch, pickWeightedBranch } from './dsl.js';
-import { renderAvatar } from './avatar.js';
+import { renderAvatar, createStandaloneAvatar } from './avatar.js';
 import { playStorylineIntro } from './cinematic.js';
 
 const STAT_KEYS = ['SOC', 'INT', 'MNY', 'PER', 'HLT', 'APP'];
@@ -92,7 +92,7 @@ const STORYLINE_CFG = {
       { cond: s => s.MNY <= -2, event: 82095 },
     ],
     progressChecks: [
-      { cond: s => s.age >= 27 && s.SOC >= 20 && s.MNY >= 15, event: 82090 },
+      { cond: s => s.SOC >= 23 && s.MNY >= 18, event: 82090 },
       { cond: s => s.age >= 30, event: 82096 },
     ],
   },
@@ -681,6 +681,66 @@ function planYear(age) {
   state.yearlyPlan.set(age, plan);
 }
 
+function probTone(p) {
+  if (p >= 60) return 'good';
+  if (p >= 30) return 'warn';
+  return 'bad';
+}
+
+function showConfirm({ title, body, stats, okText, cancelText }) {
+  return new Promise(resolve => {
+    const mask = $('confirm-modal');
+    const titleEl = $('confirm-title');
+    const bodyEl = $('confirm-body');
+    const statsEl = $('confirm-stats');
+    const okBtn = $('confirm-ok');
+    const cancelBtn = $('confirm-cancel');
+    if (!mask) { resolve(window.confirm(body || title || '')); return; }
+    titleEl.textContent = title || '确认';
+    bodyEl.textContent = body || '';
+    statsEl.innerHTML = '';
+    if (Array.isArray(stats)) {
+      stats.forEach(s => {
+        const row = document.createElement('div');
+        row.className = 'modal-stat';
+        const lab = document.createElement('span');
+        lab.className = 'modal-stat-label';
+        lab.textContent = s.label + '：';
+        const val = document.createElement('span');
+        val.className = 'modal-stat-value' + (s.tone ? ' ' + s.tone : '');
+        val.textContent = s.value;
+        row.appendChild(lab);
+        row.appendChild(val);
+        statsEl.appendChild(row);
+      });
+    }
+    okBtn.textContent = okText || '确定';
+    cancelBtn.textContent = cancelText || '取消';
+    mask.style.display = '';
+
+    const cleanup = (result) => {
+      mask.style.display = 'none';
+      okBtn.removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', onCancel);
+      mask.removeEventListener('click', onMaskClick);
+      document.removeEventListener('keydown', onKey);
+      resolve(result);
+    };
+    const onOk = () => cleanup(true);
+    const onCancel = () => cleanup(false);
+    const onMaskClick = (e) => { if (e.target === mask) cleanup(false); };
+    const onKey = (e) => {
+      if (e.key === 'Escape') cleanup(false);
+      else if (e.key === 'Enter') cleanup(true);
+    };
+    okBtn.addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', onCancel);
+    mask.addEventListener('click', onMaskClick);
+    document.addEventListener('keydown', onKey);
+    setTimeout(() => okBtn.focus(), 0);
+  });
+}
+
 function applyEvent(ev) {
   // Storyline replay: only show text, skip all side effects
   if (ev._replay) {
@@ -880,6 +940,19 @@ function resolveChoice(index) {
   if (choice.next) {
     const ev = state.eventsMap.get(choice.next);
     if (ev) applyEvent(ev);
+  } else if (choice.effect || choice.set || choice.resultText || choice.text) {
+    // Inline outcome: apply effect/set and log a short result line
+    if (choice.set) {
+      for (const [k, v] of Object.entries(choice.set)) state[k] = v;
+    }
+    if (choice.effect) {
+      for (const [k, v] of Object.entries(choice.effect)) {
+        if (EFFECT_KEYS.has(k)) state[k] = (state[k] || 0) + v;
+      }
+      clampStats();
+    }
+    const line = choice.resultText || `→ ${choice.text || ''}`;
+    if (line) pushLog(line);
   }
 
   render();
@@ -1582,7 +1655,7 @@ function render() {
     }
 
     const debutBox = $('debut-box');
-    if (state.storyline === 'idol' && !state.debut_attempted) {
+    if (state.storyline === 'idol' && !state.debut_attempted && state.phase !== 'ended') {
       debutBox.style.display = '';
       const stageEl = $('debut-stage');
       const probEl = $('debut-prob');
@@ -1621,7 +1694,7 @@ function render() {
 
     const partyBox = $('party-box');
     if (partyBox) {
-      if (state.storyline === 'party' && !state.ceo_attempted) {
+      if (state.storyline === 'party' && !state.ceo_attempted && state.phase !== 'ended') {
         partyBox.style.display = '';
         const stageEl = $('party-stage');
         const probEl = $('ceo-prob');
@@ -1661,7 +1734,7 @@ function render() {
 
     const esportsBox = $('esports-box');
     if (esportsBox) {
-      if (state.storyline === 'esports' && !state.qualifier_attempted) {
+      if (state.storyline === 'esports' && !state.qualifier_attempted && state.phase !== 'ended') {
         esportsBox.style.display = '';
         const stageEl = $('esports-stage');
         const probEl = $('esports-prob');
@@ -2140,12 +2213,21 @@ async function main() {
     location.reload();
   });
 
-  $('btn-try-debut').addEventListener('click', () => {
+  $('btn-try-debut').addEventListener('click', async () => {
+    if (state.phase === 'ended') return;
     if (state.storyline !== 'idol') return;
     if (state.idol_stage !== 'debut_window') return;
     if (state.debut_attempted) return;
     const prob = computeDebutProb(state);
-    const ok = confirm(`当前出道成功率 ${prob}%。确定要尝试出道吗？\n（成功 → 明星之路；失败 → 网红主播）`);
+    const ok = await showConfirm({
+      title: '尝试出道',
+      body: '现在向事务所提交最终试镜——只有一次机会。',
+      stats: [
+        { label: '成功率', value: prob + '%', tone: probTone(prob) },
+        { label: '成功', value: '明星之路' },
+        { label: '失败', value: '网红主播', tone: 'warn' },
+      ],
+    });
     if (!ok) return;
     stopAuto();
     attemptDebut(false);
@@ -2153,12 +2235,21 @@ async function main() {
 
   const btnTryCeo = $('btn-try-ceo');
   if (btnTryCeo) {
-    btnTryCeo.addEventListener('click', () => {
+    btnTryCeo.addEventListener('click', async () => {
+      if (state.phase === 'ended') return;
       if (state.storyline !== 'party') return;
       if (state.party_stage !== 'ceo_window') return;
       if (state.ceo_attempted) return;
       const prob = computeCeoProb(state);
-      const ok = confirm(`当前转型成功率 ${prob}%。确定要尝试退出派对、合伙创业吗？\n（成功 → CEO 之路；失败 → 派对散场，沦为废人）`);
+      const ok = await showConfirm({
+        title: '尝试转型',
+        body: '退出派对圈，把人脉和余钱押到合伙创业上。',
+        stats: [
+          { label: '成功率', value: prob + '%', tone: probTone(prob) },
+          { label: '成功', value: 'CEO 之路' },
+          { label: '失败', value: '派对散场，沦为废人', tone: 'bad' },
+        ],
+      });
       if (!ok) return;
       stopAuto();
       attemptCeo(false);
@@ -2167,12 +2258,21 @@ async function main() {
 
   const btnTryQualifier = $('btn-try-qualifier');
   if (btnTryQualifier) {
-    btnTryQualifier.addEventListener('click', () => {
+    btnTryQualifier.addEventListener('click', async () => {
+      if (state.phase === 'ended') return;
       if (state.storyline !== 'esports') return;
       if (state.esports_stage !== 'qualifier_window') return;
       if (state.qualifier_attempted) return;
       const prob = computeQualifierProb(state);
-      const ok = confirm(`当前出线成功率 ${prob}%。确定要打常规赛收官、争取世界赛门票吗？\n（成功 → 世界赛之路；失败 → 次级联赛）`);
+      const ok = await showConfirm({
+        title: '尝试出线',
+        body: '常规赛收官战，目标是世界赛门票。',
+        stats: [
+          { label: '出线率', value: prob + '%', tone: probTone(prob) },
+          { label: '成功', value: '世界赛之路' },
+          { label: '失败', value: '次级联赛', tone: 'warn' },
+        ],
+      });
       if (!ok) return;
       stopAuto();
       attemptQualifier(false);
@@ -2210,6 +2310,100 @@ async function main() {
 
   renderTalentSelect(talents);
   showScreen('start-screen');
+  startSoulsAnimation();
+}
+
+function startSoulsAnimation() {
+  const container = document.getElementById('souls-container');
+  if (!container) return;
+
+  const MAX_ON_SCREEN = 3;
+  let currentOnScreen = 0;
+
+  function spawnSoul() {
+    if (currentOnScreen >= MAX_ON_SCREEN) return;
+    
+    if (document.getElementById('start-screen').classList.contains('active')) {
+      const soulState = {
+        APP: Math.floor(Math.random() * 11),
+        INT: Math.floor(Math.random() * 11),
+        MNY: Math.floor(Math.random() * 11),
+        HLT: Math.floor(Math.random() * 11),
+        HAP: Math.floor(Math.random() * 11),
+        PER: Math.floor(Math.random() * 11),
+        sex: Math.floor(Math.random() * 2),
+        faceVariant: Math.floor(Math.random() * 3),
+        topVariant: Math.floor(Math.random() * 4),
+        bottomVariant: Math.floor(Math.random() * 3),
+        outfitColorId: Math.floor(Math.random() * 5),
+        storyline: ['spy', 'ceo', 'xianxia', 'abyss', 'meta', 'idol', ''][Math.floor(Math.random() * 7)],
+        major: ['CS', '商科', '理科', '文科', ''][Math.floor(Math.random() * 5)]
+      };
+
+      const canvas = createStandaloneAvatar(soulState);
+      canvas.className = 'walker-canvas';
+      
+      const wrap = document.createElement('div');
+      wrap.className = 'walker-wrap';
+      
+      const scaleWrap = document.createElement('div');
+      scaleWrap.className = 'walker-scale';
+
+      const scale = 0.4 + Math.random() * 0.6; // 0.4 to 1.0
+      const duration = 15 + Math.random() * 15; 
+      
+      // Determine random start and end edges
+      // 0: left, 1: right, 2: bottom
+      const startEdge = Math.floor(Math.random() * 3);
+      let startX, startY, endX, endY;
+
+      if (startEdge === 0) { // start left
+        startX = -20; startY = 30 + Math.random() * 60;
+        endX = 120; endY = 30 + Math.random() * 60;
+      } else if (startEdge === 1) { // start right
+        startX = 120; startY = 30 + Math.random() * 60;
+        endX = -20; endY = 30 + Math.random() * 60;
+      } else { // start bottom
+        startX = 10 + Math.random() * 80; startY = 120;
+        endX = startX > 50 ? -20 : 120; // go opposite side
+        endY = 30 + Math.random() * 50;
+      }
+
+      wrap.style.left = `${startX}%`;
+      wrap.style.top = `${startY}%`;
+      wrap.style.transition = `left ${duration}s linear, top ${duration}s linear`;
+      wrap.style.zIndex = Math.floor(startY / 10);
+      
+      // Flip horizontally if going left
+      const isGoingLeft = endX < startX;
+      scaleWrap.style.transform = `scale(${scale}) ${isGoingLeft ? 'scaleX(-1)' : ''}`;
+      canvas.style.animationDelay = `-${Math.random()}s`;
+
+      scaleWrap.appendChild(canvas);
+      wrap.appendChild(scaleWrap);
+      container.appendChild(wrap);
+      currentOnScreen++;
+
+      // Trigger animation on next frame
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          wrap.style.left = `${endX}%`;
+          wrap.style.top = `${endY}%`;
+        });
+      });
+
+      setTimeout(() => {
+        if (container.contains(wrap)) {
+          container.removeChild(wrap);
+          currentOnScreen--;
+        }
+      }, duration * 1000);
+    }
+  }
+
+  // Check frequently but spawn max 3
+  setInterval(spawnSoul, 2000);
+  spawnSoul(); // Spawn one immediately
 }
 
 main();

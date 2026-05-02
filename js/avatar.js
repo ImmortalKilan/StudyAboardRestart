@@ -197,12 +197,23 @@ function drawBgClub(g) {
 
 // ── Base Body (High Res) ──
 
-function drawBody(g, state, yOffset = 0) {
+function darkenHex(hex) {
+  if (hex.startsWith('rgba')) return 'rgba(0,0,0,0.3)';
+  if (hex === '#ffffff' || hex === '#fff') return '#cccccc';
+  return '#111111'; 
+}
+
+function drawBody(g, state, yOffset = 0, time = 0) {
   const isFemale = state.sex === 1;
   const skin = state.HLT >= 7 ? P.skinFlush : (state.HLT <= 2 ? P.skinLight : P.skinMid);
 
+  // Walk Cycle Logic (0: Idle/Pass, 1: Right forward, 2: Idle/Pass, 3: Left forward)
+  const isWalking = time > 0;
+  const walkFrame = isWalking ? Math.floor(time / 250) % 4 : 0;
+  const walkBounce = (walkFrame === 1 || walkFrame === 3) ? 2 : 0;
+
   // 统一的微弱呼吸幅度，保证头、脖子、躯干作为整体一起运动
-  const animY = Math.floor(yOffset / 2);
+  const animY = Math.floor(yOffset / 2) + walkBounce;
   const baseHeadTop = 36; 
   const headTop = baseHeadTop + animY;
   const headH = 40, headW = 36;
@@ -225,8 +236,15 @@ function drawBody(g, state, yOffset = 0) {
   fill(g, torsoX, torsoY, torsoW, torsoH, skin);
   const armW = 8;
   const armH = torsoH - 8;
-  fill(g, torsoX - armW, torsoY + 4, armW, armH + 6, skin);
-  fill(g, torsoX + torsoW, torsoY + 4, armW, armH + 6, skin);
+  
+  let leftArmX = torsoX - armW;
+  let rightArmX = torsoX + torsoW;
+  
+  if (walkFrame === 1) { leftArmX += 4; rightArmX -= 4; }
+  else if (walkFrame === 3) { leftArmX -= 4; rightArmX += 4; }
+
+  fill(g, leftArmX, torsoY + 4, armW, armH + 6, skin);
+  fill(g, rightArmX, torsoY + 4, armW, armH + 6, skin);
 
   for (let x = torsoX; x < torsoX + torsoW; x++) px(g, x, torsoY + torsoH, P.outline);
   for (let y = torsoY; y < torsoY + torsoH; y++) { px(g, torsoX - 1, y, P.outline); px(g, torsoX + torsoW, y, P.outline); }
@@ -237,6 +255,21 @@ function drawBody(g, state, yOffset = 0) {
   const legH = H - legY - 8; // 腿现在变短了
   const legW = 12;
   
+  let leftLegX = torsoX + 4;
+  let rightLegX = torsoX + torsoW - legW - 4;
+  let leftLegDark = false;
+  let rightLegDark = false;
+
+  if (walkFrame === 1) {
+    rightLegX += 6; 
+    leftLegX -= 4;
+    leftLegDark = true;
+  } else if (walkFrame === 3) {
+    leftLegX += 6;
+    rightLegX -= 4;
+    rightLegDark = true;
+  }
+
   let pColor = P.pants;
   let pType = state.bottomVariant % 3; 
   if (state.MNY >= 8 || state.storyline === 'ceo' || state.storyline === 'spy') { pColor = P.pantsNice; pType = 0; } 
@@ -244,26 +277,27 @@ function drawBody(g, state, yOffset = 0) {
   else if (pType === 1) pColor = P.shorts;
   else { pColor = P.bball; pType = 2; } 
 
-  if (pType === 1) { 
-    fill(g, torsoX + 4, legY, legW, 20, pColor);
-    fill(g, torsoX + torsoW - legW - 4, legY, legW, 20, pColor);
-    fill(g, torsoX + 4, legY + 20, legW, legH - 20, skin);
-    fill(g, torsoX + torsoW - legW - 4, legY + 20, legW, legH - 20, skin);
-  } else if (pType === 2) { 
-    fill(g, torsoX + 2, legY, legW + 4, 28, pColor);
-    fill(g, torsoX + torsoW - legW - 6, legY, legW + 4, 28, pColor);
-    fill(g, torsoX + 14, legY, 2, 28, '#fff'); 
-    fill(g, torsoX + torsoW - 6, legY, 2, 28, '#fff');
-    fill(g, torsoX + 4, legY + 28, legW, legH - 28, skin);
-    fill(g, torsoX + torsoW - legW - 4, legY + 28, legW, legH - 28, skin);
-  } else { 
-    fill(g, torsoX + 4, legY, legW, legH, pColor);
-    fill(g, torsoX + torsoW - legW - 4, legY, legW, legH, pColor);
-    if (pColor === P.jeans) {
-      fill(g, torsoX + 8, legY + 10, 4, 16, 'rgba(255,255,255,0.15)'); 
-      fill(g, torsoX + torsoW - 8, legY + 10, 4, 16, 'rgba(255,255,255,0.15)');
+  const drawLeg = (lx, isDark) => {
+    const c = isDark ? darkenHex(pColor) : pColor;
+    const s = isDark ? darkenHex(skin) : skin;
+    
+    if (pType === 1) { 
+      fill(g, lx, legY, legW, 20, c);
+      fill(g, lx, legY + 20, legW, legH - 20, s);
+    } else if (pType === 2) { 
+      fill(g, lx - 2, legY, legW + 4, 28, c);
+      fill(g, lx + 10, legY, 2, 28, isDark ? '#aaa' : '#fff'); 
+      fill(g, lx, legY + 28, legW, legH - 28, s);
+    } else { 
+      fill(g, lx, legY, legW, legH, c);
+      if (pColor === P.jeans && !isDark) {
+        fill(g, lx + 4, legY + 10, 4, 16, 'rgba(255,255,255,0.15)'); 
+      }
     }
-  }
+  };
+
+  if (leftLegDark) { drawLeg(leftLegX, true); drawLeg(rightLegX, false); }
+  else { drawLeg(rightLegX, rightLegDark); drawLeg(leftLegX, false); }
 
   // Shoes
   let sColor = P.shoes;
@@ -271,17 +305,20 @@ function drawBody(g, state, yOffset = 0) {
   else if (state.MNY >= 8 || state.storyline === 'ceo') { sColor = P.shoesNice; } 
   else if (state.topVariant % 2 === 0 || pType > 0) { sColor = P.shoesSneaker; }
 
-  fill(g, torsoX + 2, H - 8, legW + 4, 8, sColor);
-  fill(g, torsoX + torsoW - legW - 6, H - 8, legW + 4, 8, sColor);
-  if (sColor === P.shoesSneaker) {
-    fill(g, torsoX + 2, H - 4, legW + 4, 4, P.sneakerDetail);
-    fill(g, torsoX + torsoW - legW - 6, H - 4, legW + 4, 4, P.sneakerDetail);
-    fill(g, torsoX + 6, H - 8, 2, 4, '#333'); 
-    fill(g, torsoX + torsoW - legW - 2, H - 8, 2, 4, '#333');
-  } else if (sColor === P.shoesNice) {
-    fill(g, torsoX + 6, H - 8, 4, 2, '#6a3010');
-    fill(g, torsoX + torsoW - legW - 2, H - 8, 4, 2, '#6a3010');
-  }
+  const drawShoe = (lx, isDark) => {
+    const c = isDark ? darkenHex(sColor) : sColor;
+    fill(g, lx - 2, H - 8, legW + 4, 8, c);
+    
+    if (sColor === P.shoesSneaker) {
+      fill(g, lx - 2, H - 4, legW + 4, 4, isDark ? darkenHex(P.sneakerDetail) : P.sneakerDetail);
+      fill(g, lx + 2, H - 8, 2, 4, isDark ? '#111' : '#333'); 
+    } else if (sColor === P.shoesNice) {
+      fill(g, lx + 2, H - 8, 4, 2, isDark ? '#2a1005' : '#6a3010');
+    }
+  };
+
+  if (leftLegDark) { drawShoe(leftLegX, true); drawShoe(rightLegX, false); }
+  else { drawShoe(rightLegX, rightLegDark); drawShoe(leftLegX, false); }
 
   return { headTop, headH, headX, headW, torsoX, torsoY, torsoW, torsoH, armW, armH };
 }
@@ -1003,4 +1040,39 @@ export function renderAvatar(canvas, state) {
     animFrameId = null;
   }
   drawFrame(performance.now());
+}
+
+export function createStandaloneAvatar(state) {
+  const canvas = document.createElement('canvas');
+  // 4 frames width for walk cycle
+  canvas.width = W * SCALE * 4; 
+  canvas.height = H * SCALE;
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+
+  for (let frame = 0; frame < 4; frame++) {
+    const g = makeGrid();
+    // Simulate time passing: frame 0 -> 0ms, frame 1 -> 250ms, frame 2 -> 500ms, frame 3 -> 750ms
+    const mockTime = frame * 250 + 10; 
+    
+    // yOffset is 0 because walkBounce handles the bobbing in drawBody when time > 0
+    const m = drawBody(g, state, 0, mockTime);
+    drawClothes(g, state, m);
+    drawProps(g, state, m, mockTime);
+    drawFace(g, state, m);
+    drawHair(g, state, m);
+
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        const c = g[y][x];
+        if (c) {
+          ctx.fillStyle = c;
+          // Offset x by frame * W
+          ctx.fillRect((x + frame * W) * SCALE, y * SCALE, SCALE, SCALE);
+        }
+      }
+    }
+  }
+  
+  return canvas;
 }

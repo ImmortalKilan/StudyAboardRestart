@@ -161,6 +161,37 @@ body.in-game #game-screen {
   transform: translateY(0) scale(0.98);
 }
 
+/* Parallax Walking Animation */
+.souls-container {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.walker-wrap {
+  position: absolute;
+  /* transition handled inline by JS */
+}
+
+.walker-scale {
+  /* scale/flip handled inline by JS */
+  width: 192px; /* W(128) * SCALE(1.5) */
+  height: 288px; /* H(192) * SCALE(1.5) */
+  overflow: hidden;
+}
+
+.walker-canvas {
+  animation: walk-cycle 1s steps(4) infinite;
+  /* We remove walk-bob because the sprite sheet includes the bounce */
+}
+
+@keyframes walk-cycle {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-768px); } /* 192px * 4 frames */
+}
+
 .screen-head h1 {
   font-size: 28px;
   letter-spacing: 0.02em;
@@ -1412,6 +1443,106 @@ body.in-summary .app {
   color: #0f1420;
   box-shadow: 0 2px 8px rgba(245, 182, 66, 0.3);
 }
+/* In-game confirm modal */
+.modal-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 11, 18, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: modal-fade .18s ease-out;
+}
+@keyframes modal-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.modal-card {
+  width: min(440px, calc(100vw - 40px));
+  background: linear-gradient(160deg, var(--card-2), var(--card));
+  border: 1px solid rgba(201,169,120,0.35);
+  border-radius: 12px;
+  box-shadow:
+    0 18px 48px rgba(0,0,0,0.55),
+    0 0 0 1px rgba(255,255,255,0.03) inset,
+    0 0 36px rgba(201,169,120,0.10);
+  padding: 22px 22px 18px;
+  animation: modal-pop .22s cubic-bezier(.2,.9,.3,1.2);
+}
+@keyframes modal-pop {
+  from { transform: translateY(8px) scale(.96); opacity: 0; }
+  to   { transform: translateY(0) scale(1);    opacity: 1; }
+}
+.modal-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.modal-head::before {
+  content: '';
+  width: 4px;
+  height: 18px;
+  background: linear-gradient(180deg, #f5d28a, #c9a978);
+  border-radius: 2px;
+}
+.modal-title {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #f5d28a;
+}
+.modal-body {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink);
+  white-space: pre-wrap;
+  margin-bottom: 12px;
+}
+.modal-stats {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px dashed rgba(201,169,120,0.25);
+  border-radius: 8px;
+  font-size: 13px;
+}
+.modal-stats:empty {
+  display: none;
+}
+.modal-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.modal-stat-label {
+  color: var(--ink-faint);
+}
+.modal-stat-value {
+  font-weight: 600;
+  font-family: var(--mono);
+}
+.modal-stat-value.good { color: #7ed7a0; }
+.modal-stat-value.warn { color: #f5b642; }
+.modal-stat-value.bad  { color: #e06060; }
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.modal-btn {
+  min-width: 88px;
+  padding: 9px 18px;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+}
+
 .choice-btn.choice-gold {
   color: #ffd76a;
   border-color: #ffd76a;

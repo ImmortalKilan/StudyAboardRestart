@@ -8924,8 +8924,8 @@
   {
     "id": 82001,
     "event": "你凭借极高的情商和社交手腕，混进了当地最顶尖的华人富二代圈子和美国人的兄弟会。你成了这座城市留学生圈子里的“派对核心”。",
-    "include": "(AGE>=18)&(SOC>8)&(EVT?[97029])",
-    "weight": 100,
+    "include": "(AGE>=18)&(SOC>9)&(EVT?[97029])",
+    "weight": 70,
     "effect": {
       "SOC": 2,
       "HAP": 2
@@ -9016,11 +9016,11 @@
   {
     "id": 82021,
     "event": "突然死亡事件：在一次极其疯狂的拼酒游戏中，你一口气喝下了整整一瓶伏特加。你当场口吐白沫，失去了意识。救护车的警笛声是你听到的最后声音。",
-    "include": "(storyline==party)&(HLT<=-10)",
+    "include": "(storyline==party)&(HLT<=-2)",
     "weight": 2,
     "noRandom": true,
     "effect": {
-      "HLT": -4
+      "HLT": -3
     },
     "branch": [
       "?82092"
@@ -9100,9 +9100,10 @@
     "weight": 10,
     "repeatable": true,
     "choices": [
-      { "label": "站 CTO，技术优先", "effect": { "INT": 2, "SOC": -2, "HAP": -1 } },
-      { "label": "和稀泥，各打五十大板", "effect": { "SOC": 2, "PER": 1, "MNY": -1 } },
-      { "label": "拍板裁掉刺头", "effect": { "PER": 2, "SOC": -3, "MNY": 1 } }
+      { "text": "站 CTO，技术优先", "effect": { "INT": 2, "SOC": -2, "HAP": -1 }, "resultText": "CTO 红着眼眶给你递了根烟。运营总监第二天就提了离职——技术节奏稳了，但销售口少了半边。" },
+      { "text": "和稀泥，各打五十大板", "effect": { "SOC": 2, "PER": 1, "MNY": -1 }, "resultText": "你各打五十大板，会议结束后没人愿意做事。但至少没人当场摔门。" },
+      { "text": "拍板裁掉刺头", "effect": { "PER": 2, "SOC": -3, "MNY": 1 }, "resultText": "你直接让运营总监走人。会议室安静了三秒，剩下的人不敢再多嘴。" },
+      { "text": "提出技术中台方案，把两边职责拆开", "effect": { "INT": 3, "SOC": 3, "MNY": 1 }, "resultText": "你画了一张职责矩阵，所有争吵的接口都被标进了灰色地带。两边握手言和，工程效率反而提升。", "showExpr": "INT>=18", "gold": true }
     ]
   },
   {
@@ -9112,9 +9113,10 @@
     "weight": 10,
     "repeatable": true,
     "choices": [
-      { "label": "签！钱比控制权重要", "effect": { "MNY": 5, "SOC": 1, "PER": -1 } },
-      { "label": "拒绝，再找别家", "effect": { "MNY": -2, "PER": 2, "HAP": -1 } },
-      { "label": "讨价还价，要双 GP 结构", "effect": { "INT": 1, "SOC": 2, "MNY": 2 } }
+      { "text": "签！钱比控制权重要", "effect": { "MNY": 5, "SOC": 1, "PER": -1 }, "resultText": "钱到账。下个季度你才发现——招个 HR 都得发邮件请示。" },
+      { "text": "拒绝，再找别家", "effect": { "MNY": -2, "PER": 2, "HAP": -1 }, "resultText": "你硬着头皮拒了。三个月后那家 VC 投了你的竞品。" },
+      { "text": "讨价还价，要双 GP 结构", "effect": { "INT": 1, "SOC": 2, "MNY": 2 }, "resultText": "Term Sheet 改了七稿，最终条款几乎对你最优。圈内开始传你「能扛事」。" },
+      { "text": "硬刚条款：增加保护性条款 + 扩大 ESOP", "effect": { "MNY": 6, "PER": 3, "SOC": 2 }, "resultText": "你拉上律师把每一条对赌都拆解了一遍。VC 最终让步——不仅打了款，还多给了一轮 follow-on 承诺。", "showExpr": "PER>=18", "gold": true }
     ]
   },
   {
@@ -9124,9 +9126,10 @@
     "weight": 10,
     "repeatable": true,
     "choices": [
-      { "label": "烧钱补贴，正面硬刚", "effect": { "MNY": -4, "SOC": 2, "HAP": -1 } },
-      { "label": "走差异化路线", "effect": { "INT": 2, "MNY": 1 } },
-      { "label": "低调收购对方核心团队", "effect": { "MNY": -2, "SOC": 3, "PER": 1 } }
+      { "text": "烧钱补贴，正面硬刚", "effect": { "MNY": -4, "SOC": 2, "HAP": -1 }, "resultText": "你押上了半年现金流。市占率回来了，但下一季度的报表难看到没法见董事会。" },
+      { "text": "走差异化路线", "effect": { "INT": 2, "MNY": 1 }, "resultText": "你把产品砍成了一个垂直细分款。增速慢了，但毛利反而上来了。" },
+      { "text": "低调收购对方核心团队", "effect": { "MNY": -2, "SOC": 3, "PER": 1 }, "resultText": "你私下挖了对方 CTO 和两个核心。竞品三个月内就崩了。" },
+      { "text": "联合上下游，签独家供应链协议", "effect": { "MNY": 5, "SOC": 4, "PER": 2 }, "resultText": "你飞了五个城市，把上游三家供应商和下游两家渠道全签进了独家。竞品彻底断粮。", "showExpr": "SOC>=20", "gold": true }
     ]
   },
   {
@@ -9136,9 +9139,10 @@
     "weight": 10,
     "repeatable": true,
     "choices": [
-      { "label": "亲自发长文道歉", "effect": { "SOC": 2, "HAP": -2, "PER": 1 } },
-      { "label": "甩锅给中层管理", "effect": { "SOC": -3, "MNY": 0, "PER": -1 } },
-      { "label": "宣布加班补贴 + 体检", "effect": { "MNY": -2, "HAP": 1, "SOC": 3 } }
+      { "text": "亲自发长文道歉", "effect": { "SOC": 2, "HAP": -2, "PER": 1 }, "resultText": "你录了一段不带稿的视频，眼眶是真红的。舆论奇迹般转向同情。" },
+      { "text": "甩锅给中层管理", "effect": { "SOC": -3, "MNY": 0, "PER": -1 }, "resultText": "你让 HRD 顶了缸。员工内部群骂声一片，三天后 HRD 真的离职了。" },
+      { "text": "宣布加班补贴 + 体检", "effect": { "MNY": -2, "HAP": 1, "SOC": 3 }, "resultText": "你掏钱发了体检卡和加班费。媒体停了，但财务月底找你哭。" },
+      { "text": "提前找 KOL 朋友带节奏 + 公益捐款", "effect": { "SOC": 5, "PER": 2, "MNY": -1, "HAP": 1 }, "resultText": "你一个电话叫醒了三个百万粉博主。第二天热搜变成「逆境中的 ESG 担当」，捐款收据贴满官博。", "showExpr": "SOC>=18", "gold": true }
     ]
   },
   {
@@ -9148,8 +9152,8 @@
     "weight": 8,
     "repeatable": true,
     "choices": [
-      { "label": "去医院做次全面体检", "effect": { "HLT": 2, "MNY": -1, "HAP": 1 } },
-      { "label": "吞两片胃药继续干", "effect": { "HLT": -3, "PER": 1, "INT": 1 } }
+      { "text": "去医院做次全面体检", "effect": { "HLT": 2, "MNY": -1, "HAP": 1 }, "resultText": "医生说幸亏来得早，胃溃疡早期。你拿着报告悄悄改了作息。" },
+      { "text": "吞两片胃药继续干", "effect": { "HLT": -3, "PER": 1, "INT": 1 }, "resultText": "你把片剂当糖嚼。一周后又是半夜三点的胃痉挛。" }
     ]
   },
   {
@@ -9159,8 +9163,9 @@
     "weight": 7,
     "repeatable": true,
     "choices": [
-      { "label": "拒绝，继续 all in 自己的公司", "effect": { "PER": 3, "MNY": -1, "HAP": -1 } },
-      { "label": "套现一部分股权，回大厂", "effect": { "MNY": 4, "SOC": -2, "PER": -2, "HAP": 2 } }
+      { "text": "拒绝，继续 all in 自己的公司", "effect": { "PER": 3, "MNY": -1, "HAP": -1 }, "resultText": "你把 offer 截图发给联创看。他笑了一下，给你倒了杯水。" },
+      { "text": "套现一部分股权，回大厂", "effect": { "MNY": 4, "SOC": -2, "PER": -2, "HAP": 2 }, "resultText": "你卖了 30% 股权，签了竞业。第一天上班领了工牌，工位就在隔壁组。" },
+      { "text": "把猎头介绍给联创，自己继续扛", "effect": { "PER": 4, "SOC": 3, "MNY": 1, "HAP": 1 }, "resultText": "联创看完 offer 沉默良久，最后写了张感谢卡留在你桌上。从此他像变了一个人地拼。", "showExpr": "MNY>=15", "gold": true }
     ]
   },
   {
@@ -9176,18 +9181,19 @@
     }
   },
   {
-    "id": 82060,
+    "id": 82070,
     "event": "联合创始人深夜发长信：他想退出。理由是「方向不一致」，本质是想带走核心团队另起炉灶。",
     "storyline": "ceo",
     "weight": 6,
     "choices": [
-      { "label": "高价回购他的股权，好聚好散", "effect": { "MNY": -4, "HAP": -1, "SOC": 1 } },
-      { "label": "对簿公堂，启动竞业协议", "effect": { "MNY": -2, "SOC": -3, "PER": 2 } },
-      { "label": "亲自上门挽留", "effect": { "SOC": 2, "HAP": -2, "PER": 1 } }
+      { "text": "高价回购他的股权，好聚好散", "effect": { "MNY": -4, "HAP": -1, "SOC": 1 }, "resultText": "你掏空了私人账户买了他的股权。他临走拍拍你说『有事联系』，但你知道那是客套。" },
+      { "text": "对簿公堂，启动竞业协议", "effect": { "MNY": -2, "SOC": -3, "PER": 2 }, "resultText": "竞业官司打了八个月，你赢了。但裁决书下来时，你已经记不清自己起诉过他。" },
+      { "text": "亲自上门挽留", "effect": { "SOC": 2, "HAP": -2, "PER": 1 }, "resultText": "你飞到他老家，在他爸妈家厨房里坐了一晚上。他没回公司，但也没另起炉灶。" },
+      { "text": "用动态股权 + 业绩对赌让他留下", "effect": { "SOC": 3, "INT": 2, "MNY": 2, "PER": 2 }, "resultText": "你画了一张未来三年的对赌矩阵，把他的下行风险锁住、上行收益放大。他撕了辞职信，第二天九点准时到公司。", "showExpr": "INT>=18", "gold": true }
     ]
   },
   {
-    "id": 82061,
+    "id": 82071,
     "event": "公司年会，员工众筹送了你一块牌匾「最有人情味的老板」。你看着那张照片，鼻子有点酸。",
     "storyline": "ceo",
     "weight": 5,
@@ -9208,7 +9214,7 @@
       "HAP": 10
     },
     "end": true,
-    "include": "(storyline==ceo)&(MNY>=30)"
+    "include": "(storyline==ceo)&(MNY>=18)&(SOC>=23)"
   },
   {
     "id": 82095,
@@ -12094,8 +12100,8 @@
         "next": 97030
       }
     ],
-    "include": "(AGE>=18)&(AGE<=22)&(SOC>=7)",
-    "weight": 80
+    "include": "(AGE>=18)&(AGE<=22)&(SOC>=8)",
+    "weight": 40
   },
   {
     "id": 97029,

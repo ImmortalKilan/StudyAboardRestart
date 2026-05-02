@@ -10,6 +10,7 @@
   <main class="app">
 
     <section id="start-screen" class="screen active">
+      <div id="souls-container" class="souls-container"></div>
       <div class="start-center">
         <h1 class="start-title">留学重开模拟器</h1>
         <p class="start-sub">这垃圾留学，一秒也不想学了！</p>
@@ -151,6 +152,20 @@
 
       </div>
     </section>
+
+    <div id="confirm-modal" class="modal-mask" style="display:none;">
+      <div class="modal-card">
+        <div class="modal-head">
+          <span id="confirm-title" class="modal-title">确认</span>
+        </div>
+        <div id="confirm-body" class="modal-body"></div>
+        <div id="confirm-stats" class="modal-stats"></div>
+        <div class="modal-actions">
+          <button id="confirm-cancel" class="ghost modal-btn">取消</button>
+          <button id="confirm-ok" class="primary modal-btn">确定</button>
+        </div>
+      </div>
+    </div>
 
     <section id="summary-screen" class="screen">
       <div class="summary-wrap">
