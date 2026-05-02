@@ -103,9 +103,7 @@ const STORYLINE_CFG = {
       { cond: s => s.MNY <= -4, event: 81091 },
       { cond: s => (s.POK || 0) <= 0 && s.age - s.storylineStart >= 1, event: 81094 },
     ],
-    progressChecks: [
-      { cond: s => (s.POK || 0) > 20 || s.age - s.storylineStart >= 2, event: 81040 },
-    ],
+    progressChecks: [],
   },
   triton: {
     gracePeriod: 12,
@@ -407,6 +405,69 @@ function attemptQualifier(forced) {
   render();
 }
 
+// ── Poker stage clock (mirror of esports) ──────────────────────
+// Stages: 'rookie' (0-12 mo) → 'triton_window' (12-60 mo) → 'attempted'
+const POKER_ROOKIE_LEN = 12;
+const POKER_FORCE_LEN = 60;
+const POKER_DECAY_GRACE = 6;
+const POKER_DECAY_STEP = 3;
+const POKER_DECAY_AMT = 5;
+const POKER_DECAY_CAP = 50;
+const POKER_PROB_CAP = 80;
+const POKER_PROB_FLOOR = 5;
+
+function initPokerStage() {
+  state.poker_stage = 'rookie';
+  state.triton_decay = 0;
+  state.triton_attempted = false;
+  state.triton_window_start_month = null;
+}
+
+function updatePokerStage() {
+  if (state.storyline !== 'poker') return;
+  if (state.poker_stage === undefined || state.poker_stage === null) initPokerStage();
+  if (state.triton_attempted) return;
+  const monthsIn = state.monthTotal - (state.storylineStartMonth || 0);
+  if (state.poker_stage === 'rookie' && monthsIn >= POKER_ROOKIE_LEN) {
+    state.poker_stage = 'triton_window';
+    state.triton_window_start_month = state.monthTotal;
+  }
+  if (state.poker_stage === 'triton_window') {
+    const inWindow = state.monthTotal - (state.triton_window_start_month || state.monthTotal);
+    const decaySteps = Math.max(0, Math.floor((inWindow - POKER_DECAY_GRACE) / POKER_DECAY_STEP));
+    state.triton_decay = Math.min(POKER_DECAY_CAP, decaySteps * POKER_DECAY_AMT);
+    if (monthsIn >= POKER_FORCE_LEN) attemptTriton(true);
+  }
+}
+
+function computeTritonProb(s) {
+  if (s.storyline !== 'poker') return 0;
+  let p = -10;
+  p += (s.POK || 0) * 1.5;
+  p += (s.INT || 0) * 0.8;
+  p += (s.MNY || 0) * 0.6;
+  p -= (s.triton_decay || 0);
+  return Math.max(POKER_PROB_FLOOR, Math.min(POKER_PROB_CAP, Math.round(p)));
+}
+
+function attemptTriton(forced) {
+  if (state.triton_attempted) return;
+  state.triton_attempted = true;
+  state.poker_stage = 'attempted';
+  const prob = computeTritonProb(state);
+  const success = Math.random() * 100 < prob;
+  state.firedEvents.add(81040);
+  const evId = success ? 81041 : 81042;
+  const ev = state.eventsMap.get(evId);
+  if (forced) {
+    pushLog(success
+      ? '高客锦标赛打到决胜桌——你撕下了职业赛圈的入场券。'
+      : '资格赛泡沫期被河杀淘汰，顶级牌桌的门在你面前关上了。');
+  }
+  if (ev) applyEvent(ev);
+  render();
+}
+
 const STORYLINE_NAMES = {
   spy: '国际特工',
   abyss: '深渊科技',
@@ -529,7 +590,7 @@ function gachaDraw(talents, n) {
   // Rarity roll thresholds: grade 0 (white) 80%, 1 (blue) 15%, 2 (purple) 4%, 3 (orange) 1%
   function rollGrade() {
     const r = Math.random() * 100;
-    if (r < 5) return 3;   // orange
+    if (r < 2) return 3;   // orange
     if (r < 10) return 2;   // purple
     if (r < 30) return 1;  // blue
     return 0;               // white
@@ -776,6 +837,7 @@ function applyEvent(ev) {
       if (ev.set.storyline === 'idol') initIdolStage();
       if (ev.set.storyline === 'party') initPartyStage();
       if (ev.set.storyline === 'esports') initEsportsStage();
+      if (ev.set.storyline === 'poker') initPokerStage();
     }
     if (ev.set.profession && GRAD_SCHOOL_PHASES.has(ev.set.profession)) {
       scheduleGraduateCompletion();
@@ -995,6 +1057,7 @@ function advanceMonth() {
     updateIdolStage();
     updatePartyStage();
     updateEsportsStage();
+    updatePokerStage();
     if (state.phase === 'ended' || state.pendingChoice) { render(); return; }
     // === Storyline mode: skip normal events, only draw storyline events ===
     const cfg = STORYLINE_CFG[state.storyline];
@@ -1772,6 +1835,46 @@ function render() {
       }
     }
 
+    const pokerBox = $('poker-box');
+    if (pokerBox) {
+      if (state.storyline === 'poker' && !state.triton_attempted && state.phase !== 'ended') {
+        pokerBox.style.display = '';
+        const stageEl = $('poker-stage');
+        const probEl = $('triton-prob');
+        const warnEl = $('triton-decay-warn');
+        const btn = $('btn-try-triton');
+        const monthsIn = state.monthTotal - (state.storylineStartMonth || 0);
+        if (state.poker_stage === 'rookie' || state.poker_stage == null) {
+          const remaining = Math.max(0, POKER_ROOKIE_LEN - monthsIn);
+          stageEl.textContent = `学徒期 · 还剩 ${remaining} 个月`;
+          probEl.textContent = '--';
+          warnEl.textContent = '满 12 个月后开放参赛窗口';
+          btn.disabled = true;
+        } else if (state.poker_stage === 'triton_window') {
+          const prob = computeTritonProb(state);
+          const inWin = state.monthTotal - (state.triton_window_start_month || state.monthTotal);
+          const monthsToForce = Math.max(0, POKER_FORCE_LEN - monthsIn);
+          stageEl.textContent = `参赛窗口 · 强制结算还剩 ${monthsToForce} 个月`;
+          probEl.textContent = prob + '%';
+          probEl.style.color = prob >= 50 ? '#7ed7a0' : prob >= 25 ? '#f5b642' : '#e06060';
+          const inGrace = inWin < POKER_DECAY_GRACE;
+          const monthsToNextDecay = inGrace
+            ? POKER_DECAY_GRACE - inWin
+            : (POKER_DECAY_STEP - ((inWin - POKER_DECAY_GRACE) % POKER_DECAY_STEP)) || POKER_DECAY_STEP;
+          if ((state.triton_decay || 0) >= POKER_DECAY_CAP) {
+            warnEl.textContent = `衰减已封顶（-${POKER_DECAY_CAP}%），再拖也不会更低`;
+          } else if (inGrace) {
+            warnEl.textContent = `${monthsToNextDecay} 个月后开始衰减（每 3 个月 -5%）`;
+          } else {
+            warnEl.textContent = `已衰减 ${state.triton_decay || 0}% · ${monthsToNextDecay} 个月后再 -5%`;
+          }
+          btn.disabled = false;
+        }
+      } else {
+        pokerBox.style.display = 'none';
+      }
+    }
+
     $('time-display').textContent = `${state.age}岁${state.monthOfYear}个月`;
 
     const logEl = $('event-log');
@@ -2014,10 +2117,114 @@ function dismissEndOverlay() {
   overlay.classList.remove('active', 'show-card');
 }
 
+function calculateScore() {
+  let score = 0;
+  const peaks = state.statPeaks || {};
+  
+  // Base stats
+  score += (peaks.INT || 0) * 100;
+  score += (peaks.MNY || 0) * 100;
+  score += (peaks.APP || 0) * 100;
+  score += (peaks.SOC || 0) * 100;
+  score += (peaks.HLT || 0) * 100;
+  score += (peaks.PER || 0) * 120; // PER is harder
+  score += (peaks.HAP || 0) * 80;
+
+  // Breakthrough bonuses
+  for (const k of ['INT', 'MNY', 'APP', 'SOC', 'HLT', 'PER', 'HAP']) {
+    if ((peaks[k] || 0) >= 10) score += 300;
+  }
+
+  // Special Stats
+  if (peaks.POP) score += peaks.POP * 50;
+  if (peaks.POK) score += peaks.POK * 500;
+  if (peaks.MMR) score += peaks.MMR * 1;
+  if (peaks.cul) score += peaks.cul * 20;
+
+  // Education bonus
+  if (state.school === 'T20') score += 1000;
+  else if (state.school === 'T50') score += 500;
+  else if (state.school === '遣返' || state.school === '退学') score -= 1000;
+
+  // Storyline / Hidden Paths
+  if (state.storylinesVisited && state.storylinesVisited.size > 0) {
+    score += state.storylinesVisited.size * 2000;
+  }
+
+  // Romance / Relationship modifier
+  if (state.relationship) {
+    const rel = state.relationship;
+    if (rel === '已婚' || rel === '二婚') score += 1500; // 人生圆满
+    else if (rel === '恋爱' || rel === '校园恋' || rel === '同居') score += 800;
+    else if (rel === '傍大款') score += 500; 
+    else if (rel === '海王') score += 2000; // 海王高分
+    else if (rel === '离异') score -= 500;
+    else if (rel === '地下恋' || rel === '快餐恋' || rel === '异地恋') score += 300;
+  }
+  // 奖励丰富的情感经历
+  if (state.romanceHistory && state.romanceHistory.length > 0) {
+    score += state.romanceHistory.length * 200; // 每一段过去的感情加200阅历分
+  }
+
+  // Emotional modifier
+  const finalHap = state.HAP || 5;
+  const finalHlt = state.HLT || 5;
+  if (finalHap < 3) score = Math.floor(score * 0.9);
+  if (finalHlt < 2) score = Math.floor(score * 0.9);
+  if (finalHap >= 8 && finalHlt >= 8) score = Math.floor(score * 1.1);
+
+  return Math.max(0, score);
+}
+
+function animateScore(targetScore) {
+  const scoreEl = $('summary-score-val');
+  const rankEl = $('summary-score-rank');
+  rankEl.className = 'score-rank'; // reset
+  rankEl.textContent = '';
+  scoreEl.textContent = '0';
+
+  let current = 0;
+  const duration = 3000; // ms
+  const start = performance.now();
+
+  function update(time) {
+    const elapsed = time - start;
+    const progress = Math.min(elapsed / duration, 1);
+    // easeOutExpo
+    const ease = 1 - Math.pow(1 - progress, 4);
+    current = Math.floor(ease * targetScore);
+    scoreEl.textContent = current;
+
+    if (progress < 1) {
+      requestAnimationFrame(update);
+    } else {
+      scoreEl.textContent = targetScore;
+      
+      // Determine Rank
+      let rankText = 'F级 你是人吗';
+      let rankClass = 'rank-C';
+      if (targetScore >= 35000) { rankText = 'S+ 璀璨传奇'; rankClass = 'rank-S'; }
+      else if (targetScore >= 30000) { rankText = 'S级 人中龙凤'; rankClass = 'rank-S'; }
+      else if (targetScore >= 25000) { rankText = 'A级 高质量人类'; rankClass = 'rank-A'; }
+      else if (targetScore >= 20000) { rankText = 'B级 人上人'; rankClass = 'rank-B'; }
+      else if (targetScore >= 15000) { rankText = 'C级 勉强算人'; rankClass = 'rank-B'; }
+
+
+      rankEl.textContent = rankText;
+      rankEl.classList.add(rankClass, 'stamp');
+    }
+  }
+  requestAnimationFrame(update);
+}
+
 function renderSummary() {
   const ageY = state.age;
   const ageM = state.monthOfYear;
   $('summary-subtitle').textContent = `走过 ${ageY} 岁 ${ageM} 个月`;
+
+  // Score Animation
+  const finalScore = calculateScore();
+  animateScore(finalScore);
 
   // Hero avatar — render immediately, then redundantly to catch layout edge cases
   const sumCanvas = $('summary-avatar');
@@ -2042,7 +2249,7 @@ function renderSummary() {
   // 最终结局：优先 logType=ending（来自 ev.end=true），否则回退到 hidden/special/「结局」
   const reversed = [...state.log].reverse();
   const endingLog = reversed.find(e => e.logType === 'ending')
-    || reversed.find(e => (e.text && /结局/.test(e.text)) || e.logType === 'hidden' || e.logType === 'special');
+    || reversed.find(e => e.logType === 'hidden' || e.logType === 'special');
   const endingEl = $('summary-ending');
   if (endingLog) {
     endingEl.innerHTML = `<div class="ending-tag">${endingLog.tag}</div><div class="ending-text">${endingLog.text}</div>`;
@@ -2279,6 +2486,29 @@ async function main() {
     });
   }
 
+  const btnTryTriton = $('btn-try-triton');
+  if (btnTryTriton) {
+    btnTryTriton.addEventListener('click', async () => {
+      if (state.phase === 'ended') return;
+      if (state.storyline !== 'poker') return;
+      if (state.poker_stage !== 'triton_window') return;
+      if (state.triton_attempted) return;
+      const prob = computeTritonProb(state);
+      const ok = await showConfirm({
+        title: '尝试参赛',
+        body: '高客锦标赛的资格赛，押上全部筹码冲职业圈。',
+        stats: [
+          { label: '晋级率', value: prob + '%', tone: probTone(prob) },
+          { label: '成功', value: '传奇扑克 Triton' },
+          { label: '失败', value: '地头蛇', tone: 'warn' },
+        ],
+      });
+      if (!ok) return;
+      stopAuto();
+      attemptTriton(false);
+    });
+  }
+
   $('btn-summary').addEventListener('click', () => {
     dismissEndOverlay();
     showScreen('summary-screen');
@@ -2302,6 +2532,48 @@ async function main() {
 
   $('btn-summary-restart').addEventListener('click', () => {
     location.reload();
+  });
+
+  $('btn-summary-share').addEventListener('click', async () => {
+    const actions = document.querySelector('.summary-actions');
+    const oldDisplay = actions.style.display;
+    actions.style.display = 'none';
+
+    const wrap = document.querySelector('.summary-wrap');
+    const watermark = document.createElement('div');
+    watermark.innerHTML = '<div style="text-align:center; margin-top:24px; color:#888; font-size:14px; letter-spacing: 2px;">—— 留学重开模拟器 ——<br/><span style="font-size:12px;">测一测你的留学生涯能拿几分？</span></div>';
+    wrap.appendChild(watermark);
+
+    try {
+      // Small delay to ensure any CSS animations (like rank stamping) are finished or at least renderable
+      await new Promise(r => setTimeout(r, 100));
+      
+      const canvas = await html2canvas(wrap, {
+        backgroundColor: '#12161d', 
+        scale: window.devicePixelRatio || 2, 
+        useCORS: true
+      });
+      
+      const imgWrap = $('poster-img-wrap');
+      imgWrap.innerHTML = '';
+      const img = document.createElement('img');
+      img.src = canvas.toDataURL('image/png');
+      img.style.width = '100%';
+      img.style.display = 'block';
+      imgWrap.appendChild(img);
+      
+      $('poster-modal').style.display = 'flex';
+    } catch (e) {
+      console.error(e);
+      alert('生成图片失败，请稍后再试。');
+    } finally {
+      actions.style.display = oldDisplay;
+      wrap.removeChild(watermark);
+    }
+  });
+
+  $('btn-close-poster').addEventListener('click', () => {
+    $('poster-modal').style.display = 'none';
   });
 
   $('btn-start').addEventListener('click', () => {
