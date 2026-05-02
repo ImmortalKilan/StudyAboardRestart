@@ -2255,12 +2255,12 @@ function animateScore(targetScore) {
       
       // Determine Rank
       let rankText = 'F级 你是人吗';
-      let rankClass = 'rank-C';
-      if (targetScore >= 35000) { rankText = 'S+ 璀璨传奇'; rankClass = 'rank-S'; }
-      else if (targetScore >= 30000) { rankText = 'S级 人中龙凤'; rankClass = 'rank-S'; }
-      else if (targetScore >= 25000) { rankText = 'A级 高质量人类'; rankClass = 'rank-A'; }
-      else if (targetScore >= 20000) { rankText = 'B级 人上人'; rankClass = 'rank-B'; }
-      else if (targetScore >= 15000) { rankText = 'C级 勉强算人'; rankClass = 'rank-B'; }
+      let rankClass = 'rank-F';
+      if (targetScore >= 30000) { rankText = 'S+ 璀璨传奇'; rankClass = 'rank-S'; }
+      else if (targetScore >= 25000) { rankText = 'S级 人中龙凤'; rankClass = 'rank-S'; }
+      else if (targetScore >= 20000) { rankText = 'A级 高质量人类'; rankClass = 'rank-A'; }
+      else if (targetScore >= 15000) { rankText = 'B级 人上人'; rankClass = 'rank-B'; }
+      else if (targetScore >= 9000) { rankText = 'C级 勉强算人'; rankClass = 'rank-C'; }
 
 
       rankEl.textContent = rankText;

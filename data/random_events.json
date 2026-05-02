@@ -9835,7 +9835,7 @@
   {
     "id": 83091,
     "event": "悲惨结局：由于长期透支身体，你的手腕在世界赛高强度对线时彻底罢工，连鼠标都握不住了。队伍被迫换上替补，最终遗憾落败。你带着永久性的神经损伤黯然退役，成了粉丝口中永远的“意难平”。",
-    "include": "(storyline==worlds)&(HLT<=3)",
+    "include": "(storyline==worlds)&(HLT<=-3)",
     "noRandom": true,
     "effect": {
       "HAP": -15,

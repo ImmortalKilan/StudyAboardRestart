@@ -119,18 +119,21 @@ function _showToast(def) {
 // ── Trophy badge count ────────────────────────────────────────────────────
 function _updateBadge() {
   const badge = document.getElementById('ach-trophy-badge');
-  if (!badge) return;
-  badge.textContent = `${_unlocked.size}/${ACHIEVEMENTS.length}`;
+  if (badge) badge.textContent = `${_unlocked.size}/${ACHIEVEMENTS.length}`;
+  const startBadge = document.getElementById('ach-trophy-start-badge');
+  if (startBadge) startBadge.textContent = `${_unlocked.size}/${ACHIEVEMENTS.length}`;
 }
 
 // ── Achievement wall ──────────────────────────────────────────────────────
 function _setupWallHandlers() {
   const btn      = document.getElementById('ach-trophy-btn');
+  const startBtn = document.getElementById('ach-trophy-start-btn');
   const wall     = document.getElementById('ach-wall');
   const closeBtn = document.getElementById('ach-wall-close');
-  if (!btn || !wall) return;
+  if (!wall) return;
 
-  btn.addEventListener('click', openAchievementWall);
+  if (btn) btn.addEventListener('click', openAchievementWall);
+  if (startBtn) startBtn.addEventListener('click', openAchievementWall);
   if (closeBtn) closeBtn.addEventListener('click', closeAchievementWall);
 
   // Click on backdrop (not on the panel) closes wall

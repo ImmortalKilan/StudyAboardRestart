@@ -766,19 +766,22 @@ function drawClothes(g, state, m) {
   const startX = m.torsoX - m.armW;
   const startY = m.torsoY;
   
+  let currentSleeveColor = cMap['#'];
   if (isShortSleeve) {
     fill(g, startX, startY, m.armW, 16, cMap['#']);
     fill(g, m.torsoX + m.torsoW, startY, m.armW, 16, cMap['#']);
   } else {
-    let sleeveColor = cMap['S'] || cMap['K'] || cMap['D'];
-    fill(g, startX, startY, m.armW, m.torsoH, sleeveColor);
-    fill(g, m.torsoX + m.torsoW, startY, m.armW, m.torsoH, sleeveColor);
+    currentSleeveColor = cMap['S'] || cMap['K'] || cMap['D'];
+    fill(g, startX, startY, m.armW, m.torsoH, currentSleeveColor);
+    fill(g, m.torsoX + m.torsoW, startY, m.armW, m.torsoH, currentSleeveColor);
     fill(g, startX, startY + m.torsoH - 4, m.armW, 4, cMap['D'] || '#111');
     fill(g, m.torsoX + m.torsoW, startY + m.torsoH - 4, m.armW, 4, cMap['D'] || '#111');
   }
 
   const cx = m.torsoX + Math.floor((m.torsoW - 56) / 2);
   drawSprite(g, cx, startY, pat, cMap);
+
+  return currentSleeveColor;
 }
 
 // ── Hair ──
@@ -909,39 +912,52 @@ function drawBubble(ctx, state) {
 
 // ── Props & Items ──
 
-function drawProps(g, state, m, time) {
+function drawProps(g, state, m, time, sleeveColor) {
   const major = state.major;
 
   if (major === 'CS' || state.storyline === 'abyss' || state.storyline === 'meta') {
-    // 捧着一台亮着代码的笔记本电脑
-    const lapX = m.torsoX + Math.floor(m.torsoW / 2) - 20; 
-    const lapY = m.torsoY + 28; 
+    // 笔记本电脑位置
+    const lapX = m.torsoX + Math.floor(m.torsoW / 2) - 22; 
+    const lapY = m.torsoY + 26; 
+
+    // 1. 先画大臂（使用袖子颜色，产生真实的连接感）
+    const upperArmH = 14;
+    fill(g, m.torsoX - m.armW, m.torsoY + 4, m.armW, upperArmH, sleeveColor);
+    fill(g, m.torsoX + m.torsoW, m.torsoY + 4, m.armW, upperArmH, sleeveColor);
     
-    // 电脑底部
-    fill(g, lapX, lapY + 16, 40, 6, '#1a1a1a'); 
-    fill(g, lapX - 2, lapY + 18, 44, 4, '#333'); 
+    // 2. 画笔记本电脑
+    // 笔记本边框高亮（让深色电脑在黑色衣服前可见）
+    fill(g, lapX - 1, lapY - 1, 46, 22, '#444'); 
+    // 电脑主体
+    fill(g, lapX, lapY, 44, 20, '#1a1a1a'); 
+    // 亮着的屏幕
+    fill(g, lapX + 4, lapY + 2, 36, 14, '#111');
+    fill(g, lapX + 6, lapY + 4, 32, 10, '#1a2030'); 
     
-    // 屏幕和发光
-    fill(g, lapX + 4, lapY, 32, 16, '#111');
-    fill(g, lapX + 6, lapY + 2, 28, 12, '#1a2030'); // 屏幕底色
-    
-    // 动态滚动的代码
+    // 动态滚动的代码（更亮）
     const codeLineOffset = Math.floor(time / 400) % 4;
-    if (codeLineOffset !== 0) fill(g, lapX + 8, lapY + 4, 12, 1, '#4ade80');
-    if (codeLineOffset !== 1) fill(g, lapX + 8, lapY + 6, 20, 1, '#4ade80');
-    if (codeLineOffset !== 2) fill(g, lapX + 10, lapY + 8, 14, 1, '#facc15');
-    if (codeLineOffset !== 3) fill(g, lapX + 8, lapY + 10, 8, 1, '#38bdf8');
-    
-    // 左右小臂弯曲过来捧着电脑 (皮肤颜色)
-    // 左臂
-    fill(g, m.torsoX - m.armW, lapY + 10, 16, 6, P.skinMid);
-    // 左手
-    fill(g, lapX + 2, lapY + 14, 8, 6, P.skinMid);
-    
-    // 右臂
-    fill(g, m.torsoX + m.torsoW - 16 + m.armW, lapY + 10, 16, 6, P.skinMid);
-    // 右手
-    fill(g, lapX + 30, lapY + 14, 8, 6, P.skinMid);
+    if (codeLineOffset !== 0) fill(g, lapX + 8, lapY + 6, 12, 1, '#4ade80');
+    if (codeLineOffset !== 1) fill(g, lapX + 8, lapY + 8, 24, 1, '#4ade80');
+    if (codeLineOffset !== 2) fill(g, lapX + 12, lapY + 10, 16, 1, '#facc15');
+    if (codeLineOffset !== 3) fill(g, lapX + 8, lapY + 12, 8, 1, '#38bdf8');
+
+    // 笔记本转轴细节
+    fill(g, lapX, lapY + 17, 44, 3, '#000');
+
+    // 3. 画小臂和手部（肤色，覆盖在笔记本最上方）
+    // 从袖口处延伸出来
+    fill(g, m.torsoX - m.armW, m.torsoY + 4 + upperArmH, m.armW, 6, P.skinMid);
+    fill(g, m.torsoX + m.torsoW, m.torsoY + 4 + upperArmH, m.armW, 6, P.skinMid);
+    // 斜着指向笔记本
+    fill(g, m.torsoX - m.armW + 4, m.torsoY + 4 + upperArmH + 4, 12, 6, P.skinMid);
+    fill(g, m.torsoX + m.torsoW - 12, m.torsoY + 4 + upperArmH + 4, 12, 6, P.skinMid);
+    // 扣住笔记本的手指
+    fill(g, lapX + 2, lapY + 14, 10, 8, P.skinMid);
+    fill(g, lapX + 32, lapY + 14, 10, 8, P.skinMid);
+    // 指尖细节
+    px(g, lapX + 4, lapY + 16, P.outline);
+    px(g, lapX + 38, lapY + 16, P.outline);
+
   } else if (major === '商科' || state.storyline === 'ceo') {
     // 一手拿最新款手机看股市，一手拿星巴克
     const phoneX = m.torsoX - m.armW - 4;
@@ -1007,8 +1023,8 @@ function drawFrame(time) {
 
   drawBackground(g, lastState);
   const m = drawBody(g, lastState, yOffset);
-  drawClothes(g, lastState, m);
-  drawProps(g, lastState, m, time);
+  const sleeveColor = drawClothes(g, lastState, m);
+  drawProps(g, lastState, m, time, sleeveColor);
   drawFace(g, lastState, m);
   drawHair(g, lastState, m);
 
@@ -1057,8 +1073,8 @@ export function createStandaloneAvatar(state) {
     
     // yOffset is 0 because walkBounce handles the bobbing in drawBody when time > 0
     const m = drawBody(g, state, 0, mockTime);
-    drawClothes(g, state, m);
-    drawProps(g, state, m, mockTime);
+    const sleeveColor = drawClothes(g, state, m);
+    drawProps(g, state, m, mockTime, sleeveColor);
     drawFace(g, state, m);
     drawHair(g, state, m);
 

@@ -12,6 +12,9 @@
 
     <section id="start-screen" class="screen active">
       <div id="souls-container" class="souls-container"></div>
+      <button id="ach-trophy-start-btn" class="ghost" title="成就墙" style="position: absolute; top: 20px; right: 24px; z-index: 100; display:flex; align-items:center; gap:6px;">
+        🏆 <span id="ach-trophy-start-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/31</span>
+      </button>
       <div class="start-center">
         <h1 class="start-title">留学重开模拟器</h1>
         <p class="start-sub">这垃圾留学，一秒也不想学了！</p>
@@ -106,6 +109,9 @@
               <button id="btn-auto-2x" class="ghost">自动播放 X2</button>
               <button id="btn-summary" class="ghost" style="display:none;">查看总结</button>
               <button id="btn-restart" class="ghost">重开</button>
+              <button id="ach-trophy-btn" class="ghost" title="成就墙" style="display:flex; align-items:center; gap:6px;">
+                🏆 <span id="ach-trophy-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/31</span>
+              </button>
             </div>
           </div>
 
@@ -272,12 +278,6 @@
   </div>
 
   <!-- ── Achievement System ─────────────────────────────────────── -->
-  <!-- Trophy button: always visible, top-right corner -->
-  <button id="ach-trophy-btn" class="ach-trophy-btn" title="成就墙">
-    🏆
-    <span id="ach-trophy-badge" class="ach-trophy-badge">0/31</span>
-  </button>
-
   <!-- Achievement wall overlay -->
   <div id="ach-wall" class="ach-wall-overlay" aria-modal="true" role="dialog" aria-label="成就墙">
     <div class="ach-wall-panel">
