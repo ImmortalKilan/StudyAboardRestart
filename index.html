@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>留学重开模拟器</title>
   <link rel="stylesheet" href="styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -270,6 +270,28 @@
       <div style="color:#aaa; margin-top:16px; font-size:14px; letter-spacing:1px;">长按图片或右键保存分享</div>
     </div>
   </div>
+
+  <!-- ── Achievement System ─────────────────────────────────────── -->
+  <!-- Trophy button: always visible, top-right corner -->
+  <button id="ach-trophy-btn" class="ach-trophy-btn" title="成就墙">
+    🏆
+    <span id="ach-trophy-badge" class="ach-trophy-badge">0/31</span>
+  </button>
+
+  <!-- Achievement wall overlay -->
+  <div id="ach-wall" class="ach-wall-overlay" aria-modal="true" role="dialog" aria-label="成就墙">
+    <div class="ach-wall-panel">
+      <div class="ach-wall-head">
+        <div class="ach-wall-title">🏆&nbsp;&nbsp;成就</div>
+        <span id="ach-wall-count" class="ach-wall-count">0/31</span>
+        <button id="ach-wall-close" class="ach-wall-close" aria-label="关闭成就墙">✕</button>
+      </div>
+      <div id="ach-wall-grid" class="ach-wall-grid"></div>
+    </div>
+  </div>
+
+  <!-- Toast container: bottom-right, stacks upward -->
+  <div id="ach-toast-container" class="ach-toast-container" aria-live="polite"></div>
 
   <script type="module" src="js/game.js"></script>
 </body>

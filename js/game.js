@@ -1,6 +1,7 @@
 import { evalCondition, pickBranch, pickWeightedBranch } from './dsl.js';
 import { renderAvatar, createStandaloneAvatar } from './avatar.js';
 import { playStorylineIntro } from './cinematic.js';
+import { initAchievements, unlockAchievement } from './achievements.js';
 
 const STAT_KEYS = ['SOC', 'INT', 'MNY', 'PER', 'HLT', 'APP'];
 const STAT_LABELS = {
@@ -653,6 +654,11 @@ function clampStats() {
     if (state.statPeaks[k] === undefined || v > state.statPeaks[k]) state.statPeaks[k] = v;
   }
   if (state.storyline) state.storylinesVisited.add(state.storyline);
+
+  // Achievement: any base stat hits 10
+  if (STAT_KEYS.some(k => (state[k] || 0) >= 10)) unlockAchievement('stat_max');
+  // Achievement: any base stat goes negative
+  if (STAT_KEYS.some(k => (state[k] || 0) < 0)) unlockAchievement('stat_negative');
 }
 
 function syncProfessionByAge() {
@@ -848,9 +854,8 @@ function applyEvent(ev) {
   let evLogType = ev.logType
     || (ev.romance ? 'romance' : undefined)
     || (ev.include && (/MAJOR==/.test(ev.include) || /profession==/.test(ev.include)) ? 'major' : undefined);
-  // ev.end without a more specific category: let pushLog apply storyline color when in storyline,
-  // otherwise stamp 'ending' as final fallback
-  if (!evLogType && ev.end && !state.storyline) evLogType = 'ending';
+  // Any event with ev.end always gets the ending style (overrides storyline color)
+  if (ev.end) evLogType = 'ending';
   // Non-terminal storyline exit: storyline cleared but life continues
   const isStorylineExit = ev.set && ev.set.storyline === ''
     && prevStorylineForCinematic && !ev.end;
@@ -915,6 +920,53 @@ function applyEvent(ev) {
       const next = state.eventsMap.get(nextId);
       if (next) state.pendingEvent = next;
     }
+  }
+
+  // ── Achievement triggers ──────────────────────────────────────────────────
+  _checkEventAchievements(ev);
+}
+
+function _checkEventAchievements(ev) {
+  // Romance events
+  if (ev.romance) unlockAchievement('romance_first');
+
+  if (ev.set) {
+    const rel = ev.set.relationship;
+    if (rel === '已婚' || rel === '二婚') unlockAchievement('romance_married');
+    if (rel === '海王' || rel === '海后') unlockAchievement('romance_sea_king');
+    if (rel === '离异') unlockAchievement('romance_divorced');
+
+    // Storyline entry
+    const sl = ev.set.storyline;
+    if (sl) {
+      const SL_MAP = {
+        spy: 'sl_spy', xianxia: 'sl_xianxia', abyss: 'sl_abyss', meta: 'sl_meta',
+        idol: 'sl_idol', superstar: 'sl_superstar', streamer: 'sl_streamer',
+        party: 'sl_party', wasted: 'sl_wasted', poker: 'sl_poker',
+        esports: 'sl_esports', worlds: 'sl_worlds',
+      };
+      if (SL_MAP[sl]) unlockAchievement(SL_MAP[sl]);
+    }
+
+    // School milestones
+    const school = ev.set.school;
+    if (school === 'T20') unlockAchievement('school_t20');
+    if (school === '遣返' || school === '退学') unlockAchievement('school_expelled');
+  }
+
+  // Specific event IDs for outcomes
+  const id = ev.id;
+  if (id === 80041) unlockAchievement('end_idol');          // idol debut success
+  if (id === 80042) unlockAchievement('debut_fail');        // idol debut failure
+  if (id === 50099) unlockAchievement('end_spy');           // spy mission success
+  if (id === 60040) unlockAchievement('end_abyss');         // abyss storyline success
+  if (id === 70040) unlockAchievement('end_meta');          // meta storyline success
+  if (id === 82041 || id === 82090) unlockAchievement('end_ceo');   // CEO success
+  if (id === 83090 || id === 83094) unlockAchievement('end_worlds'); // worlds win
+
+  // Xianxia immortal ending: any game-end while in xianxia with high cul
+  if (ev.end && state.storyline === 'xianxia' && (state.cul || 0) >= 1000) {
+    unlockAchievement('end_xianxia');
   }
 }
 
@@ -1118,10 +1170,12 @@ function advanceMonth() {
     if (state.HLT <= -5) {
       pushLog('「结局：油尽灯枯」长期的忽视和透支终于压垮了你的身体。你在一个深夜倒下，再也没有醒来。人生就此画上句号。');
       state.phase = 'ended';
+      unlockAchievement('end_health');
     }
     if (state.age >= 60) {
       pushLog('你退休了。回首这一生，百感交集。');
       state.phase = 'ended';
+      unlockAchievement('end_retire');
     }
   }
 
@@ -1983,9 +2037,7 @@ function updateAutoButtons() {
   if (sb) sb.style.display = ended ? '' : 'none';
   b1.disabled = ended;
   b2.disabled = ended;
-  if (ended && !_endCinematicShown && document.body.classList.contains('in-game')) {
-    setTimeout(showEndCinematic, 600);
-  }
+  // End cinematic is now triggered by player click, not auto-shown
 }
 
 function stopAuto() {
@@ -2045,6 +2097,7 @@ function initGame() {
   } else {
     pushLog('你又重生了，重生在15岁的冬天。');
   }
+  unlockAchievement('first_play');
   const plan = state.yearlyPlan.get(15);
   if (plan && plan.has(1)) {
     const ev = state.eventsMap.get(plan.get(1));
@@ -2360,6 +2413,7 @@ function showScreen(id) {
 }
 
 async function main() {
+  initAchievements();
   const talents = await loadData();
 
   $('sex-male').addEventListener('click', () => { state.sex = 0; $('sex-male').classList.add('active'); $('sex-female').classList.remove('active'); });
@@ -2410,8 +2464,11 @@ async function main() {
   });
 
   document.querySelector('.right-panel').addEventListener('click', (e) => {
-    if (state.phase === 'ended') return;
     if (e.target.closest('button')) return;
+    if (state.phase === 'ended') {
+      if (!_endCinematicShown) showEndCinematic();
+      return;
+    }
     advanceMonth();
   });
 

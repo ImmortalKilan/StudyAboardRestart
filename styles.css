@@ -18,7 +18,7 @@
   --sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
 }
 
-* { box-sizing: border-box; }
+* { box-sizing: border-box; user-select: none; touch-action: manipulation; }
 
 html, body {
   margin: 0;
@@ -636,9 +636,40 @@ body.in-game .left-panel {
 .log-entry.log-major .log-text {
   color: #7ab8e0 !important;
 }
+.log-entry.log-ending {
+  position: relative;
+  border: 1px solid rgba(224, 100, 80, 0.55);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin: 8px 0;
+  background: linear-gradient(90deg, rgba(224, 80, 60, 0.10), rgba(224, 80, 60, 0.03));
+  box-shadow: 0 0 0 1px rgba(224, 100, 80, 0.18), 0 0 14px rgba(224, 80, 60, 0.15);
+  overflow: hidden;
+  animation: ending-frame-in .6s ease-out;
+}
+.log-entry.log-ending::before {
+  content: '结局';
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: rgba(224, 100, 80, 0.6);
+  pointer-events: none;
+}
+.log-entry.log-ending .log-tag {
+  color: #e06050;
+}
 .log-entry.log-ending .log-text {
-  color: #c0c0c0 !important;
-  font-style: italic;
+  color: #f0a898 !important;
+  font-weight: 600;
+}
+@keyframes ending-frame-in {
+  0%   { border-color: rgba(224,100,80,0); box-shadow: none; transform: scale(0.99); }
+  40%  { border-color: rgba(224,100,80,0.8); box-shadow: 0 0 18px rgba(224,80,60,0.4); }
+  100% { border-color: rgba(224,100,80,0.55); box-shadow: 0 0 0 1px rgba(224,100,80,0.18), 0 0 14px rgba(224,80,60,0.15); transform: scale(1); }
 }
 
 /* Non-terminal storyline exit — gold frame + sweep highlight */
@@ -1842,5 +1873,314 @@ body.in-summary .app {
 }
 .stat-row.stat-xianxia .stat-val {
   color: #c9a050;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Achievement System
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Trophy button (fixed, top-right) ───────────────────────────────────── */
+.ach-trophy-btn {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(23, 29, 39, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(201, 169, 120, 0.35);
+  border-radius: 20px;
+  padding: 7px 13px 7px 10px;
+  color: var(--ink);
+  font-size: 18px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color .2s, box-shadow .2s, transform .15s;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+}
+.ach-trophy-btn:hover {
+  border-color: rgba(201, 169, 120, 0.7);
+  box-shadow: 0 0 18px rgba(201, 169, 120, 0.25), 0 2px 12px rgba(0, 0, 0, 0.4);
+  transform: translateY(-1px);
+}
+.ach-trophy-btn:active { transform: scale(0.96); }
+
+.ach-trophy-badge {
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--warm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+/* ── Achievement wall overlay ────────────────────────────────────────────── */
+.ach-wall-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(10, 13, 20, 0.75);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s ease;
+}
+.ach-wall-overlay.ach-wall-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.ach-wall-panel {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  width: min(780px, 92vw);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.7);
+  transform: translateY(12px) scale(0.98);
+  transition: transform .25s ease;
+}
+.ach-wall-overlay.ach-wall-open .ach-wall-panel {
+  transform: translateY(0) scale(1);
+}
+
+.ach-wall-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+.ach-wall-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--warm);
+  letter-spacing: 0.04em;
+  flex: 1;
+}
+.ach-wall-count {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+.ach-wall-close {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink-soft);
+  width: 30px;
+  height: 30px;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  transition: border-color .15s, color .15s;
+  flex-shrink: 0;
+}
+.ach-wall-close:hover { border-color: var(--accent); color: var(--ink); }
+
+.ach-wall-grid {
+  overflow-y: auto;
+  padding: 18px 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* ── Achievement sections & cards ────────────────────────────────────────── */
+.ach-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 10px;
+}
+.ach-section-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+}
+
+.ach-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--card-2);
+  position: relative;
+  transition: border-color .15s, box-shadow .15s;
+  min-height: 62px;
+}
+
+/* Rarity borders (unlocked state) */
+.ach-card.ach-unlocked.ach-r-normal  { border-color: rgba(176, 184, 196, 0.5); }
+.ach-card.ach-unlocked.ach-r-rare    { border-color: rgba(74, 157, 229, 0.5); background: linear-gradient(135deg, rgba(74,157,229,0.08) 0%, var(--card-2) 70%); }
+.ach-card.ach-unlocked.ach-r-epic    { border-color: rgba(168, 85, 247, 0.5); background: linear-gradient(135deg, rgba(168,85,247,0.10) 0%, var(--card-2) 70%); }
+.ach-card.ach-unlocked.ach-r-legendary { border-color: rgba(245, 182, 66, 0.6); background: linear-gradient(135deg, rgba(245,182,66,0.12) 0%, var(--card-2) 70%); }
+
+/* Locked style — greyed out */
+.ach-card.ach-locked {
+  opacity: 0.45;
+  filter: grayscale(0.6);
+}
+
+.ach-card-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.ach-card-body {
+  flex: 1;
+  min-width: 0;
+}
+.ach-card-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ach-card.ach-r-rare.ach-unlocked    .ach-card-name { color: var(--grade-1); }
+.ach-card.ach-r-epic.ach-unlocked    .ach-card-name { color: var(--grade-2); }
+.ach-card.ach-r-legendary.ach-unlocked .ach-card-name {
+  color: var(--grade-3);
+  text-shadow: 0 0 8px rgba(245,182,66,0.4);
+}
+
+.ach-card-desc {
+  font-size: 11px;
+  color: var(--ink-faint);
+  line-height: 1.4;
+}
+
+.ach-card-check {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #3d8c5a;
+  color: #fff;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+/* ── Toast notifications (bottom-right, slides in) ───────────────────────── */
+.ach-toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 20px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.ach-toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(20, 26, 38, 0.97);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  min-width: 240px;
+  max-width: 320px;
+  pointer-events: auto;
+  /* Start off-screen to the right */
+  transform: translateX(calc(100% + 30px));
+  opacity: 0;
+  transition: transform .4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity .3s ease;
+}
+.ach-toast.ach-toast-show {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+/* Rarity left-border accent */
+.ach-toast::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 12px 0 0 12px;
+}
+.ach-toast.ach-r-normal::before    { background: var(--grade-0); }
+.ach-toast.ach-r-rare::before      { background: var(--grade-1); }
+.ach-toast.ach-r-epic::before      { background: var(--grade-2); }
+.ach-toast.ach-r-legendary::before {
+  background: linear-gradient(180deg, #ffd700, #f5b642, #e0a030);
+  box-shadow: 0 0 8px rgba(245,182,66,0.6);
+}
+
+.ach-toast-icon {
+  font-size: 26px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.ach-toast-body {
+  flex: 1;
+  min-width: 0;
+}
+.ach-toast-label {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 2px;
+}
+.ach-toast-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 2px;
+}
+.ach-toast.ach-r-rare.ach-toast-show      .ach-toast-name { color: var(--grade-1); }
+.ach-toast.ach-r-epic.ach-toast-show      .ach-toast-name { color: var(--grade-2); }
+.ach-toast.ach-r-legendary.ach-toast-show .ach-toast-name {
+  color: var(--grade-3);
+  text-shadow: 0 0 8px rgba(245,182,66,0.4);
+}
+.ach-toast-desc {
+  font-size: 11px;
+  color: var(--ink-soft);
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Legendary toast gets a shimmer */
+.ach-toast.ach-r-legendary {
+  border-color: rgba(245, 182, 66, 0.3);
+  background: linear-gradient(135deg, rgba(245,182,66,0.08) 0%, rgba(20, 26, 38, 0.97) 60%);
 }
 
