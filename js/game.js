@@ -1,17 +1,37 @@
 import { evalCondition, pickBranch, pickWeightedBranch } from './dsl.js';
 import { renderAvatar, createStandaloneAvatar } from './avatar.js';
-import { playStorylineIntro } from './cinematic.js';
+import { playStorylineIntro, playStorylineExit } from './cinematic.js';
 import { initAchievements, unlockAchievement } from './achievements.js';
 
 const STAT_KEYS = ['SOC', 'INT', 'MNY', 'PER', 'HLT', 'APP'];
 const STAT_LABELS = {
   SOC: '社交', INT: '智力', MNY: '家境',
   HAP: '快乐', HLT: '健康', PER: '毅力', APP: '颜值',
-  POP: '人气', POK: '牌技', MMR: '天梯分',
+  POP: '人气', POK: '牌技', MMR: '天梯分', FIT: '体能', CKL: '厨艺',
   cul: '修为', dao: '大道', karma: '机缘', tribulation: '渡劫', realm: '境界'
 };
-const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK', 'MMR', 'cul', 'dao', 'karma', 'tribulation']);
+const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK', 'MMR', 'FIT', 'CKL', 'cul', 'dao', 'karma', 'tribulation']);
 const XIANXIA_KEYS = ['realm', 'cul', 'dao', 'karma', 'tribulation'];
+
+// ── Special Scoring Endings ──
+const LEGENDARY_ENDINGS = new Set([
+  50099, // Spy Success
+  60040, // Abyss Success
+  70040, 70094, // Meta Success / Madman
+  82090, // CEO Peak
+  83090, // Esports World Champion
+  84061, 84090, // Fitness Legend
+  85061, 85090, // Chef 3-Star
+  81090  // Poker God
+]);
+
+const GOOD_ENDINGS = new Set([
+  80105, // Idol Superstar
+  82096, // Corporate Elite
+  84091, // Fitness Influencer
+  85091, 85092, // Chef 2-Star / 1-Star
+  90050, 90052, 90054, 90056 // Late dropout good endings
+]);
 
 function deriveRealm(cul) {
   cul = cul || 0;
@@ -76,9 +96,31 @@ const STORYLINE_CFG = {
       { cond: s => s.HLT <= -5, event: 70095 }
     ],
     flavor: () => metaFlavor(),
-  },
-  party: {
+    },
+    fitness: {
     gracePeriod: 12,
+    eventRate: 0.8,
+    deathChecks: [
+      { cond: s => s.HLT <= -2, event: 84094 },
+      { cond: s => s.MNY <= -4, event: 84095 },
+    ],
+    progressChecks: [
+      { cond: s => s.FIT >= 40, event: 84090 }, // 隐藏极高属性自动真结局
+      { cond: s => s.HLT <= 1 && s.FIT >= 10, event: 84093 }, // 伤病退役
+    ],
+    },
+    chef: {
+    gracePeriod: 12,
+    eventRate: 0.8,
+    deathChecks: [
+      { cond: s => s.HLT <= -2, event: 85095 },
+      { cond: s => s.MNY <= -5, event: 85095 },
+    ],
+    progressChecks: [
+      { cond: s => s.CKL >= 40 && (s.MNY || 0) >= 30, event: 85090 }, // 隐藏极高属性自动真结局
+    ],
+    },
+      idol: {    gracePeriod: 12,
     eventRate: 0.7,
     deathChecks: [
       { cond: s => s.INT < 0, event: 82020 },
@@ -177,8 +219,8 @@ const STORYLINE_CFG = {
     gracePeriod: 12,
     eventRate: 0.6,
     progressChecks: [
-      { cond: s => s.age - s.storylineStart >= 2 && s.POP >= 20, event: 80092 },
-      { cond: s => s.age - s.storylineStart >= 2 && s.POP < 20, event: 80093 },
+      { cond: s => s.age - s.storylineStart >= 2 && s.POP >= 40, event: 80092 },
+      { cond: s => s.age - s.storylineStart >= 2 && s.POP < 40, event: 80093 },
     ],
   },
   wasted: {
@@ -361,6 +403,135 @@ function initEsportsStage() {
   state.qualifier_window_start_month = null;
 }
 
+// ── Fitness Stage Clock ──────────────────────────────────────────────
+const FITNESS_PREP_LEN = 12;
+const FITNESS_FORCE_LEN = 27;
+
+function initFitnessStage() {
+  state.fitness_stage = 'prep';
+  state.fitness_attempted = false;
+}
+
+function updateFitnessStage() {
+  if (state.storyline !== 'fitness') return;
+  if (state.fitness_stage === undefined || state.fitness_stage === null) initFitnessStage();
+  if (state.fitness_attempted) return;
+  const monthsIn = state.monthTotal - (state.storylineStartMonth || 0);
+  if (state.fitness_stage === 'prep' && monthsIn >= FITNESS_PREP_LEN) {
+    state.fitness_stage = 'comp_window';
+  }
+  if (state.fitness_stage === 'comp_window' && monthsIn >= FITNESS_FORCE_LEN) {
+    attemptFitness(true);
+  }
+}
+
+function computeFitnessProb(s) {
+  if (s.storyline !== 'fitness') return 0;
+  let p = -15;
+  p += (s.FIT || 0) * 2;
+  p += (s.PER || 0) * 1;
+  p += (s.APP || 0) * 0.5;
+  return Math.max(5, Math.min(95, Math.round(p)));
+}
+
+async function attemptFitness(forced) {
+  if (state.fitness_attempted) return;
+  state.fitness_attempted = true; // 原子锁，防止重复触发
+
+  state.pendingCinematic = true;
+  state._cineSavedAuto = autoMode;
+  stopAuto();
+  render();
+
+  await playStorylineIntro({
+    name: "奥林匹亚总决赛",
+    color: "#f1c40f",
+    statLabels: STAT_LABELS,
+    onDone: () => {
+      state.fitness_stage = 'completed';
+      state.fitness_attempt_count = (state.fitness_attempt_count || 0) + 1;
+      const prob = computeFitnessProb(state);
+      const success = Math.random() * 100 < prob;
+      triggerEvent(84060); 
+      setTimeout(() => {
+        if (success) {
+          triggerEvent(84061);
+        } else {
+          if (state.fitness_attempt_count >= 2) {
+            triggerEvent(84065);
+          } else {
+            triggerEvent(84062);
+          }
+        }
+        state.pendingCinematic = false;
+        const saved = state._cineSavedAuto || 0;
+        state._cineSavedAuto = 0;
+        if (saved > 0) startAuto(saved);
+        render();
+      }, 800);
+    }
+  });
+}// ── Chef Stage Clock ──────────────────────────────────────────────
+const CHEF_STARTUP_LEN = 12;
+const CHEF_FORCE_LEN = 27;
+
+function initChefStage() {
+  state.chef_stage = 'startup';
+  state.chef_attempted = false;
+}
+
+function updateChefStage() {
+  if (state.storyline !== 'chef') return;
+  if (state.chef_stage === undefined || state.chef_stage === null) initChefStage();
+  if (state.chef_attempted) return;
+  const monthsIn = state.monthTotal - (state.storylineStartMonth || 0);
+  if (state.chef_stage === 'startup' && monthsIn >= CHEF_STARTUP_LEN) {
+    state.chef_stage = 'comp_window';
+  }
+  if (state.chef_stage === 'comp_window' && monthsIn >= CHEF_FORCE_LEN) {
+    attemptChef(true);
+  }
+}
+
+function computeChefProb(s) {
+  if (s.storyline !== 'chef') return 0;
+  let p = -30;
+  p += (s.CKL || 0) * 1.5;
+  p += (s.SOC || 0) * 1;
+  p += (s.PER || 0) * 0.5;
+  return Math.max(5, Math.min(95, Math.round(p)));
+}
+
+async function attemptChef(forced) {
+  if (state.chef_attempted) return;
+  state.chef_attempted = true; // 原子锁
+
+  state.pendingCinematic = true;
+  state._cineSavedAuto = autoMode;
+  stopAuto();
+  render();
+
+  await playStorylineIntro({
+    name: "米其林星级审定",
+    color: "#e74c3c",
+    statLabels: STAT_LABELS,
+    onDone: () => {
+      state.chef_stage = 'completed';
+      const prob = computeChefProb(state);
+      const success = Math.random() * 100 < prob;
+      triggerEvent(85060); 
+      setTimeout(() => {
+        triggerEvent(success ? 85061 : 85062);
+        state.pendingCinematic = false;
+        const saved = state._cineSavedAuto || 0;
+        state._cineSavedAuto = 0;
+        if (saved > 0) startAuto(saved);
+        render();
+      }, 800);
+    }
+  });
+}
+
 function updateEsportsStage() {
   if (state.storyline !== 'esports') return;
   if (state.esports_stage === undefined || state.esports_stage === null) initEsportsStage();
@@ -486,13 +657,17 @@ const STORYLINE_NAMES = {
   worlds: '世界赛之路',
   minor_league: '次级联赛',
   xianxia: '修真求道',
+  fitness: '健美巅峰',
+  chef: '校园厨神',
 };
 const HIDDEN_STORYLINES = new Set(['spy', 'abyss', 'meta', 'xianxia']);
-const SPECIAL_STORYLINES = new Set(['idol', 'superstar', 'streamer', 'poker', 'triton', 'local_shark', 'party', 'ceo', 'wasted', 'esports', 'worlds', 'minor_league']);
+const SPECIAL_STORYLINES = new Set(['idol', 'superstar', 'streamer', 'poker', 'triton', 'local_shark', 'party', 'ceo', 'wasted', 'esports', 'worlds', 'minor_league', 'fitness', 'chef']);
 const STORYLINE_UNLOCK_STAT = {
   idol: 'POP', superstar: 'POP', streamer: 'POP',
   poker: 'POK', triton: 'POK', local_shark: 'POK',
   esports: 'MMR', worlds: 'MMR', minor_league: 'MMR',
+  fitness: 'FIT',
+  chef: 'CKL',
 };
 const STUDENT_PHASES = new Set([
   '高中生', '本科生', '理工生', '商科生', '文科生',
@@ -648,7 +823,7 @@ function applyTalentEffects() {
 
 function clampStats() {
   state.HAP = Math.min(10, state.HAP);
-  const trackKeys = ['SOC', 'INT', 'MNY', 'HAP', 'HLT', 'PER', 'APP', 'POP', 'POK', 'MMR'];
+  const trackKeys = ['SOC', 'INT', 'MNY', 'HAP', 'HLT', 'PER', 'APP', 'POP', 'POK', 'MMR', 'FIT', 'CKL', 'cul', 'dao', 'karma', 'tribulation'];
   for (const k of trackKeys) {
     const v = state[k] || 0;
     if (state.statPeaks[k] === undefined || v > state.statPeaks[k]) state.statPeaks[k] = v;
@@ -808,6 +983,11 @@ function showConfirm({ title, body, stats, okText, cancelText }) {
   });
 }
 
+function triggerEvent(id) {
+  const ev = state.eventsMap.get(id);
+  if (ev) applyEvent(ev);
+}
+
 function applyEvent(ev) {
   // Storyline replay: only show text, skip all side effects
   if (ev._replay) {
@@ -844,6 +1024,8 @@ function applyEvent(ev) {
       if (ev.set.storyline === 'party') initPartyStage();
       if (ev.set.storyline === 'esports') initEsportsStage();
       if (ev.set.storyline === 'poker') initPokerStage();
+      if (ev.set.storyline === 'fitness') initFitnessStage();
+      if (ev.set.storyline === 'chef') initChefStage();
     }
     if (ev.set.profession && GRAD_SCHOOL_PHASES.has(ev.set.profession)) {
       scheduleGraduateCompletion();
@@ -859,7 +1041,24 @@ function applyEvent(ev) {
   // Non-terminal storyline exit: storyline cleared but life continues
   const isStorylineExit = ev.set && ev.set.storyline === ''
     && prevStorylineForCinematic && !ev.end;
-  if (isStorylineExit) evLogType = 'storyline-exit';
+  if (isStorylineExit) {
+    evLogType = 'storyline-exit';
+    const statToHide = STORYLINE_UNLOCK_STAT[prevStorylineForCinematic];
+    if (statToHide) state['show' + statToHide] = false;
+    
+    // Reset profession to generic age-based fallback when abandoning a special career
+    if (state.age >= 23) {
+      state.late_dropout = true;
+      state.profession = '待业中';
+    } else {
+      for (const row of DEFAULT_PROF_BY_AGE) {
+        if (state.age <= row.max) {
+          state.profession = row.prof;
+          break;
+        }
+      }
+    }
+  }
   if (msg) pushLog(msg, evLogType);
 
   if (ev.effect) for (const [k, v] of Object.entries(ev.effect)) {
@@ -871,6 +1070,8 @@ function applyEvent(ev) {
 
   if (ev.end) {
     state.phase = 'ended';
+    state.endingId = ev.id;
+    state.endingAge = state.age;
   }
 
   // Cinematic intro when entering a special/hidden storyline
@@ -893,6 +1094,28 @@ function applyEvent(ev) {
         const saved = state._cineSavedAuto || 0;
         state._cineSavedAuto = 0;
         if (saved > 0) startAuto(saved);
+      }
+    });
+  }
+
+  // Cinematic exit when leaving a special/hidden storyline
+  if (isStorylineExit) {
+    state.pendingCinematic = true;
+    state._cineSavedAuto = autoMode;
+    stopAuto();
+    render();
+    const statToHide = STORYLINE_UNLOCK_STAT[prevStorylineForCinematic];
+    playStorylineExit({
+      name: STORYLINE_NAMES[prevStorylineForCinematic] || prevStorylineForCinematic,
+      color: '#aaa',
+      hideStat: statToHide,
+      statLabels: STAT_LABELS,
+      onDone: () => {
+        state.pendingCinematic = false;
+        const saved = state._cineSavedAuto || 0;
+        state._cineSavedAuto = 0;
+        if (saved > 0) startAuto(saved);
+        render();
       }
     });
   }
@@ -1051,10 +1274,18 @@ function resolveChoice(index) {
   const choice = state.pendingChoice[index];
   state.pendingChoice = null;
 
-  if (choice.next) {
+  if (choice.branch) {
+    const nextId = pickBranch(state, choice.branch);
+    if (nextId) {
+      const ev = state.eventsMap.get(nextId);
+      if (ev) applyEvent(ev);
+    }
+  } else if (choice.next) {
     const ev = state.eventsMap.get(choice.next);
     if (ev) applyEvent(ev);
   } else if (choice.effect || choice.set || choice.resultText || choice.text) {
+    const prevStoryline = state.storyline;
+
     // Inline outcome: apply effect/set and log a short result line
     if (choice.set) {
       for (const [k, v] of Object.entries(choice.set)) state[k] = v;
@@ -1065,8 +1296,62 @@ function resolveChoice(index) {
       }
       clampStats();
     }
+
+    const isExit = choice.set && choice.set.storyline === '' && prevStoryline;
+    let logType = undefined;
+    
+    if (isExit) {
+      logType = 'storyline-exit';
+      const statToHide = STORYLINE_UNLOCK_STAT[prevStoryline];
+      if (statToHide) state['show' + statToHide] = false;
+      
+      // Reset profession
+      if (state.age >= 23) {
+        state.late_dropout = true;
+        state.profession = '待业中';
+      } else {
+        for (const row of DEFAULT_PROF_BY_AGE) {
+          if (state.age <= row.max) {
+            state.profession = row.prof;
+            break;
+          }
+        }
+      }
+      
+      state.pendingCinematic = true;
+      state._cineSavedAuto = autoMode;
+      stopAuto();
+      playStorylineExit({
+        name: STORYLINE_NAMES[prevStoryline] || prevStoryline,
+        color: '#aaa',
+        hideStat: statToHide,
+        statLabels: STAT_LABELS,
+        onDone: () => {
+          state.pendingCinematic = false;
+          const saved = state._cineSavedAuto || 0;
+          state._cineSavedAuto = 0;
+          if (saved > 0) startAuto(saved);
+          render();
+        }
+      });
+    }
+
+    // ── Storyline Retry Logic ──
+    // 如果玩家在决赛失败后选择“再战一年”，我们需要重置尝试标记和时间线
+    if (choice.text && (choice.text.includes('明年再来') || choice.text.includes('重振旗鼓'))) {
+      state.storylineStartMonth = state.monthTotal;
+      if (state.storyline === 'fitness') {
+        state.fitness_attempted = false;
+        state.fitness_stage = 'prep';
+      }
+      if (state.storyline === 'chef') {
+        state.chef_attempted = false;
+        state.chef_stage = 'startup';
+      }
+    }
+
     const line = choice.resultText || `→ ${choice.text || ''}`;
-    if (line) pushLog(line);
+    if (line) pushLog(line, logType);
   }
 
   render();
@@ -1110,6 +1395,8 @@ function advanceMonth() {
     updatePartyStage();
     updateEsportsStage();
     updatePokerStage();
+    updateFitnessStage();
+    updateChefStage();
     if (state.phase === 'ended' || state.pendingChoice) { render(); return; }
     // === Storyline mode: skip normal events, only draw storyline events ===
     const cfg = STORYLINE_CFG[state.storyline];
@@ -1573,6 +1860,8 @@ function storylineFlavor() {
     worlds:     ['全世界的目光都聚焦在这里。', '你在后台调整着鼠标DPI。', '赛前的紧张感让你手心冒汗。'],
     minor_league:['又是一场没人看的比赛。', '网吧的空调坏了，热得你心烦意乱。', '你刷着手机看顶级联赛的集锦，心里五味杂陈。'],
     xianxia:    ['你于洞府中盘膝吐纳，岁月如水流过。', '山雨过后，林间灵气格外稠密。', '你抬头看天，一只白鹤掠过云端。', '你打坐时，听见远处有人在念诵经文。', '你拈起一片落叶，叶上灵息流转。', '你在溪边写了几个字，又被风吹散。', '你试着以神识扫过山林，鸟兽四散。', '你想起当年那本残卷，墨迹仍在脑海中流动。'],
+    fitness:    ['你对着镜子检查肌肉分离度。', '又到了痛苦的练腿日。', '你在计算今天的宏量营养素。', '凌晨的健身房只有杠铃的撞击声。', '你喝下了一大口难以下咽的蛋白粉。', '你的体脂率似乎又降了一点。'],
+    chef:       ['你在后厨反复翻炒，火苗窜起。', '你切土豆切得手腕发麻。', '你正在研究新的酱汁配方。', '餐车外的食客排起了长队。', '你清洗着沾满油污的铁锅。', '空气中弥漫着香料的味道。']
   };
   const pool = flavors[sl];
   if (pool) return pool[Math.floor(Math.random() * pool.length)];
@@ -1720,8 +2009,10 @@ function render() {
       if (state.showPOP) shown.push('POP');
       if (state.showPOK) shown.push('POK');
       if (state.showMMR) shown.push('MMR');
+      if (state.showFIT) shown.push('FIT');
+      if (state.showCKL) shown.push('CKL');
       const dynamicMax = Math.max(1, ...shown.filter(k => k !== 'HAP').map(k => state[k]));
-      const SPECIAL_STATS = new Set(['POP', 'POK', 'MMR']);
+      const SPECIAL_STATS = new Set(['POP', 'POK', 'MMR', 'FIT', 'CKL']);
       for (const k of shown) {
         const row = document.createElement('div');
         const isSpecial = SPECIAL_STATS.has(k);
@@ -1889,6 +2180,66 @@ function render() {
       }
     }
 
+    const fitnessBox = $('fitness-box');
+    if (fitnessBox) {
+      if (state.storyline === 'fitness' && !state.fitness_attempted && state.phase !== 'ended') {
+        fitnessBox.style.display = 'flex';
+        const stageEl = $('fitness-stage');
+        const probEl = $('fitness-prob');
+        const warnEl = $('fitness-decay-warn');
+        const btn = $('btn-try-fitness');
+        const monthsIn = state.monthTotal - (state.storylineStartMonth || 0);
+        
+        if (state.fitness_stage === 'prep' || state.fitness_stage == null) {
+          const remaining = Math.max(0, FITNESS_PREP_LEN - monthsIn);
+          stageEl.textContent = `备赛期 · 还剩 ${remaining} 个月`;
+          probEl.textContent = '--';
+          warnEl.textContent = '备赛 12 个月后登上选拔赛舞台';
+          btn.disabled = true;
+        } else {
+          const prob = computeFitnessProb(state);
+          const monthsToForce = Math.max(0, FITNESS_FORCE_LEN - monthsIn);
+          stageEl.textContent = `选拔窗口 · 强制结算还剩 ${monthsToForce} 个月`;
+          probEl.textContent = prob + '%';
+          probEl.style.color = prob >= 50 ? '#7ed7a0' : prob >= 25 ? '#f5b642' : '#e06060';
+          warnEl.textContent = '此刻状态最佳，请及时登上舞台';
+          btn.disabled = false;
+        }
+      } else {
+        fitnessBox.style.display = 'none';
+      }
+    }
+
+    const chefBox = $('chef-box');
+    if (chefBox) {
+      if (state.storyline === 'chef' && !state.chef_attempted && state.phase !== 'ended') {
+        chefBox.style.display = 'flex';
+        const stageEl = $('chef-stage');
+        const probEl = $('chef-prob');
+        const warnEl = $('chef-decay-warn');
+        const btn = $('btn-try-chef');
+        const monthsIn = state.monthTotal - (state.storylineStartMonth || 0);
+        
+        if (state.chef_stage === 'startup' || state.chef_stage == null) {
+          const remaining = Math.max(0, CHEF_STARTUP_LEN - monthsIn);
+          stageEl.textContent = `初创期 · 还剩 ${remaining} 个月`;
+          probEl.textContent = '--';
+          warnEl.textContent = '满 12 个月后开启米其林考察';
+          btn.disabled = true;
+        } else {
+          const prob = computeChefProb(state);
+          const monthsToForce = Math.max(0, CHEF_FORCE_LEN - monthsIn);
+          stageEl.textContent = `考察期 · 强制结算还剩 ${monthsToForce} 个月`;
+          probEl.textContent = prob + '%';
+          probEl.style.color = prob >= 50 ? '#7ed7a0' : prob >= 25 ? '#f5b642' : '#e06060';
+          warnEl.textContent = '米其林密探随时可能光临';
+          btn.disabled = false;
+        }
+      } else {
+        chefBox.style.display = 'none';
+      }
+    }
+
     const pokerBox = $('poker-box');
     if (pokerBox) {
       if (state.storyline === 'poker' && !state.triton_attempted && state.phase !== 'ended') {
@@ -1967,7 +2318,19 @@ function render() {
       const choiceDiv = document.createElement('div');
       choiceDiv.className = 'choice-container';
       const isCardLayout = state.pendingChoice.some(c => c.title || c.desc);
-      if (isCardLayout) choiceDiv.classList.add('choice-cards');
+      if (isCardLayout) {
+        choiceDiv.classList.add('choice-cards');
+        if (state.log.length > 0) {
+          const ctxEl = document.createElement('div');
+          ctxEl.className = 'choice-context';
+          ctxEl.textContent = state.log[state.log.length - 1].text;
+          choiceDiv.appendChild(ctxEl);
+        }
+      }
+      
+      let canClick = false;
+      setTimeout(() => { canClick = true; }, 500);
+
       state.pendingChoice.forEach((c, i) => {
         const btn = document.createElement('button');
         btn.className = 'choice-btn';
@@ -2010,7 +2373,7 @@ function render() {
         }
         btn.addEventListener('click', (e) => {
           e.stopPropagation();  // 阻止冒泡到面板的 advanceMonth
-          if (locked) return;
+          if (locked || !canClick) return;
           resolveChoice(i);
         });
         choiceDiv.appendChild(btn);
@@ -2222,11 +2585,37 @@ function calculateScore() {
   // Emotional modifier
   const finalHap = state.HAP || 5;
   const finalHlt = state.HLT || 5;
-  if (finalHap < 3) score = Math.floor(score * 0.9);
-  if (finalHlt < 2) score = Math.floor(score * 0.9);
-  if (finalHap >= 8 && finalHlt >= 8) score = Math.floor(score * 1.1);
+  
+  let multiplier = 1.0;
+  if (finalHap < 3) multiplier *= 0.9;
+  if (finalHlt < 2) multiplier *= 0.9;
+  if (finalHap >= 8 && finalHlt >= 8) multiplier *= 1.1;
 
-  return Math.max(0, score);
+  // ── Ending & Timing Bonuses ──
+  // 传奇结局与好结局的固定加分与百分比加成
+  // 并且越早触发传奇结局，加分越多
+  if (state.endingId) {
+    const eid = state.endingId;
+    const eage = state.endingAge || state.age;
+    
+    if (LEGENDARY_ENDINGS.has(eid)) {
+      score += 2000; // 传奇结局固定加5000
+      multiplier += 0.2; // 额外50%总分加成
+      
+      // 越早达成越牛：以28岁为基准，每早一年多加1000分
+      const earlyBonus = Math.max(0, (30 - eage) * 400);
+      score += earlyBonus;
+    } else if (GOOD_ENDINGS.has(eid)) {
+      score += 1000; // 好结局固定加2000
+      multiplier += 0.1; // 额外20%总分加成
+      
+      // 越早达成越牛：每早一年多加400分
+      const earlyBonus = Math.max(0, (30 - eage) * 200);
+      score += earlyBonus;
+    }
+  }
+
+  return Math.max(0, Math.floor(score * multiplier));
 }
 
 function animateScore(targetScore) {
@@ -2328,10 +2717,16 @@ function renderSummary() {
   if (state.statPeaks.POP !== undefined && state.statPeaks.POP > 0) keys.push('POP');
   if (state.statPeaks.POK !== undefined && state.statPeaks.POK > 0) keys.push('POK');
   if (state.statPeaks.MMR !== undefined && state.statPeaks.MMR > 0) keys.push('MMR');
+  if (state.statPeaks.FIT !== undefined && state.statPeaks.FIT > 0) keys.push('FIT');
+  if (state.statPeaks.CKL !== undefined && state.statPeaks.CKL > 0) keys.push('CKL');
+  if (state.statPeaks.cul !== undefined && state.statPeaks.cul > 0) keys.push('cul');
+  if (state.statPeaks.dao !== undefined && state.statPeaks.dao > 0) keys.push('dao');
+  if (state.statPeaks.karma !== undefined && state.statPeaks.karma > 0) keys.push('karma');
+  if (state.statPeaks.tribulation !== undefined && state.statPeaks.tribulation > 0) keys.push('tribulation');
   statsEl.innerHTML = keys.map(k => {
     const peak = state.statPeaks[k] ?? 0;
     const cur = state[k] ?? 0;
-    const isSpec = ['POP','POK','MMR'].includes(k);
+    const isSpec = ['POP','POK','MMR','FIT','CKL','cul','dao','karma','tribulation'].includes(k);
     return `
       <div class="stat-line ${isSpec ? 'spec' : ''}">
         <span class="stat-line-label">${STAT_LABELS[k]}</span>
@@ -2517,6 +2912,50 @@ async function main() {
       if (!ok) return;
       stopAuto();
       attemptCeo(false);
+    });
+  }
+
+  const btnTryFitness = $('btn-try-fitness');
+  if (btnTryFitness) {
+    btnTryFitness.addEventListener('click', async () => {
+      if (state.phase === 'ended') return;
+      if (state.storyline !== 'fitness') return;
+      if (state.fitness_attempted) return;
+      const prob = computeFitnessProb(state);
+      const ok = await showConfirm({
+        title: '登上奥林匹亚',
+        body: '这是职业健美的最高舞台。你准备好展示你的钢铁躯壳了吗？',
+        stats: [
+          { label: '夺冠概率', value: prob + '%', tone: probTone(prob) },
+          { label: '成功', value: '诸神黄昏 (终极成就)' },
+          { label: '失败', value: '遗憾离场', tone: 'warn' },
+        ],
+        okText: '开始展示',
+        cancelText: '再练一个月'
+      });
+      if (ok) attemptFitness();
+    });
+  }
+
+  const btnTryChef = $('btn-try-chef');
+  if (btnTryChef) {
+    btnTryChef.addEventListener('click', async () => {
+      if (state.phase === 'ended') return;
+      if (state.storyline !== 'chef') return;
+      if (state.chef_attempted) return;
+      const prob = computeChefProb(state);
+      const ok = await showConfirm({
+        title: '呈上主菜',
+        body: '米其林密探已经落座。这一道菜将决定你餐车的命运。',
+        stats: [
+          { label: '获星概率', value: prob + '%', tone: probTone(prob) },
+          { label: '成功', value: '晋升星级主厨' },
+          { label: '失败', value: '维持现状', tone: 'warn' },
+        ],
+        okText: '呈上菜品',
+        cancelText: '再调整一下'
+      });
+      if (ok) attemptChef();
     });
   }
 

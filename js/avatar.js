@@ -229,9 +229,16 @@ function drawBody(g, state, yOffset = 0, time = 0) {
 
   // 躯干紧连着脖子
   const torsoY = headTop + headH + 4;
-  const torsoH = isFemale ? 56 : 60; // 躯干长一点
-  const torsoX = isFemale ? 36 : 32;
-  const torsoW = isFemale ? 56 : 64;
+  let torsoH = isFemale ? 56 : 60; // 躯干长一点
+  let torsoX = isFemale ? 36 : 32;
+  let torsoW = isFemale ? 56 : 64;
+
+  // 健美形态：躯干变宽，呈现倒三角
+  if (state.storyline === 'fitness') {
+    const fitLevel = Math.min(10, (state.FIT || 0) / 2); // 0 to 5
+    torsoW += Math.floor(fitLevel * 4);
+    torsoX -= Math.floor(fitLevel * 2);
+  }
 
   fill(g, torsoX, torsoY, torsoW, torsoH, skin);
   const armW = 8;
@@ -957,6 +964,35 @@ function drawProps(g, state, m, time, sleeveColor) {
     // 指尖细节
     px(g, lapX + 4, lapY + 16, P.outline);
     px(g, lapX + 38, lapY + 16, P.outline);
+
+  } else if (state.storyline === 'chef') {
+    // 白色厨师围裙
+    fill(g, m.torsoX + 4, m.torsoY + 8, m.torsoW - 8, m.torsoH - 4, '#ffffff');
+    fill(g, m.torsoX + m.torsoW/2 - 4, m.torsoY + 16, 8, 8, '#e74c3c'); // 围裙上的红色Logo
+    
+    // 一手托盘，一手掂锅
+    const wokX = m.torsoX - m.armW - 10;
+    const wokY = m.torsoY + 24;
+    fill(g, wokX, wokY, 18, 5, '#222'); // 锅身
+    fill(g, wokX - 6, wokY - 2, 8, 3, '#444'); // 锅柄
+    // 锅气动画（动态火苗）
+    if (Math.floor(time / 200) % 2 === 0) {
+      fill(g, wokX + 4, wokY - 6, 6, 6, '#e67e22');
+      px(g, wokX + 7, wokY - 8, '#f1c40f');
+    }
+
+    const dishX = m.torsoX + m.torsoW + 2;
+    const dishY = m.torsoY + 26;
+    fill(g, dishX, dishY, 16, 3, '#ecf0f1'); // 银盘子
+    fill(g, dishX + 4, dishY - 4, 8, 4, '#d35400'); // 冒尖的东坡肉
+    // 蒸汽动画
+    const steamY = dishY - 8 - (Math.floor(time / 400) % 6);
+    px(g, dishX + 6, steamY, 'rgba(255,255,255,0.4)');
+    px(g, dishX + 10, steamY - 3, 'rgba(255,255,255,0.3)');
+
+    // 弯曲的手臂（对齐锅和盘子）
+    fill(g, m.torsoX - m.armW, wokY, 8, 6, P.skinMid);
+    fill(g, m.torsoX + m.torsoW, dishY, 8, 6, P.skinMid);
 
   } else if (major === '商科' || state.storyline === 'ceo') {
     // 一手拿最新款手机看股市，一手拿星巴克

@@ -630,6 +630,10 @@ body.in-game .left-panel {
 .log-entry.log-special .log-text {
   color: #f5b642 !important;
 }
+.log-entry.log-fitness .log-text {
+  border-left: 3px solid #e67e22;
+  padding-left: 10px;
+}
 .log-entry.log-romance .log-text {
   color: #f0a0b8 !important;
 }
@@ -1437,6 +1441,9 @@ body.in-summary .app {
   padding: 14px 0 6px;
   animation: slide-in .25s ease-out;
 }
+.choice-context {
+  display: none; /* Hide on desktop to prevent layout interference */
+}
 .choice-btn {
   flex: 1;
   padding: 12px 16px;
@@ -1450,23 +1457,29 @@ body.in-summary .app {
   cursor: pointer;
   transition: all .2s ease;
 }
-.choice-btn:hover {
-  background: var(--accent);
-  color: #0f1420;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(111, 143, 184, 0.25);
+@media (hover: hover) and (pointer: fine) {
+  .choice-btn:hover {
+    background: var(--accent);
+    color: #0f1420;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(111, 143, 184, 0.25);
+  }
 }
 .choice-btn:active {
   transform: translateY(0);
+  background: var(--accent);
+  color: #0f1420;
 }
 
 /* 卡面布局：标题/描述/门槛 */
 .choice-container.choice-cards {
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
 }
 .choice-btn.choice-card {
-  flex: 1 1 200px;
-  min-width: 180px;
+  width: 100%;
+  min-width: 0;
   text-align: left;
   padding: 14px 16px;
   display: flex;
@@ -1493,16 +1506,25 @@ body.in-summary .app {
 }
 .choice-btn.choice-card .choice-req.met { color: #6dd49a; }
 .choice-btn.choice-card .choice-req.locked { color: #b8896d; }
-.choice-btn.choice-card:hover {
-  background: linear-gradient(140deg, var(--card-2) 0%, rgba(255,255,255,0.02) 100%);
-  border-color: #d4af37;
-  box-shadow: 0 0 0 1px #d4af37, 0 0 16px rgba(212, 175, 55, 0.45);
-  transform: translateY(-1px);
+
+@media (hover: hover) and (pointer: fine) {
+  .choice-btn.choice-card:hover {
+    background: linear-gradient(140deg, var(--card-2) 0%, rgba(255,255,255,0.02) 100%);
+    border-color: #d4af37;
+    box-shadow: 0 0 0 1px #d4af37, 0 0 16px rgba(212, 175, 55, 0.45);
+    transform: translateY(-1px);
+    color: var(--ink);
+  }
+  .choice-btn.choice-card:hover .choice-desc { color: var(--ink-soft); }
+  .choice-btn.choice-card:hover .choice-req.met { color: #6dd49a; }
+  .choice-btn.choice-card:hover .choice-req.locked { color: #b8896d; }
 }
-.choice-btn.choice-card:hover { color: var(--ink); }
-.choice-btn.choice-card:hover .choice-desc { color: var(--ink-soft); }
-.choice-btn.choice-card:hover .choice-req.met { color: #6dd49a; }
-.choice-btn.choice-card:hover .choice-req.locked { color: #b8896d; }
+
+.choice-btn.choice-card:active {
+  border-color: #d4af37;
+  box-shadow: 0 0 0 1px #d4af37, 0 0 8px rgba(212, 175, 55, 0.25);
+  transform: translateY(0);
+}
 
 .choice-btn.choice-locked {
   opacity: 0.45;
@@ -1656,22 +1678,204 @@ body.in-summary .app {
 }
 
 @media (max-width: 760px) {
-  .app { padding: 10px 10px 12px; }
-  .game-layout { grid-template-columns: 1fr; }
-  .left-panel { position: static; padding: 12px; }
+  .app { padding: 10px 10px 12px; height: 100vh; overflow: hidden; }
+  .game-layout { 
+    grid-template-columns: 1fr; 
+    display: flex; 
+    flex-direction: column;
+    height: 100%;
+    position: relative; /* Anchor for absolute right-head */
+  }
+  .left-panel { 
+    position: static; 
+    padding: 12px; 
+    flex: none;
+  }
 
   body.in-game .game-layout {
     grid-template-columns: 1fr;
     height: 100%;
+    position: relative;
   }
   body.in-game .left-panel {
-    display: none;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    height: auto;
+    max-height: 48vh;
+    overflow-y: auto;
+    border-radius: 8px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 10px;
+    padding: 12px;
+    align-items: flex-start;
   }
-  body.in-game .right-panel {
-    height: 100%;
+  
+  /* Left Half: Scalable Large Avatar */
+  body.in-game .avatar-wrap {
+    grid-column: 1;
+    grid-row: 1 / span 30;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 128 / 192;
+    margin: 0;
+    border-radius: 6px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    position: sticky;
+    top: 0;
   }
 
-  .avatar-wrap { height: 240px; }
+  /* Right column elements */
+  body.in-game .left-panel > *:not(.avatar-wrap) {
+    grid-column: 2;
+    width: 100%;
+  }
+
+  body.in-game .time-box {
+    margin-top: 105px; /* Clear space for top-right absolute buttons */
+    margin-bottom: 6px;
+    padding: 6px 8px;
+    font-size: 11px;
+    justify-content: center;
+    background: var(--card-2);
+  }
+
+  body.in-game #stats-panel {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  body.in-game .stat-row { padding: 4px 6px; font-size: 11px; }
+
+  body.in-game .major-box {
+    margin-top: 4px;
+    padding: 6px 8px;
+  }
+  body.in-game .major-val { font-size: 11px; }
+
+  body.in-game .right-panel {
+    height: auto;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Refined top-right actions */
+  body.in-game .right-head {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: calc(50% - 18px);
+    border: none;
+    padding: 0;
+    background: transparent;
+    z-index: 10;
+  }
+  body.in-game .right-head h2 {
+    display: none;
+  }
+  body.in-game .right-actions {
+    display: flex !important;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+    width: 100%;
+  }
+  body.in-game .right-actions .ghost {
+    background: var(--card-2);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 6px 10px;
+    font-size: 11px;
+    color: var(--ink-soft);
+    text-align: center;
+    height: auto;
+    min-height: 0;
+    flex: 1 1 40%;
+  }
+  body.in-game #ach-trophy-btn {
+    flex: 1 1 100%;
+    justify-content: center;
+    background: rgba(241, 196, 15, 0.08);
+    border: 1px solid rgba(241, 196, 15, 0.2);
+    border-radius: 12px;
+  }
+
+  /* --- Bottom Action Sheet for Choice Cards --- */
+  body.in-game .choice-container.choice-cards {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: rgba(14, 20, 32, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 24px 20px calc(24px + env(safe-area-inset-bottom));
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px 20px 0 0;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8);
+    transform: translateY(100%);
+    animation: drawer-slide-up 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    margin: 0;
+  }
+
+  body.in-game .choice-container.choice-cards::before {
+    content: '';
+    position: fixed;
+    top: -200vh;
+    left: -100vw;
+    width: 300vw;
+    height: 300vh;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: -1;
+    opacity: 0;
+    pointer-events: auto; /* Block background clicks */
+    animation: drawer-fade-in 0.35s ease forwards;
+  }
+
+  body.in-game .choice-container.choice-cards::after {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+  }
+
+  body.in-game .choice-context {
+    display: block; /* Show only on mobile action sheet */
+    font-size: 14px;
+    line-height: 1.6;
+    color: #e2e8f0;
+    margin-bottom: 16px;
+    padding: 0 4px;
+    font-weight: 500;
+  }
+
+  body.in-game .choice-btn.choice-card {
+    flex: none;
+    width: 100%;
+    min-width: 0;
+    padding: 16px;
+  }
+}
+
+@keyframes drawer-slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes drawer-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* ── Cinematic storyline intro ── */

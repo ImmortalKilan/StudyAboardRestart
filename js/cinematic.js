@@ -66,3 +66,45 @@ export async function playStorylineIntro({ name, color, unlockStat, statLabels, 
   overlay.remove();
   if (onDone) onDone();
 }
+
+export async function playStorylineExit({ name, color, hideStat, statLabels, onDone }) {
+  const overlay = document.createElement('div');
+  overlay.className = 'cinematic-overlay';
+  document.body.appendChild(overlay);
+
+  // ① 标题居中亮相（带“结篇”字样）
+  const title = document.createElement('div');
+  title.className = 'cinematic-title';
+  title.style.color = color;
+  title.style.fontSize = '32px';
+  title.innerHTML = `<span style="font-size:14px; opacity:0.7; display:block; margin-bottom:10px;">—— 剧情结篇 ——</span>${name}`;
+  overlay.appendChild(title);
+  
+  // 伴随一个向下的轻微位移淡入
+  title.animate([
+    { transform: 'translateY(-20px)', opacity: 0 },
+    { transform: 'translateY(0)', opacity: 1 }
+  ], { duration: 800, fill: 'forwards' });
+
+  await wait(2000);
+
+  // ② 如果有要隐藏的属性，做一个缩回动画
+  if (hideStat) {
+    const target = document.querySelector(`.stat-row[data-stat="${hideStat}"]`);
+    if (target) {
+      target.style.transition = 'all 1s ease';
+      target.style.opacity = '0.3';
+      target.style.transform = 'scale(0.9)';
+      await wait(500);
+    }
+  }
+
+  // ③ 整体淡出
+  overlay.style.transition = 'opacity 0.8s ease';
+  overlay.style.opacity = '0';
+  await wait(800);
+
+  overlay.remove();
+  if (onDone) onDone();
+}
+
