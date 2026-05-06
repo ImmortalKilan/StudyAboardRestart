@@ -3,7 +3,9 @@
     "allow": [
       "Bash(node --input-type=module -e \"import\\('./js/dsl.js'\\).then\\(m => console.log\\('dsl ok:', Object.keys\\(m\\)\\)\\)\")",
       "Bash(node -e ' *)",
-      "Bash(python3 -m http.server 8080)"
+      "Bash(python3 -m http.server 8080)",
+      "Bash(python3 *)",
+      "Bash(node *)"
     ]
   }
 }

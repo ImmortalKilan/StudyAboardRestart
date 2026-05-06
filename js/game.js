@@ -7,10 +7,10 @@ const STAT_KEYS = ['SOC', 'INT', 'MNY', 'PER', 'HLT', 'APP'];
 const STAT_LABELS = {
   SOC: '社交', INT: '智力', MNY: '家境',
   HAP: '快乐', HLT: '健康', PER: '毅力', APP: '颜值',
-  POP: '人气', POK: '牌技', MMR: '天梯分', FIT: '体能', CKL: '厨艺',
+  POP: '人气', POK: '牌技', MMR: '天梯分', FIT: '体能', CKL: '厨艺', ATH: '运动',
   cul: '修为', dao: '大道', karma: '机缘', tribulation: '渡劫', realm: '境界'
 };
-const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK', 'MMR', 'FIT', 'CKL', 'cul', 'dao', 'karma', 'tribulation']);
+const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'cul', 'dao', 'karma', 'tribulation']);
 const XIANXIA_KEYS = ['realm', 'cul', 'dao', 'karma', 'tribulation'];
 
 // ── Special Scoring Endings ──
@@ -20,9 +20,10 @@ const LEGENDARY_ENDINGS = new Set([
   70040, 70094, // Meta Success / Madman
   82090, // CEO Peak
   83090, // Esports World Champion
-  84061, 84090, // Fitness Legend
-  85061, 85090, // Chef 3-Star
-  81090  // Poker God
+  84061, // Fitness Legend
+  85061, // Chef 3-Star
+  81090, // Poker God
+  86105, 86120, 86136 // Athlete Top Tier (NBA状元, World Cup Champion, Frisbee Worlds Champion)
 ]);
 
 const GOOD_ENDINGS = new Set([
@@ -101,24 +102,32 @@ const STORYLINE_CFG = {
     gracePeriod: 12,
     eventRate: 0.8,
     deathChecks: [
-      { cond: s => s.HLT <= -2, event: 84094 },
+      { cond: s => s.PER < 3, event: 84094 },
       { cond: s => s.MNY <= -4, event: 84095 },
     ],
     progressChecks: [
-      { cond: s => s.FIT >= 35, event: 84090 }, // 隐藏极高属性自动真结局
-      { cond: s => s.HLT < 0 && s.FIT >= 10, event: 84093 }, // 伤病退役
+      { cond: s => s.HLT < 0 && s.FIT >= 10, event: 84093 },
     ],
     },
     chef: {
     gracePeriod: 12,
     eventRate: 0.8,
     deathChecks: [
-      { cond: s => s.HLT <= -2, event: 85095 },
-      { cond: s => s.MNY <= -5, event: 85095 },
+      { cond: s => (s.HLT || 0) <= 2, event: 85080 },
+      { cond: s => (s.HAP || 0) <= 2, event: 85081 },
+      { cond: s => (s.SOC || 0) <= 0, event: 85095 },
     ],
-    progressChecks: [
-      { cond: s => s.CKL >= 40 && (s.MNY || 0) >= 30, event: 85090 }, // 隐藏极高属性自动真结局
+    progressChecks: [],
+    },
+    athlete: {
+    gracePeriod: 12,
+    eventRate: 0.8,
+    deathChecks: [
+      { cond: s => (s.HLT || 0) <= 2, event: 86151 },
+      { cond: s => (s.HAP || 0) <= 2, event: 86152 },
+      { cond: s => (s.SOC || 0) <= 0, event: 86153 },
     ],
+    progressChecks: [],
     },
       idol: {    gracePeriod: 12,
     eventRate: 0.7,
@@ -254,7 +263,7 @@ const STORYLINE_CFG = {
 // During debut_window, success probability decays 5% every 3 months past
 // a 6-month grace, capped at -50%. Forced auto-attempt at month 60.
 const IDOL_TRAINING_LEN = 12;
-const IDOL_FORCE_LEN = 60;
+const IDOL_FORCE_LEN = 24;
 const IDOL_DECAY_GRACE = 6;
 const IDOL_DECAY_STEP = 3;
 const IDOL_DECAY_AMT = 5;
@@ -322,7 +331,7 @@ function attemptDebut(forced) {
 // ── Party stage clock (mirror of idol) ──────────────────────────
 // Stages: 'settling' (0-12 mo) → 'ceo_window' (12-60 mo) → 'exited'
 const PARTY_SETTLE_LEN = 12;
-const PARTY_FORCE_LEN = 60;
+const PARTY_FORCE_LEN = 24;
 const PARTY_DECAY_GRACE = 6;
 const PARTY_DECAY_STEP = 3;
 const PARTY_DECAY_AMT = 5;
@@ -388,7 +397,7 @@ function attemptCeo(forced) {
 // ── Esports stage clock (mirror of idol/party) ──────────────────
 // Stages: 'rookie' (0-12 mo) → 'qualifier_window' (12-60 mo) → 'qualified'
 const ESPORTS_ROOKIE_LEN = 12;
-const ESPORTS_FORCE_LEN = 60;
+const ESPORTS_FORCE_LEN = 24;
 const ESPORTS_DECAY_GRACE = 6;
 const ESPORTS_DECAY_STEP = 3;
 const ESPORTS_DECAY_AMT = 5;
@@ -434,7 +443,9 @@ function updateFitnessStage() {
         Math.round((inWin - FITNESS_DECAY_GRACE) * FITNESS_DECAY_PER_MONTH));
     }
   }
-  if (state.fitness_stage === 'comp_window' && monthsIn >= FITNESS_FORCE_LEN) {
+  const isRetry = (state.fitness_attempt_count || 0) >= 1;
+  const forceLen = isRetry ? FITNESS_PREP_LEN : FITNESS_FORCE_LEN;
+  if (state.fitness_stage === 'comp_window' && monthsIn >= forceLen) {
     attemptFitness(true);
   }
 }
@@ -490,10 +501,15 @@ async function attemptFitness(forced) {
 }// ── Chef Stage Clock ──────────────────────────────────────────────
 const CHEF_STARTUP_LEN = 12;
 const CHEF_FORCE_LEN = 27;
+const CHEF_DECAY_GRACE = 3;
+const CHEF_DECAY_PER_MONTH = 1.5;
+const CHEF_DECAY_CAP = 15;
 
 function initChefStage() {
   state.chef_stage = 'startup';
   state.chef_attempted = false;
+  state.chef_comp_window_start = 0;
+  state.chef_decay = 0;
 }
 
 function updateChefStage() {
@@ -503,6 +519,15 @@ function updateChefStage() {
   const monthsIn = state.monthTotal - (state.storylineStartMonth || 0);
   if (state.chef_stage === 'startup' && monthsIn >= CHEF_STARTUP_LEN) {
     state.chef_stage = 'comp_window';
+    state.chef_comp_window_start = state.monthTotal;
+    state.chef_decay = 0;
+  }
+  if (state.chef_stage === 'comp_window') {
+    const inWin = state.monthTotal - (state.chef_comp_window_start || state.monthTotal);
+    if (inWin > CHEF_DECAY_GRACE) {
+      state.chef_decay = Math.min(CHEF_DECAY_CAP,
+        Math.round((inWin - CHEF_DECAY_GRACE) * CHEF_DECAY_PER_MONTH));
+    }
   }
   if (state.chef_stage === 'comp_window' && monthsIn >= CHEF_FORCE_LEN) {
     attemptChef(true);
@@ -511,10 +536,11 @@ function updateChefStage() {
 
 function computeChefProb(s) {
   if (s.storyline !== 'chef') return 0;
-  let p = -30;
-  p += (s.CKL || 0) * 1.5;
-  p += (s.SOC || 0) * 1;
+  let p = -15;
+  p += (s.CKL || 0) * 2;
+  p += (s.SOC || 0) * 0.5;
   p += (s.PER || 0) * 0.5;
+  p -= (s.chef_decay || 0);
   return Math.max(5, Math.min(95, Math.round(p)));
 }
 
@@ -535,14 +561,187 @@ async function attemptChef(forced) {
       state.chef_stage = 'completed';
       const prob = computeChefProb(state);
       const success = Math.random() * 100 < prob;
-      triggerEvent(85060); 
+      triggerEvent(85060);
       setTimeout(() => {
-        triggerEvent(success ? 85061 : 85062);
+        if (success) {
+          const ckl = state.CKL || 0;
+          triggerEvent(ckl >= 35 ? 85061 : ckl >= 22 ? 85091 : 85092);
+        } else {
+          triggerEvent(85062);
+        }
         state.pendingCinematic = false;
         const saved = state._cineSavedAuto || 0;
         state._cineSavedAuto = 0;
         if (saved > 0) startAuto(saved);
         render();
+      }, 800);
+    }
+  });
+}
+
+// ── Athlete Stage Clock ──────────────────────────────────────────
+const ATHLETE_STARTUP_LEN = 12;
+const ATHLETE_FORCE_LEN = 27;
+const ATHLETE_DECAY_GRACE = 3;
+const ATHLETE_DECAY_PER_MONTH = 1.5;
+const ATHLETE_DECAY_CAP = 15;
+
+function initAthleteStage() {
+  state.athlete_stage = 'startup';
+  state.athlete_attempted = false;
+  state.athlete_comp_window_start = 0;
+  state.athlete_decay = 0;
+}
+
+function updateAthleteStage() {
+  if (state.storyline !== 'athlete') return;
+  if (state.athlete_stage === undefined || state.athlete_stage === null) initAthleteStage();
+  if (state.athlete_attempted) return;
+  const monthsIn = state.monthTotal - (state.storylineStartMonth || 0);
+  if (state.athlete_stage === 'startup' && monthsIn >= ATHLETE_STARTUP_LEN) {
+    state.athlete_stage = 'comp_window';
+    state.athlete_comp_window_start = state.monthTotal;
+    state.athlete_decay = 0;
+  }
+  if (state.athlete_stage === 'comp_window') {
+    const inWin = state.monthTotal - (state.athlete_comp_window_start || state.monthTotal);
+    if (inWin > ATHLETE_DECAY_GRACE) {
+      state.athlete_decay = Math.min(ATHLETE_DECAY_CAP,
+        Math.round((inWin - ATHLETE_DECAY_GRACE) * ATHLETE_DECAY_PER_MONTH));
+    }
+  }
+  if (state.athlete_stage === 'comp_window' && monthsIn >= ATHLETE_FORCE_LEN) {
+    attemptAthlete(true);
+  }
+}
+
+function computeAthleteProb(s) {
+  if (s.storyline !== 'athlete') return 0;
+  let p = -15;
+  p += (s.ATH || 0) * 2;
+  p += (s.PER || 0) * 0.5;
+  p += (s.HLT || 0) * 0.5;
+  p -= (s.athlete_decay || 0);
+  return Math.max(5, Math.min(95, Math.round(p)));
+}
+
+const SPORT_LABELS = { basketball: 'NBA选秀', soccer: '世界杯预选赛', frisbee: '飞盘世锦赛' };
+
+function finishAthleteCompetition() {
+  state.pendingCinematic = false;
+  const saved = state._cineSavedAuto || 0;
+  state._cineSavedAuto = 0;
+  if (saved > 0) startAuto(saved);
+  render();
+}
+
+function runNBADraft() {
+  triggerEvent(86102);
+  setTimeout(() => {
+    triggerEvent(86103);
+    setTimeout(() => {
+      triggerEvent(86104);
+      setTimeout(() => {
+        const ath = state.ATH || 0;
+        let probs;
+        if (ath >= 40)      probs = [8, 12, 15, 30, 25, 10, 0];
+        else if (ath >= 30) probs = [0, 3, 7, 25, 35, 30, 0];
+        else if (ath >= 22) probs = [0, 0, 0, 5, 25, 60, 10];
+        else                probs = [0, 0, 0, 0, 5, 45, 50];
+        const events = [86105, 86106, 86107, 86108, 86109, 86110, 86111];
+        const roll = Math.random() * 100;
+        let cum = 0;
+        let result = events[events.length - 1];
+        for (let i = 0; i < probs.length; i++) {
+          cum += probs[i];
+          if (roll < cum) { result = events[i]; break; }
+        }
+        triggerEvent(result);
+        finishAthleteCompetition();
+      }, 800);
+    }, 800);
+  }, 800);
+}
+
+function runWorldCup() {
+  const rounds = [
+    { win: 86112, lose: 86113, penalty: 0 },
+    { win: 86114, lose: 86115, penalty: 5 },
+    { win: 86116, lose: 86117, penalty: 10 },
+    { win: 86118, lose: 86119, penalty: 15 },
+  ];
+  function playRound(i) {
+    if (i >= rounds.length) {
+      const wp = Math.max(20, Math.min(85, 30 + (state.ATH || 0) * 1.2 - 20));
+      triggerEvent(Math.random() * 100 < wp ? 86120 : 86121);
+      finishAthleteCompetition();
+      return;
+    }
+    const r = rounds[i];
+    const wp = Math.max(20, Math.min(85, 30 + (state.ATH || 0) * 1.2 - r.penalty));
+    const won = Math.random() * 100 < wp;
+    triggerEvent(won ? r.win : r.lose);
+    if (!won) { finishAthleteCompetition(); return; }
+    setTimeout(() => playRound(i + 1), 800);
+  }
+  playRound(0);
+}
+
+function runFrisbeeWorlds() {
+  const rounds = [
+    { win: 86130, lose: 86131, penalty: 0 },
+    { win: 86132, lose: 86133, penalty: 5 },
+    { win: 86134, lose: 86135, penalty: 10 },
+  ];
+  function playRound(i) {
+    if (i >= rounds.length) {
+      const wp = Math.max(20, Math.min(85, 30 + (state.ATH || 0) * 1.2 - 15));
+      triggerEvent(Math.random() * 100 < wp ? 86136 : 86137);
+      finishAthleteCompetition();
+      return;
+    }
+    const r = rounds[i];
+    const wp = Math.max(20, Math.min(85, 30 + (state.ATH || 0) * 1.2 - r.penalty));
+    const won = Math.random() * 100 < wp;
+    triggerEvent(won ? r.win : r.lose);
+    if (!won) { finishAthleteCompetition(); return; }
+    setTimeout(() => playRound(i + 1), 800);
+  }
+  playRound(0);
+}
+
+async function attemptAthlete(forced) {
+  if (state.athlete_attempted) return;
+  state.athlete_attempted = true;
+
+  state.pendingCinematic = true;
+  state._cineSavedAuto = autoMode;
+  stopAuto();
+  render();
+
+  const sport = state.sport_type || 'basketball';
+  await playStorylineIntro({
+    name: SPORT_LABELS[sport] || '职业选拔',
+    color: "#2ecc71",
+    statLabels: STAT_LABELS,
+    onDone: () => {
+      state.athlete_stage = 'completed';
+      const prob = computeAthleteProb(state);
+      const success = Math.random() * 100 < prob;
+      triggerEvent(86100);
+      setTimeout(() => {
+        if (success) {
+          if (sport === 'basketball') runNBADraft();
+          else if (sport === 'soccer') runWorldCup();
+          else runFrisbeeWorlds();
+        } else {
+          const s = state;
+          if ((s.MNY || 0) >= 25) triggerEvent(86140);
+          else if ((s.SOC || 0) >= 15) triggerEvent(86141);
+          else if ((s.INT || 0) >= 15) triggerEvent(86142);
+          else triggerEvent(86143);
+          finishAthleteCompetition();
+        }
       }, 800);
     }
   });
@@ -596,7 +795,7 @@ function attemptQualifier(forced) {
 // ── Poker stage clock (mirror of esports) ──────────────────────
 // Stages: 'rookie' (0-12 mo) → 'triton_window' (12-60 mo) → 'attempted'
 const POKER_ROOKIE_LEN = 12;
-const POKER_FORCE_LEN = 60;
+const POKER_FORCE_LEN = 24;
 const POKER_DECAY_GRACE = 6;
 const POKER_DECAY_STEP = 3;
 const POKER_DECAY_AMT = 5;
@@ -675,15 +874,17 @@ const STORYLINE_NAMES = {
   xianxia: '修真求道',
   fitness: '健美巅峰',
   chef: '校园厨神',
+  athlete: '校队之星',
 };
 const HIDDEN_STORYLINES = new Set(['spy', 'abyss', 'meta', 'xianxia']);
-const SPECIAL_STORYLINES = new Set(['idol', 'superstar', 'streamer', 'poker', 'triton', 'local_shark', 'party', 'ceo', 'wasted', 'esports', 'worlds', 'minor_league', 'fitness', 'chef']);
+const SPECIAL_STORYLINES = new Set(['idol', 'superstar', 'streamer', 'poker', 'triton', 'local_shark', 'party', 'ceo', 'wasted', 'esports', 'worlds', 'minor_league', 'fitness', 'chef', 'athlete']);
 const STORYLINE_UNLOCK_STAT = {
   idol: 'POP', superstar: 'POP', streamer: 'POP',
   poker: 'POK', triton: 'POK', local_shark: 'POK',
   esports: 'MMR', worlds: 'MMR', minor_league: 'MMR',
   fitness: 'FIT',
   chef: 'CKL',
+  athlete: 'ATH',
 };
 const STUDENT_PHASES = new Set([
   '高中生', '本科生', '理工生', '商科生', '文科生',
@@ -1043,6 +1244,7 @@ function applyEvent(ev) {
       if (ev.set.storyline === 'poker') initPokerStage();
       if (ev.set.storyline === 'fitness') initFitnessStage();
       if (ev.set.storyline === 'chef') initChefStage();
+      if (ev.set.storyline === 'athlete') initAthleteStage();
     }
     if (ev.set.profession && GRAD_SCHOOL_PHASES.has(ev.set.profession)) {
       scheduleGraduateCompletion();
@@ -1369,7 +1571,8 @@ function resolveChoice(index) {
       state.storylineStartMonth = state.monthTotal;
       if (state.storyline === 'fitness') {
         state.fitness_attempted = false;
-        state.fitness_stage = 'prep';
+        state.fitness_stage = 'comp_window';
+        state.fitness_comp_window_start = state.monthTotal;
         state.fitness_decay = 0;
       }
       if (state.storyline === 'chef') {
@@ -1425,6 +1628,7 @@ function advanceMonth() {
     updatePokerStage();
     updateFitnessStage();
     updateChefStage();
+    updateAthleteStage();
     if (state.phase === 'ended' || state.pendingChoice) { render(); return; }
     // === Storyline mode: skip normal events, only draw storyline events ===
     const cfg = STORYLINE_CFG[state.storyline];
@@ -1883,7 +2087,8 @@ function storylineFlavor() {
     minor_league:['又是一场没人看的比赛。', '网吧的空调坏了，热得你心烦意乱。', '你刷着手机看顶级联赛的集锦，心里五味杂陈。'],
     xianxia:    ['你于洞府中盘膝吐纳，岁月如水流过。', '山雨过后，林间灵气格外稠密。', '你抬头看天，一只白鹤掠过云端。', '你打坐时，听见远处有人在念诵经文。', '你拈起一片落叶，叶上灵息流转。', '你在溪边写了几个字，又被风吹散。', '你试着以神识扫过山林，鸟兽四散。', '你想起当年那本残卷，墨迹仍在脑海中流动。'],
     fitness:    ['你对着镜子检查肌肉分离度。', '又到了痛苦的练腿日。', '你在计算今天的宏量营养素。', '凌晨的健身房只有杠铃的撞击声。', '你喝下了一大口难以下咽的蛋白粉。', '你的体脂率似乎又降了一点。'],
-    chef:       ['你在后厨反复翻炒，火苗窜起。', '你切土豆切得手腕发麻。', '你正在研究新的酱汁配方。', '餐车外的食客排起了长队。', '你清洗着沾满油污的铁锅。', '空气中弥漫着香料的味道。']
+    chef:       ['你在后厨反复翻炒，火苗窜起。', '你切土豆切得手腕发麻。', '你正在研究新的酱汁配方。', '餐车外的食客排起了长队。', '你清洗着沾满油污的铁锅。', '空气中弥漫着香料的味道。'],
+    athlete:    ['你在训练场上挥汗如雨。', '教练的哨声在耳边回响。', '你在力量房做着第无数组深蹲。', '冰敷袋贴在酸痛的膝盖上。', '你在看比赛录像分析战术。', '更衣室里弥漫着运动后的疲惫。']
   };
   const pool = flavors[sl];
   if (pool) return pool[Math.floor(Math.random() * pool.length)];
@@ -2039,8 +2244,9 @@ function render() {
       if (state.showMMR) shown.push('MMR');
       if (state.showFIT) shown.push('FIT');
       if (state.showCKL) shown.push('CKL');
+      if (state.showATH) shown.push('ATH');
       const dynamicMax = Math.max(1, ...shown.filter(k => k !== 'HAP').map(k => state[k]));
-      const SPECIAL_STATS = new Set(['POP', 'POK', 'MMR', 'FIT', 'CKL']);
+      const SPECIAL_STATS = new Set(['POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH']);
       for (const k of shown) {
         const row = document.createElement('div');
         const isSpecial = SPECIAL_STATS.has(k);
@@ -2226,8 +2432,10 @@ function render() {
           btn.disabled = true;
         } else {
           const prob = computeFitnessProb(state);
-          const monthsToForce = Math.max(0, FITNESS_FORCE_LEN - monthsIn);
-          const retryTag = (state.fitness_attempt_count || 0) >= 1 ? ' [再战]' : '';
+          const isRetry = (state.fitness_attempt_count || 0) >= 1;
+          const forceLen = isRetry ? FITNESS_PREP_LEN : FITNESS_FORCE_LEN;
+          const monthsToForce = Math.max(0, forceLen - monthsIn);
+          const retryTag = isRetry ? ' [再战]' : '';
           stageEl.textContent = `选拔窗口${retryTag} · 强制结算还剩 ${monthsToForce} 个月`;
           probEl.textContent = prob + '%';
           probEl.style.color = prob >= 50 ? '#7ed7a0' : prob >= 25 ? '#f5b642' : '#e06060';
@@ -2269,11 +2477,60 @@ function render() {
           stageEl.textContent = `考察期 · 强制结算还剩 ${monthsToForce} 个月`;
           probEl.textContent = prob + '%';
           probEl.style.color = prob >= 50 ? '#7ed7a0' : prob >= 25 ? '#f5b642' : '#e06060';
-          warnEl.textContent = '米其林密探随时可能光临';
+          const inWin = state.monthTotal - (state.chef_comp_window_start || state.monthTotal);
+          const decay = state.chef_decay || 0;
+          if (decay >= CHEF_DECAY_CAP) {
+            warnEl.textContent = `状态衰减已封顶（-${CHEF_DECAY_CAP}%），尽快行动`;
+          } else if (inWin <= CHEF_DECAY_GRACE) {
+            warnEl.textContent = `${CHEF_DECAY_GRACE - inWin} 个月后获星概率开始衰减`;
+          } else {
+            warnEl.textContent = `获星概率已衰减 ${decay}%（每月 -${CHEF_DECAY_PER_MONTH}%）`;
+          }
           btn.disabled = false;
         }
       } else {
         chefBox.style.display = 'none';
+      }
+    }
+
+    const athleteBox = $('athlete-box');
+    if (athleteBox) {
+      if (state.storyline === 'athlete' && !state.athlete_attempted && state.phase !== 'ended') {
+        athleteBox.style.display = 'flex';
+        const titleEl = $('athlete-title');
+        const stageEl = $('athlete-stage');
+        const probEl = $('athlete-prob');
+        const warnEl = $('athlete-decay-warn');
+        const btn = $('btn-try-athlete');
+        const sport = state.sport_type || 'basketball';
+        if (titleEl) titleEl.textContent = SPORT_LABELS[sport] || '职业选拔';
+        const monthsIn = state.monthTotal - (state.storylineStartMonth || 0);
+
+        if (state.athlete_stage === 'startup' || state.athlete_stage == null) {
+          const remaining = Math.max(0, ATHLETE_STARTUP_LEN - monthsIn);
+          stageEl.textContent = `训练期 · 还剩 ${remaining} 个月`;
+          probEl.textContent = '--';
+          warnEl.textContent = '满 12 个月后开启选拔窗口';
+          btn.disabled = true;
+        } else {
+          const prob = computeAthleteProb(state);
+          const monthsToForce = Math.max(0, ATHLETE_FORCE_LEN - monthsIn);
+          stageEl.textContent = `选拔期 · 强制结算还剩 ${monthsToForce} 个月`;
+          probEl.textContent = prob + '%';
+          probEl.style.color = prob >= 50 ? '#7ed7a0' : prob >= 25 ? '#f5b642' : '#e06060';
+          const inWin = state.monthTotal - (state.athlete_comp_window_start || state.monthTotal);
+          const decay = state.athlete_decay || 0;
+          if (decay >= ATHLETE_DECAY_CAP) {
+            warnEl.textContent = `状态衰减已封顶（-${ATHLETE_DECAY_CAP}%），尽快行动`;
+          } else if (inWin <= ATHLETE_DECAY_GRACE) {
+            warnEl.textContent = `${ATHLETE_DECAY_GRACE - inWin} 个月后晋级概率开始衰减`;
+          } else {
+            warnEl.textContent = `晋级概率已衰减 ${decay}%（每月 -${ATHLETE_DECAY_PER_MONTH}%）`;
+          }
+          btn.disabled = false;
+        }
+      } else {
+        athleteBox.style.display = 'none';
       }
     }
 
@@ -2926,6 +3183,7 @@ function updateMobileStatsStrip(strip) {
   if (s.POK != null) html += `<div class="ms-chip"><span class="ms-label">${STAT_LABELS.POK}</span><span class="ms-val">${s.POK}</span></div>`;
   if (s.FIT != null) html += `<div class="ms-chip"><span class="ms-label">${STAT_LABELS.FIT}</span><span class="ms-val">${s.FIT}</span></div>`;
   if (s.CKL != null) html += `<div class="ms-chip"><span class="ms-label">${STAT_LABELS.CKL}</span><span class="ms-val">${s.CKL}</span></div>`;
+  if (s.ATH != null) html += `<div class="ms-chip"><span class="ms-label">${STAT_LABELS.ATH}</span><span class="ms-val">${s.ATH}</span></div>`;
   if (s.MMR != null) html += `<div class="ms-chip"><span class="ms-label">${STAT_LABELS.MMR}</span><span class="ms-val">${s.MMR}</span></div>`;
 
   const majorEl = document.getElementById('major-display');
@@ -3153,6 +3411,29 @@ async function main() {
         cancelText: '再调整一下'
       });
       if (ok) attemptChef();
+    });
+  }
+
+  const btnTryAthlete = $('btn-try-athlete');
+  if (btnTryAthlete) {
+    btnTryAthlete.addEventListener('click', async () => {
+      if (state.phase === 'ended') return;
+      if (state.storyline !== 'athlete') return;
+      if (state.athlete_attempted) return;
+      const prob = computeAthleteProb(state);
+      const sport = state.sport_type || 'basketball';
+      const ok = await showConfirm({
+        title: SPORT_LABELS[sport] || '职业选拔',
+        body: '选拔的日子到了。所有的训练和伤痛，都将在这一刻得到回应。',
+        stats: [
+          { label: '晋级概率', value: prob + '%', tone: probTone(prob) },
+          { label: '成功', value: '职业生涯开启' },
+          { label: '失败', value: '另寻出路', tone: 'warn' },
+        ],
+        okText: '迎接选拔',
+        cancelText: '再练一个月'
+      });
+      if (ok) attemptAthlete();
     });
   }
 
