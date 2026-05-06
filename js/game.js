@@ -1907,9 +1907,15 @@ function renderTalentSelect(talents) {
     el.innerHTML = `<div class="t-name">${t.name}</div><div class="t-desc">${t.description}</div>`;
     el.addEventListener('click', () => {
       const idx = state.talentsPicked.findIndex(x => x.id === t.id);
-      if (idx >= 0) { state.talentsPicked.splice(idx, 1); el.classList.remove('picked'); }
-      else if (state.talentsPicked.length < 3) { state.talentsPicked.push(t); el.classList.add('picked'); }
+      if (idx >= 0) {
+        state.talentsPicked.splice(idx, 1);
+        el.classList.remove('picked');
+      } else if (state.talentsPicked.length < 3) {
+        state.talentsPicked.push(t);
+        el.classList.add('picked');
+      }
       $('talent-confirm').disabled = state.talentsPicked.length !== 3;
+      if (typeof updateCreationAvatar === 'function') updateCreationAvatar();
     });
     list.appendChild(el);
   });
@@ -2478,10 +2484,6 @@ function initGame() {
   state.phase = 'game';
   state.age = 15;
   state.monthOfYear = 1;
-  state.faceVariant = Math.floor(Math.random() * 3);
-  state.topVariant = Math.floor(Math.random() * 4);
-  state.bottomVariant = Math.floor(Math.random() * 3);
-  state.outfitColorId = Math.floor(Math.random() * 5);
   state.gradEndAge = 0;
   state.gradEndMonth = 0;
   syncProfessionByAge();
@@ -2835,6 +2837,7 @@ function showScreen(id) {
   $(id).classList.add('active');
   document.body.classList.toggle('in-game', id === 'game-screen');
   document.body.classList.toggle('in-summary', id === 'summary-screen');
+  document.body.classList.toggle('in-creation', id === 'creation-screen');
   if (id !== 'game-screen') stopAuto();
   rearrangeMobileLayout(id === 'game-screen');
 }
@@ -2949,19 +2952,55 @@ function updateMobileStatsStrip(strip) {
   strip.innerHTML = html;
 }
 
+function updateCreationAvatar() {
+  const canvas = $('creation-avatar-canvas');
+  if (canvas) {
+    // Temporarily sync stats for preview
+    for (const k of STAT_KEYS) {
+      state[k] = (state.alloc[k] || 0);
+    }
+    // Also apply talent bonuses to the preview
+    for (const t of state.talentsPicked || []) {
+      if (t.effect) {
+        for (const [k, v] of Object.entries(t.effect)) {
+          if (STAT_KEYS.includes(k)) state[k] = (state[k] || 0) + v;
+        }
+      }
+    }
+    renderAvatar(canvas, state);
+  }
+}
+
 async function main() {
   initAchievements();
   const talents = await loadData();
 
-  $('sex-male').addEventListener('click', () => { state.sex = 0; $('sex-male').classList.add('active'); $('sex-female').classList.remove('active'); });
-  $('sex-female').addEventListener('click', () => { state.sex = 1; $('sex-female').classList.add('active'); $('sex-male').classList.remove('active'); });
+
+  $('sex-male').addEventListener('click', () => { state.sex = 0; $('sex-male').classList.add('active'); $('sex-female').classList.remove('active'); updateCreationAvatar(); });
+  $('sex-female').addEventListener('click', () => { state.sex = 1; $('sex-female').classList.add('active'); $('sex-male').classList.remove('active'); updateCreationAvatar(); });
+
+  $('btn-random-appearance').addEventListener('click', () => {
+    state.faceVariant = Math.floor(Math.random() * 3);
+    state.topVariant = Math.floor(Math.random() * 6);
+    state.bottomVariant = Math.floor(Math.random() * 6);
+    state.outfitColorId = Math.floor(Math.random() * 5);
+    updateCreationAvatar();
+  });
 
   $('talent-confirm').addEventListener('click', () => {
     for (const k of STAT_KEYS) {
       state.alloc[k] = 0;
     }
-    showScreen('alloc-screen');
     renderAlloc();
+    
+    // Programmatic Scroll to Step 2
+    const container = $('creation-scroll-area');
+    const target = $('step-alloc');
+    if (container && target) {
+      container.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
+    }
+    // Reset the internal scroll of the new step for mobile
+    setTimeout(() => { target.scrollTop = 0; }, 300);
   });
 
   for (const k of STAT_KEYS) {
@@ -2970,12 +3009,27 @@ async function main() {
       if (used < ALLOC_TOTAL && state.alloc[k] < MAX_PER_STAT) {
         state.alloc[k] += 1;
         renderAlloc();
+        updateCreationAvatar();
       }
     });
     $(`minus-${k}`).addEventListener('click', () => {
-      if (state.alloc[k] > 0) { state.alloc[k] -= 1; renderAlloc(); }
+      if (state.alloc[k] > 0) { 
+        state.alloc[k] -= 1; 
+        renderAlloc(); 
+        updateCreationAvatar();
+      }
     });
   }
+
+  $('alloc-back-to-talent').addEventListener('click', () => {
+    const container = $('creation-scroll-area');
+    const target = $('step-talents');
+    if (container && target) {
+      container.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
+    }
+    // Reset internal scroll for step 1
+    setTimeout(() => { target.scrollTop = 0; }, 300);
+  });
 
   $('alloc-random').addEventListener('click', () => {
     for (const k of STAT_KEYS) state.alloc[k] = 0;
@@ -2988,6 +3042,7 @@ async function main() {
       remaining--;
     }
     renderAlloc();
+    updateCreationAvatar();
   });
 
   $('alloc-start').addEventListener('click', initGame);
@@ -3173,40 +3228,138 @@ async function main() {
   });
 
   $('btn-summary-share').addEventListener('click', async () => {
-    const actions = document.querySelector('.summary-actions');
-    const oldDisplay = actions.style.display;
-    actions.style.display = 'none';
-
-    const wrap = document.querySelector('.summary-wrap');
-    const watermark = document.createElement('div');
-    watermark.innerHTML = '<div style="text-align:center; margin-top:24px; color:#888; font-size:14px; letter-spacing: 2px;">—— 留学重开模拟器 ——<br/><span style="font-size:12px;">测一测你的留学生涯能拿几分？</span></div>';
-    wrap.appendChild(watermark);
-
     try {
-      // Small delay to ensure any CSS animations (like rank stamping) are finished or at least renderable
-      await new Promise(r => setTimeout(r, 100));
+      const btn = $('btn-summary-share');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<span class="icon">⏳</span> 生成中...';
+      btn.disabled = true;
+
+      // 1. Fill poster data
+      const avatarCanvas = $('summary-avatar');
+      if(avatarCanvas) {
+        $('poster-avatar').src = avatarCanvas.toDataURL('image/png');
+      }
+
+      $('poster-score-val').textContent = $('summary-score-val').textContent;
+      const rankEl = $('summary-score-rank');
+      const pRankEl = $('poster-rank');
+      pRankEl.className = 'poster-rank ' + rankEl.className.replace('score-rank', '').replace('stamp', '').trim();
       
-      const canvas = await html2canvas(wrap, {
-        backgroundColor: '#12161d', 
-        scale: window.devicePixelRatio || 2, 
+      const fullRankText = rankEl.textContent; // e.g. "C级 勉强算人"
+      const rankMatch = fullRankText.match(/^([SABCD]级)(.*)$/);
+      let rankLetter = fullRankText;
+      let rankDesc = "";
+      if (rankMatch) {
+          rankLetter = rankMatch[1]; // "C级"
+          rankDesc = rankMatch[2].trim(); // "勉强算人"
+      }
+      pRankEl.innerHTML = `<div class="poster-rank-letter">${rankLetter}</div><div class="poster-rank-desc">${rankDesc}</div>`;
+
+      // Meta
+      const heroChips = document.querySelectorAll('#summary-hero-meta .hero-chip');
+      let metaHTML = '';
+      const labels = ['生存时长', '最终学历', '主修方向', '职业身份', '感情状态', '其他'];
+      heroChips.forEach((chip, i) => {
+        const val = chip.innerText;
+        if(val) metaHTML += `<div class="poster-meta-item"><span class="poster-meta-k">${labels[i]||'状态'}</span><span class="poster-meta-v">${val}</span></div>`;
+      });
+      $('poster-meta').innerHTML = metaHTML;
+
+      // Stats
+      const keys = ['SOC', 'INT', 'MNY', 'HAP', 'HLT', 'PER', 'APP'];
+      let statsHTML = '';
+      keys.forEach(k => {
+         const cur = state[k] ?? 0;
+         statsHTML += `<div class="poster-stat-box"><div class="poster-stat-label">${STAT_LABELS[k]}</div><div class="poster-stat-val">${cur}</div></div>`;
+      });
+      $('poster-stats').innerHTML = statsHTML;
+
+      // Talents
+      const pTalentsEl = $('poster-talents');
+      if (state.talentsPicked && state.talentsPicked.length) {
+        pTalentsEl.innerHTML = state.talentsPicked.map(t =>
+          `<div class="poster-talent-item grade-${t.grade}">
+            <span class="poster-talent-name">${t.name}</span>
+            <span class="poster-talent-desc">${t.description}</span>
+          </div>`
+        ).join('');
+      } else {
+        pTalentsEl.innerHTML = `<div class="poster-hl-item">未选择任何天赋。</div>`;
+      }
+
+      // Ending
+      const reversed = [...state.log].reverse();
+      const endingLog = reversed.find(e => e.logType === 'ending');
+      if (endingLog) {
+        $('poster-ending').innerHTML = `<div class="poster-ending-tag">${endingLog.tag}</div><div class="poster-ending-text">${endingLog.text}</div>`;
+      } else {
+        $('poster-ending').innerHTML = `<div class="poster-ending-text">这一生平淡如水。</div>`;
+      }
+
+      // Highlights
+      const hlEl = $('summary-highlights');
+      let hlHTML = '';
+      if (hlEl) {
+         const records = hlEl.querySelectorAll('.choice-record');
+         for(let i=0; i<Math.min(records.length, 3); i++) {
+            const ctx = records[i].querySelector('.choice-record-ctx')?.innerText || '';
+            const picked = records[i].querySelector('.choice-opt-picked')?.innerText || '';
+            if(ctx && picked) {
+              hlHTML += `<div class="poster-hl-item">面临 <b>${ctx}</b>，最终选择了 <b>${picked}</b></div>`;
+            }
+         }
+      }
+      if(!hlHTML) hlHTML = `<div class="poster-hl-item">按部就班的一生，未经历重大命运抉择。</div>`;
+      $('poster-highlights').innerHTML = hlHTML;
+
+      // Footer message
+      const pFooterRank = $('poster-footer-rank');
+      const letterOnlyMatch = fullRankText.match(/^([SABCD])/);
+      pFooterRank.textContent = letterOnlyMatch ? letterOnlyMatch[1] : fullRankText[0];
+      pFooterRank.className = rankEl.className.replace('score-rank', '').replace('stamp', '').trim();
+
+      // Small delay to ensure any CSS/DOM updates are applied
+      await new Promise(r => setTimeout(r, 150));
+      
+      const pTemplate = $('poster-template');
+      
+      const canvas = await html2canvas(pTemplate, {
+        backgroundColor: '#0d1117',
+        scale: window.devicePixelRatio || 2,
         useCORS: true
       });
       
-      const imgWrap = $('poster-img-wrap');
-      imgWrap.innerHTML = '';
-      const img = document.createElement('img');
-      img.src = canvas.toDataURL('image/png');
-      img.style.width = '100%';
-      img.style.display = 'block';
-      imgWrap.appendChild(img);
-      
-      $('poster-modal').style.display = 'flex';
+      const dataUrl = canvas.toDataURL('image/png');
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 760;
+
+      if (!isMobile) {
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = '我的留学人生档案.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else {
+        const imgWrap = $('poster-img-wrap');
+        imgWrap.innerHTML = '';
+        const img = document.createElement('img');
+        img.src = dataUrl;
+        img.style.width = '100%';
+        img.style.display = 'block';
+        imgWrap.appendChild(img);
+        
+        $('poster-modal').style.display = 'flex';
+      }
+
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+
     } catch (e) {
       console.error(e);
       alert('生成图片失败，请稍后再试。');
-    } finally {
-      actions.style.display = oldDisplay;
-      wrap.removeChild(watermark);
+      const btn = $('btn-summary-share');
+      btn.innerHTML = '<span class="icon">📸</span> 生成人生档案';
+      btn.disabled = false;
     }
   });
 
@@ -3215,7 +3368,20 @@ async function main() {
   });
 
   $('btn-start').addEventListener('click', () => {
-    showScreen('talent-screen');
+    // Initialize random appearance before showing
+    state.faceVariant = Math.floor(Math.random() * 3);
+    state.topVariant = Math.floor(Math.random() * 6);
+    state.bottomVariant = Math.floor(Math.random() * 6);
+    state.outfitColorId = Math.floor(Math.random() * 5);
+    
+    showScreen('creation-screen');
+    
+    // Reset scroll and render
+    const scrollArea = $('creation-scroll-area');
+    if (scrollArea) scrollArea.scrollTop = 0;
+    
+    // Wait a tick for DOM to be visible so canvas can render properly
+    setTimeout(updateCreationAvatar, 50);
   });
 
   renderTalentSelect(talents);

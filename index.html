@@ -12,6 +12,17 @@
 
     <section id="start-screen" class="screen active">
       <div id="souls-container" class="souls-container"></div>
+      
+      <!-- GitHub Promotion Area -->
+      <div class="github-promo">
+        <a href="https://github.com/ImmortalKilan/StudyAboardRestart" target="_blank" class="github-link" title="前往 GitHub">
+          <svg height="32" aria-hidden="true" viewBox="0 0 16 16" version="1.1" width="32" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+        </a>
+        <div class="github-bubble">
+          喜欢我们的游戏的话请给我们的 GitHub 点上您宝贵的 Star！✨
+        </div>
+      </div>
+
       <button id="ach-trophy-start-btn" class="ghost" title="成就墙" style="position: absolute; top: 20px; right: 24px; z-index: 100; display:flex; align-items:center; gap:6px;">
         🏆 <span id="ach-trophy-start-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/31</span>
       </button>
@@ -22,47 +33,66 @@
       </div>
     </section>
 
-    <section id="talent-screen" class="screen">
-      <header class="screen-head">
-        <h1>留学重开</h1>
-        <p class="sub">你即将推翻现在的人生，重新从 15 岁开始。先决定你是谁。</p>
-      </header>
+    <section id="creation-screen" class="screen">
+      <div class="creation-layout">
+        <!-- Left: Avatar Preview -->
+        <aside class="creation-left">
+          <div class="creation-avatar-wrap">
+            <canvas id="creation-avatar-canvas"></canvas>
+          </div>
+          <div class="creation-controls">
+            <div class="sex-row">
+              <button id="sex-male" class="chip active">男</button>
+              <button id="sex-female" class="chip">女</button>
+            </div>
+            <button id="btn-random-appearance" class="ghost small-btn">🎲 Fit Check</button>
+          </div>
+        </aside>
 
-      <div class="sex-row">
-        <button id="sex-male" class="chip active">男</button>
-        <button id="sex-female" class="chip">女</button>
-      </div>
+        <!-- Right: Scrollable Steps -->
+        <div class="creation-right" id="creation-scroll-area">
+          <!-- Step 1: Talents -->
+          <div class="creation-step" id="step-talents">
+            <header class="screen-head">
+              <h1>重开中......</h1>
+              <p class="sub">推翻你现在的人生吧！</p>
+            </header>
 
-      <h2 class="section-title">抽取天赋 <span class="hint">选 3 个</span></h2>
-      <div id="talent-list" class="talent-grid"></div>
+            <h2 class="section-title">抽取天赋 <span class="hint">选 3 个</span></h2>
+            <div id="talent-list" class="talent-grid"></div>
 
-      <div class="footer-actions">
-        <button id="talent-confirm" class="primary" disabled>确认天赋</button>
-      </div>
-    </section>
+            <div class="footer-actions">
+              <button id="talent-confirm" class="primary" disabled>确认天赋</button>
+            </div>
+          </div>
 
-    <section id="alloc-screen" class="screen">
-      <header class="screen-head">
-        <h1>分配属性</h1>
-        <p class="sub">总共 <strong>25</strong> 点，单项上限 10。快乐不参与分配（局内默认 5）。</p>
-      </header>
+          <!-- Step 2: Stats Allocation -->
+          <div class="creation-step" id="step-alloc">
+            <header class="screen-head">
+              <h1>分配属性</h1>
+              <p class="sub">总共 <strong>25</strong> 点，单项上限 10。快乐不参与分配（局内默认 5）。</p>
+            </header>
 
-      <div class="alloc-banner">剩余点数 <span id="alloc-remaining">25</span></div>
+            <div class="alloc-banner">剩余点数 <span id="alloc-remaining">25</span></div>
 
-      <div id="talent-bonus-banner" class="talent-bonus-banner" style="display:none;"></div>
+            <div id="talent-bonus-banner" class="talent-bonus-banner" style="display:none;"></div>
 
-      <div class="alloc-list">
-        <div class="alloc-row"><span>社交</span><button class="step" id="minus-SOC">−</button><span class="alloc-val" id="alloc-SOC">0</span><button class="step" id="plus-SOC">＋</button><span class="alloc-bonus" id="bonus-SOC"></span></div>
-        <div class="alloc-row"><span>智力</span><button class="step" id="minus-INT">−</button><span class="alloc-val" id="alloc-INT">0</span><button class="step" id="plus-INT">＋</button><span class="alloc-bonus" id="bonus-INT"></span></div>
-        <div class="alloc-row"><span>家境</span><button class="step" id="minus-MNY">−</button><span class="alloc-val" id="alloc-MNY">0</span><button class="step" id="plus-MNY">＋</button><span class="alloc-bonus" id="bonus-MNY"></span></div>
-        <div class="alloc-row"><span>健康</span><button class="step" id="minus-HLT">−</button><span class="alloc-val" id="alloc-HLT">0</span><button class="step" id="plus-HLT">＋</button><span class="alloc-bonus" id="bonus-HLT"></span></div>
-        <div class="alloc-row"><span>毅力</span><button class="step" id="minus-PER">−</button><span class="alloc-val" id="alloc-PER">0</span><button class="step" id="plus-PER">＋</button><span class="alloc-bonus" id="bonus-PER"></span></div>
-        <div class="alloc-row"><span>颜值</span><button class="step" id="minus-APP">−</button><span class="alloc-val" id="alloc-APP">0</span><button class="step" id="plus-APP">＋</button><span class="alloc-bonus" id="bonus-APP"></span></div>
-      </div>
+            <div class="alloc-list">
+              <div class="alloc-row"><span>社交</span><button class="step" id="minus-SOC">−</button><span class="alloc-val" id="alloc-SOC">0</span><button class="step" id="plus-SOC">＋</button><span class="alloc-bonus" id="bonus-SOC"></span></div>
+              <div class="alloc-row"><span>智力</span><button class="step" id="minus-INT">−</button><span class="alloc-val" id="alloc-INT">0</span><button class="step" id="plus-INT">＋</button><span class="alloc-bonus" id="bonus-INT"></span></div>
+              <div class="alloc-row"><span>家境</span><button class="step" id="minus-MNY">−</button><span class="alloc-val" id="alloc-MNY">0</span><button class="step" id="plus-MNY">＋</button><span class="alloc-bonus" id="bonus-MNY"></span></div>
+              <div class="alloc-row"><span>健康</span><button class="step" id="minus-HLT">−</button><span class="alloc-val" id="alloc-HLT">0</span><button class="step" id="plus-HLT">＋</button><span class="alloc-bonus" id="bonus-HLT"></span></div>
+              <div class="alloc-row"><span>毅力</span><button class="step" id="minus-PER">−</button><span class="alloc-val" id="alloc-PER">0</span><button class="step" id="plus-PER">＋</button><span class="alloc-bonus" id="bonus-PER"></span></div>
+              <div class="alloc-row"><span>颜值</span><button class="step" id="minus-APP">−</button><span class="alloc-val" id="alloc-APP">0</span><button class="step" id="plus-APP">＋</button><span class="alloc-bonus" id="bonus-APP"></span></div>
+            </div>
 
-      <div class="footer-actions">
-        <button id="alloc-random" class="ghost">随机分配</button>
-        <button id="alloc-start" class="primary" disabled>开始留学人生</button>
+            <div class="footer-actions">
+              <button id="alloc-back-to-talent" class="ghost">返回修改天赋</button>
+              <button id="alloc-random" class="ghost">随机分配</button>
+              <button id="alloc-start" class="primary" disabled>开始留学人生</button>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -289,6 +319,60 @@
         <div class="end-card-actions">
           <button id="btn-end-restart" class="ghost">再来一次</button>
           <button id="btn-end-summary" class="primary">查看人生总结</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hidden Poster Template for Image Generation -->
+    <div id="poster-template-container" style="position: absolute; left: -9999px; top: 0; pointer-events: none;">
+      <div id="poster-template" class="poster-template">
+        <div class="poster-header">
+          <div class="poster-title">留学重开模拟器</div>
+          <div class="poster-subtitle">我的专属人生档案</div>
+        </div>
+        
+        <div class="poster-hero">
+          <div class="poster-avatar-box">
+            <img id="poster-avatar" src="" alt="Avatar">
+          </div>
+          <div class="poster-hero-info">
+            <div class="poster-score-box">
+              <div class="poster-score-label">综合评分</div>
+              <div class="poster-score-val" id="poster-score-val">0</div>
+            </div>
+            <div id="poster-rank" class="poster-rank"></div>
+          </div>
+        </div>
+
+        <div id="poster-meta" class="poster-meta-grid"></div>
+
+        <div class="poster-section">
+          <div class="poster-section-title">核心属性终值</div>
+          <div id="poster-stats" class="poster-stats-grid"></div>
+        </div>
+
+        <div class="poster-section">
+          <div class="poster-section-title">所选天赋</div>
+          <div id="poster-talents" class="poster-talents-grid"></div>
+        </div>
+
+        <div class="poster-section">
+          <div class="poster-section-title">最终结局</div>
+          <div id="poster-ending" class="poster-ending-content"></div>
+        </div>
+
+        <div class="poster-section">
+          <div class="poster-section-title">人生轨迹</div>
+          <div id="poster-highlights" class="poster-highlights-content"></div>
+        </div>
+
+        <div class="poster-footer">
+          <div class="poster-qrcode">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://cchck.itch.io/studyabroadsimulator" alt="QR Code" style="width:100%; height:100%; object-fit:contain; border-radius: 6px;">
+          </div>
+          <div class="poster-footer-text" id="poster-footer-text">
+            我在留学重开模拟器中玩出了<span id="poster-footer-rank"></span>级人生，你也快来试试吧！
+          </div>
         </div>
       </div>
     </div>
