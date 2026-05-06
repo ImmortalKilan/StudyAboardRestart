@@ -105,8 +105,8 @@ const STORYLINE_CFG = {
       { cond: s => s.MNY <= -4, event: 84095 },
     ],
     progressChecks: [
-      { cond: s => s.FIT >= 40, event: 84090 }, // 隐藏极高属性自动真结局
-      { cond: s => s.HLT <= 1 && s.FIT >= 10, event: 84093 }, // 伤病退役
+      { cond: s => s.FIT >= 35, event: 84090 }, // 隐藏极高属性自动真结局
+      { cond: s => s.HLT < 0 && s.FIT >= 10, event: 84093 }, // 伤病退役
     ],
     },
     chef: {
@@ -406,10 +406,15 @@ function initEsportsStage() {
 // ── Fitness Stage Clock ──────────────────────────────────────────────
 const FITNESS_PREP_LEN = 12;
 const FITNESS_FORCE_LEN = 27;
+const FITNESS_DECAY_GRACE = 3;
+const FITNESS_DECAY_PER_MONTH = 1.5;
+const FITNESS_DECAY_CAP = 15;
 
 function initFitnessStage() {
   state.fitness_stage = 'prep';
   state.fitness_attempted = false;
+  state.fitness_comp_window_start = 0;
+  state.fitness_decay = 0;
 }
 
 function updateFitnessStage() {
@@ -419,6 +424,15 @@ function updateFitnessStage() {
   const monthsIn = state.monthTotal - (state.storylineStartMonth || 0);
   if (state.fitness_stage === 'prep' && monthsIn >= FITNESS_PREP_LEN) {
     state.fitness_stage = 'comp_window';
+    state.fitness_comp_window_start = state.monthTotal;
+    state.fitness_decay = 0;
+  }
+  if (state.fitness_stage === 'comp_window') {
+    const inWin = state.monthTotal - (state.fitness_comp_window_start || state.monthTotal);
+    if (inWin > FITNESS_DECAY_GRACE) {
+      state.fitness_decay = Math.min(FITNESS_DECAY_CAP,
+        Math.round((inWin - FITNESS_DECAY_GRACE) * FITNESS_DECAY_PER_MONTH));
+    }
   }
   if (state.fitness_stage === 'comp_window' && monthsIn >= FITNESS_FORCE_LEN) {
     attemptFitness(true);
@@ -431,6 +445,8 @@ function computeFitnessProb(s) {
   p += (s.FIT || 0) * 2;
   p += (s.PER || 0) * 1;
   p += (s.APP || 0) * 0.5;
+  if (s.fitness_attempt_count >= 1) p += 10;
+  p -= (s.fitness_decay || 0);
   return Math.max(5, Math.min(95, Math.round(p)));
 }
 
@@ -726,6 +742,7 @@ const state = {
   // Summary tracking
   statPeaks: {},
   storylinesVisited: new Set(),
+  choiceHistory: [],
 };
 
 let autoTimer = null;
@@ -1272,6 +1289,16 @@ function drawRandomEvent() {
  */
 function resolveChoice(index) {
   const choice = state.pendingChoice[index];
+  const allOptions = state.pendingChoice.map(c => c.title || c.text || '?');
+  const chosenText = choice.title || choice.text || '?';
+  const context = state.log.length > 0 ? state.log[state.log.length - 1].text : '';
+  state.choiceHistory.push({
+    age: `${state.age}岁${state.monthOfYear}月`,
+    context,
+    options: allOptions,
+    chosen: chosenText,
+    chosenIdx: index,
+  });
   state.pendingChoice = null;
 
   if (choice.branch) {
@@ -1343,6 +1370,7 @@ function resolveChoice(index) {
       if (state.storyline === 'fitness') {
         state.fitness_attempted = false;
         state.fitness_stage = 'prep';
+        state.fitness_decay = 0;
       }
       if (state.storyline === 'chef') {
         state.chef_attempted = false;
@@ -1455,12 +1483,12 @@ function advanceMonth() {
 
   if (!state.storyline) {
     if (state.HLT <= -5) {
-      pushLog('「结局：油尽灯枯」长期的忽视和透支终于压垮了你的身体。你在一个深夜倒下，再也没有醒来。人生就此画上句号。');
+      pushLog('「结局：油尽灯枯」长期的忽视和透支终于压垮了你的身体。你在一个深夜倒下，再也没有醒来。人生就此画上句号。', 'ending');
       state.phase = 'ended';
       unlockAchievement('end_health');
     }
     if (state.age >= 60) {
-      pushLog('你退休了。回首这一生，百感交集。');
+      pushLog('你退休了。回首这一生，百感交集。', 'ending');
       state.phase = 'ended';
       unlockAchievement('end_retire');
     }
@@ -2193,10 +2221,19 @@ function render() {
         } else {
           const prob = computeFitnessProb(state);
           const monthsToForce = Math.max(0, FITNESS_FORCE_LEN - monthsIn);
-          stageEl.textContent = `选拔窗口 · 强制结算还剩 ${monthsToForce} 个月`;
+          const retryTag = (state.fitness_attempt_count || 0) >= 1 ? ' [再战]' : '';
+          stageEl.textContent = `选拔窗口${retryTag} · 强制结算还剩 ${monthsToForce} 个月`;
           probEl.textContent = prob + '%';
           probEl.style.color = prob >= 50 ? '#7ed7a0' : prob >= 25 ? '#f5b642' : '#e06060';
-          warnEl.textContent = '此刻状态最佳，请及时登上舞台';
+          const inWin = state.monthTotal - (state.fitness_comp_window_start || state.monthTotal);
+          const decay = state.fitness_decay || 0;
+          if (decay >= FITNESS_DECAY_CAP) {
+            warnEl.textContent = `状态衰减已封顶（-${FITNESS_DECAY_CAP}%），尽快登台`;
+          } else if (inWin <= FITNESS_DECAY_GRACE) {
+            warnEl.textContent = `${FITNESS_DECAY_GRACE - inWin} 个月后状态开始衰减`;
+          } else {
+            warnEl.textContent = `状态已衰减 ${decay}%（每月 -${FITNESS_DECAY_PER_MONTH}%）`;
+          }
           btn.disabled = false;
         }
       } else {
@@ -2379,6 +2416,7 @@ function render() {
   }
 
   updateAutoButtons();
+  if (_mobileStatsStripUpdate) _mobileStatsStripUpdate();
 }
 
 function updateAutoButtons() {
@@ -2433,6 +2471,7 @@ function initGame() {
   state.talentIds = new Set(state.talentsPicked.map(t => t.id));
   state.statPeaks = {};
   state.storylinesVisited = new Set();
+  state.choiceHistory = [];
   _endCinematicShown = false;
   applyTalentEffects();
   clampStats();
@@ -2472,17 +2511,11 @@ function showEndCinematic() {
   if (_endCinematicShown) return;
   _endCinematicShown = true;
 
-  // Pick the actual ending log: prefer logType='ending' (set when ev.end=true),
-  // fallback to last entry with 「结局」 keyword, else last log
+  // Pick the actual ending log: only logType='ending' (set when ev.end=true or system endings)
   const logs = state.log;
   let endingIdx = -1;
   for (let i = logs.length - 1; i >= 0; i--) {
     if (logs[i].logType === 'ending') { endingIdx = i; break; }
-  }
-  if (endingIdx < 0) {
-    for (let i = logs.length - 1; i >= 0; i--) {
-      if (logs[i].text && /结局/.test(logs[i].text)) { endingIdx = i; break; }
-    }
   }
   const endingLog = endingIdx >= 0 ? logs[endingIdx] : logs[logs.length - 1];
 
@@ -2682,10 +2715,9 @@ function renderSummary() {
     heroMeta.innerHTML = chips.join('');
   }
 
-  // 最终结局：优先 logType=ending（来自 ev.end=true），否则回退到 hidden/special/「结局」
+  // 最终结局：只取 logType=ending（来自 ev.end=true 或系统结局）
   const reversed = [...state.log].reverse();
-  const endingLog = reversed.find(e => e.logType === 'ending')
-    || reversed.find(e => e.logType === 'hidden' || e.logType === 'special');
+  const endingLog = reversed.find(e => e.logType === 'ending');
   const endingEl = $('summary-ending');
   if (endingLog) {
     endingEl.innerHTML = `<div class="ending-tag">${endingLog.tag}</div><div class="ending-text">${endingLog.text}</div>`;
@@ -2740,17 +2772,22 @@ function renderSummary() {
     talentEl.innerHTML = `<div class="empty-hint">无天赋记录</div>`;
   }
 
-  // 高光时刻：抽 hidden/special/romance 的 log，最多 6 条
+  // 命运抉择：玩家做出过的选择
   const hlEl = $('summary-highlights');
-  const highlights = state.log.filter(e =>
-    e.logType === 'hidden' || e.logType === 'special' || e.logType === 'romance'
-  );
-  if (highlights.length === 0) {
-    hlEl.innerHTML = `<div class="empty-hint">没有特别记录</div>`;
+  const choices = state.choiceHistory || [];
+  if (choices.length === 0) {
+    hlEl.innerHTML = `<div class="empty-hint">没有做出过选择</div>`;
   } else {
-    hlEl.innerHTML = highlights.map(h =>
-      `<div class="highlight-row hl-${h.logType}"><span class="hl-tag">${h.tag}</span><span class="hl-text">${h.text}</span></div>`
-    ).join('');
+    hlEl.innerHTML = choices.map(c => {
+      const opts = c.options.map((o, i) =>
+        `<span class="choice-opt${i === c.chosenIdx ? ' choice-opt-picked' : ''}">${o}</span>`
+      ).join('');
+      return `<div class="choice-record">
+        <div class="choice-record-head"><span class="hl-tag">${c.age}</span></div>
+        <div class="choice-record-ctx">${c.context}</div>
+        <div class="choice-record-opts">${opts}</div>
+      </div>`;
+    }).join('');
   }
 
   // 恋爱史
@@ -2799,6 +2836,117 @@ function showScreen(id) {
   document.body.classList.toggle('in-game', id === 'game-screen');
   document.body.classList.toggle('in-summary', id === 'summary-screen');
   if (id !== 'game-screen') stopAuto();
+  rearrangeMobileLayout(id === 'game-screen');
+}
+
+let _mobileStatsStripUpdate = null;
+
+function initStripDrag(el) {
+  let isDown = false, startX, scrollLeft;
+  el.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'touch') return;
+    isDown = true;
+    startX = e.pageX - el.offsetLeft;
+    scrollLeft = el.scrollLeft;
+    el.setPointerCapture(e.pointerId);
+  });
+  el.addEventListener('pointermove', e => {
+    if (!isDown) return;
+    const x = e.pageX - el.offsetLeft;
+    el.scrollLeft = scrollLeft - (x - startX);
+  });
+  const stop = () => { isDown = false; };
+  el.addEventListener('pointerup', stop);
+  el.addEventListener('pointercancel', stop);
+}
+
+function rearrangeMobileLayout(entering) {
+  const isMobile = window.matchMedia('(max-width: 760px)').matches;
+  const leftPanel = document.querySelector('.left-panel');
+  const rightHead = document.querySelector('.right-head');
+  const rightPanel = document.querySelector('.right-panel');
+  const gameLayout = document.querySelector('.game-layout');
+  if (!leftPanel || !rightHead || !gameLayout) return;
+
+  if (entering && isMobile) {
+    leftPanel.insertBefore(rightHead, leftPanel.children[1]);
+
+    if (!gameLayout.querySelector('.mobile-stats-strip')) {
+      const strip = document.createElement('div');
+      strip.className = 'mobile-stats-strip';
+      gameLayout.insertBefore(strip, rightPanel);
+      initStripDrag(strip);
+      _mobileStatsStripUpdate = () => updateMobileStatsStrip(strip);
+      _mobileStatsStripUpdate();
+    }
+
+    if (!gameLayout.querySelector('.mobile-fs-toggle')) {
+      const toggle = document.createElement('div');
+      toggle.className = 'mobile-fs-toggle';
+      toggle.innerHTML = '<svg class="fs-arrow" viewBox="0 0 28 14"><polyline points="6,12 14,4 22,12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      toggle.addEventListener('click', () => {
+        gameLayout.classList.toggle('mobile-fs');
+      });
+      rightPanel.insertBefore(toggle, rightPanel.firstChild);
+    }
+  } else if (!entering) {
+    if (rightPanel && rightHead.parentElement === leftPanel) {
+      rightPanel.insertBefore(rightHead, rightPanel.querySelector('.mobile-fs-toggle') || rightPanel.firstChild);
+    }
+    const strip = gameLayout.querySelector('.mobile-stats-strip');
+    if (strip) strip.remove();
+    const toggle = rightPanel?.querySelector('.mobile-fs-toggle');
+    if (toggle) toggle.remove();
+    gameLayout.classList.remove('mobile-fs');
+    _mobileStatsStripUpdate = null;
+  }
+}
+
+function updateMobileStatsStrip(strip) {
+  if (!strip) return;
+  const s = state;
+  let html = '';
+
+  const timeEl = document.getElementById('time-display');
+  const timeText = timeEl ? timeEl.textContent : `${s.age}岁`;
+  html += `<div class="ms-chip ms-chip-time"><span class="ms-val">${timeText}</span></div>`;
+
+  const allKeys = [...STAT_KEYS, 'HAP'];
+  for (const k of allKeys) {
+    const v = s[k] ?? 0;
+    const label = STAT_LABELS[k] || k;
+    const pct = Math.max(0, Math.min(100, (v / 30) * 100));
+    html += `<div class="ms-chip"><span class="ms-label">${label}</span><div class="ms-bar"><div class="ms-bar-fill" style="width:${pct}%"></div></div><span class="ms-val">${v}</span></div>`;
+  }
+
+  if (s.POP != null) html += `<div class="ms-chip"><span class="ms-label">${STAT_LABELS.POP}</span><span class="ms-val">${s.POP}</span></div>`;
+  if (s.POK != null) html += `<div class="ms-chip"><span class="ms-label">${STAT_LABELS.POK}</span><span class="ms-val">${s.POK}</span></div>`;
+  if (s.FIT != null) html += `<div class="ms-chip"><span class="ms-label">${STAT_LABELS.FIT}</span><span class="ms-val">${s.FIT}</span></div>`;
+  if (s.CKL != null) html += `<div class="ms-chip"><span class="ms-label">${STAT_LABELS.CKL}</span><span class="ms-val">${s.CKL}</span></div>`;
+  if (s.MMR != null) html += `<div class="ms-chip"><span class="ms-label">${STAT_LABELS.MMR}</span><span class="ms-val">${s.MMR}</span></div>`;
+
+  const majorEl = document.getElementById('major-display');
+  if (majorEl) html += `<div class="ms-chip ms-chip-info"><span class="ms-label">专业</span><span class="ms-val">${majorEl.textContent}</span></div>`;
+
+  const relEl = document.getElementById('relationship-display');
+  if (relEl) html += `<div class="ms-chip ms-chip-info"><span class="ms-label">恋爱</span><span class="ms-val">${relEl.textContent}</span></div>`;
+
+  const schoolEl = document.getElementById('school-display');
+  if (schoolEl && schoolEl.parentElement.style.display !== 'none') {
+    html += `<div class="ms-chip ms-chip-info"><span class="ms-label">学校</span><span class="ms-val">${schoolEl.textContent}</span></div>`;
+  }
+
+  const profEl = document.getElementById('profession-display');
+  if (profEl && profEl.parentElement.style.display !== 'none') {
+    html += `<div class="ms-chip ms-chip-info"><span class="ms-label">职业</span><span class="ms-val">${profEl.textContent}</span></div>`;
+  }
+
+  const storyEl = document.getElementById('storyline-display');
+  if (storyEl && storyEl.parentElement.style.display !== 'none') {
+    html += `<div class="ms-chip ms-chip-storyline"><span class="ms-label">剧情</span><span class="ms-val">${storyEl.textContent}</span></div>`;
+  }
+
+  strip.innerHTML = html;
 }
 
 async function main() {
