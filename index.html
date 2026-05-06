@@ -2,14 +2,30 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>留学重开模拟器</title>
   <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
   <main class="app">
 
     <section id="start-screen" class="screen active">
+      <div id="souls-container" class="souls-container"></div>
+      
+      <!-- GitHub Promotion Area -->
+      <div class="github-promo">
+        <a href="https://github.com/ImmortalKilan/StudyAboardRestart" target="_blank" class="github-link" title="前往 GitHub">
+          <svg height="32" aria-hidden="true" viewBox="0 0 16 16" version="1.1" width="32" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+        </a>
+        <div class="github-bubble">
+          喜欢我们的游戏的话请给我们的 GitHub 点上您宝贵的 Star！✨
+        </div>
+      </div>
+
+      <button id="ach-trophy-start-btn" class="ghost" title="成就墙" style="position: absolute; top: 20px; right: 24px; z-index: 100; display:flex; align-items:center; gap:6px;">
+        🏆 <span id="ach-trophy-start-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/31</span>
+      </button>
       <div class="start-center">
         <h1 class="start-title">留学重开模拟器</h1>
         <p class="start-sub">这垃圾留学，一秒也不想学了！</p>
@@ -17,45 +33,66 @@
       </div>
     </section>
 
-    <section id="talent-screen" class="screen">
-      <header class="screen-head">
-        <h1>留学重开</h1>
-        <p class="sub">你即将推翻现在的人生，重新从 15 岁开始。先决定你是谁。</p>
-      </header>
+    <section id="creation-screen" class="screen">
+      <div class="creation-layout">
+        <!-- Left: Avatar Preview -->
+        <aside class="creation-left">
+          <div class="creation-avatar-wrap">
+            <canvas id="creation-avatar-canvas"></canvas>
+          </div>
+          <div class="creation-controls">
+            <div class="sex-row">
+              <button id="sex-male" class="chip active">男</button>
+              <button id="sex-female" class="chip">女</button>
+            </div>
+            <button id="btn-random-appearance" class="ghost small-btn">🎲 Fit Check</button>
+          </div>
+        </aside>
 
-      <div class="sex-row">
-        <button id="sex-male" class="chip active">男</button>
-        <button id="sex-female" class="chip">女</button>
-      </div>
+        <!-- Right: Scrollable Steps -->
+        <div class="creation-right" id="creation-scroll-area">
+          <!-- Step 1: Talents -->
+          <div class="creation-step" id="step-talents">
+            <header class="screen-head">
+              <h1>重开中......</h1>
+              <p class="sub">推翻你现在的人生吧！</p>
+            </header>
 
-      <h2 class="section-title">抽取天赋 <span class="hint">选 3 个</span></h2>
-      <div id="talent-list" class="talent-grid"></div>
+            <h2 class="section-title">抽取天赋 <span class="hint">选 3 个</span></h2>
+            <div id="talent-list" class="talent-grid"></div>
 
-      <div class="footer-actions">
-        <button id="talent-confirm" class="primary" disabled>确认天赋</button>
-      </div>
-    </section>
+            <div class="footer-actions">
+              <button id="talent-confirm" class="primary" disabled>确认天赋</button>
+            </div>
+          </div>
 
-    <section id="alloc-screen" class="screen">
-      <header class="screen-head">
-        <h1>分配属性</h1>
-        <p class="sub">总共 <strong>20</strong> 点，单项上限 10。快乐不参与分配（局内默认 5）。</p>
-      </header>
+          <!-- Step 2: Stats Allocation -->
+          <div class="creation-step" id="step-alloc">
+            <header class="screen-head">
+              <h1>分配属性</h1>
+              <p class="sub">总共 <strong>25</strong> 点，单项上限 10。快乐不参与分配（局内默认 5）。</p>
+            </header>
 
-      <div class="alloc-banner">剩余点数 <span id="alloc-remaining">20</span></div>
+            <div class="alloc-banner">剩余点数 <span id="alloc-remaining">25</span></div>
 
-      <div class="alloc-list">
-        <div class="alloc-row"><span>社交</span><button class="step" id="minus-SOC">−</button><span class="alloc-val" id="alloc-SOC">0</span><button class="step" id="plus-SOC">＋</button></div>
-        <div class="alloc-row"><span>智力</span><button class="step" id="minus-INT">−</button><span class="alloc-val" id="alloc-INT">0</span><button class="step" id="plus-INT">＋</button></div>
-        <div class="alloc-row"><span>家境</span><button class="step" id="minus-MNY">−</button><span class="alloc-val" id="alloc-MNY">0</span><button class="step" id="plus-MNY">＋</button></div>
-        <div class="alloc-row"><span>健康</span><button class="step" id="minus-HLT">−</button><span class="alloc-val" id="alloc-HLT">0</span><button class="step" id="plus-HLT">＋</button></div>
-        <div class="alloc-row"><span>毅力</span><button class="step" id="minus-PER">−</button><span class="alloc-val" id="alloc-PER">0</span><button class="step" id="plus-PER">＋</button></div>
-        <div class="alloc-row"><span>颜值</span><button class="step" id="minus-APP">−</button><span class="alloc-val" id="alloc-APP">0</span><button class="step" id="plus-APP">＋</button></div>
-      </div>
+            <div id="talent-bonus-banner" class="talent-bonus-banner" style="display:none;"></div>
 
-      <div class="footer-actions">
-        <button id="alloc-random" class="ghost">随机分配</button>
-        <button id="alloc-start" class="primary" disabled>开始留学人生</button>
+            <div class="alloc-list">
+              <div class="alloc-row"><span>社交</span><button class="step" id="minus-SOC">−</button><span class="alloc-val" id="alloc-SOC">0</span><button class="step" id="plus-SOC">＋</button><span class="alloc-bonus" id="bonus-SOC"></span></div>
+              <div class="alloc-row"><span>智力</span><button class="step" id="minus-INT">−</button><span class="alloc-val" id="alloc-INT">0</span><button class="step" id="plus-INT">＋</button><span class="alloc-bonus" id="bonus-INT"></span></div>
+              <div class="alloc-row"><span>家境</span><button class="step" id="minus-MNY">−</button><span class="alloc-val" id="alloc-MNY">0</span><button class="step" id="plus-MNY">＋</button><span class="alloc-bonus" id="bonus-MNY"></span></div>
+              <div class="alloc-row"><span>健康</span><button class="step" id="minus-HLT">−</button><span class="alloc-val" id="alloc-HLT">0</span><button class="step" id="plus-HLT">＋</button><span class="alloc-bonus" id="bonus-HLT"></span></div>
+              <div class="alloc-row"><span>毅力</span><button class="step" id="minus-PER">−</button><span class="alloc-val" id="alloc-PER">0</span><button class="step" id="plus-PER">＋</button><span class="alloc-bonus" id="bonus-PER"></span></div>
+              <div class="alloc-row"><span>颜值</span><button class="step" id="minus-APP">−</button><span class="alloc-val" id="alloc-APP">0</span><button class="step" id="plus-APP">＋</button><span class="alloc-bonus" id="bonus-APP"></span></div>
+            </div>
+
+            <div class="footer-actions">
+              <button id="alloc-back-to-talent" class="ghost">返回修改天赋</button>
+              <button id="alloc-random" class="ghost">随机分配</button>
+              <button id="alloc-start" class="primary" disabled>开始留学人生</button>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -91,6 +128,7 @@
             <span class="storyline-label">隐藏剧情</span>
             <span id="storyline-display" class="storyline-val"></span>
           </div>
+
         </aside>
 
         <section class="right-panel">
@@ -99,16 +137,271 @@
             <div class="right-actions">
               <button id="btn-auto-1x" class="ghost">自动播放</button>
               <button id="btn-auto-2x" class="ghost">自动播放 X2</button>
+              <button id="btn-summary" class="ghost" style="display:none;">查看总结</button>
               <button id="btn-restart" class="ghost">重开</button>
+              <button id="ach-trophy-btn" class="ghost" title="成就墙" style="display:flex; align-items:center; gap:6px;">
+                🏆 <span id="ach-trophy-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/31</span>
+              </button>
             </div>
           </div>
+
+          <div id="debut-box" class="action-banner" style="display:none;">
+            <div class="banner-title-col">
+              <span class="banner-title">出道</span>
+              <span id="debut-stage" class="banner-stage">练习生</span>
+            </div>
+            <div class="banner-prob-col">
+              <span class="banner-prob-label">成功率</span>
+              <span id="debut-prob" class="banner-prob">--</span>
+            </div>
+            <div id="debut-decay-warn" class="banner-warn"></div>
+            <button id="btn-try-debut" class="primary banner-btn" disabled>尝试出道</button>
+          </div>
+
+          <div id="party-box" class="action-banner" style="display:none;">
+            <div class="banner-title-col">
+              <span class="banner-title">转型</span>
+              <span id="party-stage" class="banner-stage">局长</span>
+            </div>
+            <div class="banner-prob-col">
+              <span class="banner-prob-label">成功率</span>
+              <span id="ceo-prob" class="banner-prob">--</span>
+            </div>
+            <div id="ceo-decay-warn" class="banner-warn"></div>
+            <button id="btn-try-ceo" class="primary banner-btn" disabled>尝试转型</button>
+          </div>
+
+          <div id="poker-box" class="action-banner" style="display:none;">
+            <div class="banner-title-col">
+              <span class="banner-title">参赛</span>
+              <span id="poker-stage" class="banner-stage">学徒</span>
+            </div>
+            <div class="banner-prob-col">
+              <span class="banner-prob-label">晋级率</span>
+              <span id="triton-prob" class="banner-prob">--</span>
+            </div>
+            <div id="triton-decay-warn" class="banner-warn"></div>
+            <button id="btn-try-triton" class="primary banner-btn" disabled>尝试参赛</button>
+          </div>
+
+          <div id="fitness-box" class="action-banner" style="display:none;">
+            <div class="banner-title-col">
+              <span class="banner-title">选拔</span>
+              <span id="fitness-stage" class="banner-stage">备赛</span>
+            </div>
+            <div class="banner-prob-col">
+              <span class="banner-prob-label">夺冠率</span>
+              <span id="fitness-prob" class="banner-prob">--</span>
+            </div>
+            <div id="fitness-decay-warn" class="banner-warn"></div>
+            <button id="btn-try-fitness" class="primary banner-btn">登上舞台</button>
+          </div>
+
+          <div id="chef-box" class="action-banner" style="display:none;">
+            <div class="banner-title-col">
+              <span class="banner-title">米其林考察</span>
+              <span id="chef-stage" class="banner-stage">秘密考察中</span>
+            </div>
+            <div class="banner-prob-col">
+              <span class="banner-prob-label">获星概率</span>
+              <span id="chef-prob" class="banner-prob">--</span>
+            </div>
+            <div id="chef-decay-warn" class="banner-warn"></div>
+            <button id="btn-try-chef" class="primary banner-btn">呈上主菜</button>
+          </div>
+
+          <div id="esports-box" class="action-banner" style="display:none;">
+            <div class="banner-title-col">
+              <span class="banner-title">出线</span>
+              <span id="esports-stage" class="banner-stage">新秀</span>
+            </div>
+            <div class="banner-prob-col">
+              <span class="banner-prob-label">出线率</span>
+              <span id="esports-prob" class="banner-prob">--</span>
+            </div>
+            <div id="esports-decay-warn" class="banner-warn"></div>
+            <button id="btn-try-qualifier" class="primary banner-btn" disabled>尝试出线</button>
+          </div>
+
           <div id="event-log" class="event-log"></div>
         </section>
 
       </div>
     </section>
 
+    <div id="confirm-modal" class="modal-mask" style="display:none;">
+      <div class="modal-card">
+        <div class="modal-head">
+          <span id="confirm-title" class="modal-title">确认</span>
+        </div>
+        <div id="confirm-body" class="modal-body"></div>
+        <div id="confirm-stats" class="modal-stats"></div>
+        <div class="modal-actions">
+          <button id="confirm-cancel" class="ghost modal-btn">取消</button>
+          <button id="confirm-ok" class="primary modal-btn">确定</button>
+        </div>
+      </div>
+    </div>
+
+    <section id="summary-screen" class="screen">
+      <div class="summary-wrap">
+        <header class="summary-head">
+          <div class="summary-title-row">
+            <h1 class="summary-title">人生总结</h1>
+            <span id="summary-subtitle" class="summary-subtitle"></span>
+          </div>
+          <div class="summary-actions">
+            <button id="btn-summary-share" class="primary share-btn" style="background: linear-gradient(135deg, #f1c40f, #e67e22); border: none; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5);"><span class="icon">📸</span> 生成人生档案</button>
+            <button id="btn-summary-back" class="ghost">返回事件流</button>
+            <button id="btn-summary-restart" class="primary">再来一次</button>
+          </div>
+        </header>
+
+        <div class="summary-score-banner">
+          <div class="score-box">
+            <div class="score-label">人生综合评分</div>
+            <div class="score-value-wrap">
+              <span id="summary-score-val" class="score-value">0</span>
+            </div>
+          </div>
+          <div id="summary-score-rank" class="score-rank"></div>
+        </div>
+
+        <div class="summary-hero">
+          <div class="hero-avatar-wrap">
+            <canvas id="summary-avatar" class="hero-avatar"></canvas>
+            <div id="summary-hero-meta" class="hero-meta"></div>
+          </div>
+          <div class="sum-card sum-card-ending hero-ending">
+            <div class="sum-card-label">最终结局</div>
+            <div id="summary-ending" class="sum-card-body"></div>
+          </div>
+        </div>
+
+        <div class="summary-grid">
+          <div class="sum-card sum-card-storylines">
+            <div class="sum-card-label">走过的剧情</div>
+            <div id="summary-storylines" class="sum-card-body"></div>
+          </div>
+
+          <div class="sum-card sum-card-stats">
+            <div class="sum-card-label">属性峰值 vs 终值</div>
+            <div id="summary-stats" class="sum-card-body"></div>
+          </div>
+
+          <div class="sum-card sum-card-talents">
+            <div class="sum-card-label">所选天赋</div>
+            <div id="summary-talents" class="sum-card-body"></div>
+          </div>
+
+          <div class="sum-card sum-card-meta">
+            <div class="sum-card-label">人生数据</div>
+            <div id="summary-meta" class="sum-card-body"></div>
+          </div>
+
+          <div class="sum-card sum-card-highlights">
+            <div class="sum-card-label">命运抉择</div>
+            <div id="summary-highlights" class="sum-card-body"></div>
+          </div>
+
+          <div class="sum-card sum-card-romance">
+            <div class="sum-card-label">恋爱史</div>
+            <div id="summary-romance" class="sum-card-body"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div id="end-overlay" class="end-overlay">
+      <div id="end-card" class="end-card">
+        <div class="end-card-tag" id="end-card-tag"></div>
+        <div class="end-card-text" id="end-card-text"></div>
+        <div class="end-card-actions">
+          <button id="btn-end-restart" class="ghost">再来一次</button>
+          <button id="btn-end-summary" class="primary">查看人生总结</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hidden Poster Template for Image Generation -->
+    <div id="poster-template-container" style="position: absolute; left: -9999px; top: 0; pointer-events: none;">
+      <div id="poster-template" class="poster-template">
+        <div class="poster-header">
+          <div class="poster-title">留学重开模拟器</div>
+          <div class="poster-subtitle">我的专属人生档案</div>
+        </div>
+        
+        <div class="poster-hero">
+          <div class="poster-avatar-box">
+            <img id="poster-avatar" src="" alt="Avatar">
+          </div>
+          <div class="poster-hero-info">
+            <div class="poster-score-box">
+              <div class="poster-score-label">综合评分</div>
+              <div class="poster-score-val" id="poster-score-val">0</div>
+            </div>
+            <div id="poster-rank" class="poster-rank"></div>
+          </div>
+        </div>
+
+        <div id="poster-meta" class="poster-meta-grid"></div>
+
+        <div class="poster-section">
+          <div class="poster-section-title">核心属性终值</div>
+          <div id="poster-stats" class="poster-stats-grid"></div>
+        </div>
+
+        <div class="poster-section">
+          <div class="poster-section-title">所选天赋</div>
+          <div id="poster-talents" class="poster-talents-grid"></div>
+        </div>
+
+        <div class="poster-section">
+          <div class="poster-section-title">最终结局</div>
+          <div id="poster-ending" class="poster-ending-content"></div>
+        </div>
+
+        <div class="poster-section">
+          <div class="poster-section-title">人生轨迹</div>
+          <div id="poster-highlights" class="poster-highlights-content"></div>
+        </div>
+
+        <div class="poster-footer">
+          <div class="poster-qrcode">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://cchck.itch.io/studyabroadsimulator" alt="QR Code" style="width:100%; height:100%; object-fit:contain; border-radius: 6px;">
+          </div>
+          <div class="poster-footer-text" id="poster-footer-text">
+            我在留学重开模拟器中玩出了<span id="poster-footer-rank"></span>级人生，你也快来试试吧！
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
+
+  <div id="poster-modal" class="overlay" style="display:none; z-index: 10000; align-items:center; justify-content:center; background: rgba(0,0,0,0.85); flex-direction:column;">
+    <div class="poster-modal-content" style="position:relative; display:flex; flex-direction:column; align-items:center;">
+      <button id="btn-close-poster" style="position:absolute; right:-40px; top:-40px; background:none; border:none; color:#fff; font-size:32px; cursor:pointer;">&times;</button>
+      <div id="poster-img-wrap" style="max-height:80vh; max-width:90vw; overflow-y:auto; border-radius:12px; border:2px solid #333; box-shadow:0 10px 40px rgba(0,0,0,0.8);"></div>
+      <div style="color:#aaa; margin-top:16px; font-size:14px; letter-spacing:1px;">长按图片或右键保存分享</div>
+    </div>
+  </div>
+
+  <!-- ── Achievement System ─────────────────────────────────────── -->
+  <!-- Achievement wall overlay -->
+  <div id="ach-wall" class="ach-wall-overlay" aria-modal="true" role="dialog" aria-label="成就墙">
+    <div class="ach-wall-panel">
+      <div class="ach-wall-head">
+        <div class="ach-wall-title">🏆&nbsp;&nbsp;成就</div>
+        <span id="ach-wall-count" class="ach-wall-count">0/31</span>
+        <button id="ach-wall-close" class="ach-wall-close" aria-label="关闭成就墙">✕</button>
+      </div>
+      <div id="ach-wall-grid" class="ach-wall-grid"></div>
+    </div>
+  </div>
+
+  <!-- Toast container: bottom-right, stacks upward -->
+  <div id="ach-toast-container" class="ach-toast-container" aria-live="polite"></div>
 
   <script type="module" src="js/game.js"></script>
 </body>
