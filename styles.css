@@ -884,6 +884,9 @@ body.in-game .left-panel {
 .log-entry.log-hidden .log-text {
   color: #e04040 !important;
 }
+.log-entry.log-hogwarts .log-text {
+  color: #9B59B6 !important;
+}
 .log-entry.log-special .log-text {
   color: #f5b642 !important;
 }

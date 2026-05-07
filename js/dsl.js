@@ -12,7 +12,15 @@ const ALIASES = {
   relationship: 'relationship', REL: 'relationship',
   cul: 'cul', CUL: 'cul', dao: 'dao', DAO: 'dao',
   karma: 'karma', KARMA: 'karma', tribulation: 'tribulation', TRIB: 'tribulation',
-  xianxiaSeed: 'xianxiaSeed', yuanshen_book: 'yuanshen_book', xingchen_book: 'xingchen_book'
+  xianxiaSeed: 'xianxiaSeed', yuanshen_book: 'yuanshen_book', xingchen_book: 'xingchen_book',
+  MAG: 'MAG', hogwartsYear: 'hogwartsYear', housePt: 'housePt', house: 'house',
+  hasOwl: 'hasOwl', hogwartsSeed: 'hogwartsSeed',
+  canFly: 'canFly', quidditch: 'quidditch', darkForces: 'darkForces',
+  DA_member: 'DA_member', triwizard: 'triwizard',
+  invisibility_cloak: 'invisibility_cloak', hogsmeade_secret: 'hogsmeade_secret',
+  spell_expelliarmus: 'spell_expelliarmus', spell_protego: 'spell_protego',
+  spell_stupefy: 'spell_stupefy', spell_lumos: 'spell_lumos', spell_patronus: 'spell_patronus',
+  voldemort_defeated: 'voldemort_defeated'
 };
 
 function readVar(state, key) {

@@ -1,0 +1,608 @@
+[
+  {
+    "id": 61001,
+    "text": "路过一家魔法宠物店，橱窗里一只雪白的猫头鹰正直勾勾地盯着你，仿佛在等你很久了。",
+    "include": "TLT?[6001]&MNY>7&AGE>=16",
+    "weight": 80,
+    "choices": [
+      {
+        "text": "买下它（花费不少零花钱）",
+        "effect": { "MNY": -2, "HAP": 3 },
+        "set": { "hasOwl": 1 },
+        "next": 61002
+      },
+      {
+        "text": "只是一只普通的鸟，走了",
+        "effect": {}
+      }
+    ]
+  },
+  {
+    "id": 61002,
+    "text": "你给猫头鹰取名海德薇。它似乎格外通人性，总是在深夜衔来一些奇怪的东西——羽毛笔、蜡封信纸、一颗会发光的弹珠。",
+    "noRandom": true,
+    "effect": { "HAP": 2 }
+  },
+  {
+    "id": 61003,
+    "text": "一个平常的早晨，海德薇衔来一封厚重的羊皮纸信。蜡封上印着一个盾徽——狮子、蛇、獾、鹰环绕着一个大大的\"H\"。信中写道：亲爱的同学，我们荣幸地通知您，您已获准在霍格沃茨魔法学校就读。",
+    "include": "hasOwl=1&TLT?[6001]",
+    "weight": 100,
+    "set": { "hogwartsSeed": 1 },
+    "logType": "hidden",
+    "choices": [
+      {
+        "text": "这一定是恶作剧……吧？",
+        "next": 61004
+      },
+      {
+        "text": "握紧老魔杖，你知道这一天终会来临",
+        "next": 61004
+      }
+    ]
+  },
+  {
+    "id": 61004,
+    "text": "你按信上的指示来到火车站。在9号和10号站台之间，你深吸一口气，推着行李冲向那面砖墙——身体穿墙而过！眼前是一列猩红色的蒸汽火车，车头铭牌写着：霍格沃茨特快。",
+    "noRandom": true,
+    "effect": { "HAP": 5 },
+    "logType": "hidden",
+    "branch": ["?61005"]
+  },
+  {
+    "id": 61005,
+    "text": "火车穿过苏格兰高地的山谷和湖泊。窗外暮色渐浓时，远处山顶出现了一座灯火通明的城堡——尖塔、廊桥、无数窗口映着温暖的光。你到了。",
+    "noRandom": true,
+    "set": {
+      "storyline": "hogwarts",
+      "school": "无",
+      "profession": "霍格沃茨学生",
+      "MAG": 1,
+      "hogwartsYear": 1,
+      "housePt": 0
+    },
+    "effect": { "HAP": 5, "INT": 1 },
+    "logType": "hidden",
+    "branch": ["?61006"]
+  },
+  {
+    "id": 61006,
+    "text": "大礼堂的天花板映着漫天星辰。一顶破旧的帽子被放在你面前——分院帽。它的褶皱像一张嘴巴那样裂开：\"嗯……让我看看，你的脑袋里藏着什么？\"",
+    "noRandom": true,
+    "logType": "hidden",
+    "choices": [
+      {
+        "text": "格兰芬多！——勇气与骑士精神",
+        "set": { "house": "gryffindor" },
+        "effect": { "PER": 2, "HLT": 1 },
+        "next": 61010
+      },
+      {
+        "text": "拉文克劳！——智慧与求知欲",
+        "set": { "house": "ravenclaw" },
+        "effect": { "INT": 2, "MAG": 1 },
+        "next": 61011
+      },
+      {
+        "text": "赫奇帕奇！——忠诚与勤勉",
+        "set": { "house": "hufflepuff" },
+        "effect": { "SOC": 2, "HAP": 2 },
+        "next": 61012
+      },
+      {
+        "text": "斯莱特林！——野心与谋略",
+        "set": { "house": "slytherin" },
+        "effect": { "MNY": 1, "INT": 1, "MAG": 1 },
+        "next": 61013
+      }
+    ]
+  },
+  {
+    "id": 61010,
+    "text": "\"格兰芬多！\"分院帽高声喊道。最左边那张长桌爆发出雷鸣般的掌声和欢呼。你坐下时，一个红头发的学长拍了拍你的肩膀：\"欢迎加入，勇士。\"",
+    "noRandom": true,
+    "logType": "hidden",
+    "effect": { "HAP": 3 }
+  },
+  {
+    "id": 61011,
+    "text": "\"拉文克劳！\"分院帽宣布。铜蓝色桌旗下的学生们优雅地鼓掌。一个戴着奇特眼镜的女孩递给你一本书：\"入学礼物，霍格沃茨千年秘闻录。\"",
+    "noRandom": true,
+    "logType": "hidden",
+    "effect": { "HAP": 3 }
+  },
+  {
+    "id": 61012,
+    "text": "\"赫奇帕奇！\"分院帽温和地说。黄黑色长桌传来热情的欢呼，好几个人同时站起来和你握手。\"我们这儿没有架子，\"一个圆脸男生笑着说，\"待会儿带你去厨房拿宵夜。\"",
+    "noRandom": true,
+    "logType": "hidden",
+    "effect": { "HAP": 3 }
+  },
+  {
+    "id": 61013,
+    "text": "\"斯莱特林！\"分院帽的声音意味深长。银绿色长桌的掌声克制而整齐。一个金发少年微微颔首：\"不错的选择。在这里，你会学到真正有用的东西。\"",
+    "noRandom": true,
+    "logType": "hidden",
+    "effect": { "HAP": 3 }
+  },
+
+  {
+    "id": 61100,
+    "storyline": "hogwarts",
+    "text": "飞行课上，你第一次骑上扫帚。风灌满袍子的瞬间，地面急速远离——你天生就属于天空。",
+    "include": "hogwartsYear<=2",
+    "effect": { "MAG": 1, "HLT": 1, "HAP": 2 },
+    "set": { "canFly": 1 },
+    "weight": 8
+  },
+  {
+    "id": 61101,
+    "storyline": "hogwarts",
+    "text": "变形术课上，麦格教授让你把火柴变成针。你集中精神，挥动魔杖——火柴缓缓变银、变尖。\"很好，加十分。\"",
+    "include": "hogwartsYear<=3",
+    "effect": { "MAG": 1, "INT": 1 },
+    "weight": 6,
+    "repeatable": true
+  },
+  {
+    "id": 61102,
+    "storyline": "hogwarts",
+    "text": "魔药课的地牢里弥漫着刺鼻的气味。你小心翼翼地按配方加入蝾螈眼和月光草——坩埚里的液体变成完美的蓝绿色。",
+    "include": "hogwartsYear<=4",
+    "effect": { "INT": 1, "PER": 1 },
+    "weight": 6,
+    "repeatable": true
+  },
+  {
+    "id": 61103,
+    "storyline": "hogwarts",
+    "text": "黑魔法防御课上，教授教你们\"除你武器\"咒。你对着训练假人挥杖：\"Expelliarmus！\"——一道红光击中目标，假人手中的棍子飞了出去。",
+    "effect": { "MAG": 2 },
+    "set": { "spell_expelliarmus": 1 },
+    "storyline": "hogwarts",
+    "weight": 7
+  },
+  {
+    "id": 61104,
+    "storyline": "hogwarts",
+    "text": "你在走廊上练习盔甲护身咒。\"Protego！\"一面半透明的银色屏障出现在面前，弹开了恶作剧鬼皮尔维斯扔来的水球。",
+    "effect": { "MAG": 1, "PER": 1 },
+    "set": { "spell_protego": 1 },
+    "storyline": "hogwarts",
+    "weight": 6
+  },
+  {
+    "id": 61105,
+    "storyline": "hogwarts",
+    "text": "深夜，你偷偷溜进禁书区，翻开一本发出低语声的古书。书页上的文字教你了\"昏昏倒地\"咒的正确手势。",
+    "include": "PER>5",
+    "effect": { "MAG": 2, "INT": 1 },
+    "set": { "spell_stupefy": 1 },
+    "storyline": "hogwarts",
+    "weight": 5
+  },
+  {
+    "id": 61106,
+    "storyline": "hogwarts",
+    "text": "在魅力课上，弗立维教授用尖细的嗓音教你\"荧光闪烁\"。你的杖尖亮起柔和的光芒——以后再也不怕黑暗了。",
+    "effect": { "MAG": 1, "HAP": 1 },
+    "set": { "spell_lumos": 1 },
+    "storyline": "hogwarts",
+    "weight": 7,
+    "repeatable": true
+  },
+  {
+    "id": 61107,
+    "storyline": "hogwarts",
+    "text": "你花了整整一个月练习守护神咒。终于，在一个满月的夜晚，你的杖尖涌出银色光雾，凝成一只闪耀的动物——你的守护神。",
+    "include": "MAG>=8&hogwartsYear>=3",
+    "effect": { "MAG": 3, "HAP": 3, "PER": 1 },
+    "set": { "spell_patronus": 1 },
+    "storyline": "hogwarts",
+    "weight": 5
+  },
+
+  {
+    "id": 61200,
+    "storyline": "hogwarts",
+    "text": "魁地奇赛季开始了！队长看中了你的飞行天赋，邀请你加入学院队。",
+    "include": "canFly=1&hogwartsYear>=2",
+    "weight": 8,
+    "choices": [
+      {
+        "text": "加入！追求金色飞贼的快感无与伦比",
+        "set": { "quidditch": 1 },
+        "effect": { "HAP": 3, "HLT": 2, "SOC": 1 }
+      },
+      {
+        "text": "算了，还是专心学业",
+        "effect": { "INT": 1, "MAG": 1 }
+      }
+    ]
+  },
+  {
+    "id": 61201,
+    "storyline": "hogwarts",
+    "text": "魁地奇比赛日！你骑着扫帚冲上天空，对手的游走球擦着耳边飞过。",
+    "include": "quidditch=1",
+    "weight": 7,
+    "choices": [
+      {
+        "text": "全力进攻，冲向金色飞贼",
+        "effect": { "HAP": 3, "HLT": -1, "housePt": 15 },
+        "next": 61202
+      },
+      {
+        "text": "稳扎稳打，先帮队友挡住游走球",
+        "effect": { "SOC": 1, "housePt": 5, "PER": 1 }
+      }
+    ],
+    "repeatable": true
+  },
+  {
+    "id": 61202,
+    "text": "你的手指合拢——触到了那颗冰凉光滑的金属球！全场沸腾，你的学院赢了！",
+    "noRandom": true,
+    "effect": { "HAP": 5, "SOC": 2, "housePt": 30 },
+    "storyline": "hogwarts"
+  },
+
+  {
+    "id": 61300,
+    "storyline": "hogwarts",
+    "text": "决斗俱乐部开张了！讲台上两个学生面对面举杖行礼。教授问：\"谁想上来试试？\"",
+    "include": "hogwartsYear>=2",
+    "weight": 6,
+    "choices": [
+      {
+        "text": "举手上台",
+        "next": 61301
+      },
+      {
+        "text": "在台下观摩学习",
+        "effect": { "INT": 1, "MAG": 1 }
+      }
+    ]
+  },
+  {
+    "id": 61301,
+    "text": "你面对对手，心脏狂跳。对方率先出招——",
+    "noRandom": true,
+    "storyline": "hogwarts",
+    "choices": [
+      {
+        "text": "\"除你武器！\"先发制人",
+        "showExpr": "EVT?[61103]",
+        "effect": { "MAG": 2, "SOC": 2, "housePt": 10 }
+      },
+      {
+        "text": "\"盔甲护身！\"防御反击",
+        "showExpr": "EVT?[61104]",
+        "effect": { "MAG": 1, "PER": 2, "housePt": 5 }
+      },
+      {
+        "text": "慌乱中瞎挥魔杖",
+        "effect": { "HAP": -2, "HLT": -1 }
+      }
+    ]
+  },
+
+  {
+    "id": 61400,
+    "storyline": "hogwarts",
+    "text": "四年级开学典礼上，邓布利多宣布：\"今年，霍格沃茨将举办三强争霸赛！\"火焰杯的蓝色火焰在大礼堂中央跃动。",
+    "include": "hogwartsYear>=4&MAG>=6",
+    "weight": 10,
+    "choices": [
+      {
+        "text": "把写着名字的纸条投入火焰杯",
+        "set": { "triwizard": 1 },
+        "next": 61401
+      },
+      {
+        "text": "这比赛太危险了，还是当观众吧",
+        "effect": { "HAP": -1 }
+      }
+    ]
+  },
+  {
+    "id": 61401,
+    "text": "火焰杯喷出一团火花，吐出一张焦黑的纸片——上面是你的名字。大礼堂陷入短暂的沉默，随后你的学院爆发出震耳的欢呼。你是霍格沃茨的勇士。",
+    "noRandom": true,
+    "storyline": "hogwarts",
+    "effect": { "HAP": 3, "SOC": 2 },
+    "logType": "hidden",
+    "branch": ["?61402"]
+  },
+  {
+    "id": 61402,
+    "text": "第一个项目：面对一只守着金蛋的火龙。它的眼睛像熔岩，鳞片反射着烈焰。",
+    "noRandom": true,
+    "storyline": "hogwarts",
+    "choices": [
+      {
+        "text": "用飞天扫帚引开火龙",
+        "showExpr": "canFly=1",
+        "effect": { "MAG": 2, "HLT": -1, "housePt": 20 },
+        "next": 61403
+      },
+      {
+        "text": "用变形术把石头变成动物引开它",
+        "showExpr": "MAG>=8",
+        "effect": { "MAG": 3, "INT": 1, "housePt": 25 },
+        "next": 61403
+      },
+      {
+        "text": "硬冲过去抢金蛋",
+        "effect": { "HLT": -5, "PER": 2, "housePt": 10 },
+        "next": 61403
+      }
+    ]
+  },
+  {
+    "id": 61403,
+    "text": "你成功拿到了金蛋！打开它，里面传出一段诡异的尖叫声——线索指向黑湖。",
+    "noRandom": true,
+    "storyline": "hogwarts",
+    "effect": { "HAP": 3 },
+    "branch": ["?61404"]
+  },
+  {
+    "id": 61404,
+    "text": "第二个项目：黑湖深潜。你必须在一小时内从人鱼手中救回人质。冰冷的湖水吞没了你。",
+    "noRandom": true,
+    "storyline": "hogwarts",
+    "choices": [
+      {
+        "text": "使用鳃囊草水下呼吸",
+        "showExpr": "INT>=6",
+        "effect": { "MAG": 2, "housePt": 20 }
+      },
+      {
+        "text": "用泡头咒撑出空气泡",
+        "showExpr": "MAG>=10",
+        "effect": { "MAG": 3, "housePt": 25 }
+      },
+      {
+        "text": "憋气硬游，靠毅力撑过去",
+        "effect": { "HLT": -3, "PER": 3, "housePt": 10 }
+      }
+    ]
+  },
+
+  {
+    "id": 61500,
+    "storyline": "hogwarts",
+    "text": "夜里，你的伤疤（不对，是老魔杖）忽然灼热起来。走廊尽头闪过一个黑袍身影——禁林方向升起了骷髅头状的绿光：黑魔标记。",
+    "include": "hogwartsYear>=5",
+    "weight": 10,
+    "effect": { "HAP": -3 },
+    "logType": "hidden",
+    "set": { "darkForces": 1 },
+    "branch": ["?61501"]
+  },
+  {
+    "id": 61501,
+    "text": "邓布利多在晨会上神情严肃：\"黑暗势力正在集结。我需要志愿者加入一个秘密组织——邓布利多军。\"",
+    "noRandom": true,
+    "storyline": "hogwarts",
+    "logType": "hidden",
+    "choices": [
+      {
+        "text": "毫不犹豫地站起来",
+        "set": { "DA_member": 1 },
+        "effect": { "PER": 2, "MAG": 2, "SOC": 1 }
+      },
+      {
+        "text": "低下头，假装没听见",
+        "effect": { "HAP": -2 }
+      }
+    ]
+  },
+  {
+    "id": 61502,
+    "storyline": "hogwarts",
+    "text": "邓布利多军的秘密训练：今天练习的是高级防御咒语。你和同伴们互相对练，魔杖火花四溅。",
+    "include": "DA_member=1",
+    "weight": 7,
+    "effect": { "MAG": 2, "PER": 1, "SOC": 1 },
+    "repeatable": true
+  },
+  {
+    "id": 61503,
+    "storyline": "hogwarts",
+    "text": "食死徒潜入了城堡！走廊上响起爆炸声和尖叫。你紧握魔杖，面前出现三个黑袍巫师。",
+    "include": "darkForces=1&hogwartsYear>=6",
+    "weight": 9,
+    "logType": "hidden",
+    "choices": [
+      {
+        "text": "\"昏昏倒地！\"连续攻击",
+        "showExpr": "EVT?[61105]",
+        "effect": { "MAG": 3, "housePt": 20, "PER": 1 }
+      },
+      {
+        "text": "\"呼神护卫！\"召唤守护神",
+        "showExpr": "EVT?[61107]",
+        "effect": { "MAG": 4, "HAP": 2, "housePt": 30 }
+      },
+      {
+        "text": "\"盔甲护身！\"掩护同学撤退",
+        "showExpr": "EVT?[61104]",
+        "effect": { "MAG": 2, "SOC": 3, "housePt": 15 }
+      },
+      {
+        "text": "转身逃跑",
+        "effect": { "HAP": -5, "SOC": -2 }
+      }
+    ]
+  },
+
+  {
+    "id": 61600,
+    "storyline": "hogwarts",
+    "text": "第七年。城堡上空布满阴云，远处的山丘上黑压压站满了食死徒和巨人。邓布利多的声音响彻每个角落：\"霍格沃茨保卫战，现在开始。\"",
+    "include": "hogwartsYear>=7&darkForces=1",
+    "weight": 100,
+    "logType": "hidden",
+    "effect": { "HAP": -3 },
+    "branch": ["?61601"]
+  },
+  {
+    "id": 61601,
+    "text": "城堡的石甲骑士在你身边活了过来，加入战斗。爆炸声不断，墙壁碎裂。你必须穿过战场。",
+    "noRandom": true,
+    "storyline": "hogwarts",
+    "logType": "hidden",
+    "choices": [
+      {
+        "text": "冲在最前线，用所有学过的咒语战斗",
+        "showExpr": "MAG>=12",
+        "effect": { "MAG": 3, "HLT": -3, "PER": 2 },
+        "next": 61602
+      },
+      {
+        "text": "组织低年级学生撤退",
+        "showExpr": "SOC>=6",
+        "effect": { "SOC": 3, "PER": 2 },
+        "next": 61602
+      },
+      {
+        "text": "寻找并摧毁伏地魔的魂器",
+        "showExpr": "INT>=8",
+        "effect": { "INT": 3, "MAG": 2 },
+        "next": 61603
+      }
+    ]
+  },
+  {
+    "id": 61602,
+    "text": "战斗持续了整整一夜。黎明时分，一个苍白如蛇的身影出现在废墟中——伏地魔。他的红眼直视着你手中的老魔杖。\"那根杖……是我的。\"",
+    "noRandom": true,
+    "storyline": "hogwarts",
+    "logType": "hidden",
+    "branch": ["?61610"]
+  },
+  {
+    "id": 61603,
+    "text": "你在有求必应屋找到了最后一个魂器——拉文克劳的冠冕。摧毁它的瞬间，一声非人的尖叫响彻城堡。然后，你去面对那个没有了所有灵魂碎片的黑魔王。",
+    "noRandom": true,
+    "storyline": "hogwarts",
+    "logType": "hidden",
+    "effect": { "INT": 2, "MAG": 2 },
+    "branch": ["?61610"]
+  },
+  {
+    "id": 61610,
+    "text": "伏地魔举起魔杖：\"阿瓦达索命！\"绿光直奔而来——",
+    "noRandom": true,
+    "storyline": "hogwarts",
+    "logType": "hidden",
+    "choices": [
+      {
+        "text": "\"除你武器！\"——以老魔杖的力量正面抗衡",
+        "showExpr": "EVT?[61103]&MAG>=10",
+        "next": 61611
+      },
+      {
+        "text": "\"呼神护卫！\"——以守护神阻挡死咒",
+        "showExpr": "EVT?[61107]",
+        "next": 61612
+      },
+      {
+        "text": "闭上眼睛，接受命运",
+        "next": 61613
+      }
+    ]
+  },
+  {
+    "id": 61611,
+    "text": "两道光束在空中相撞！老魔杖在你手中爆发出从未有过的力量——它认出了它真正的主人。伏地魔的杀戮咒被弹了回去，击中他自己。黑魔王倒下了。晨光洒在废墟上，欢呼声从四面八方涌来。",
+    "noRandom": true,
+    "storyline": "hogwarts",
+    "logType": "hidden",
+    "effect": { "MAG": 10, "HAP": 10, "SOC": 5, "housePt": 100 },
+    "set": { "voldemort_defeated": 1 },
+    "end": true
+  },
+  {
+    "id": 61612,
+    "text": "银色的守护神挡住了死咒，为你争取了一瞬间。你趁机挥出老魔杖——\"Expelliarmus！\"伏地魔的魔杖脱手飞出。失去魔杖的黑魔王化为灰烬消散在风中。结束了。",
+    "noRandom": true,
+    "storyline": "hogwarts",
+    "logType": "hidden",
+    "effect": { "MAG": 8, "HAP": 8, "SOC": 3, "housePt": 80 },
+    "set": { "voldemort_defeated": 1 },
+    "end": true
+  },
+  {
+    "id": 61613,
+    "text": "绿光吞没了一切。但在无尽的白色中，你醒了过来。一个熟悉的声音说：\"你可以选择回去。\"你选择了回去。死而复生的你重新站起，拿起老魔杖，向伏地魔走去。这一次，你不再恐惧。",
+    "noRandom": true,
+    "storyline": "hogwarts",
+    "logType": "hidden",
+    "effect": { "MAG": 5, "HAP": 5, "PER": 5, "housePt": 50 },
+    "set": { "voldemort_defeated": 1 },
+    "end": true
+  },
+
+  {
+    "id": 61700,
+    "storyline": "hogwarts",
+    "text": "圣诞节到了，大礼堂挂满了冰柱装饰和活圣诞树。你在壁炉旁拆开礼物——一件隐形衣！",
+    "include": "hogwartsYear<=3",
+    "weight": 4,
+    "effect": { "HAP": 3 },
+    "set": { "invisibility_cloak": 1 }
+  },
+  {
+    "id": 61701,
+    "storyline": "hogwarts",
+    "text": "你披着隐形衣偷溜进厨房，家养小精灵们热情地塞给你一大堆蛋糕和黄油啤酒。",
+    "include": "invisibility_cloak=1",
+    "weight": 5,
+    "effect": { "HAP": 2, "HLT": 1 },
+    "repeatable": true
+  },
+  {
+    "id": 61702,
+    "storyline": "hogwarts",
+    "text": "海格邀请你去他的小屋喝茶。他养的新宠物——一条火蜥蜴——差点把你的眉毛烧掉。",
+    "weight": 5,
+    "effect": { "HAP": 2, "HLT": -1 },
+    "repeatable": true
+  },
+  {
+    "id": 61703,
+    "storyline": "hogwarts",
+    "text": "活点地图上出现了一个不该在这里的名字。你顺着它走，发现了一条通往霍格莫德的秘密通道。",
+    "include": "hogwartsYear>=3",
+    "weight": 4,
+    "effect": { "INT": 1, "HAP": 2 },
+    "set": { "hogsmeade_secret": 1 }
+  },
+  {
+    "id": 61704,
+    "storyline": "hogwarts",
+    "text": "你在霍格莫德的蜂蜜公爵糖果店花光了零花钱，抱着一大袋比比多味豆和巧克力蛙回来。",
+    "include": "hogwartsYear>=3",
+    "weight": 5,
+    "effect": { "HAP": 3, "MNY": -1 },
+    "repeatable": true
+  },
+  {
+    "id": 61705,
+    "storyline": "hogwarts",
+    "text": "差点被活动楼梯甩到禁区走廊，你抓住栏杆时，看见三头犬路威在门缝后打呼噜。",
+    "weight": 4,
+    "effect": { "HAP": -1, "INT": 1 }
+  },
+  {
+    "id": 61706,
+    "storyline": "hogwarts",
+    "text": "皮皮鬼朝你泼了一桶墨水。你浑身漆黑地站在走廊里，旁边的幽灵笑得前仰后合。",
+    "weight": 5,
+    "effect": { "HAP": -2, "SOC": -1 },
+    "repeatable": true
+  }
+]

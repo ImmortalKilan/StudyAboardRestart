@@ -24,7 +24,8 @@ const LEGENDARY_ENDINGS = new Set([
   85061, // Chef 3-Star
   81090, // Poker God
   86105, 86120, 86136, // Athlete Top Tier (NBA状元, World Cup Champion, Frisbee Worlds Champion)
-  87190 // Thief Ghost Rating
+  87190, // Thief Ghost Rating
+  61611 // Hogwarts: defeated Voldemort with Elder Wand
 ]);
 
 const GOOD_ENDINGS = new Set([
@@ -32,7 +33,8 @@ const GOOD_ENDINGS = new Set([
   82096, // Corporate Elite
   84091, // Fitness Influencer
   85091, 85092, // Chef 2-Star / 1-Star
-  90050, 90052, 90054, 90056 // Late dropout good endings
+  90050, 90052, 90054, 90056, // Late dropout good endings
+  61612, 61613 // Hogwarts: defeated Voldemort (patronus / resurrection)
 ]);
 
 function deriveRealm(cul) {
@@ -269,7 +271,31 @@ const STORYLINE_CFG = {
     deathChecks: [],
     flavor: () => xianxiaFlavor(),
   },
+  hogwarts: {
+    gracePeriod: 24,
+    eventRate: 0.6,
+    progressChecks: [
+      { cond: s => (s.hogwartsYear || 1) >= 7 && !s.firedEvents.has(61600) && (s.darkForces || 0) === 0, event: 61500 },
+    ],
+    deathChecks: [],
+    flavor: () => hogwartsFlavor(),
+  },
 };
+
+// ── Hogwarts flavor lines ──────────────────────────────────────
+function hogwartsFlavor() {
+  const lines = [
+    '你在公共休息室里做着魔药学的论文，壁炉里的火焰跳跃不停。',
+    '猫头鹰送来了家里的包裹，里面是一大盒自制曲奇。',
+    '你在图书馆翻阅《高级魔药制作》，差点打翻旁边的墨水瓶。',
+    '移动楼梯又变了方向，你在城堡里多走了二十分钟的冤枉路。',
+    '差点被打人柳的枝条抽中，你及时跳开了。',
+    '晚饭时南瓜汁喝了三杯，幽灵们在头顶飘来飘去。',
+    '你在天文塔顶看星星，辨认着猎户座和天狼星的位置。',
+    '草药学课上，你成功让曼德拉草安静下来了。',
+  ];
+  return lines[Math.floor(Math.random() * lines.length)];
+}
 
 // ── Idol stage clock (System D) ─────────────────────────────────
 // Stages: 'training' (0-12 mo) → 'debut_window' (12-60 mo) → 'debuted'
@@ -633,6 +659,15 @@ function updateAthleteStage() {
   }
 }
 
+function updateHogwartsYear() {
+  if (state.storyline !== 'hogwarts') return;
+  const monthsIn = (state.monthTotal || 0) - (state.storylineStartMonth || 0);
+  const year = Math.min(7, Math.floor(monthsIn / 12) + 1);
+  if (year > (state.hogwartsYear || 1)) {
+    state.hogwartsYear = year;
+  }
+}
+
 function computeAthleteProb(s) {
   if (s.storyline !== 'athlete') return 0;
   let p = -15;
@@ -894,8 +929,9 @@ const STORYLINE_NAMES = {
   chef: '校园厨神',
   athlete: '校队之星',
   thief: '影子协会',
+  hogwarts: '霍格沃茨',
 };
-const HIDDEN_STORYLINES = new Set(['spy', 'abyss', 'meta', 'xianxia', 'thief']);
+const HIDDEN_STORYLINES = new Set(['spy', 'abyss', 'meta', 'xianxia', 'thief', 'hogwarts']);
 const SPECIAL_STORYLINES = new Set(['idol', 'superstar', 'streamer', 'poker', 'triton', 'local_shark', 'party', 'ceo', 'wasted', 'esports', 'worlds', 'minor_league', 'fitness', 'chef', 'athlete']);
 const STORYLINE_UNLOCK_STAT = {
   idol: 'POP', superstar: 'POP', streamer: 'POP',
@@ -958,6 +994,7 @@ const state = {
   POP: 0, POK: 0, MMR: 0,
   cul: 0, dao: 0, karma: 0, tribulation: 0,
   xianxiaSeed: 0, yuanshen_book: 0, xingchen_book: 0,
+  MAG: 0, hogwartsYear: 0, housePt: 0, house: '', hasOwl: 0, hogwartsSeed: 0,
 
   // Summary tracking
   statPeaks: {},
@@ -970,16 +1007,17 @@ let autoMode = 0;
 let sessionPlayCount = 0;
 
 async function loadData() {
-  const [talents, events, ages, randomEvents, xianxiaEvents] = await Promise.all([
+  const [talents, events, ages, randomEvents, xianxiaEvents, hogwartsEvents] = await Promise.all([
     fetch('data/talents.json').then(r => r.json()),
     fetch('data/events.json').then(r => r.json()),
     fetch('data/ages.json').then(r => r.json()),
     fetch('data/random_events.json').then(r => r.json()),
-    fetch('data/xianxia_events.json').then(r => r.json()).catch(() => [])
+    fetch('data/xianxia_events.json').then(r => r.json()).catch(() => []),
+    fetch('data/hogwarts_events.json').then(r => r.json()).catch(() => [])
   ]);
   state.eventsMap = new Map(events.map(e => [e.id, e]));
   state.agesMap = ages;
-  state.randomEvents = randomEvents.concat(xianxiaEvents);
+  state.randomEvents = randomEvents.concat(xianxiaEvents).concat(hogwartsEvents);
   // Also index random events into eventsMap for branch lookups
   for (const re of state.randomEvents) state.eventsMap.set(re.id, re);
   return talents;
@@ -1324,7 +1362,7 @@ function applyEvent(ev) {
     const prevStat = STORYLINE_UNLOCK_STAT[prevStorylineForCinematic];
     playStorylineIntro({
       name: STORYLINE_NAMES[state.storyline] || state.storyline,
-      color: isHidden ? '#ff5252' : '#d4af37',
+      color: state.storyline === 'hogwarts' ? '#9B59B6' : (isHidden ? '#ff5252' : '#d4af37'),
       unlockStat: (newStat && newStat !== prevStat) ? newStat : null,
       statLabels: STAT_LABELS,
       onDone: () => {
@@ -1408,7 +1446,7 @@ function _checkEventAchievements(ev) {
         spy: 'sl_spy', xianxia: 'sl_xianxia', abyss: 'sl_abyss', meta: 'sl_meta',
         idol: 'sl_idol', superstar: 'sl_superstar', streamer: 'sl_streamer',
         party: 'sl_party', wasted: 'sl_wasted', poker: 'sl_poker',
-        esports: 'sl_esports', worlds: 'sl_worlds',
+        esports: 'sl_esports', worlds: 'sl_worlds', hogwarts: 'sl_hogwarts',
       };
       if (SL_MAP[sl]) unlockAchievement(SL_MAP[sl]);
     }
@@ -1439,7 +1477,8 @@ function pushLog(text, typeOverride) {
   const tag = `${state.age}岁${state.monthOfYear}月`;
   let logType = typeOverride || '';
   if (!logType && state.storyline) {
-    logType = HIDDEN_STORYLINES.has(state.storyline) ? 'hidden' : 'special';
+    if (state.storyline === 'hogwarts') logType = 'hogwarts';
+    else logType = HIDDEN_STORYLINES.has(state.storyline) ? 'hidden' : 'special';
   }
   state.log.push({ tag, text, logType });
   if (state.log.length > 200) {
@@ -1652,6 +1691,7 @@ function advanceMonth() {
     updateFitnessStage();
     updateChefStage();
     updateAthleteStage();
+    updateHogwartsYear();
     if (state.phase === 'ended' || state.pendingChoice) { render(); return; }
     // === Storyline mode: skip normal events, only draw storyline events ===
     const cfg = STORYLINE_CFG[state.storyline];
