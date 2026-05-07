@@ -35,59 +35,187 @@ FOLDER: assets/avatars/head/
 Face + neck stub only. Top of skull BARE (hair overlays).
 Head occupies approx y=6 to y=52. Max 8 colors.
 
-GENERATE: male_light_a.png
-Head layer, transparent PNG 72x72. Male, 3/4 angle facing lower-left. Light peach skin (#fce4c8) + shadow shade (#e0b898). Rounded rectangular head, left cheek more prominent. Large anime-style eyes: dark iris (#2a1a1a), 1 white highlight pixel, thin eyelid line above. Small nose: 2px shadow. Relaxed closed neutral mouth. Top of skull bare/transparent — NO hair. Neck stub center-bottom. 8 colors max.
+NAMING CONVENTION: {sex}_{skin}_{app}_{emotion}.png
+  sex:     male / female
+  skin:    light (#fce4c8 + shadow #e0b898) / mid (#d4a870 + shadow #b88a50) / dark (#a06840 + shadow #885228)
+  app:     a = plain ordinary  |  b = good-looking  |  c = striking/beautiful
+  emotion: happy (wide smile, squint-joy eyes, blush)  |  neutral (calm, flat mouth)  |  sad (drooping lids, downturned corners, no blush)
 
-GENERATE: male_light_b.png
-Head layer, transparent PNG 72x72. Male, 3/4 angle facing lower-left. Light peach skin (#fce4c8) + shadow (#e0b898). Narrower face than _a, sharper almond eyes, thinner eyelids. Determined composed neutral expression. Thin straight mouth line. Top of skull bare. Neck stub. 8 colors max.
+Total 54 sprites. Top of skull always bare (hair overlay goes here). Neck stub at center-bottom.
 
-GENERATE: male_light_c.png
-Head layer, transparent PNG 72x72. Male, 3/4 angle facing lower-left. Light peach skin (#fce4c8) + shadow (#e0b898). Rounder chubbier cheeks, wider brighter eyes with slight lash curve. Gentle soft expression, subtle upturn at mouth corners. Top of skull bare. Neck stub. 8 colors max.
+--- MALE LIGHT ---
 
-GENERATE: male_mid_a.png
-Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Warm tan skin (#d4a870) + shadow (#b88a50). Rounded head, expressive eyes with iris highlight, small nose shadow, relaxed neutral mouth. Top bare. Neck stub. 8 colors max.
+GENERATE: male_light_a_happy.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Plain rounded head, ordinary proportions. Eyes squinted with joy — upper eyelid curves down, bright iris highlight. Wide open smile showing 2px white teeth row. Warm blush pixels on far cheek. Top bare. Neck stub. 8 colors max.
 
-GENERATE: male_mid_b.png
-Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Warm tan skin (#d4a870) + shadow (#b88a50). Narrower face, sharper eyes, determined composed expression. Top bare. Neck stub. 8 colors max.
+GENERATE: male_light_a_neutral.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Plain rounded head, ordinary proportions. Calm open eyes, dark iris with 1 white highlight pixel, thin eyelid line. Relaxed flat closed mouth. No blush. Top bare. Neck stub. 8 colors max.
 
-GENERATE: male_mid_c.png
-Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Warm tan skin (#d4a870) + shadow (#b88a50). Round chubby face, wide bright eyes, gentle soft expression. Top bare. Neck stub. 8 colors max.
+GENERATE: male_light_a_sad.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Plain rounded head. Eyes with drooping outer corners, heavy upper lids, slightly glazed — extra white highlight pixel at lower corner suggesting moisture. Downturned mouth corners. No blush. Top bare. Neck stub. 8 colors max.
 
-GENERATE: male_dark_a.png
-Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Deep warm brown skin (#a06840) + shadow (#885228). Rounded head, expressive eyes with highlight, small nose shadow, relaxed neutral mouth. Top bare. Neck stub. 8 colors max.
+GENERATE: male_light_b_happy.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Good-looking: well-defined face, sharper jaw. Eyes squinted with joy — confident narrow squint, bright double highlight. Charming wide smile, 2px teeth. Blush on far cheek. Top bare. Neck stub. 8 colors max.
 
-GENERATE: male_dark_b.png
-Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Deep warm brown skin (#a06840) + shadow (#885228). Narrower face, sharper eyes, determined neutral expression. Top bare. Neck stub. 8 colors max.
+GENERATE: male_light_b_neutral.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Good-looking: well-defined face, sharper jaw. Sharp almond eyes, composed confident expression. Thin straight mouth line, slight upward hint at corner. No blush. Top bare. Neck stub. 8 colors max.
 
-GENERATE: male_dark_c.png
-Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Deep warm brown skin (#a06840) + shadow (#885228). Round chubby face, wide soft eyes, gentle expression. Top bare. Neck stub. 8 colors max.
+GENERATE: male_light_b_sad.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Good-looking: well-defined face. Almond eyes with outer lids drooping, pained expression, moisture highlight at lower lash. Downturned mouth, subtle sad frown. No blush. Top bare. Neck stub. 8 colors max.
 
-GENERATE: female_light_a.png
-Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Light peach skin (#fce4c8) + shadow (#e0b898). Softer rounder face than male. Large wide eyes with lash pixels at upper edge, delicate small nose (2px shadow), soft closed neutral mouth. Faint blush suggestion (1-2 pink pixels on far cheek). Top bare. Neck stub. 8 colors max.
+GENERATE: male_light_c_happy.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Striking handsome: chiseled jaw, elegant nose. Eyes deeply squinted with warm joy, double highlight, upper lids curved. Radiant broad smile, 2px white teeth. Strong blush on far cheek. Top bare. Neck stub. 8 colors max.
 
-GENERATE: female_light_b.png
-Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Light peach skin (#fce4c8) + shadow (#e0b898). Narrower elegant face, almond eyes with graceful lash line, composed cool neutral expression, faint thin lips. Top bare. Neck stub. 8 colors max.
+GENERATE: male_light_c_neutral.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Striking handsome: chiseled jaw, elegant nose. Large expressive eyes, double iris highlight, confident gaze. Composed closed mouth, subtle charm at corners. No blush. Top bare. Neck stub. 8 colors max.
 
-GENERATE: female_light_c.png
-Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Light peach skin (#fce4c8) + shadow (#e0b898). Full round cheeks, big bright eyes with double highlight pixel, clear rosy blush on far cheek, cute cheerful-neutral expression. Top bare. Neck stub. 8 colors max.
+GENERATE: male_light_c_sad.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Striking handsome: chiseled jaw. Large eyes with heavy drooping outer lids, sorrowful expression, moisture highlight pixel at lower lash corner. Deep downturned mouth. No blush. Top bare. Neck stub. 8 colors max.
 
-GENERATE: female_mid_a.png
-Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Warm tan skin (#d4a870) + shadow (#b88a50). Soft round face, large wide eyes with lash pixels, small nose shadow, soft neutral mouth, subtle blush. Top bare. Neck stub. 8 colors max.
+--- MALE MID ---
 
-GENERATE: female_mid_b.png
-Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Warm tan skin (#d4a870) + shadow (#b88a50). Narrower elegant face, almond eyes, composed cool expression. Top bare. Neck stub. 8 colors max.
+GENERATE: male_mid_a_happy.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Plain rounded head, ordinary proportions. Eyes squinted with joy, bright iris highlight. Wide smile, 2px white teeth. Warm blush on far cheek. Top bare. Neck stub. 8 colors max.
 
-GENERATE: female_mid_c.png
-Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Warm tan skin (#d4a870) + shadow (#b88a50). Round full cheeks, big bright eyes, double highlight, rosy blush, cute expression. Top bare. Neck stub. 8 colors max.
+GENERATE: male_mid_a_neutral.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Plain rounded head. Calm open eyes, 1 white highlight, thin eyelid. Relaxed flat closed mouth. No blush. Top bare. Neck stub. 8 colors max.
 
-GENERATE: female_dark_a.png
-Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Deep warm brown (#a06840) + shadow (#885228). Soft round face, large anime eyes with lash pixels, small nose, soft neutral mouth, subtle blush. Top bare. Neck stub. 8 colors max.
+GENERATE: male_mid_a_sad.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Plain rounded head. Drooping outer lids, glazed moisture highlight. Downturned mouth corners. No blush. Top bare. Neck stub. 8 colors max.
 
-GENERATE: female_dark_b.png
-Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Deep warm brown (#a06840) + shadow (#885228). Narrower elegant face, almond eyes, composed cool expression. Top bare. Neck stub. 8 colors max.
+GENERATE: male_mid_b_happy.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Good-looking: defined jaw, sharper features. Joy squint eyes, double highlight. Charming smile, 2px teeth. Blush on far cheek. Top bare. Neck stub. 8 colors max.
 
-GENERATE: female_dark_c.png
-Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Deep warm brown (#a06840) + shadow (#885228). Round full cheeks, big bright eyes with double highlights, subtle blush, cute expression. Top bare. Neck stub. 8 colors max.
+GENERATE: male_mid_b_neutral.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Good-looking: defined jaw. Sharp almond eyes, composed confident gaze. Thin mouth, slight upward corner hint. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_mid_b_sad.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Good-looking: defined jaw. Almond eyes drooping outer lids, pain expression, moisture highlight. Downturned mouth. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_mid_c_happy.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Striking handsome: chiseled jaw. Deeply squinted joy eyes, double highlight. Radiant broad smile, 2px teeth. Strong blush on far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_mid_c_neutral.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Striking handsome: chiseled jaw. Large expressive eyes, double highlight, confident gaze. Composed closed mouth, charm at corners. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_mid_c_sad.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Striking handsome. Large eyes, heavy drooping outer lids, sorrowful, moisture highlight. Deep downturned mouth. No blush. Top bare. Neck stub. 8 colors max.
+
+--- MALE DARK ---
+
+GENERATE: male_dark_a_happy.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Plain rounded head. Eyes squinted with joy, bright iris highlight. Wide smile, 2px white teeth. Warm blush on far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_dark_a_neutral.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Plain rounded head. Calm open eyes, white highlight, thin eyelid. Relaxed flat closed mouth. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_dark_a_sad.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Plain rounded head. Drooping outer lids, moisture highlight pixel. Downturned mouth corners. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_dark_b_happy.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Good-looking: defined jaw. Joy squint eyes, double highlight. Charming smile, 2px teeth. Blush on far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_dark_b_neutral.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Good-looking: defined jaw. Sharp almond eyes, composed gaze. Thin mouth, slight upward corner. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_dark_b_sad.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Good-looking: defined jaw. Drooping outer lids, moisture highlight. Downturned mouth. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_dark_c_happy.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Striking handsome: chiseled jaw. Deeply squinted joy eyes, double highlight. Radiant broad smile, 2px teeth. Strong blush on far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_dark_c_neutral.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Striking handsome: chiseled jaw. Large expressive eyes, double highlight, confident gaze. Composed closed mouth, charm at corners. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_dark_c_sad.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Striking handsome. Large eyes, heavy drooping lids, sorrowful, moisture highlight. Deep downturned mouth. No blush. Top bare. Neck stub. 8 colors max.
+
+--- FEMALE LIGHT ---
+
+GENERATE: female_light_a_happy.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Plain soft round face, ordinary proportions. Wide eyes squinted with joy, upper lashes curve, double highlight. Big open smile, 2px white teeth. Vivid rosy blush (#f0a0b0) on far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_light_a_neutral.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Plain soft round face. Large wide eyes with lash pixels, 1 white highlight. Soft closed neutral mouth. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_light_a_sad.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Plain soft round face. Wide eyes with drooping outer corners, heavy lids, moisture highlight at lower lash corner. Downturned closed mouth. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_light_b_happy.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Pretty: elegant face, graceful lash line. Eyes joyfully squinted, bright double highlight, upper lid curves. Warm smile, 2px teeth. Vivid rosy blush on far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_light_b_neutral.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Pretty: elegant face, graceful lash line. Almond eyes, composed cool gaze, faint blush suggestion (1px). Thin elegant closed mouth. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_light_b_sad.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Pretty: elegant face. Almond eyes with drooping outer corners, heavy lids, teardrop moisture highlight. Downturned mouth, pained graceful expression. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_light_c_happy.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Striking beautiful: full round cheeks, refined features. Eyes joyfully squinted, triple highlight pixels, upper lashes long. Radiant beaming smile, 2px white teeth. Strong vivid blush (#f090a8) on far cheek + hint on near cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_light_c_neutral.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Striking beautiful: full round cheeks, refined features. Large bright eyes, double highlight, long lash pixels. Warm charming closed mouth, subtle upturn at corners. Faint blush (1-2px) on far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_light_c_sad.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Striking beautiful: full round cheeks. Large eyes with heavy drooping outer lids, sorrowful, moisture highlight lower-corner. Deep downturned mouth, delicate sad expression. No blush. Top bare. Neck stub. 8 colors max.
+
+--- FEMALE MID ---
+
+GENERATE: female_mid_a_happy.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Plain soft round face. Wide eyes squinted with joy, double highlight. Open smile, 2px white teeth. Rosy blush on far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_mid_a_neutral.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Plain soft round face. Large wide eyes, lash pixels, 1 white highlight. Soft closed neutral mouth. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_mid_a_sad.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Plain soft round face. Eyes drooping outer corners, heavy lids, moisture highlight. Downturned mouth. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_mid_b_happy.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Pretty: elegant face, graceful lash line. Eyes joyfully squinted, double highlight. Warm smile, 2px teeth. Rosy blush on far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_mid_b_neutral.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Pretty: elegant face, graceful lash. Almond eyes, composed cool gaze, faint blush (1px). Thin elegant closed mouth. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_mid_b_sad.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Pretty: elegant face. Almond eyes drooping outer lids, moisture highlight. Downturned mouth, pained graceful expression. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_mid_c_happy.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Striking beautiful: full round cheeks, refined features. Eyes joyfully squinted, triple highlight, long lashes. Beaming smile, 2px white teeth. Strong rosy blush on far cheek, hint near cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_mid_c_neutral.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Striking beautiful: full round cheeks, refined features. Large bright eyes, double highlight, long lashes. Warm closed mouth, subtle upturn. Faint blush (1-2px) far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_mid_c_sad.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Striking beautiful: full round cheeks. Large eyes drooping outer lids, sorrowful, moisture highlight. Deep downturned closed mouth, delicate sad expression. No blush. Top bare. Neck stub. 8 colors max.
+
+--- FEMALE DARK ---
+
+GENERATE: female_dark_a_happy.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Plain soft round face. Wide eyes squinted with joy, double highlight. Open smile, 2px white teeth. Rosy blush on far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_dark_a_neutral.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Plain soft round face. Large wide eyes, lash pixels, 1 white highlight. Soft closed neutral mouth. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_dark_a_sad.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Plain soft round face. Eyes drooping outer corners, heavy lids, moisture highlight. Downturned mouth. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_dark_b_happy.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Pretty: elegant face, graceful lash line. Eyes joyfully squinted, double highlight. Warm smile, 2px teeth. Rosy blush on far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_dark_b_neutral.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Pretty: elegant face, graceful lash. Almond eyes, composed cool gaze, faint blush (1px). Thin elegant closed mouth. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_dark_b_sad.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Pretty: elegant face. Almond eyes drooping outer lids, moisture highlight. Downturned mouth, pained graceful expression. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_dark_c_happy.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Striking beautiful: full round cheeks, refined features. Eyes joyfully squinted, triple highlight, long lashes. Beaming smile, 2px white teeth. Strong rosy blush on far cheek, hint near cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_dark_c_neutral.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Striking beautiful: full round cheeks, refined features. Large bright eyes, double highlight, long lashes. Warm closed mouth, subtle upturn. Faint blush (1-2px) far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_dark_c_sad.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Striking beautiful: full round cheeks. Large eyes drooping outer lids, sorrowful, moisture highlight. Deep downturned closed mouth, delicate sad expression. No blush. Top bare. Neck stub. 8 colors max.
 
 
 FOLDER: assets/avatars/body/
