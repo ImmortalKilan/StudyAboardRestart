@@ -34,7 +34,17 @@ function _skin(hlt) {
 }
 
 function _faceVariant(state) {
-  return FACE_VARIANTS[(state.faceVariant ?? 0) % FACE_VARIANTS.length];
+  const app = state.APP ?? 5;
+  if (app >= 8) return 'c';
+  if (app >= 5) return 'b';
+  return 'a';
+}
+
+function _emotion(state) {
+  const hap = state.HAP ?? 5;
+  if (hap >= 7) return 'happy';
+  if (hap >= 4) return 'neutral';
+  return 'sad';
 }
 
 function _hairStyle(state) {
@@ -109,10 +119,11 @@ function _paths(state) {
   const sex = state.sex === 0 ? 'male' : 'female';
   const skin = _skin(state.HLT);
   const fv = _faceVariant(state);
+  const em = _emotion(state);
   const acc = _accessory(state);
   return [
     `assets/avatars/bg/${_bg(state)}.png`,
-    `assets/avatars/head/${sex}_${skin}_${fv}.png`,
+    `assets/avatars/head/${sex}_${skin}_${fv}_${em}.png`,
     `assets/avatars/body/${_outfit(state)}.png`,
     `assets/avatars/hair/${_hairStyle(state)}_${_hairColor(state)}.png`,
     acc ? `assets/avatars/accessory/${acc}.png` : null,
