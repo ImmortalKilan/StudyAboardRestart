@@ -206,19 +206,16 @@ body.in-creation .app {
 
 .walker-scale {
   /* scale/flip handled inline by JS */
-  width: 192px; /* W(128) * SCALE(1.5) */
-  height: 288px; /* H(192) * SCALE(1.5) */
+  width: 128px;
+  height: 192px;
   overflow: hidden;
 }
 
 .walker-canvas {
-  animation: walk-cycle 1s steps(4) infinite;
-  /* We remove walk-bob because the sprite sheet includes the bounce */
-}
-
-@keyframes walk-cycle {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-768px); } /* 192px * 4 frames */
+  width: 128px;
+  height: 192px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
 
 .screen-head h1 {
@@ -418,6 +415,56 @@ body.in-creation .app {
   flex-shrink: 0;
 }
 
+/* === Step 2: Appearance layout === */
+.appearance-layout {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+  flex: 1;
+  min-height: 0;
+}
+
+.appearance-layout .creation-avatar-wrap {
+  width: 200px;
+  flex-shrink: 0;
+}
+
+.appearance-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  flex: 1;
+}
+
+.appearance-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.appearance-label {
+  font-size: 12px;
+  color: var(--ink-faint);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.appearance-random-btn {
+  padding: 12px 20px;
+  font-size: 15px;
+  border-radius: 10px;
+  align-self: flex-start;
+}
+
+.appearance-hint {
+  font-size: 12px;
+  color: var(--ink-faint);
+  margin: 0;
+  line-height: 1.5;
+}
+
+
 @media (max-width: 760px) {
   .creation-layout {
     flex-direction: column;
@@ -457,6 +504,23 @@ body.in-creation .app {
     height: 100%;
     padding: 24px 16px;
     overflow-y: auto; /* Allow internal scrolling if content is too long for the 65vh area */
+  }
+  .appearance-layout {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    overflow-y: auto;
+  }
+  .appearance-layout .creation-avatar-wrap {
+    width: 120px;
+  }
+  .appearance-controls {
+    width: 100%;
+    gap: 18px;
+  }
+  .appearance-random-btn {
+    width: 100%;
+    text-align: center;
   }
   .talent-grid {
     grid-template-columns: repeat(2, 1fr); /* 2 columns on mobile for better fit */
@@ -2607,6 +2671,26 @@ body.in-summary {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 8px;
+}
+
+@media (max-width: 760px) {
+  .ach-section-items {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .ach-card-name {
+    font-size: 12px;
+  }
+  .ach-card-desc {
+    font-size: 10px;
+  }
+  .ach-card {
+    padding: 8px 10px;
+    gap: 8px;
+    min-height: 52px;
+  }
+  .ach-card-icon {
+    font-size: 18px;
+  }
 }
 
 .ach-card {

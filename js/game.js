@@ -3303,11 +3303,26 @@ async function main() {
   $('sex-female').addEventListener('click', () => { state.sex = 1; $('sex-female').classList.add('active'); $('sex-male').classList.remove('active'); updateCreationAvatar(); });
 
   $('btn-random-appearance').addEventListener('click', () => {
-    state.faceVariant = Math.floor(Math.random() * 3);
-    state.topVariant = Math.floor(Math.random() * 6);
+    state.faceVariant = Math.floor(Math.random() * 10);
+    state.topVariant = Math.floor(Math.random() * 12);
     state.bottomVariant = Math.floor(Math.random() * 6);
     state.outfitColorId = Math.floor(Math.random() * 5);
     updateCreationAvatar();
+  });
+
+  // Step 2 (appearance, last): confirm → start game
+  $('appearance-confirm').addEventListener('click', () => {
+    initGame();
+  });
+
+  // Step 2 back → Step 1 (alloc)
+  $('back-to-alloc').addEventListener('click', () => {
+    const container = $('creation-scroll-area');
+    const target = $('step-alloc');
+    if (container && target) {
+      container.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
+    }
+    setTimeout(() => { target.scrollTop = 0; }, 300);
   });
 
   $('talent-confirm').addEventListener('click', () => {
@@ -3350,7 +3365,6 @@ async function main() {
     if (container && target) {
       container.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
     }
-    // Reset internal scroll for step 1
     setTimeout(() => { target.scrollTop = 0; }, 300);
   });
 
@@ -3368,7 +3382,15 @@ async function main() {
     updateCreationAvatar();
   });
 
-  $('alloc-start').addEventListener('click', initGame);
+  // Step 1 (alloc) → Step 2 (appearance, last)
+  $('alloc-start').addEventListener('click', () => {
+    const container = $('creation-scroll-area');
+    const target = $('step-appearance');
+    if (container && target) {
+      container.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
+    }
+    setTimeout(() => { target.scrollTop = 0; updateCreationAvatar(); }, 300);
+  });
 
   $('btn-auto-1x').addEventListener('click', () => {
     startAuto(1);
@@ -3715,19 +3737,20 @@ async function main() {
 
   $('btn-start').addEventListener('click', () => {
     // Initialize random appearance before showing
-    state.faceVariant = Math.floor(Math.random() * 3);
-    state.topVariant = Math.floor(Math.random() * 6);
+    state.faceVariant = Math.floor(Math.random() * 10);
+    state.topVariant = Math.floor(Math.random() * 12);
     state.bottomVariant = Math.floor(Math.random() * 6);
     state.outfitColorId = Math.floor(Math.random() * 5);
-    
+    state.sex = 0;
+    $('sex-male').classList.add('active');
+    $('sex-female').classList.remove('active');
+
     showScreen('creation-screen');
-    
-    // Reset scroll and render
+
+    // Always start at step-talents (first step)
     const scrollArea = $('creation-scroll-area');
     if (scrollArea) scrollArea.scrollTop = 0;
-    
-    // Wait a tick for DOM to be visible so canvas can render properly
-    setTimeout(updateCreationAvatar, 50);
+    // Avatar is in the last step — no need to render on start-screen click
   });
 
   renderTalentSelect(talents);
@@ -3754,9 +3777,9 @@ function startSoulsAnimation() {
         HAP: Math.floor(Math.random() * 11),
         PER: Math.floor(Math.random() * 11),
         sex: Math.floor(Math.random() * 2),
-        faceVariant: Math.floor(Math.random() * 3),
-        topVariant: Math.floor(Math.random() * 4),
-        bottomVariant: Math.floor(Math.random() * 3),
+        faceVariant: Math.floor(Math.random() * 10),
+        topVariant: Math.floor(Math.random() * 12),
+        bottomVariant: Math.floor(Math.random() * 6),
         outfitColorId: Math.floor(Math.random() * 5),
         storyline: ['spy', 'ceo', 'xianxia', 'abyss', 'meta', 'idol', ''][Math.floor(Math.random() * 7)],
         major: ['CS', '商科', '理科', '文科', ''][Math.floor(Math.random() * 5)]
