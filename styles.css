@@ -206,14 +206,15 @@ body.in-creation .app {
 
 .walker-scale {
   /* scale/flip handled inline by JS */
-  width: 128px;
-  height: 192px;
+  width: 96px;   /* 48 * 2 */
+  height: 128px; /* 64 * 2 */
   overflow: hidden;
+  image-rendering: pixelated;
 }
 
 .walker-canvas {
-  width: 128px;
-  height: 192px;
+  width: 96px;
+  height: 128px;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
