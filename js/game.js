@@ -2297,7 +2297,9 @@ function render() {
     }
 
     $('major-display').textContent = state.major || '未定';
-    $('relationship-display').textContent = state.relationship || '单身';
+    $('relationship-display').textContent = (state.talentIds.has(3036) && state.relationship === '暧昧')
+      ? '？？？'
+      : (state.relationship || '单身');
 
     const profBox = $('profession-box');
     if (state.profession && !STUDENT_PHASES.has(state.profession)) {
