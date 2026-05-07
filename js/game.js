@@ -1446,7 +1446,9 @@ function _checkEventAchievements(ev) {
         spy: 'sl_spy', xianxia: 'sl_xianxia', abyss: 'sl_abyss', meta: 'sl_meta',
         idol: 'sl_idol', superstar: 'sl_superstar', streamer: 'sl_streamer',
         party: 'sl_party', wasted: 'sl_wasted', poker: 'sl_poker',
-        esports: 'sl_esports', worlds: 'sl_worlds', hogwarts: 'sl_hogwarts',
+        esports: 'sl_esports', worlds: 'sl_worlds',
+        fitness: 'sl_fitness', chef: 'sl_chef', athlete: 'sl_athlete',
+        thief: 'sl_thief', hogwarts: 'sl_hogwarts',
       };
       if (SL_MAP[sl]) unlockAchievement(SL_MAP[sl]);
     }
@@ -1466,6 +1468,12 @@ function _checkEventAchievements(ev) {
   if (id === 70040) unlockAchievement('end_meta');          // meta storyline success
   if (id === 82041 || id === 82090) unlockAchievement('end_ceo');   // CEO success
   if (id === 83090 || id === 83094) unlockAchievement('end_worlds'); // worlds win
+
+  if (id === 84061) unlockAchievement('end_fitness');        // fitness legend
+  if (id === 85061) unlockAchievement('end_chef');           // chef 3-star
+  if (id === 86105 || id === 86120 || id === 86136) unlockAchievement('end_athlete'); // athlete top tier
+  if (id === 87190) unlockAchievement('end_thief');          // thief ghost rating
+  if (id === 61611) unlockAchievement('end_hogwarts');       // defeated Voldemort with Elder Wand
 
   // Xianxia immortal ending: any game-end while in xianxia with high cul
   if (ev.end && state.storyline === 'xianxia' && (state.cul || 0) >= 1000) {

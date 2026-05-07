@@ -32,6 +32,11 @@ export const ACHIEVEMENTS = [
   { id: 'sl_esports',       name: '电竞新星',     icon: '🎮', rarity: 'normal',    cat: '剧情',   desc: '踏入了职业电竞赛场' },
   { id: 'sl_wasted',        name: '南柯梦境',     icon: '🌙', rarity: 'normal',    cat: '剧情',   desc: '陷入了颓废的南柯梦' },
   { id: 'sl_worlds',        name: '赛场巅峰',     icon: '🏆', rarity: 'rare',      cat: '剧情',   desc: '踏上了电竞世界赛之路' },
+  { id: 'sl_fitness',       name: '铁血健将',     icon: '💪', rarity: 'normal',    cat: '剧情',   desc: '踏上了健美之路' },
+  { id: 'sl_chef',          name: '围裙新星',     icon: '👨‍🍳', rarity: 'normal',    cat: '剧情',   desc: '踏入了校园厨神的世界' },
+  { id: 'sl_athlete',       name: '运动少年',     icon: '⚽', rarity: 'normal',    cat: '剧情',   desc: '加入了校队，开启运动生涯' },
+  { id: 'sl_thief',         name: '影子协会',     icon: '🦊', rarity: 'rare',      cat: '剧情',   desc: '收到了影子协会的邀请' },
+  { id: 'sl_hogwarts',      name: '魔法学徒',     icon: '🪄', rarity: 'rare',      cat: '剧情',   desc: '收到了霍格沃茨的入学通知书' },
 
   // ── 终局 ─────────────────────────────────────────────────────────────────
   { id: 'end_health',       name: '油尽灯枯',     icon: '💀', rarity: 'normal',    cat: '终局',   desc: '因健康耗尽而离开了人世' },
@@ -44,6 +49,11 @@ export const ACHIEVEMENTS = [
   { id: 'end_ceo',          name: '商界传奇',     icon: '💼', rarity: 'epic',      cat: '终局',   desc: '成功转型，成为了 CEO' },
   { id: 'end_worlds',       name: '全球冠军',     icon: '🥇', rarity: 'epic',      cat: '终局',   desc: '赢得了电竞世界赛冠军' },
   { id: 'end_xianxia',      name: '羽化登仙',     icon: '✨', rarity: 'legendary', cat: '终局',   desc: '踏入修真之路，最终成仙' },
+  { id: 'end_fitness',      name: '健美传奇',     icon: '🏋️', rarity: 'epic',      cat: '终局',   desc: '站上了健美巅峰的舞台' },
+  { id: 'end_chef',         name: '三星主厨',     icon: '⭐', rarity: 'epic',      cat: '终局',   desc: '获得了米其林三星评级' },
+  { id: 'end_athlete',      name: '体坛之巅',     icon: '🏆', rarity: 'epic',      cat: '终局',   desc: '成为了职业体育的传奇' },
+  { id: 'end_thief',        name: '幽灵评级',     icon: '👻', rarity: 'epic',      cat: '终局',   desc: '达到了影子协会最高评级' },
+  { id: 'end_hogwarts',     name: '救世之星',     icon: '⚡', rarity: 'legendary', cat: '终局',   desc: '用老魔杖击败了伏地魔' },
 ];
 
 let _unlocked = new Set();

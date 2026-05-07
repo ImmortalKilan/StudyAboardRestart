@@ -6,7 +6,7 @@
     "weight": 80,
     "choices": [
       {
-        "text": "买下它（花费不少零花钱）",
+        "text": "买下它",
         "effect": { "MNY": -2, "HAP": 3 },
         "set": { "hasOwl": 1 },
         "next": 61002
