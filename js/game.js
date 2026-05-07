@@ -10,7 +10,7 @@ const STAT_LABELS = {
   POP: '人气', POK: '牌技', MMR: '天梯分', FIT: '体能', CKL: '厨艺', ATH: '运动',
   cul: '修为', dao: '大道', karma: '机缘', tribulation: '渡劫', realm: '境界'
 };
-const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'cul', 'dao', 'karma', 'tribulation']);
+const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'HEAT', 'cul', 'dao', 'karma', 'tribulation']);
 const XIANXIA_KEYS = ['realm', 'cul', 'dao', 'karma', 'tribulation'];
 
 // ── Special Scoring Endings ──
@@ -23,7 +23,8 @@ const LEGENDARY_ENDINGS = new Set([
   84061, // Fitness Legend
   85061, // Chef 3-Star
   81090, // Poker God
-  86105, 86120, 86136 // Athlete Top Tier (NBA状元, World Cup Champion, Frisbee Worlds Champion)
+  86105, 86120, 86136, // Athlete Top Tier (NBA状元, World Cup Champion, Frisbee Worlds Champion)
+  87190 // Thief Ghost Rating
 ]);
 
 const GOOD_ENDINGS = new Set([
@@ -128,6 +129,18 @@ const STORYLINE_CFG = {
       { cond: s => (s.SOC || 0) <= 0, event: 86153 },
     ],
     progressChecks: [],
+    },
+    thief: {
+    gracePeriod: 12,
+    eventRate: 0.7,
+    deathChecks: [
+      { cond: s => (s.HLT || 0) <= 0, event: 87195 },
+      { cond: s => (s.HAP || 0) <= -3, event: 87196 },
+      { cond: s => (s.SOC || 0) <= -3, event: 87197 },
+    ],
+    progressChecks: [
+      { cond: s => s.thief_stage === 'active' && s.age - s.storylineStart >= 3, event: 87100 },
+    ],
     },
       idol: {    gracePeriod: 12,
     eventRate: 0.7,
@@ -452,7 +465,7 @@ function updateFitnessStage() {
 
 function computeFitnessProb(s) {
   if (s.storyline !== 'fitness') return 0;
-  let p = -15;
+  let p = -30;
   p += (s.FIT || 0) * 2;
   p += (s.PER || 0) * 1;
   p += (s.APP || 0) * 0.5;
@@ -536,22 +549,27 @@ function updateChefStage() {
 
 function computeChefProb(s) {
   if (s.storyline !== 'chef') return 0;
-  let p = -15;
-  p += (s.CKL || 0) * 2;
-  p += (s.SOC || 0) * 0.5;
-  p += (s.PER || 0) * 0.5;
+  let p = -20;
+  p += (s.CKL || 0) * 1.6;
+  p += (s.SOC || 0) * 0.4;
+  p += (s.PER || 0) * 0.4;
   p -= (s.chef_decay || 0);
   return Math.max(5, Math.min(95, Math.round(p)));
 }
 
 async function attemptChef(forced) {
   if (state.chef_attempted) return;
-  state.chef_attempted = true; // 原子锁
+  state.chef_attempted = true;
 
   state.pendingCinematic = true;
   state._cineSavedAuto = autoMode;
   stopAuto();
   render();
+
+  const prob = computeChefProb(state);
+  const success = Math.random() * 100 < prob;
+  state.chef_result = success ? 'success' : 'fail';
+  state.chef_bonus = 0;
 
   await playStorylineIntro({
     name: "米其林星级审定",
@@ -559,24 +577,24 @@ async function attemptChef(forced) {
     statLabels: STAT_LABELS,
     onDone: () => {
       state.chef_stage = 'completed';
-      const prob = computeChefProb(state);
-      const success = Math.random() * 100 < prob;
       triggerEvent(85060);
-      setTimeout(() => {
-        if (success) {
-          const ckl = state.CKL || 0;
-          triggerEvent(ckl >= 35 ? 85061 : ckl >= 22 ? 85091 : 85092);
-        } else {
-          triggerEvent(85062);
-        }
-        state.pendingCinematic = false;
-        const saved = state._cineSavedAuto || 0;
-        state._cineSavedAuto = 0;
-        if (saved > 0) startAuto(saved);
-        render();
-      }, 800);
+      state.pendingCinematic = false;
+      const saved = state._cineSavedAuto || 0;
+      state._cineSavedAuto = 0;
+      if (saved > 0) startAuto(saved);
+      render();
     }
   });
+}
+
+function resolveChefFinal() {
+  const bonus = (state.chef_bonus || 0) + (state.chef_bonus_extra || 0);
+  if (state.chef_result === 'success') {
+    const ckl = (state.CKL || 0) + bonus;
+    triggerEvent(ckl >= 50 ? 85061 : ckl >= 40 ? 85091 : 85092);
+  } else {
+    triggerEvent(85062);
+  }
 }
 
 // ── Athlete Stage Clock ──────────────────────────────────────────
@@ -875,8 +893,9 @@ const STORYLINE_NAMES = {
   fitness: '健美巅峰',
   chef: '校园厨神',
   athlete: '校队之星',
+  thief: '影子协会',
 };
-const HIDDEN_STORYLINES = new Set(['spy', 'abyss', 'meta', 'xianxia']);
+const HIDDEN_STORYLINES = new Set(['spy', 'abyss', 'meta', 'xianxia', 'thief']);
 const SPECIAL_STORYLINES = new Set(['idol', 'superstar', 'streamer', 'poker', 'triton', 'local_shark', 'party', 'ceo', 'wasted', 'esports', 'worlds', 'minor_league', 'fitness', 'chef', 'athlete']);
 const STORYLINE_UNLOCK_STAT = {
   idol: 'POP', superstar: 'POP', streamer: 'POP',
@@ -1362,6 +1381,10 @@ function applyEvent(ev) {
       const next = state.eventsMap.get(nextId);
       if (next) state.pendingEvent = next;
     }
+  }
+
+  if (ev.id === 85069) {
+    resolveChefFinal();
   }
 
   // ── Achievement triggers ──────────────────────────────────────────────────

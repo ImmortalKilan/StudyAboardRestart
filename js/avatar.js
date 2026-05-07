@@ -1,4 +1,4 @@
-const W = 128, H = 192, SCALE = 1.5;
+const W = 128, H = 192, SCALE = 3;
 let animFrameId = null;
 let lastState = null;
 let lastCanvas = null;
