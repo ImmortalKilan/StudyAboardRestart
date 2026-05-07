@@ -9,10 +9,15 @@ const ALIASES = {
   STORYLINE: 'storyline', storyline: 'storyline',
   MMR: 'MMR', POP: 'POP', POK: 'POK',
   match_fixing: 'match_fixing',
-  relationship: 'relationship', REL: 'relationship'
+  relationship: 'relationship', REL: 'relationship',
+  cul: 'cul', CUL: 'cul', dao: 'dao', DAO: 'dao',
+  karma: 'karma', KARMA: 'karma', tribulation: 'tribulation', TRIB: 'tribulation',
+  xianxiaSeed: 'xianxiaSeed', yuanshen_book: 'yuanshen_book', xingchen_book: 'xingchen_book'
 };
 
 function readVar(state, key) {
+  if (key === 'AGE_AFTER_STORY') return (state.age || 0) - (state.storylineStart || 0);
+  if (key === 'MTH_AFTER_STORY') return (state.monthTotal || 0) - (state.storylineStartMonth || 0);
   const mapped = ALIASES[key] ?? key;
   return state[mapped];
 }
