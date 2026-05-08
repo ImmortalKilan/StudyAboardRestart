@@ -7,10 +7,10 @@ const STAT_KEYS = ['SOC', 'INT', 'MNY', 'PER', 'HLT', 'APP'];
 const STAT_LABELS = {
   SOC: '社交', INT: '智力', MNY: '家境',
   HAP: '快乐', HLT: '健康', PER: '毅力', APP: '颜值',
-  POP: '人气', POK: '牌技', MMR: '天梯分', FIT: '体能', CKL: '厨艺', ATH: '运动',
+  POP: '人气', POK: '牌技', MMR: '天梯分', FIT: '体能', CKL: '厨艺', ATH: '运动', MAG: '魔力',
   cul: '修为', dao: '大道', karma: '机缘', tribulation: '渡劫', realm: '境界'
 };
-const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'HEAT', 'cul', 'dao', 'karma', 'tribulation']);
+const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG', 'HEAT', 'cul', 'dao', 'karma', 'tribulation']);
 const XIANXIA_KEYS = ['realm', 'cul', 'dao', 'karma', 'tribulation'];
 
 // ── Special Scoring Endings ──
@@ -940,6 +940,7 @@ const STORYLINE_UNLOCK_STAT = {
   fitness: 'FIT',
   chef: 'CKL',
   athlete: 'ATH',
+  hogwarts: 'MAG',
 };
 const STUDENT_PHASES = new Set([
   '高中生', '本科生', '理工生', '商科生', '文科生',
@@ -1041,7 +1042,7 @@ function gachaDraw(talents, n) {
   // Rarity roll thresholds: grade 0 (white) 80%, 1 (blue) 15%, 2 (purple) 4%, 3 (orange) 1%
   function rollGrade() {
     const r = Math.random() * 100;
-    if (r < 2) return 3;   // orange
+    if (r < 70) return 3;   // orange
     if (r < 10) return 2;   // purple
     if (r < 30) return 1;  // blue
     return 0;               // white
@@ -1580,6 +1581,15 @@ function resolveChoice(index) {
       if (ev) applyEvent(ev);
     }
   } else if (choice.next) {
+    if (choice.set) {
+      for (const [k, v] of Object.entries(choice.set)) state[k] = v;
+    }
+    if (choice.effect) {
+      for (const [k, v] of Object.entries(choice.effect)) {
+        if (EFFECT_KEYS.has(k)) state[k] = (state[k] || 0) + v;
+      }
+      clampStats();
+    }
     const ev = state.eventsMap.get(choice.next);
     if (ev) applyEvent(ev);
   } else if (choice.effect || choice.set || choice.resultText || choice.text) {
@@ -2316,8 +2326,9 @@ function render() {
       if (state.showFIT) shown.push('FIT');
       if (state.showCKL) shown.push('CKL');
       if (state.showATH) shown.push('ATH');
+      if (state.showMAG) shown.push('MAG');
       const dynamicMax = Math.max(1, ...shown.filter(k => k !== 'HAP').map(k => state[k]));
-      const SPECIAL_STATS = new Set(['POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH']);
+      const SPECIAL_STATS = new Set(['POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG']);
       for (const k of shown) {
         const row = document.createElement('div');
         const isSpecial = SPECIAL_STATS.has(k);
@@ -2336,37 +2347,85 @@ function render() {
       }
     }
 
+    const HOUSE_NAMES = {
+      gryffindor: '格兰芬多', ravenclaw: '拉文克劳',
+      hufflepuff: '赫奇帕奇', slytherin: '斯莱特林'
+    };
+    const HOUSE_COLORS = {
+      gryffindor: { primary: '#740001', secondary: '#EEBA30', text: '#c0392b' },
+      slytherin:  { primary: '#1A472A', secondary: '#AAAAAA', text: '#27ae60' },
+      ravenclaw:  { primary: '#222F5B', secondary: '#BEBEBE', text: '#5b8abf' },
+      hufflepuff: { primary: '#FFDB00', secondary: '#000000', text: '#d4a017' }
+    };
+    const isHogwarts = state.storyline === 'hogwarts';
+
     const schoolBox = $('school-box');
-    if (state.school && state.school !== '无') {
-      schoolBox.style.display = '';
-      $('school-display').textContent = state.school;
-    } else {
+    const majorBox = $('major-box');
+    const profBox = $('profession-box');
+    const houseBox = $('house-box');
+
+    if (isHogwarts) {
+      schoolBox.classList.add('hogwarts-fade-out');
+      majorBox.classList.add('hogwarts-fade-out');
+      profBox.classList.add('hogwarts-fade-out');
       schoolBox.style.display = 'none';
+      majorBox.style.display = 'none';
+      profBox.style.display = 'none';
+
+      if (state.house) {
+        houseBox.style.display = '';
+        houseBox.classList.add('hogwarts-fade-in');
+        const hc = HOUSE_COLORS[state.house] || { primary: '#9B59B6', secondary: '#9B59B6', text: '#9B59B6' };
+        houseBox.style.setProperty('--house-gradient', `linear-gradient(to right, ${hc.primary}, ${hc.secondary})`);
+        houseBox.style.background = `linear-gradient(135deg, ${hc.primary}18 0%, var(--card-2) 60%)`;
+        $('house-display').textContent = HOUSE_NAMES[state.house] || state.house;
+        $('house-display').style.color = hc.text;
+        const houseLabel = houseBox.querySelector('.hogwarts-house-label');
+        if (houseLabel) houseLabel.style.color = hc.primary;
+      } else {
+        houseBox.style.display = 'none';
+      }
+    } else {
+      schoolBox.classList.remove('hogwarts-fade-out');
+      majorBox.classList.remove('hogwarts-fade-out');
+      profBox.classList.remove('hogwarts-fade-out');
+      houseBox.classList.remove('hogwarts-fade-in');
+      houseBox.style.display = 'none';
+
+      if (state.school && state.school !== '无') {
+        schoolBox.style.display = '';
+        $('school-display').textContent = state.school;
+      } else {
+        schoolBox.style.display = 'none';
+      }
+
+      majorBox.style.display = '';
+      $('major-display').textContent = state.major || '未定';
+
+      if (state.profession && !STUDENT_PHASES.has(state.profession)) {
+        profBox.style.display = '';
+        $('profession-display').textContent = state.profession;
+      } else {
+        profBox.style.display = 'none';
+      }
     }
 
-    $('major-display').textContent = state.major || '未定';
     $('relationship-display').textContent = (state.talentIds.has(3036) && state.relationship === '暧昧')
       ? '？？？'
       : (state.relationship || '单身');
-
-    const profBox = $('profession-box');
-    if (state.profession && !STUDENT_PHASES.has(state.profession)) {
-      profBox.style.display = '';
-      $('profession-display').textContent = state.profession;
-    } else {
-      profBox.style.display = 'none';
-    }
 
     const slBox = $('storyline-box');
     if (state.storyline) {
       slBox.style.display = '';
       const isHidden = HIDDEN_STORYLINES.has(state.storyline);
-      slBox.classList.toggle('hidden-storyline', isHidden);
+      slBox.classList.toggle('hidden-storyline', isHidden && !isHogwarts);
       slBox.classList.toggle('special-storyline', !isHidden);
-      slBox.querySelector('.storyline-label').textContent = isHidden ? '隐藏剧情' : '特殊剧情';
+      slBox.classList.toggle('hogwarts-storyline', isHogwarts);
+      slBox.querySelector('.storyline-label').textContent = isHogwarts ? '魔法世界' : (isHidden ? '隐藏剧情' : '特殊剧情');
       $('storyline-display').textContent = STORYLINE_NAMES[state.storyline] || state.storyline;
     } else {
       slBox.style.display = 'none';
+      slBox.classList.remove('hogwarts-storyline');
     }
 
     const debutBox = $('debut-box');

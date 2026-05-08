@@ -945,6 +945,57 @@ body.in-game .left-panel {
   color: var(--grade-3);
 }
 
+/* Hogwarts house box */
+.hogwarts-house-box {
+  position: relative;
+  border: none !important;
+  border-radius: 6px;
+  z-index: 0;
+}
+.hogwarts-house-box::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  padding: 1px;
+  background: var(--house-gradient);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: -1;
+}
+.hogwarts-house-val {
+  font-weight: 700;
+}
+
+/* Hogwarts fade transitions */
+.hogwarts-fade-out {
+  animation: hogwartsFadeOut 0.5s ease forwards;
+}
+.hogwarts-fade-in {
+  animation: hogwartsFadeIn 0.6s ease forwards;
+}
+@keyframes hogwartsFadeOut {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-8px); }
+}
+@keyframes hogwartsFadeIn {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Hogwarts storyline box (purple instead of red) */
+.storyline-box.hogwarts-storyline {
+  background: linear-gradient(135deg, rgba(155,89,182,0.12) 0%, var(--card-2) 60%);
+  border-color: rgba(155,89,182,0.25);
+}
+.hogwarts-storyline .storyline-label,
+.hogwarts-storyline .storyline-val {
+  color: #9B59B6;
+}
+
 /* Storyline log entry colors */
 .log-entry.log-hidden .log-text {
   color: #e04040 !important;
