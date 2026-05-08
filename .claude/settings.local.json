@@ -6,7 +6,9 @@
       "Bash(python3 -m http.server 8080)",
       "Bash(python3 *)",
       "Bash(node *)",
-      "Bash(curl -s http://127.0.0.1:8000/)"
+      "Bash(curl -s http://127.0.0.1:8000/)",
+      "Bash(npx http-server *)",
+      "Bash(curl -s http://127.0.0.1:8000/data/hogwarts_events.json)"
     ]
   }
 }

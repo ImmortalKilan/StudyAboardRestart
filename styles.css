@@ -191,34 +191,6 @@ body.in-creation .app {
 }
 
 /* Parallax Walking Animation */
-.souls-container {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.walker-wrap {
-  position: absolute;
-  /* transition handled inline by JS */
-}
-
-.walker-scale {
-  /* scale/flip handled inline by JS */
-  width: 96px;   /* 48 * 2 */
-  height: 128px; /* 64 * 2 */
-  overflow: hidden;
-  image-rendering: pixelated;
-}
-
-.walker-canvas {
-  width: 96px;
-  height: 128px;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
-}
-
 .screen-head h1 {
   font-size: 28px;
   letter-spacing: 0.02em;
@@ -416,55 +388,6 @@ body.in-creation .app {
   flex-shrink: 0;
 }
 
-/* === Step 2: Appearance layout === */
-.appearance-layout {
-  display: flex;
-  gap: 40px;
-  align-items: center;
-  flex: 1;
-  min-height: 0;
-}
-
-.appearance-layout .creation-avatar-wrap {
-  width: 200px;
-  flex-shrink: 0;
-}
-
-.appearance-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
-  flex: 1;
-}
-
-.appearance-section {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.appearance-label {
-  font-size: 12px;
-  color: var(--ink-faint);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  font-weight: 600;
-}
-
-.appearance-random-btn {
-  padding: 12px 20px;
-  font-size: 15px;
-  border-radius: 10px;
-  align-self: flex-start;
-}
-
-.appearance-hint {
-  font-size: 12px;
-  color: var(--ink-faint);
-  margin: 0;
-  line-height: 1.5;
-}
-
 
 @media (max-width: 760px) {
   .creation-layout {
@@ -505,23 +428,6 @@ body.in-creation .app {
     height: 100%;
     padding: 24px 16px;
     overflow-y: auto; /* Allow internal scrolling if content is too long for the 65vh area */
-  }
-  .appearance-layout {
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    overflow-y: auto;
-  }
-  .appearance-layout .creation-avatar-wrap {
-    width: 120px;
-  }
-  .appearance-controls {
-    width: 100%;
-    gap: 18px;
-  }
-  .appearance-random-btn {
-    width: 100%;
-    text-align: center;
   }
   .talent-grid {
     grid-template-columns: repeat(2, 1fr); /* 2 columns on mobile for better fit */
@@ -890,6 +796,13 @@ body.in-game .left-panel {
 }
 .stat-special .stat-fill {
   background: linear-gradient(90deg, #f5b642, #e0a030);
+}
+.stat-special.stat-hogwarts .stat-label,
+.stat-special.stat-hogwarts .stat-val {
+  color: #a855f7;
+}
+.stat-special.stat-hogwarts .stat-fill {
+  background: linear-gradient(90deg, #a855f7, #7c3aed);
 }
 
 .major-box {

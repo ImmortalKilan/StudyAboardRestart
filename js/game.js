@@ -1042,7 +1042,7 @@ function gachaDraw(talents, n) {
   // Rarity roll thresholds: grade 0 (white) 80%, 1 (blue) 15%, 2 (purple) 4%, 3 (orange) 1%
   function rollGrade() {
     const r = Math.random() * 100;
-    if (r < 70) return 3;   // orange
+    if (r < 2) return 3;   // orange
     if (r < 10) return 2;   // purple
     if (r < 30) return 1;  // blue
     return 0;               // white
@@ -2334,7 +2334,7 @@ function render() {
       for (const k of shown) {
         const row = document.createElement('div');
         const isSpecial = SPECIAL_STATS.has(k);
-        row.className = 'stat-row' + (isSpecial ? ' stat-special' : '');
+        row.className = 'stat-row' + (isSpecial ? (k === 'MAG' ? ' stat-special stat-hogwarts' : ' stat-special') : '');
         row.dataset.stat = k;
         const label = STAT_LABELS[k];
         const val = state[k];
@@ -3379,21 +3379,6 @@ async function main() {
     updateCreationAvatar();
   });
 
-  // Step 2 (appearance, last): confirm → start game
-  $('appearance-confirm').addEventListener('click', () => {
-    initGame();
-  });
-
-  // Step 2 back → Step 1 (alloc)
-  $('back-to-alloc').addEventListener('click', () => {
-    const container = $('creation-scroll-area');
-    const target = $('step-alloc');
-    if (container && target) {
-      container.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
-    }
-    setTimeout(() => { target.scrollTop = 0; }, 300);
-  });
-
   $('talent-confirm').addEventListener('click', () => {
     for (const k of STAT_KEYS) {
       state.alloc[k] = 0;
@@ -3451,15 +3436,7 @@ async function main() {
     updateCreationAvatar();
   });
 
-  // Step 1 (alloc) → Step 2 (appearance, last)
-  $('alloc-start').addEventListener('click', () => {
-    const container = $('creation-scroll-area');
-    const target = $('step-appearance');
-    if (container && target) {
-      container.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
-    }
-    setTimeout(() => { target.scrollTop = 0; updateCreationAvatar(); }, 300);
-  });
+  $('alloc-start').addEventListener('click', initGame);
 
   $('btn-auto-1x').addEventListener('click', () => {
     startAuto(1);
@@ -3824,100 +3801,6 @@ async function main() {
 
   renderTalentSelect(talents);
   showScreen('start-screen');
-  startSoulsAnimation();
-}
-
-function startSoulsAnimation() {
-  const container = document.getElementById('souls-container');
-  if (!container) return;
-
-  const MAX_ON_SCREEN = 3;
-  let currentOnScreen = 0;
-
-  function spawnSoul() {
-    if (currentOnScreen >= MAX_ON_SCREEN) return;
-    
-    if (document.getElementById('start-screen').classList.contains('active')) {
-      const soulState = {
-        APP: Math.floor(Math.random() * 11),
-        INT: Math.floor(Math.random() * 11),
-        MNY: Math.floor(Math.random() * 11),
-        HLT: Math.floor(Math.random() * 11),
-        HAP: Math.floor(Math.random() * 11),
-        PER: Math.floor(Math.random() * 11),
-        sex: Math.floor(Math.random() * 2),
-        faceVariant: Math.floor(Math.random() * 10),
-        topVariant: Math.floor(Math.random() * 12),
-        bottomVariant: Math.floor(Math.random() * 6),
-        outfitColorId: Math.floor(Math.random() * 5),
-        storyline: ['spy', 'ceo', 'xianxia', 'abyss', 'meta', 'idol', ''][Math.floor(Math.random() * 7)],
-        major: ['CS', '商科', '理科', '文科', ''][Math.floor(Math.random() * 5)]
-      };
-
-      const canvas = createStandaloneAvatar(soulState);
-      canvas.className = 'walker-canvas';
-      
-      const wrap = document.createElement('div');
-      wrap.className = 'walker-wrap';
-      
-      const scaleWrap = document.createElement('div');
-      scaleWrap.className = 'walker-scale';
-
-      const scale = 0.4 + Math.random() * 0.6; // 0.4 to 1.0
-      const duration = 15 + Math.random() * 15; 
-      
-      // Determine random start and end edges
-      // 0: left, 1: right, 2: bottom
-      const startEdge = Math.floor(Math.random() * 3);
-      let startX, startY, endX, endY;
-
-      if (startEdge === 0) { // start left
-        startX = -20; startY = 30 + Math.random() * 60;
-        endX = 120; endY = 30 + Math.random() * 60;
-      } else if (startEdge === 1) { // start right
-        startX = 120; startY = 30 + Math.random() * 60;
-        endX = -20; endY = 30 + Math.random() * 60;
-      } else { // start bottom
-        startX = 10 + Math.random() * 80; startY = 120;
-        endX = startX > 50 ? -20 : 120; // go opposite side
-        endY = 30 + Math.random() * 50;
-      }
-
-      wrap.style.left = `${startX}%`;
-      wrap.style.top = `${startY}%`;
-      wrap.style.transition = `left ${duration}s linear, top ${duration}s linear`;
-      wrap.style.zIndex = Math.floor(startY / 10);
-      
-      // Flip horizontally if going left
-      const isGoingLeft = endX < startX;
-      scaleWrap.style.transform = `scale(${scale}) ${isGoingLeft ? 'scaleX(-1)' : ''}`;
-      canvas.style.animationDelay = `-${Math.random()}s`;
-
-      scaleWrap.appendChild(canvas);
-      wrap.appendChild(scaleWrap);
-      container.appendChild(wrap);
-      currentOnScreen++;
-
-      // Trigger animation on next frame
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          wrap.style.left = `${endX}%`;
-          wrap.style.top = `${endY}%`;
-        });
-      });
-
-      setTimeout(() => {
-        if (container.contains(wrap)) {
-          container.removeChild(wrap);
-          currentOnScreen--;
-        }
-      }, duration * 1000);
-    }
-  }
-
-  // Check frequently but spawn max 3
-  setInterval(spawnSoul, 2000);
-  spawnSoul(); // Spawn one immediately
 }
 
 main();
