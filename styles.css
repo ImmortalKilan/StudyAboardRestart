@@ -2684,6 +2684,17 @@ body.in-summary {
   font-size: 13px;
   color: var(--ink-faint);
 }
+.ach-io-btn {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink-soft);
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ach-io-btn:hover { border-color: var(--warm); color: var(--warm); }
 .ach-wall-close {
   background: transparent;
   border: 1px solid var(--line);

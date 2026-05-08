@@ -1,0 +1,486 @@
+﻿============================================================
+SESSION OPENER — send this ONCE at the start of each Gemini session
+============================================================
+
+I need you to generate a complete set of pixel art sprites for a life simulation game.
+
+Before we start, memorize this universal style guide — every image in this session must follow it exactly:
+
+UNIVERSAL STYLE RULES:
+- Canvas size: 72x72 pixels (will be displayed scaled up, so every pixel reads clearly)
+- View angle: 3/4 perspective — character faces toward the bottom-left, like classic JRPG style. NOT flat front-facing.
+- Outline: 1-pixel solid dark outline (#1a1a1a) around all shapes
+- NO anti-aliasing. Hard pixel edges only.
+- Transparent background (PNG) — except bg_* scene sprites which are fully opaque
+- Style: Stardew Valley x Octopath Traveler — expressive, chunky, clean
+- Palette: max 8 colors per sprite. Each color gets exactly 1 darker shade for depth. No gradients.
+- 3/4 angle gives volume — NOT a flat paper cutout. Left side of figure is dominant/wider in frame.
+- All sprites of the same TYPE must be consistent in scale, position, and perspective.
+
+I will give you one sprite at a time. Say "GENERATE: [filename]" then paste the matching prompt.
+Reply "Style guide locked" to confirm you understand.
+
+============================================================
+LAYER SYSTEM (bottom to top):
+  bg         full scene background (72x72, opaque)
+  head       face + neck stub (transparent, hair area bare at top)
+  body       clothing from shoulders down (transparent, top ~40px empty)
+  hair       hair only overlay (transparent)
+  accessory  item on top of everything (transparent)
+All layers share the same 72x72 canvas coordinate space.
+============================================================
+
+
+FOLDER: assets/avatars/head/
+Face + neck stub only. Top of skull BARE (hair overlays).
+Head occupies approx y=6 to y=52. Max 8 colors.
+
+NAMING CONVENTION: {sex}_{skin}_{app}_{emotion}.png
+  sex:     male / female
+  skin:    light (#fce4c8 + shadow #e0b898) / mid (#d4a870 + shadow #b88a50) / dark (#a06840 + shadow #885228)
+  app:     a = plain ordinary  |  b = good-looking  |  c = striking/beautiful
+  emotion: happy (wide smile, squint-joy eyes, blush)  |  neutral (calm, flat mouth)  |  sad (drooping lids, downturned corners, no blush)
+
+Total 54 sprites. Top of skull always bare (hair overlay goes here). Neck stub at center-bottom.
+
+--- MALE LIGHT ---
+
+GENERATE: male_light_a_happy.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Plain rounded head, ordinary proportions. Eyes squinted with joy — upper eyelid curves down, bright iris highlight. Wide open smile showing 2px white teeth row. Warm blush pixels on far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_light_a_neutral.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Plain rounded head, ordinary proportions. Calm open eyes, dark iris with 1 white highlight pixel, thin eyelid line. Relaxed flat closed mouth. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_light_a_sad.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Plain rounded head. Eyes with drooping outer corners, heavy upper lids, slightly glazed — extra white highlight pixel at lower corner suggesting moisture. Downturned mouth corners. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_light_b_happy.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Good-looking: well-defined face, sharper jaw. Eyes squinted with joy — confident narrow squint, bright double highlight. Charming wide smile, 2px teeth. Blush on far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_light_b_neutral.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Good-looking: well-defined face, sharper jaw. Sharp almond eyes, composed confident expression. Thin straight mouth line, slight upward hint at corner. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_light_b_sad.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Good-looking: well-defined face. Almond eyes with outer lids drooping, pained expression, moisture highlight at lower lash. Downturned mouth, subtle sad frown. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_light_c_happy.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Striking handsome: chiseled jaw, elegant nose. Eyes deeply squinted with warm joy, double highlight, upper lids curved. Radiant broad smile, 2px white teeth. Strong blush on far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_light_c_neutral.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Striking handsome: chiseled jaw, elegant nose. Large expressive eyes, double iris highlight, confident gaze. Composed closed mouth, subtle charm at corners. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_light_c_sad.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Striking handsome: chiseled jaw. Large eyes with heavy drooping outer lids, sorrowful expression, moisture highlight pixel at lower lash corner. Deep downturned mouth. No blush. Top bare. Neck stub. 8 colors max.
+
+--- MALE MID ---
+
+GENERATE: male_mid_a_happy.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Plain rounded head, ordinary proportions. Eyes squinted with joy, bright iris highlight. Wide smile, 2px white teeth. Warm blush on far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_mid_a_neutral.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Plain rounded head. Calm open eyes, 1 white highlight, thin eyelid. Relaxed flat closed mouth. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_mid_a_sad.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Plain rounded head. Drooping outer lids, glazed moisture highlight. Downturned mouth corners. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_mid_b_happy.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Good-looking: defined jaw, sharper features. Joy squint eyes, double highlight. Charming smile, 2px teeth. Blush on far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_mid_b_neutral.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Good-looking: defined jaw. Sharp almond eyes, composed confident gaze. Thin mouth, slight upward corner hint. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_mid_b_sad.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Good-looking: defined jaw. Almond eyes drooping outer lids, pain expression, moisture highlight. Downturned mouth. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_mid_c_happy.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Striking handsome: chiseled jaw. Deeply squinted joy eyes, double highlight. Radiant broad smile, 2px teeth. Strong blush on far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_mid_c_neutral.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Striking handsome: chiseled jaw. Large expressive eyes, double highlight, confident gaze. Composed closed mouth, charm at corners. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_mid_c_sad.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Striking handsome. Large eyes, heavy drooping outer lids, sorrowful, moisture highlight. Deep downturned mouth. No blush. Top bare. Neck stub. 8 colors max.
+
+--- MALE DARK ---
+
+GENERATE: male_dark_a_happy.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Plain rounded head. Eyes squinted with joy, bright iris highlight. Wide smile, 2px white teeth. Warm blush on far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_dark_a_neutral.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Plain rounded head. Calm open eyes, white highlight, thin eyelid. Relaxed flat closed mouth. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_dark_a_sad.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Plain rounded head. Drooping outer lids, moisture highlight pixel. Downturned mouth corners. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_dark_b_happy.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Good-looking: defined jaw. Joy squint eyes, double highlight. Charming smile, 2px teeth. Blush on far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_dark_b_neutral.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Good-looking: defined jaw. Sharp almond eyes, composed gaze. Thin mouth, slight upward corner. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_dark_b_sad.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Good-looking: defined jaw. Drooping outer lids, moisture highlight. Downturned mouth. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_dark_c_happy.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Striking handsome: chiseled jaw. Deeply squinted joy eyes, double highlight. Radiant broad smile, 2px teeth. Strong blush on far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_dark_c_neutral.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Striking handsome: chiseled jaw. Large expressive eyes, double highlight, confident gaze. Composed closed mouth, charm at corners. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: male_dark_c_sad.png
+Head layer, transparent PNG 72x72. Male, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Striking handsome. Large eyes, heavy drooping lids, sorrowful, moisture highlight. Deep downturned mouth. No blush. Top bare. Neck stub. 8 colors max.
+
+--- FEMALE LIGHT ---
+
+GENERATE: female_light_a_happy.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Plain soft round face, ordinary proportions. Wide eyes squinted with joy, upper lashes curve, double highlight. Big open smile, 2px white teeth. Vivid rosy blush (#f0a0b0) on far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_light_a_neutral.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Plain soft round face. Large wide eyes with lash pixels, 1 white highlight. Soft closed neutral mouth. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_light_a_sad.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Plain soft round face. Wide eyes with drooping outer corners, heavy lids, moisture highlight at lower lash corner. Downturned closed mouth. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_light_b_happy.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Pretty: elegant face, graceful lash line. Eyes joyfully squinted, bright double highlight, upper lid curves. Warm smile, 2px teeth. Vivid rosy blush on far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_light_b_neutral.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Pretty: elegant face, graceful lash line. Almond eyes, composed cool gaze, faint blush suggestion (1px). Thin elegant closed mouth. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_light_b_sad.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Pretty: elegant face. Almond eyes with drooping outer corners, heavy lids, teardrop moisture highlight. Downturned mouth, pained graceful expression. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_light_c_happy.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Striking beautiful: full round cheeks, refined features. Eyes joyfully squinted, triple highlight pixels, upper lashes long. Radiant beaming smile, 2px white teeth. Strong vivid blush (#f090a8) on far cheek + hint on near cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_light_c_neutral.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Striking beautiful: full round cheeks, refined features. Large bright eyes, double highlight, long lash pixels. Warm charming closed mouth, subtle upturn at corners. Faint blush (1-2px) on far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_light_c_sad.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Light peach skin (#fce4c8 + shadow #e0b898). Striking beautiful: full round cheeks. Large eyes with heavy drooping outer lids, sorrowful, moisture highlight lower-corner. Deep downturned mouth, delicate sad expression. No blush. Top bare. Neck stub. 8 colors max.
+
+--- FEMALE MID ---
+
+GENERATE: female_mid_a_happy.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Plain soft round face. Wide eyes squinted with joy, double highlight. Open smile, 2px white teeth. Rosy blush on far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_mid_a_neutral.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Plain soft round face. Large wide eyes, lash pixels, 1 white highlight. Soft closed neutral mouth. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_mid_a_sad.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Plain soft round face. Eyes drooping outer corners, heavy lids, moisture highlight. Downturned mouth. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_mid_b_happy.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Pretty: elegant face, graceful lash line. Eyes joyfully squinted, double highlight. Warm smile, 2px teeth. Rosy blush on far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_mid_b_neutral.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Pretty: elegant face, graceful lash. Almond eyes, composed cool gaze, faint blush (1px). Thin elegant closed mouth. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_mid_b_sad.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Pretty: elegant face. Almond eyes drooping outer lids, moisture highlight. Downturned mouth, pained graceful expression. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_mid_c_happy.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Striking beautiful: full round cheeks, refined features. Eyes joyfully squinted, triple highlight, long lashes. Beaming smile, 2px white teeth. Strong rosy blush on far cheek, hint near cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_mid_c_neutral.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Striking beautiful: full round cheeks, refined features. Large bright eyes, double highlight, long lashes. Warm closed mouth, subtle upturn. Faint blush (1-2px) far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_mid_c_sad.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Warm tan skin (#d4a870 + shadow #b88a50). Striking beautiful: full round cheeks. Large eyes drooping outer lids, sorrowful, moisture highlight. Deep downturned closed mouth, delicate sad expression. No blush. Top bare. Neck stub. 8 colors max.
+
+--- FEMALE DARK ---
+
+GENERATE: female_dark_a_happy.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Plain soft round face. Wide eyes squinted with joy, double highlight. Open smile, 2px white teeth. Rosy blush on far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_dark_a_neutral.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Plain soft round face. Large wide eyes, lash pixels, 1 white highlight. Soft closed neutral mouth. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_dark_a_sad.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Plain soft round face. Eyes drooping outer corners, heavy lids, moisture highlight. Downturned mouth. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_dark_b_happy.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Pretty: elegant face, graceful lash line. Eyes joyfully squinted, double highlight. Warm smile, 2px teeth. Rosy blush on far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_dark_b_neutral.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Pretty: elegant face, graceful lash. Almond eyes, composed cool gaze, faint blush (1px). Thin elegant closed mouth. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_dark_b_sad.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Pretty: elegant face. Almond eyes drooping outer lids, moisture highlight. Downturned mouth, pained graceful expression. No blush. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_dark_c_happy.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Striking beautiful: full round cheeks, refined features. Eyes joyfully squinted, triple highlight, long lashes. Beaming smile, 2px white teeth. Strong rosy blush on far cheek, hint near cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_dark_c_neutral.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Striking beautiful: full round cheeks, refined features. Large bright eyes, double highlight, long lashes. Warm closed mouth, subtle upturn. Faint blush (1-2px) far cheek. Top bare. Neck stub. 8 colors max.
+
+GENERATE: female_dark_c_sad.png
+Head layer, transparent PNG 72x72. Female, 3/4 angle lower-left. Deep warm brown skin (#a06840 + shadow #885228). Striking beautiful: full round cheeks. Large eyes drooping outer lids, sorrowful, moisture highlight. Deep downturned closed mouth, delicate sad expression. No blush. Top bare. Neck stub. 8 colors max.
+
+
+FOLDER: assets/avatars/body/
+Clothing from shoulders down ONLY.
+y=0 to y=40 MUST be fully transparent (head goes there).
+Shoulders begin at y=40. 3/4 angle: left side dominant.
+Max 8 colors. One shadow shade per color for volume.
+
+== CASUAL / DAILY ==
+
+GENERATE: casual_a.png
+Body layer, transparent PNG 72x72. Top 40px transparent. Plain white oversized t-shirt from y=40. 3/4 perspective — left shoulder wider/lower, right slightly receded. Faint chest crease shadow (#d8d8d8). Arms at sides. Clean everyday look. 8 colors max.
+
+GENERATE: casual_b.png
+Body layer, transparent PNG 72x72. Top 40px transparent. Cream ribbed knit sweater from y=40. Horizontal ribbing: alternating 1px cream and slightly darker cream lines. 3/4 shoulders. Relaxed volume. 8 colors max.
+
+GENERATE: casual_c.png
+Body layer, transparent PNG 72x72. Top 40px transparent. Heather grey crewneck sweatshirt from y=40. 3/4 perspective. Kangaroo pocket outlined on lower chest. Slightly darker grey shadow on right side. 8 colors max.
+
+GENERATE: hoodie.png
+Body layer, transparent PNG 72x72. Top 40px transparent. Black zip-up hoodie from y=40. 3/4 perspective. White zipper line down center. Hood fabric edge visible behind left shoulder. Darker black shadow right side. 8 colors max.
+
+GENERATE: hoodie_b.png
+Body layer, transparent PNG 72x72. Top 40px transparent. Dusty blue pullover hoodie from y=40. Front kangaroo pocket seam. 3/4 perspective. Darker blue shadow right side. 8 colors max.
+
+GENERATE: streetwear.png
+Body layer, transparent PNG 72x72. Top 40px transparent. White graphic tee (small 4px geometric logo on left chest) from y=40, worn under open flannel shirt. Flannel clearly on left shoulder/sleeve in 3/4, barely on right. 8 colors max.
+
+== SCHOOL / STUDENT ==
+
+GENERATE: school.png
+Body layer, transparent PNG 72x72. Top 40px transparent. Navy blue school uniform blazer from y=40. 3/4 — left lapel prominent. White dress shirt collar at neck join. Single gold button on left chest. Classic anime school uniform. 8 colors max.
+
+GENERATE: school_b.png
+Body layer, transparent PNG 72x72. Top 40px transparent. Warm beige/cream school blazer from y=40. 3/4 perspective. Red ribbon bow-tie at collar join. Preppy neat look. 8 colors max.
+
+== PROFESSIONAL / FORMAL ==
+
+GENERATE: suit.png
+Body layer, transparent PNG 72x72. Top 40px transparent. Dark charcoal suit jacket from y=40. 3/4 — left lapel prominent, white shirt collar at neck, thin dark tie down center. Sharp shoulder pixels. Lighter charcoal highlight on left shoulder. 8 colors max.
+
+GENERATE: suit_b.png
+Body layer, transparent PNG 72x72. Top 40px transparent. Navy suit jacket from y=40. 3/4 perspective. Open collar, no tie. Sleek modern cut. Lighter navy on left shoulder highlight. 8 colors max.
+
+== CAREER STORYLINE OUTFITS ==
+
+GENERATE: idol.png
+Body layer, transparent PNG 72x72. Top 40px transparent. Sparkly magenta stage jacket from y=40. 3/4 perspective. 5-6 bright sequin-dot pixels scattered on left chest. Dramatic upright collar. Darker magenta shadow on right side. Stage idol K-pop aesthetic. 8 colors max.
+
+GENERATE: esports.png
+Body layer, transparent PNG 72x72. Top 40px transparent. Dark navy esports team jersey from y=40. 3/4 perspective. Neon electric blue accent stripe along left shoulder and sleeve edge. Abstract 4px logo on left chest. Lighter shade left shoulder highlight. 8 colors max.
+
+GENERATE: poker.png
+Body layer, transparent PNG 72x72. Top 40px transparent. Black vest over white dress shirt from y=40. 3/4 perspective. White collar and rolled cuff visible. Tiny card suit (spade) 3px icon on vest breast pocket. Darker black shadow on right side. 8 colors max.
+
+GENERATE: chef.png
+Body layer, transparent PNG 72x72. Top 40px transparent. Double-breasted white chef coat from y=40. 3/4 perspective. Two columns of small dark buttons. Small flour-stain darker pixel on left chest. Off-white shadow (#e0e0d8) on right side. 8 colors max.
+
+GENERATE: sporty_b.png
+Body layer, transparent PNG 72x72. Top 40px transparent. Dark tracksuit jacket from y=40. 3/4 perspective. Single bright red accent stripe down left shoulder and sleeve. Clean athletic look. 8 colors max.
+
+GENERATE: sporty.png
+Body layer, transparent PNG 72x72. Top 40px transparent. Blue and white sports jersey from y=40. 3/4 perspective. Number 7 on left chest in blocky pixel font. Short cap sleeves. Lighter blue highlight on left arm. 8 colors max.
+
+GENERATE: hanfu.png
+Body layer, transparent PNG 72x72. Top 40px transparent. Layered traditional Chinese hanfu top from y=40. 3/4 perspective — wide left sleeve clearly draped and visible, right partially behind. Decorative sash/ribbon at waist. Subtle embroidery pixel pattern at collar edge. Soft teal and cream palette. 8 colors max.
+
+== SPECIAL / HIDDEN STORYLINE OUTFITS ==
+
+GENERATE: spy_suit.png
+Body layer, transparent PNG 72x72. Top 40px transparent. Sleek all-black tactical turtleneck from y=40. 3/4 perspective. Clean covert operative look — no logos, no buttons visible. Very slight dark charcoal (#101018) shadow on right side for volume. Subtle utility belt line at waist. Cold professional. 8 colors max.
+
+GENERATE: labcoat.png
+Body layer, transparent PNG 72x72. Top 40px transparent. White researcher lab coat from y=40. 3/4 perspective. Clean open collar revealing dark shirt underneath. Breast pocket on left with 2px pen pixels inside. Off-white shadow (#d8d8d0) on right side. One small wrinkle pixel crease on left arm. 8 colors max.
+
+GENERATE: meta_hoodie.png
+Body layer, transparent PNG 72x72. Top 40px transparent. Dark grey oversized hoodie from y=40. 3/4 perspective. Faint glitch-pattern: 3-4 horizontal 1px lines of slightly lighter grey on the chest area, as if image corruption. Hood edge behind left shoulder. Error/404 aesthetic. 8 colors max.
+
+GENERATE: thief_suit.png
+Body layer, transparent PNG 72x72. Top 40px transparent. Matte all-black stealth outfit from y=40. 3/4 perspective. Slim fitted turtleneck + tactical vest layered on top — visible by subtle pocket outlines on chest. Fingerless glove suggestion on left wrist. Zero shine. Shadow via slightly lighter black (#141414) on left shoulder only. 8 colors max.
+
+GENERATE: hogwarts_robe.png
+Body layer, transparent PNG 72x72. Top 40px transparent. Black Hogwarts wizard robe from y=40. 3/4 perspective — wide left sleeve clearly visible and flowing. Gryffindor scarlet and gold trim at collar edge and left sleeve cuff. Slightly lighter black (#181818) on left shoulder for volume. Magical academia aesthetic. 8 colors max.
+
+GENERATE: party_outfit.png
+Body layer, transparent PNG 72x72. Top 40px transparent. Flashy club/party outfit from y=40. 3/4 perspective. Fitted shimmery purple button-up shirt, top 2 buttons open. Subtle metallic sheen: 2-3 lighter purple highlight pixel lines on left chest. Party-ready look. 8 colors max.
+
+GENERATE: streamer.png
+Body layer, transparent PNG 72x72. Top 40px transparent. Casual oversized mint green printed hoodie from y=40. 3/4 perspective. Small pixel camera icon logo on left chest (4px). Very faint lighter halo on left shoulder edge suggesting ring-light warmth. Comfy streamer aesthetic. 8 colors max.
+
+GENERATE: wasted.png
+Body layer, transparent PNG 72x72. Top 40px transparent. Disheveled messy t-shirt and open flannel from y=40. 3/4 perspective. White tee underneath visibly wrinkled (2-3 crease pixel lines). Dark flannel shirt open and sliding off left shoulder — left shoulder exposed. Worn, tired, falling-apart aesthetic. 8 colors max.
+
+
+FOLDER: assets/avatars/hair/
+Hair ONLY — everything else transparent.
+Overlays the head. 3/4 angle: left side dominant.
+Head center: x=36, y=28. Use EXACTLY 2 shades + outline.
+
+COLOR SUFFIX GUIDE (replace [COLOR]):
+  _black  base #1a1416 + shadow #0e0a0c
+  _dark   base #3a2820 + shadow #241810
+  _brown  base #6a4a30 + shadow #4a3020
+  _light  base #c8a050 + shadow #a07830
+  _dyed   base #e04080 + shadow #b02860
+
+Generate each style in all 5 colors.
+
+== MALE HAIR (8 styles x 5 colors = 40 files) ==
+
+GENERATE: short_a_[COLOR].png
+Hair layer only, transparent PNG 72x72. Male short neat side-part. Combed toward character's left (dominant in 3/4). Strand pixel lines on top going left. Skull top y=4 to y=16. Left side wider, right thinner. Shadow shade on right for volume. Hair color: [COLOR].
+
+GENERATE: short_b_[COLOR].png
+Hair layer only, transparent PNG 72x72. Male short tousled, no part. 3-4 pixel spike clusters at top in different directions. y=4 to y=16. Left prominent, shadow on right. Hair color: [COLOR].
+
+GENERATE: buzz_[COLOR].png
+Hair layer only, transparent PNG 72x72. Male buzzcut. Very thin 2-3px layer hugging skull top only. y=4 to y=10. Shadow on right half. Hair color: [COLOR].
+
+GENERATE: swept_[COLOR].png
+Hair layer only, transparent PNG 72x72. Male swept hair — bold swooping arc from upper-right toward lower-left. y=2 to y=20. Strong left volume, wispy right edge. Shadow under sweep. Hair color: [COLOR].
+
+GENERATE: messy_[COLOR].png
+Hair layer only, transparent PNG 72x72. Male messy bedhead — 5-7 spike clusters in chaotic random directions. y=2 to y=22. Shadow beneath spikes. Hair color: [COLOR].
+
+GENERATE: undercut_[COLOR].png
+Hair layer only, transparent PNG 72x72. Male undercut — sides 1-2px thin, top longer and swept left. Fade line on left side visible in 3/4. y=2 to y=20. Hair color: [COLOR].
+
+GENERATE: curtains_[COLOR].png
+Hair layer only, transparent PNG 72x72. Male curtains — center-parted, left lock large forward in 3/4 reaching y=32. Right lock barely visible. Shadow on inner side. Hair color: [COLOR].
+
+GENERATE: wolf_[COLOR].png
+Hair layer only, transparent PNG 72x72. Male wolf cut — shaggy choppy layers at crown (shorter) and neck/sides (longer). Messy-stylish. Left side dominant, shadow right. y=2 to y=28. Hair color: [COLOR].
+
+== FEMALE HAIR (10 styles x 5 colors = 50 files) ==
+
+GENERATE: long_[COLOR].png
+Hair layer only, transparent PNG 72x72. Female long straight hair. Left side drapes forward in 3/4 to y=58. Right disappears behind head. Slight inward curl at ends. Shadow right half. Hair color: [COLOR].
+
+GENERATE: long_wavy_[COLOR].png
+Hair layer only, transparent PNG 72x72. Female long wavy. S-curve waves every 8-10px on left drape. y=2 to y=58. Shadow right half. Hair color: [COLOR].
+
+GENERATE: ponytail_[COLOR].png
+Hair layer only, transparent PNG 72x72. Female low side ponytail toward character's left. 2px hairband. 2 loose face-framing strands on left. Tail extends down-left to y=60. Shadow inside tail. Hair color: [COLOR].
+
+GENERATE: high_ponytail_[COLOR].png
+Hair layer only, transparent PNG 72x72. Female high ponytail at crown (base puff y=0 to y=14). Tail cascades down-right to y=60. Energetic sporty shape. Shadow right of tail. Hair color: [COLOR].
+
+GENERATE: bob_a_[COLOR].png
+Hair layer only, transparent PNG 72x72. Female classic bob — jaw-length, left side visible with inward curl at ends. Right partially behind head. y=2 to y=38. Shadow right half. Hair color: [COLOR].
+
+GENERATE: bob_b_[COLOR].png
+Hair layer only, transparent PNG 72x72. Female textured bob — asymmetric wispy uneven pixel ends. Left side slightly longer. y=2 to y=40. Shadow right half. Hair color: [COLOR].
+
+GENERATE: twintail_[COLOR].png
+Hair layer only, transparent PNG 72x72. Female twin tails — left pigtail large and prominent in 3/4 (y=0 to y=50), right smaller behind. Shadow on inner sides. Hair color: [COLOR].
+
+GENERATE: bun_[COLOR].png
+Hair layer only, transparent PNG 72x72. Female messy bun — circular cluster upper-right of head (y=2 to y=20). 2 wispy face-framing strands on left (y=10 to y=30). Shadow back-right of bun. Hair color: [COLOR].
+
+GENERATE: braids_[COLOR].png
+Hair layer only, transparent PNG 72x72. Female two braids — left braid over left shoulder prominent in 3/4 (alternating wider/narrower segments, y=2 to y=56). Right braid barely visible behind. Shadow right side of left braid. Hair color: [COLOR].
+
+GENERATE: pixie_[COLOR].png
+Hair layer only, transparent PNG 72x72. Female pixie cut — very short. 2-3px styled spikes on top, sides flush. y=2 to y=18. Shadow right half. Hair color: [COLOR].
+
+
+FOLDER: assets/avatars/accessory/
+Accessory ONLY on top of everything. Transparent PNG 72x72.
+
+== UNIVERSAL ==
+
+GENERATE: glasses.png
+Accessory layer only, transparent PNG 72x72. Thin rectangular glasses at eye level (y=22 to y=34). Dark metal frames (#2a2a2a), 1px lines. Left lens more visible in 3/4, right foreshortened. Thin nose bridge pixel. Faint blue-grey lens tint. Only glasses visible. 8 colors max.
+
+== CAREER STORYLINE ACCESSORIES ==
+
+GENERATE: headphones.png
+Accessory layer, transparent PNG 72x72. Gaming headphones. Headband arc over skull (y=4 to y=14). Left ear cup prominent (y=16 to y=28), right smaller behind. Dark frame with neon electric blue accent line. Only headphones. 8 colors max.
+
+GENERATE: chef_hat.png
+Accessory layer, transparent PNG 72x72. Classic white toque chef hat (y=0 to y=14). Puffed rounded white top, stiff band below. Off-white shadow (#e0e0d8). Dark outline. Only the hat. 8 colors max.
+
+== SPECIAL / HIDDEN STORYLINE ACCESSORIES ==
+
+GENERATE: earpiece.png
+Accessory layer, transparent PNG 72x72. Spy earpiece in right ear (right is receded in 3/4, approx x=50-56, y=28-34). Tiny flesh-toned in-ear device (2-3px oval) with 1px wire tracing down behind neck. Subtle, covert. 8 colors max.
+
+GENERATE: spirit_beads.png
+Accessory layer, transparent PNG 72x72. Cultivation spirit bead necklace. Arc of 5-6 round pixel beads (2px each) across upper chest (y=38 to y=46, x=24 to x=50 in 3/4 arc). Translucent pale jade (#80e0c0) with tiny white highlight each. 1px lighter teal halo aura around each bead. 8 colors max.
+
+GENERATE: goggles.png
+Accessory layer, transparent PNG 72x72. Lab safety goggles on forehead (y=10 to y=24). Wide oval lenses with dark plastic strap. Left lens more visible in 3/4. Translucent amber tint inside lenses. Elastic strap behind head. 8 colors max.
+
+GENERATE: mask.png
+Accessory layer, transparent PNG 72x72. Stealth face mask covering lower face (y=28 to y=44). Matte dark grey fitted mask. Left side clearly covers cheek/jaw/mouth in 3/4, right side barely peeking. No straps visible in front. Clean minimal. 8 colors max.
+
+GENERATE: wand.png
+Accessory layer, transparent PNG 72x72. Magic wand held in left hand (lower-left area, approx x=10-22, y=46-68 — may extend past canvas bottom). Dark wood wand: 3px at grip, 1px at tip. Subtle pale yellow glow halo (2px) at tip. 8 colors max.
+
+
+FOLDER: assets/avatars/bg/
+Full 72x72, fully OPAQUE background scene.
+No character visible. Max 8 colors each.
+Pixel art impressionistic — key shapes suggest the scene.
+
+== GENERAL / PROGRESSION ==
+
+GENERATE: bg_school.png
+Background, full 72x72 opaque. High school classroom. Dark green chalkboard left ~40px, warm beige wall right. Small white window on right (20x14px). Wooden floor strip bottom 16px (warm brown #8a5a30). 8 colors max.
+
+GENERATE: bg_campus.png
+Background, full 72x72 opaque. Outdoor university campus. Bright blue sky top half (#4a7abf). Green grass bottom half (#2a6a30). Dark green tree blob silhouettes at left and right edges. 8 colors max.
+
+GENERATE: bg_office.png
+Background, full 72x72 opaque. Modern office interior. Dark navy wall (#1a2040). Desk surface bottom 18px (warm brown). Glowing blue monitor right side. City night window left (dark with yellow dot lights). 8 colors max.
+
+GENERATE: bg_penthouse.png
+Background, full 72x72 opaque. Luxury penthouse at night. Floor-to-ceiling window view. Dark interior strip bottom 12px. Scattered warm yellow and white pixel lights against deep navy (#0a1428). Upscale atmosphere. 8 colors max.
+
+GENERATE: bg_boardroom.png
+Background, full 72x72 opaque. Corporate boardroom. Dark wood wall (#2a1a10). Long conference table bottom 20px (glossy dark brown with thin highlight). City view window on right: grey sky with building silhouettes. Intimidating. 8 colors max.
+
+GENERATE: bg_dorm.png
+Background, full 72x72 opaque. Messy student dorm. Beige wall (#c8b898). Unmade bed bottom-right (white crumple pixel sheets, wood headboard). Stacked textbook/object rectangles left side. Dim yellowish lamp glow on left wall. 8 colors max.
+
+== CAREER STORYLINE BACKGROUNDS ==
+
+GENERATE: bg_stage.png
+Background, full 72x72 opaque. Concert performance stage. Pure dark interior (#100820). Yellow spotlight cone from upper-left, magenta spotlight from upper-right. Glossy floor reflection strip bottom 10px. 8 colors max.
+
+GENERATE: bg_casino.png
+Background, full 72x72 opaque. Underground casino. Deep green felt table bottom 22px (#1a6a30). Dark red velvet wall above (#600a10). Gold trim 1px at table edge. 3-4 tiny card suit pixel icons on wall. 8 colors max.
+
+GENERATE: bg_club.png
+Background, full 72x72 opaque. Nightclub. Pure black background. Neon pink (#e03080) and cyan (#20c8e0) vertical light streak pixels scattered. Dark purple floor bottom 12px (#1a0828). 8 colors max.
+
+GENERATE: bg_gym.png
+Background, full 72x72 opaque. Fitness gym. Light grey floor bottom 18px (#c0c0b8). White/cream wall above. Dark grey weight rack silhouette on right (3 stacked dumbbell shapes). 8 colors max.
+
+GENERATE: bg_kitchen.png
+Background, full 72x72 opaque. Restaurant kitchen. Warm cream wall with 2x2px checkerboard tile (#e8e0c8 and #d0c8b0). Stainless steel counter bottom 14px (light grey with 1px highlight). 8 colors max.
+
+GENERATE: bg_cyber.png
+Background, full 72x72 opaque. Esports gaming room. Pure black (#080808). Neon green grid lines (#20e840) — 1px every 9px H and V. 5-6 scattered 2px green code-fragment pixel clusters. 8 colors max.
+
+GENERATE: bg_stream.png
+Background, full 72x72 opaque. Streamer gaming room. Dark room (#0e0e18). Gaming PC monitor glow left (bright blue-white #a0c8ff rectangle 16x20px). Ring light glow suggestion on right wall (soft warm white circular halo). 8 colors max.
+
+== HIDDEN STORYLINE BACKGROUNDS ==
+
+GENERATE: bg_spy.png
+Background, full 72x72 opaque. Covert operative scene. Pure near-black (#080a10). Single thin red laser line (#e02020) at y=52. Faint dark grid overlay: 1px lines (#111318) every 12px. Tense surveillance atmosphere. 8 colors max.
+
+GENERATE: bg_temple.png
+Background, full 72x72 opaque. Ancient Chinese cultivation temple. Deep blue-grey misty sky (#101a2a). Stone pillar edge left and right (~8px wide dark grey rectangles). Faint cloud wisp pixels upper center. Mystical atmosphere. 8 colors max.
+
+GENERATE: bg_lab.png
+Background, full 72x72 opaque. Deep research facility. Cold dark teal walls (#0a1e1e). Bright fluorescent strip light across top 6px (white-blue #c0e0e8). Control panel silhouette on right (dark grey rectangles with 2-3 tiny red/green indicator dots). Sterile yet ominous. 8 colors max.
+
+GENERATE: bg_meta.png
+Background, full 72x72 opaque. Fourth-wall glitch room. Corrupted video game look: horizontal glitch stripes every 12-16px (random pixel-shifted color bars in red/green/blue). Core background flat grey (#808080). Window/doorframe outline in pure white, then corrupted. Unsettling. 8 colors max.
+
+GENERATE: bg_vault.png
+Background, full 72x72 opaque. High-security vault corridor. Pitch black left half (#05050a). Right half: heavy vault door edge (dark grey steel #303038, circular bolt pixels). Single 1px orange-gold light crack at y=36. Heist tension. 8 colors max.
+
+GENERATE: bg_hogwarts.png
+Background, full 72x72 opaque. Hogwarts castle corridor. Dark grey stone walls (stone block texture: #282830 mortar, #383840 stone, 2px mortar grid lines). Arched doorway silhouette center-back. Warm torch glow on left wall (orange-amber #d06820 circular halo). Magical medieval. 8 colors max.

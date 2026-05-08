@@ -1535,11 +1535,13 @@ function drawRandomEvent() {
   }
   if (!pool.length) return null;
   const majorKey = state.major ? 'MAJOR==' + state.major : null;
+  const romanceImmune = state.talentIds && state.talentIds.has(3036);
   const weights = pool.map(ev => {
     let w = ev.weight ?? 1;
     if (majorKey && ev.include && ev.include.includes(majorKey)) w *= 2;
     // System A: damp choice events so flavor dominates
     if (ev.choices && ev.choices.length > 0) w *= 0.5;
+    if (romanceImmune && ev.romance) w *= 0.5;
     return w;
   });
   const total = weights.reduce((a, b) => a + b, 0);

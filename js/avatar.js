@@ -34,7 +34,17 @@ function _skin(hlt) {
 }
 
 function _faceVariant(state) {
-  return FACE_VARIANTS[(state.faceVariant ?? 0) % FACE_VARIANTS.length];
+  const app = state.APP ?? 5;
+  if (app >= 8) return 'c';
+  if (app >= 5) return 'b';
+  return 'a';
+}
+
+function _emotion(state) {
+  const hap = state.HAP ?? 5;
+  if (hap >= 7) return 'happy';
+  if (hap >= 4) return 'neutral';
+  return 'sad';
 }
 
 function _hairStyle(state) {
@@ -48,13 +58,21 @@ function _hairColor(state) {
 
 function _outfit(state) {
   const sl = state.storyline;
-  if (sl === 'idol' || sl === 'superstar') return 'idol';
-  if (sl === 'xianxia')                   return 'hanfu';
-  if (sl === 'athlete' || sl === 'fitness') return 'sporty_b';
-  if (sl === 'chef')                       return 'chef';
-  if (sl === 'esports' || sl === 'worlds') return 'esports';
-  if (sl === 'poker' || sl === 'triton')   return 'poker';
-  if (sl === 'spy' || (state.MNY ?? 0) >= 8 || sl === 'ceo') return 'suit';
+  if (sl === 'idol' || sl === 'superstar')              return 'idol';
+  if (sl === 'xianxia')                                 return 'hanfu';
+  if (sl === 'athlete' || sl === 'fitness')             return 'sporty_b';
+  if (sl === 'chef')                                    return 'chef';
+  if (sl === 'esports' || sl === 'worlds' || sl === 'minor_league') return 'esports';
+  if (sl === 'poker' || sl === 'triton' || sl === 'local_shark')    return 'poker';
+  if (sl === 'spy')                                     return 'spy_suit';
+  if (sl === 'abyss')                                   return 'labcoat';
+  if (sl === 'meta')                                    return 'meta_hoodie';
+  if (sl === 'thief')                                   return 'thief_suit';
+  if (sl === 'hogwarts')                                return 'hogwarts_robe';
+  if (sl === 'party')                                   return 'party_outfit';
+  if (sl === 'streamer')                                return 'streamer';
+  if (sl === 'wasted')                                  return 'wasted';
+  if (sl === 'ceo' || (state.MNY ?? 0) >= 8)           return 'suit';
   if (state.profession === '高中生' || state.profession === '本科生')
     return ['school', 'school_b'][(state.topVariant ?? 0) % 2];
   return OUTFITS[(state.topVariant ?? 0) % OUTFITS.length];
@@ -62,8 +80,13 @@ function _outfit(state) {
 
 function _accessory(state) {
   const sl = state.storyline;
-  if (sl === 'esports' || sl === 'worlds') return 'headphones';
-  if (sl === 'chef')                       return 'chef_hat';
+  if (sl === 'esports' || sl === 'worlds' || sl === 'minor_league') return 'headphones';
+  if (sl === 'chef')     return 'chef_hat';
+  if (sl === 'spy')      return 'earpiece';
+  if (sl === 'xianxia')  return 'spirit_beads';
+  if (sl === 'abyss')    return 'goggles';
+  if (sl === 'thief')    return 'mask';
+  if (sl === 'hogwarts') return 'wand';
   if ((state.INT ?? 5) >= 8 && (state.faceVariant ?? 0) % 2 === 0) return 'glasses';
   if ((state.faceVariant ?? 0) % 5 === 1 && (state.outfitColorId ?? 0) % 2 === 0) return 'glasses';
   return null;
@@ -71,17 +94,24 @@ function _accessory(state) {
 
 function _bg(state) {
   const sl = state.storyline;
-  if (sl === 'spy')                         return 'bg_spy';
-  if (sl === 'xianxia')                     return 'bg_temple';
-  if (sl === 'idol' || sl === 'superstar')  return 'bg_stage';
-  if (sl === 'poker' || sl === 'triton')    return 'bg_casino';
-  if (sl === 'party')                       return 'bg_club';
-  if (sl === 'fitness' || sl === 'athlete') return 'bg_gym';
-  if (sl === 'chef')                        return 'bg_kitchen';
-  if (sl === 'esports' || sl === 'worlds')  return 'bg_cyber';
-  if ((state.age ?? 16) <= 18)             return 'bg_school';
-  if ((state.age ?? 16) <= 22)             return 'bg_campus';
-  if ((state.MNY ?? 5) >= 8)               return 'bg_penthouse';
+  if (sl === 'spy')                                              return 'bg_spy';
+  if (sl === 'xianxia')                                         return 'bg_temple';
+  if (sl === 'idol' || sl === 'superstar')                      return 'bg_stage';
+  if (sl === 'poker' || sl === 'triton' || sl === 'local_shark') return 'bg_casino';
+  if (sl === 'party')                                           return 'bg_club';
+  if (sl === 'fitness' || sl === 'athlete')                     return 'bg_gym';
+  if (sl === 'chef')                                            return 'bg_kitchen';
+  if (sl === 'esports' || sl === 'worlds' || sl === 'minor_league') return 'bg_cyber';
+  if (sl === 'abyss')                                           return 'bg_lab';
+  if (sl === 'meta')                                            return 'bg_meta';
+  if (sl === 'thief')                                           return 'bg_vault';
+  if (sl === 'hogwarts')                                        return 'bg_hogwarts';
+  if (sl === 'streamer')                                        return 'bg_stream';
+  if (sl === 'wasted')                                          return 'bg_dorm';
+  if (sl === 'ceo')                                             return 'bg_boardroom';
+  if ((state.age ?? 16) <= 18)                                  return 'bg_school';
+  if ((state.age ?? 16) <= 22)                                  return 'bg_campus';
+  if ((state.MNY ?? 5) >= 8)                                    return 'bg_penthouse';
   return 'bg_office';
 }
 
@@ -89,10 +119,11 @@ function _paths(state) {
   const sex = state.sex === 0 ? 'male' : 'female';
   const skin = _skin(state.HLT);
   const fv = _faceVariant(state);
+  const em = _emotion(state);
   const acc = _accessory(state);
   return [
     `assets/avatars/bg/${_bg(state)}.png`,
-    `assets/avatars/head/${sex}_${skin}_${fv}.png`,
+    `assets/avatars/head/${sex}_${skin}_${fv}_${em}.png`,
     `assets/avatars/body/${_outfit(state)}.png`,
     `assets/avatars/hair/${_hairStyle(state)}_${_hairColor(state)}.png`,
     acc ? `assets/avatars/accessory/${acc}.png` : null,
