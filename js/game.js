@@ -968,6 +968,9 @@ const state = {
   school: '无',
   hsType: '',
   overseas: 0,
+  country: '',
+  countryIntent: '',
+  schoolTier: '',
   major: '',
   relationship: '单身',
   relationshipHistory: [],
@@ -1455,7 +1458,8 @@ function _checkEventAchievements(ev) {
 
     // School milestones
     const school = ev.set.school;
-    if (school === 'T20') unlockAchievement('school_t20');
+    const tier = ev.set.schoolTier;
+    if (tier === 'top' || school === 'T20') unlockAchievement('school_t20');
     if (school === '遣返' || school === '退学') unlockAchievement('school_expelled');
   }
 
@@ -2341,7 +2345,7 @@ function render() {
     const schoolBox = $('school-box');
     if (state.school && state.school !== '无') {
       schoolBox.style.display = '';
-      $('school-display').textContent = state.school;
+      $('school-display').textContent = state.country ? `${state.school} · ${state.country}` : state.school;
     } else {
       schoolBox.style.display = 'none';
     }
@@ -2919,8 +2923,8 @@ function calculateScore() {
   if (peaks.cul) score += peaks.cul * 20;
 
   // Education bonus
-  if (state.school === 'T20') score += 1000;
-  else if (state.school === 'T50') score += 500;
+  if (state.schoolTier === 'top' || state.school === 'T20') score += 1000;
+  else if (state.schoolTier === 'mid' || state.school === 'T50') score += 500;
   else if (state.school === '遣返' || state.school === '退学') score -= 1000;
 
   // Storyline / Hidden Paths
