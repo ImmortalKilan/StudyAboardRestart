@@ -7,7 +7,12 @@
       "Bash(python3 *)",
       "Bash(node *)",
       "Bash(curl -s http://127.0.0.1:8000/)",
+<<<<<<< HEAD
       "PowerShell(Out-Null *)"
+=======
+      "Bash(npx http-server *)",
+      "Bash(curl -s http://127.0.0.1:8000/data/hogwarts_events.json)"
+>>>>>>> da98d18a146ef690314b5fb549dc9de6212a1b25
     ]
   }
 }

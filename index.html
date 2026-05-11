@@ -11,8 +11,6 @@
   <main class="app">
 
     <section id="start-screen" class="screen active">
-      <div id="souls-container" class="souls-container"></div>
-      
       <!-- GitHub Promotion Area -->
       <div class="github-promo">
         <a href="https://github.com/ImmortalKilan/StudyAboardRestart" target="_blank" class="github-link" title="前往 GitHub">
@@ -35,10 +33,23 @@
 
     <section id="creation-screen" class="screen">
       <div class="creation-layout">
-        <!-- Scrollable Steps (talents → alloc → appearance) -->
-        <div class="creation-right" id="creation-scroll-area">
+        <!-- Left: Avatar Preview -->
+        <aside class="creation-left">
+          <div class="creation-avatar-wrap">
+            <canvas id="creation-avatar-canvas"></canvas>
+          </div>
+          <div class="creation-controls">
+            <div class="sex-row">
+              <button id="sex-male" class="chip active">男</button>
+              <button id="sex-female" class="chip">女</button>
+            </div>
+            <button id="btn-random-appearance" class="ghost small-btn">🎲 Fit Check</button>
+          </div>
+        </aside>
 
-          <!-- Step 0: Talents -->
+        <!-- Right: Scrollable Steps -->
+        <div class="creation-right" id="creation-scroll-area">
+          <!-- Step 1: Talents -->
           <div class="creation-step" id="step-talents">
             <header class="screen-head">
               <h1>重开中......</h1>
@@ -49,11 +60,11 @@
             <div id="talent-list" class="talent-grid"></div>
 
             <div class="footer-actions">
-              <button id="talent-confirm" class="primary" disabled>确认天赋 →</button>
+              <button id="talent-confirm" class="primary" disabled>确认天赋</button>
             </div>
           </div>
 
-          <!-- Step 1: Stats Allocation -->
+          <!-- Step 2: Stats Allocation -->
           <div class="creation-step" id="step-alloc">
             <header class="screen-head">
               <h1>分配属性</h1>
@@ -74,43 +85,12 @@
             </div>
 
             <div class="footer-actions">
-              <button id="alloc-back-to-talent" class="ghost">← 返回天赋</button>
+              <button id="alloc-back-to-talent" class="ghost">返回修改天赋</button>
               <button id="alloc-random" class="ghost">随机分配</button>
-              <button id="alloc-start" class="primary" disabled>确认属性，去捏脸 →</button>
+              <button id="alloc-start" class="primary" disabled>开始留学人生</button>
             </div>
           </div>
-
-          <!-- Step 2: Appearance (LAST) -->
-          <div class="creation-step" id="step-appearance">
-            <header class="screen-head">
-              <h1>捏个脸</h1>
-              <p class="sub">最后一步！选好外貌，就开始你的留学人生。</p>
-            </header>
-            <div class="appearance-layout">
-              <div class="creation-avatar-wrap">
-                <canvas id="creation-avatar-canvas"></canvas>
-              </div>
-              <div class="appearance-controls">
-                <div class="appearance-section">
-                  <div class="appearance-label">性别</div>
-                  <div class="sex-row">
-                    <button id="sex-male" class="chip active">♂ 男</button>
-                    <button id="sex-female" class="chip">♀ 女</button>
-                  </div>
-                </div>
-                <div class="appearance-section">
-                  <div class="appearance-label">外貌随机</div>
-                  <button id="btn-random-appearance" class="ghost appearance-random-btn">🎲 Fit Check</button>
-                  <p class="appearance-hint">随机你的发型、服装和肤色搭配</p>
-                </div>
-              </div>
-            </div>
-            <div class="footer-actions">
-              <button id="back-to-alloc" class="ghost">← 重新分配属性</button>
-              <button id="appearance-confirm" class="primary">开始人生！</button>
-            </div>
-          </div>
-        </div><!-- end creation-right -->
+        </div>
       </div>
     </section>
 
@@ -130,13 +110,17 @@
             <span class="major-label">学校</span>
             <span id="school-display" class="major-val"></span>
           </div>
-          <div class="major-box">
+          <div id="major-box" class="major-box">
             <span class="major-label">专业</span>
             <span id="major-display" class="major-val">未定</span>
           </div>
           <div id="profession-box" class="major-box" style="display:none;">
             <span class="major-label">职业</span>
             <span id="profession-display" class="major-val"></span>
+          </div>
+          <div id="house-box" class="major-box hogwarts-house-box" style="display:none;">
+            <span class="major-label hogwarts-house-label">学院</span>
+            <span id="house-display" class="major-val hogwarts-house-val"></span>
           </div>
           <div class="major-box">
             <span class="major-label">恋爱</span>

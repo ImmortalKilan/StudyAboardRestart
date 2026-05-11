@@ -7,10 +7,10 @@ const STAT_KEYS = ['SOC', 'INT', 'MNY', 'PER', 'HLT', 'APP'];
 const STAT_LABELS = {
   SOC: '社交', INT: '智力', MNY: '家境',
   HAP: '快乐', HLT: '健康', PER: '毅力', APP: '颜值',
-  POP: '人气', POK: '牌技', MMR: '天梯分', FIT: '体能', CKL: '厨艺', ATH: '运动',
+  POP: '人气', POK: '牌技', MMR: '天梯分', FIT: '体能', CKL: '厨艺', ATH: '运动', MAG: '魔力',
   cul: '修为', dao: '大道', karma: '机缘', tribulation: '渡劫', realm: '境界'
 };
-const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'HEAT', 'cul', 'dao', 'karma', 'tribulation']);
+const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG', 'HEAT', 'cul', 'dao', 'karma', 'tribulation']);
 const XIANXIA_KEYS = ['realm', 'cul', 'dao', 'karma', 'tribulation'];
 
 // ── Special Scoring Endings ──
@@ -940,6 +940,7 @@ const STORYLINE_UNLOCK_STAT = {
   fitness: 'FIT',
   chef: 'CKL',
   athlete: 'ATH',
+  hogwarts: 'MAG',
 };
 const STUDENT_PHASES = new Set([
   '高中生', '本科生', '理工生', '商科生', '文科生',
@@ -1586,6 +1587,15 @@ function resolveChoice(index) {
       if (ev) applyEvent(ev);
     }
   } else if (choice.next) {
+    if (choice.set) {
+      for (const [k, v] of Object.entries(choice.set)) state[k] = v;
+    }
+    if (choice.effect) {
+      for (const [k, v] of Object.entries(choice.effect)) {
+        if (EFFECT_KEYS.has(k)) state[k] = (state[k] || 0) + v;
+      }
+      clampStats();
+    }
     const ev = state.eventsMap.get(choice.next);
     if (ev) applyEvent(ev);
   } else if (choice.effect || choice.set || choice.resultText || choice.text) {
@@ -2322,12 +2332,13 @@ function render() {
       if (state.showFIT) shown.push('FIT');
       if (state.showCKL) shown.push('CKL');
       if (state.showATH) shown.push('ATH');
+      if (state.showMAG) shown.push('MAG');
       const dynamicMax = Math.max(1, ...shown.filter(k => k !== 'HAP').map(k => state[k]));
-      const SPECIAL_STATS = new Set(['POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH']);
+      const SPECIAL_STATS = new Set(['POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG']);
       for (const k of shown) {
         const row = document.createElement('div');
         const isSpecial = SPECIAL_STATS.has(k);
-        row.className = 'stat-row' + (isSpecial ? ' stat-special' : '');
+        row.className = 'stat-row' + (isSpecial ? (k === 'MAG' ? ' stat-special stat-hogwarts' : ' stat-special') : '');
         row.dataset.stat = k;
         const label = STAT_LABELS[k];
         const val = state[k];
@@ -2342,37 +2353,92 @@ function render() {
       }
     }
 
+    const HOUSE_NAMES = {
+      gryffindor: '格兰芬多', ravenclaw: '拉文克劳',
+      hufflepuff: '赫奇帕奇', slytherin: '斯莱特林'
+    };
+    const HOUSE_COLORS = {
+      gryffindor: { primary: '#740001', secondary: '#EEBA30', text: '#c0392b' },
+      slytherin:  { primary: '#1A472A', secondary: '#AAAAAA', text: '#27ae60' },
+      ravenclaw:  { primary: '#222F5B', secondary: '#BEBEBE', text: '#5b8abf' },
+      hufflepuff: { primary: '#FFDB00', secondary: '#000000', text: '#d4a017' }
+    };
+    const isHogwarts = state.storyline === 'hogwarts';
+
     const schoolBox = $('school-box');
+<<<<<<< HEAD
     if (state.school && state.school !== '无') {
       schoolBox.style.display = '';
       $('school-display').textContent = state.country ? `${state.school} · ${state.country}` : state.school;
     } else {
+=======
+    const majorBox = $('major-box');
+    const profBox = $('profession-box');
+    const houseBox = $('house-box');
+
+    if (isHogwarts) {
+      schoolBox.classList.add('hogwarts-fade-out');
+      majorBox.classList.add('hogwarts-fade-out');
+      profBox.classList.add('hogwarts-fade-out');
+>>>>>>> da98d18a146ef690314b5fb549dc9de6212a1b25
       schoolBox.style.display = 'none';
+      majorBox.style.display = 'none';
+      profBox.style.display = 'none';
+
+      if (state.house) {
+        houseBox.style.display = '';
+        houseBox.classList.add('hogwarts-fade-in');
+        const hc = HOUSE_COLORS[state.house] || { primary: '#9B59B6', secondary: '#9B59B6', text: '#9B59B6' };
+        houseBox.style.setProperty('--house-gradient', `linear-gradient(to right, ${hc.primary}, ${hc.secondary})`);
+        houseBox.style.background = `linear-gradient(135deg, ${hc.primary}18 0%, var(--card-2) 60%)`;
+        $('house-display').textContent = HOUSE_NAMES[state.house] || state.house;
+        $('house-display').style.color = hc.text;
+        const houseLabel = houseBox.querySelector('.hogwarts-house-label');
+        if (houseLabel) houseLabel.style.color = hc.primary;
+      } else {
+        houseBox.style.display = 'none';
+      }
+    } else {
+      schoolBox.classList.remove('hogwarts-fade-out');
+      majorBox.classList.remove('hogwarts-fade-out');
+      profBox.classList.remove('hogwarts-fade-out');
+      houseBox.classList.remove('hogwarts-fade-in');
+      houseBox.style.display = 'none';
+
+      if (state.school && state.school !== '无') {
+        schoolBox.style.display = '';
+        $('school-display').textContent = state.school;
+      } else {
+        schoolBox.style.display = 'none';
+      }
+
+      majorBox.style.display = '';
+      $('major-display').textContent = state.major || '未定';
+
+      if (state.profession && !STUDENT_PHASES.has(state.profession)) {
+        profBox.style.display = '';
+        $('profession-display').textContent = state.profession;
+      } else {
+        profBox.style.display = 'none';
+      }
     }
 
-    $('major-display').textContent = state.major || '未定';
     $('relationship-display').textContent = (state.talentIds.has(3036) && state.relationship === '暧昧')
       ? '？？？'
       : (state.relationship || '单身');
-
-    const profBox = $('profession-box');
-    if (state.profession && !STUDENT_PHASES.has(state.profession)) {
-      profBox.style.display = '';
-      $('profession-display').textContent = state.profession;
-    } else {
-      profBox.style.display = 'none';
-    }
 
     const slBox = $('storyline-box');
     if (state.storyline) {
       slBox.style.display = '';
       const isHidden = HIDDEN_STORYLINES.has(state.storyline);
-      slBox.classList.toggle('hidden-storyline', isHidden);
+      slBox.classList.toggle('hidden-storyline', isHidden && !isHogwarts);
       slBox.classList.toggle('special-storyline', !isHidden);
-      slBox.querySelector('.storyline-label').textContent = isHidden ? '隐藏剧情' : '特殊剧情';
+      slBox.classList.toggle('hogwarts-storyline', isHogwarts);
+      slBox.querySelector('.storyline-label').textContent = isHogwarts ? '魔法世界' : (isHidden ? '隐藏剧情' : '特殊剧情');
       $('storyline-display').textContent = STORYLINE_NAMES[state.storyline] || state.storyline;
     } else {
       slBox.style.display = 'none';
+      slBox.classList.remove('hogwarts-storyline');
     }
 
     const debutBox = $('debut-box');
@@ -3324,21 +3390,6 @@ async function main() {
     updateCreationAvatar();
   });
 
-  // Step 2 (appearance, last): confirm → start game
-  $('appearance-confirm').addEventListener('click', () => {
-    initGame();
-  });
-
-  // Step 2 back → Step 1 (alloc)
-  $('back-to-alloc').addEventListener('click', () => {
-    const container = $('creation-scroll-area');
-    const target = $('step-alloc');
-    if (container && target) {
-      container.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
-    }
-    setTimeout(() => { target.scrollTop = 0; }, 300);
-  });
-
   $('talent-confirm').addEventListener('click', () => {
     for (const k of STAT_KEYS) {
       state.alloc[k] = 0;
@@ -3396,15 +3447,7 @@ async function main() {
     updateCreationAvatar();
   });
 
-  // Step 1 (alloc) → Step 2 (appearance, last)
-  $('alloc-start').addEventListener('click', () => {
-    const container = $('creation-scroll-area');
-    const target = $('step-appearance');
-    if (container && target) {
-      container.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
-    }
-    setTimeout(() => { target.scrollTop = 0; updateCreationAvatar(); }, 300);
-  });
+  $('alloc-start').addEventListener('click', initGame);
 
   $('btn-auto-1x').addEventListener('click', () => {
     startAuto(1);
@@ -3769,100 +3812,6 @@ async function main() {
 
   renderTalentSelect(talents);
   showScreen('start-screen');
-  startSoulsAnimation();
-}
-
-function startSoulsAnimation() {
-  const container = document.getElementById('souls-container');
-  if (!container) return;
-
-  const MAX_ON_SCREEN = 3;
-  let currentOnScreen = 0;
-
-  function spawnSoul() {
-    if (currentOnScreen >= MAX_ON_SCREEN) return;
-    
-    if (document.getElementById('start-screen').classList.contains('active')) {
-      const soulState = {
-        APP: Math.floor(Math.random() * 11),
-        INT: Math.floor(Math.random() * 11),
-        MNY: Math.floor(Math.random() * 11),
-        HLT: Math.floor(Math.random() * 11),
-        HAP: Math.floor(Math.random() * 11),
-        PER: Math.floor(Math.random() * 11),
-        sex: Math.floor(Math.random() * 2),
-        faceVariant: Math.floor(Math.random() * 10),
-        topVariant: Math.floor(Math.random() * 12),
-        bottomVariant: Math.floor(Math.random() * 6),
-        outfitColorId: Math.floor(Math.random() * 5),
-        storyline: ['spy', 'ceo', 'xianxia', 'abyss', 'meta', 'idol', ''][Math.floor(Math.random() * 7)],
-        major: ['CS', '商科', '理科', '文科', ''][Math.floor(Math.random() * 5)]
-      };
-
-      const canvas = createStandaloneAvatar(soulState);
-      canvas.className = 'walker-canvas';
-      
-      const wrap = document.createElement('div');
-      wrap.className = 'walker-wrap';
-      
-      const scaleWrap = document.createElement('div');
-      scaleWrap.className = 'walker-scale';
-
-      const scale = 0.4 + Math.random() * 0.6; // 0.4 to 1.0
-      const duration = 15 + Math.random() * 15; 
-      
-      // Determine random start and end edges
-      // 0: left, 1: right, 2: bottom
-      const startEdge = Math.floor(Math.random() * 3);
-      let startX, startY, endX, endY;
-
-      if (startEdge === 0) { // start left
-        startX = -20; startY = 30 + Math.random() * 60;
-        endX = 120; endY = 30 + Math.random() * 60;
-      } else if (startEdge === 1) { // start right
-        startX = 120; startY = 30 + Math.random() * 60;
-        endX = -20; endY = 30 + Math.random() * 60;
-      } else { // start bottom
-        startX = 10 + Math.random() * 80; startY = 120;
-        endX = startX > 50 ? -20 : 120; // go opposite side
-        endY = 30 + Math.random() * 50;
-      }
-
-      wrap.style.left = `${startX}%`;
-      wrap.style.top = `${startY}%`;
-      wrap.style.transition = `left ${duration}s linear, top ${duration}s linear`;
-      wrap.style.zIndex = Math.floor(startY / 10);
-      
-      // Flip horizontally if going left
-      const isGoingLeft = endX < startX;
-      scaleWrap.style.transform = `scale(${scale}) ${isGoingLeft ? 'scaleX(-1)' : ''}`;
-      canvas.style.animationDelay = `-${Math.random()}s`;
-
-      scaleWrap.appendChild(canvas);
-      wrap.appendChild(scaleWrap);
-      container.appendChild(wrap);
-      currentOnScreen++;
-
-      // Trigger animation on next frame
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          wrap.style.left = `${endX}%`;
-          wrap.style.top = `${endY}%`;
-        });
-      });
-
-      setTimeout(() => {
-        if (container.contains(wrap)) {
-          container.removeChild(wrap);
-          currentOnScreen--;
-        }
-      }, duration * 1000);
-    }
-  }
-
-  // Check frequently but spawn max 3
-  setInterval(spawnSoul, 2000);
-  spawnSoul(); // Spawn one immediately
 }
 
 main();

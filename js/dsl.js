@@ -21,8 +21,7 @@ const ALIASES = {
   canFly: 'canFly', quidditch: 'quidditch', darkForces: 'darkForces',
   DA_member: 'DA_member', triwizard: 'triwizard',
   invisibility_cloak: 'invisibility_cloak', hogsmeade_secret: 'hogsmeade_secret',
-  spell_expelliarmus: 'spell_expelliarmus', spell_protego: 'spell_protego',
-  spell_stupefy: 'spell_stupefy', spell_lumos: 'spell_lumos', spell_patronus: 'spell_patronus',
+  duel_wins: 'duel_wins', duel_losses: 'duel_losses',
   voldemort_defeated: 'voldemort_defeated'
 };
 
@@ -155,7 +154,7 @@ export function pickBranch(state, branches) {
       }
       
       if (cond === '' || evalCondition(state, cond)) {
-        validItems.push({ id: Number(idStr), weight: Number(wStr) });
+        validItems.push({ id: /^\d+$/.test(idStr) ? Number(idStr) : idStr, weight: Number(wStr) });
       }
     }
     
@@ -174,7 +173,8 @@ export function pickBranch(state, branches) {
     const idx = b.lastIndexOf('?');
     if (idx < 0) continue;
     const cond = b.slice(0, idx).trim();
-    const id = Number(b.slice(idx + 1).trim());
+    const raw = b.slice(idx + 1).trim();
+    const id = /^\d+$/.test(raw) ? Number(raw) : raw;
     if (cond === '' || evalCondition(state, cond)) return id;
   }
   return null;
