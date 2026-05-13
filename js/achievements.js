@@ -7,7 +7,7 @@ const STORAGE_KEY = 'studyAbroad_ach_v1';
 export const ACHIEVEMENTS = [
   // ── 里程碑 ──────────────────────────────────────────────────────────────
   { id: 'first_play',       name: '人生重来',     icon: '🔄', rarity: 'normal',    cat: '里程碑', desc: '开始了第一次留学重开' },
-  { id: 'school_t20',       name: '名校之路',     icon: '🎓', rarity: 'rare',      cat: '里程碑', desc: '成功进入 T20 大学' },
+  { id: 'school_t20',       name: '名校之路',     icon: '🎓', rarity: 'rare',      cat: '里程碑', desc: '成功进入顶尖大学（T20 / G5 / 港三 / 帝大 等）' },
   { id: 'school_expelled',  name: '学业未竟',     icon: '📋', rarity: 'normal',    cat: '里程碑', desc: '被学校开除或遣返回国' },
   { id: 'stat_max',         name: '天赋异禀',     icon: '💪', rarity: 'rare',      cat: '里程碑', desc: '某项基础属性达到了 10 点' },
   { id: 'stat_negative',    name: '人生低谷',     icon: '📉', rarity: 'normal',    cat: '里程碑', desc: '某项基础属性跌入了负数' },

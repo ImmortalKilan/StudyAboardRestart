@@ -344,6 +344,22 @@
   },
 
   {
+    "id": 10220,
+    "text": "中介让你尽快敲定主申请国家——不同的国家，文书、标化、推荐信全套都不一样。你坐在书桌前，开始认真考虑：到底想去哪？",
+    "include": "AGE=17&HS==国际",
+    "fixedMonth": 9,
+    "choices": [
+      { "text": "美国（藤校梦／自由灵活，但贵）", "set": { "countryIntent": "美国" } },
+      { "text": "英国（学制短／G5招牌响）", "set": { "countryIntent": "英国" } },
+      { "text": "澳洲（移民友好／阳光沙滩）", "set": { "countryIntent": "澳洲" } },
+      { "text": "欧洲（学费便宜／文化深厚）", "set": { "countryIntent": "欧洲" } },
+      { "text": "香港（离家近／中西合璧）", "set": { "countryIntent": "香港" } },
+      { "text": "日本（动漫情怀／东亚文化圈）", "set": { "countryIntent": "日本" } },
+      { "text": "新加坡（亚洲顶级／英文授课）", "set": { "countryIntent": "新加坡" } }
+    ]
+  },
+
+  {
     "id": 10320,
     "text": "十二月，朋友圈被一波 ED 录取喜报刷屏。",
     "include": "AGE=18&HS==国际",
@@ -387,6 +403,30 @@
     "include": "AGE=18&HS==国际",
     "fixedMonth": 3,
     "branch": [
+      "countryIntent==英国&INT>=9&MNY>=5?10330",
+      "countryIntent==英国&INT>=7?10331",
+      "countryIntent==英国&INT>=4?10332",
+      "countryIntent==英国?10333",
+      "countryIntent==澳洲&INT>=8&MNY>=5?10334",
+      "countryIntent==澳洲&INT>=5?10335",
+      "countryIntent==澳洲&INT>=3?10336",
+      "countryIntent==澳洲?10337",
+      "countryIntent==欧洲&INT>=9?10338",
+      "countryIntent==欧洲&INT>=6?10339",
+      "countryIntent==欧洲&INT>=3?10340",
+      "countryIntent==欧洲?10341",
+      "countryIntent==香港&INT>=9?10342",
+      "countryIntent==香港&INT>=7?10343",
+      "countryIntent==香港&INT>=4?10344",
+      "countryIntent==香港?10345",
+      "countryIntent==日本&INT>=9?10346",
+      "countryIntent==日本&INT>=6?10347",
+      "countryIntent==日本&INT>=3?10348",
+      "countryIntent==日本?10349",
+      "countryIntent==新加坡&INT>=9?10350",
+      "countryIntent==新加坡&INT>=6?10351",
+      "countryIntent==新加坡&INT>=3?10352",
+      "countryIntent==新加坡?10353",
       "INT>=9&MNY>=5?10302",
       "INT>=7?10303",
       "INT>=4?10304",
@@ -398,21 +438,21 @@
     "text": "Congratulations! 你被Top20名校录取了！全家都疯了，你被设为家族群头像。朋友圈收到了 200+ 个赞。",
     "noRandom": true,
     "happyDelta": 5,
-    "set": { "school": "T20" }
+    "set": { "school": "T20", "schoolTier": "top", "country": "美国" }
   },
   {
     "id": 10303,
     "text": "你收到了一封来自 Top50 大学的录取通知。结果不算惊艳，但也算稳稳上岸了。",
     "noRandom": true,
     "happyDelta": 3,
-    "set": { "school": "T50" }
+    "set": { "school": "T50", "schoolTier": "mid", "country": "美国" }
   },
   {
     "id": 10304,
     "text": "你被一所QS排名一百开外的学校录取了。不是梦校，但至少能出去了。算了，先出去再说。",
     "noRandom": true,
     "happyDelta": 1,
-    "set": { "school": "T100+" }
+    "set": { "school": "T100+", "schoolTier": "low", "country": "美国" }
   },
   {
     "id": 10305,
@@ -425,7 +465,7 @@
   {
     "id": 10306,
     "text": "你拿着新出的标化高分去找中介补交材料。焦急地等了两周后，收到了一封意想不到的邮件：",
-    "include": "AGE=18&HS==国际&EVT?[17004]&school!=T20&school!=无",
+    "include": "AGE=18&HS==国际&EVT?[17004]&country==美国&school!=T20&school!=无",
     "branch": ["school==T50?10307", "school==T100+?10308"]
   },
   {
@@ -433,14 +473,188 @@
     "text": "补交成绩后，一所Top20名校向你抛来了橄榄枝！你激动得差点把手机摔了。",
     "noRandom": true,
     "happyDelta": 4,
-    "set": { "school": "T20" }
+    "set": { "school": "T20", "schoolTier": "top", "country": "美国" }
   },
   {
     "id": 10308,
     "text": "补交成绩后，一所Top50大学给了你offer。比之前的学校好了不少，你松了一口气。",
     "noRandom": true,
     "happyDelta": 3,
-    "set": { "school": "T50" }
+    "set": { "school": "T50", "schoolTier": "mid", "country": "美国" }
+  },
+
+  {
+    "id": 10330,
+    "text": "Offer 来自 UCL/IC/LSE/牛津/剑桥——你被 G5 录取了！家里相册被翻了出来，从小学奖状一路晒到推荐信。微信群里飘起一句句「学神」。",
+    "noRandom": true,
+    "happyDelta": 5,
+    "set": { "school": "G5", "schoolTier": "top", "country": "英国" }
+  },
+  {
+    "id": 10331,
+    "text": "你拿到了一所罗素集团大学的 offer。虽不是 G5，但红砖名校的招牌还是相当能打。家里人难掩骄傲，朋友圈刷了一晚上点赞。",
+    "noRandom": true,
+    "happyDelta": 3,
+    "set": { "school": "罗素", "schoolTier": "mid", "country": "英国" }
+  },
+  {
+    "id": 10332,
+    "text": "你被一所英国普通大学录取，QS 排名一百开外。妈妈安慰你说：「先去读，再升学」。你点点头，心里盘算着将来能不能转学到罗素。",
+    "noRandom": true,
+    "happyDelta": 1,
+    "set": { "school": "普通英校", "schoolTier": "low", "country": "英国" }
+  },
+  {
+    "id": 10333,
+    "text": "拒信一封接一封。你刷新着 UCAS 的状态，最后一所学校也 reject 了。Tier 4 签证的事谈不上了。你开始考虑 Gap year 重申，或者放弃英国。",
+    "noRandom": true,
+    "happyDelta": -4,
+    "set": { "school": "无" }
+  },
+
+  {
+    "id": 10334,
+    "text": "你被澳洲八大录取！悉尼/墨尔本的阳光在等你。",
+    "noRandom": true,
+    "happyDelta": 4,
+    "set": { "school": "澳八大", "schoolTier": "top", "country": "澳洲" }
+  },
+  {
+    "id": 10335,
+    "text": "你被一所澳洲普通公立大学录取。先出去再说。",
+    "noRandom": true,
+    "happyDelta": 2,
+    "set": { "school": "普通澳校", "schoolTier": "mid", "country": "澳洲" }
+  },
+  {
+    "id": 10336,
+    "text": "你被澳洲一所私立学校录取，学费昂贵，但好歹下签了。",
+    "noRandom": true,
+    "happyDelta": 0,
+    "set": { "school": "私校", "schoolTier": "low", "country": "澳洲" }
+  },
+  {
+    "id": 10337,
+    "text": "澳洲学校全聚德。你开始重新规划。",
+    "noRandom": true,
+    "happyDelta": -4,
+    "set": { "school": "无" }
+  },
+
+  {
+    "id": 10338,
+    "text": "你被欧洲顶尖名校录取（ETH/巴黎理工/慕尼黑工大）。学费几乎免费，但课程难度爆表。",
+    "noRandom": true,
+    "happyDelta": 5,
+    "set": { "school": "顶尖欧校", "schoolTier": "top", "country": "欧洲" }
+  },
+  {
+    "id": 10339,
+    "text": "你被欧洲一所公立大学录取。学费便宜，性价比拉满。",
+    "noRandom": true,
+    "happyDelta": 3,
+    "set": { "school": "公立大学", "schoolTier": "mid", "country": "欧洲" }
+  },
+  {
+    "id": 10340,
+    "text": "你被欧洲一所普通学校录取。先去再说，欧元区的体验本身就值。",
+    "noRandom": true,
+    "happyDelta": 1,
+    "set": { "school": "普通欧校", "schoolTier": "low", "country": "欧洲" }
+  },
+  {
+    "id": 10341,
+    "text": "欧洲学校全聚德。语言关或者标化没过。",
+    "noRandom": true,
+    "happyDelta": -4,
+    "set": { "school": "无" }
+  },
+
+  {
+    "id": 10342,
+    "text": "你被港三（港大/港中文/港科）录取！亚洲顶级，离家又近。",
+    "noRandom": true,
+    "happyDelta": 5,
+    "set": { "school": "港三", "schoolTier": "top", "country": "香港" }
+  },
+  {
+    "id": 10343,
+    "text": "你被港八之一录取（理工/城大/浸会等）。",
+    "noRandom": true,
+    "happyDelta": 3,
+    "set": { "school": "港八", "schoolTier": "mid", "country": "香港" }
+  },
+  {
+    "id": 10344,
+    "text": "你被香港一所普通大学录取。",
+    "noRandom": true,
+    "happyDelta": 1,
+    "set": { "school": "普通港校", "schoolTier": "low", "country": "香港" }
+  },
+  {
+    "id": 10345,
+    "text": "香港学校全聚德。",
+    "noRandom": true,
+    "happyDelta": -4,
+    "set": { "school": "无" }
+  },
+
+  {
+    "id": 10346,
+    "text": "你被东京大学/京都大学录取！日本最高学府向你敞开大门。",
+    "noRandom": true,
+    "happyDelta": 5,
+    "set": { "school": "帝大", "schoolTier": "top", "country": "日本" }
+  },
+  {
+    "id": 10347,
+    "text": "你被早稻田/庆应/MARCH 之一录取。日本一线私立的牌子。",
+    "noRandom": true,
+    "happyDelta": 3,
+    "set": { "school": "早庆", "schoolTier": "mid", "country": "日本" }
+  },
+  {
+    "id": 10348,
+    "text": "你被日本一所普通大学录取。",
+    "noRandom": true,
+    "happyDelta": 1,
+    "set": { "school": "普通日校", "schoolTier": "low", "country": "日本" }
+  },
+  {
+    "id": 10349,
+    "text": "日本学校全聚德。N1 没过或留考分数太低。",
+    "noRandom": true,
+    "happyDelta": -4,
+    "set": { "school": "无" }
+  },
+
+  {
+    "id": 10350,
+    "text": "你被新加坡国立大学/南洋理工录取！亚洲顶尖，全英文授课。",
+    "noRandom": true,
+    "happyDelta": 5,
+    "set": { "school": "新二", "schoolTier": "top", "country": "新加坡" }
+  },
+  {
+    "id": 10351,
+    "text": "你被新加坡管理大学录取。商科金字招牌。",
+    "noRandom": true,
+    "happyDelta": 3,
+    "set": { "school": "SMU", "schoolTier": "mid", "country": "新加坡" }
+  },
+  {
+    "id": 10352,
+    "text": "你被新加坡一所私立大学录取。",
+    "noRandom": true,
+    "happyDelta": 1,
+    "set": { "school": "普通新校", "schoolTier": "low", "country": "新加坡" }
+  },
+  {
+    "id": 10353,
+    "text": "新加坡学校全聚德。",
+    "noRandom": true,
+    "happyDelta": -4,
+    "set": { "school": "无" }
   },
 
   {
@@ -489,6 +703,19 @@
     "text": "你和室友混熟了，至少不是一个人吃饭。",
     "noRandom": true,
     "happyDelta": 1
+  },
+
+  {
+    "id": 10406,
+    "text": "新生季的喧嚣过去了。看着窗外异国的天色，你开始认真思考——这一年要怎么过？",
+    "include": "AGE=19&HS==国际&school!=无&overseas==1",
+    "fixedMonth": 3,
+    "choices": [
+      { "text": "拼学业，把 GPA 锁死", "effect": { "INT": 2 }, "resultText": "你把作息调成图书馆作息，期中前 GPA 已经稳了。" },
+      { "text": "全力融入当地圈子，把语言练到母语水平", "effect": { "SOC": 2, "PER": 1 }, "resultText": "你硬着头皮跟本地同学一起开 party、看球赛，舌头慢慢转过来了。" },
+      { "text": "保持原有圈子，和同胞抱团取暖", "effect": { "SOC": 1, "HLT": 1 }, "resultText": "你和华人朋友们一起做饭、刷剧、互相打气。日子过得舒坦。" },
+      { "text": "兼顾不下，先保平安", "effect": { "HLT": 1 }, "resultText": "你决定先稳住身体和情绪，能毕业就行。" }
+    ]
   },
 
   {

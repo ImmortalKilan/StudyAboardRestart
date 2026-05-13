@@ -122,7 +122,10 @@ These exist on `state` and can be referenced in DSL but aren't shown in the UI:
 
 | key | source | typical use |
 | --- | --- | --- |
-| `school` | `set` on admission events (`T20`, `T50`, `T100`, `州大`, `社区大学`, `遣返`, `退学`) | `school==T20` gates premium random events |
+| `school` | `set` on admission events. US: `T20/T50/T100+/州大/社区大学`; UK: `G5/罗素/普通英校`; AU: `澳八大/普通澳校/私校`; EU: `顶尖欧校/公立大学/普通欧校`; HK: `港三/港八/普通港校`; JP: `帝大/早庆/普通日校`; SG: `新二/SMU/普通新校`; plus `海外硕`, `遣返`, `退学`, `无` | display string varies by country — use `TIER==top/mid/low` for cross-country gating, or `school==T20` for US-only events |
+| `schoolTier` | `top` / `mid` / `low` — set alongside `school` on admission events | cross-country tier gating: `TIER==top` for premium events, `TIER==low` for struggle events |
+| `country` | `美国` / `英国` / `澳洲` / `欧洲` / `香港` / `日本` / `新加坡` — set by admission events | gates country-specific flavor: `country==英国` for British humor, etc. |
+| `countryIntent` | same value set as `country` — set by event 10220 (高三 9月 国际部 意向选择) | drives event 10301 admission branch routing (`countryIntent==英国` → UK admission events). Empty string falls back to US default |
 | `hsType` | `国际` / `体制内` (set in HS branch) | drives college-prep paths |
 | `overseas` | 0/1 | gates overseas-only events |
 | `major` | `CS`/`商科`/`理科`/`文科`/`文艺` | doubles random event weight when matched |
