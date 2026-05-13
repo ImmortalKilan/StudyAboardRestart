@@ -8957,7 +8957,8 @@
       "MNY": -1,
       "HLT": -1,
       "HAP": 2
-    }
+    },
+    "repeatable": true
   },
   {
     "id": 82011,
@@ -8966,7 +8967,8 @@
     "weight": 8,
     "effect": {
       "HLT": -2
-    }
+    },
+    "repeatable": true
   },
   {
     "id": 82012,
@@ -8976,19 +8978,22 @@
     "effect": {
       "SOC": 2,
       "INT": 1
-    }
+    },
+    "repeatable": true
   },
   {
     "id": 82013,
     "event": "下午三点，你顶着宿醉从床上爬起来，点了一份麦当劳外卖，然后看着天花板发呆。今天又是没有去上课的一天。",
     "storyline": "party",
-    "weight": 20
+    "weight": 20,
+    "repeatable": true
   },
   {
     "id": 82014,
     "event": "你花了两个小时在 Instagram 上给昨晚派对认识的几十个人挨个点赞、评论。维持人脉也是一项体力活。",
     "storyline": "party",
-    "weight": 18
+    "weight": 18,
+    "repeatable": true
   },
   {
     "id": 82015,
@@ -8997,7 +9002,8 @@
     "weight": 15,
     "effect": {
       "HLT": -1
-    }
+    },
+    "repeatable": true
   },
   {
     "id": 82020,
@@ -10562,7 +10568,7 @@
     }
   },
   {
-    "id":14051,
+    "id": 14051,
     "event": "你邀请一个有好感的异性朋友去漫展，TA同意了。",
     "weight": 1,
     "include": "(TLT?[3036])&(AGE>=18)&(AGE<=20)"
@@ -16433,28 +16439,36 @@
     "id": 86150,
     "event": "【失败结局：禁药丑闻】药检结果出来了——阳性。你被取消所有比赛成绩并禁赛三年。丑闻上了校报头条，你的名字成了作弊的代名词。你的运动生涯在耻辱中画上了句号。",
     "noRandom": true,
-    "set": { "storyline": "" },
+    "set": {
+      "storyline": ""
+    },
     "logType": "bad"
   },
   {
     "id": 86151,
     "event": "【失败结局：重伤退役】一次训练中你听到膝盖传来「咔嚓」一声。十字韧带撕裂。手术后医生告诉你，你的运动生涯结束了。你拄着拐杖离开了你深爱的赛场。",
     "noRandom": true,
-    "set": { "storyline": "" },
+    "set": {
+      "storyline": ""
+    },
     "logType": "bad"
   },
   {
     "id": 86152,
     "event": "【失败结局：心理崩溃】无休止的训练、比赛的压力、远离家人的孤独感，所有的一切在某个深夜把你压垮了。你退出了球队，在心理咨询师的帮助下慢慢恢复。运动梦碎了，但至少你还在。",
     "noRandom": true,
-    "set": { "storyline": "" },
+    "set": {
+      "storyline": ""
+    },
     "logType": "bad"
   },
   {
     "id": 86153,
     "event": "【失败结局：众叛亲离】你的自大和独断让队友一个个离你而去。教练最终把你从名单上除名。你一个人坐在空荡荡的更衣室里，不知道自己是怎么走到这一步的。",
     "noRandom": true,
-    "set": { "storyline": "" },
+    "set": {
+      "storyline": ""
+    },
     "logType": "bad"
   },
   {
@@ -18384,13 +18398,14 @@
     ],
     "logType": "hidden"
   },
-
   {
     "id": 88001,
     "event": "化妆品过海关被抽查，海关大叔翻了半天你的行李箱，最后放行时说了句「Nice collection」。",
     "include": "(SEX==1)&(AGE>=18)&((MTH==1)|(MTH==8))",
     "weight": 5,
-    "effect": { "HAP": 1 },
+    "effect": {
+      "HAP": 1
+    },
     "repeatable": false
   },
   {
@@ -18398,7 +18413,10 @@
     "event": "室友拉你去做美甲，结果你俩在店里聊了三小时八卦，指甲倒是很好看。",
     "include": "(SEX==1)&(AGE>=18)",
     "weight": 6,
-    "effect": { "SOC": 1, "MNY": -1 },
+    "effect": {
+      "SOC": 1,
+      "MNY": -1
+    },
     "repeatable": true
   },
   {
@@ -18406,7 +18424,9 @@
     "event": "深夜一个人走回宿舍，身后有脚步声越来越近。你攥紧钥匙加快脚步——回头一看是个赶着遛狗的邻居。",
     "include": "(SEX==1)&(AGE>=18)",
     "weight": 5,
-    "effect": { "PER": 1 },
+    "effect": {
+      "PER": 1
+    },
     "repeatable": false
   },
   {
@@ -18414,7 +18434,10 @@
     "event": "教授在课堂讨论中反复打断你的发言，却对男同学频频点头。你深吸一口气，用数据和逻辑让全班安静下来。",
     "include": "(SEX==1)&(AGE>=18)&(INT>=5)",
     "weight": 5,
-    "effect": { "INT": 1, "PER": 1 },
+    "effect": {
+      "INT": 1,
+      "PER": 1
+    },
     "repeatable": false
   },
   {
@@ -18422,7 +18445,9 @@
     "event": "学姐带你加入了一个亚裔女生互助群，从选课建议到租房避坑，什么都有人答。",
     "include": "(SEX==1)&(AGE>=18)",
     "weight": 6,
-    "effect": { "SOC": 2 },
+    "effect": {
+      "SOC": 2
+    },
     "repeatable": false
   },
   {
@@ -18430,7 +18455,10 @@
     "event": "参加学校的Women in STEM活动，认识了几个同专业的学姐，她们分享了实习内推的渠道。",
     "include": "(SEX==1)&(AGE>=19)&(INT>=5)",
     "weight": 5,
-    "effect": { "SOC": 1, "INT": 1 },
+    "effect": {
+      "SOC": 1,
+      "INT": 1
+    },
     "repeatable": false
   },
   {
@@ -18438,7 +18466,10 @@
     "event": "约会软件上一个白人男生发来消息：「I've always had a thing for Asian girls」。你截图发群里，姐妹们的吐槽比脱口秀还精彩。",
     "include": "(SEX==1)&(AGE>=18)&(APP>=4)",
     "weight": 5,
-    "effect": { "SOC": 1, "HAP": -1 },
+    "effect": {
+      "SOC": 1,
+      "HAP": -1
+    },
     "repeatable": false
   },
   {
@@ -18446,7 +18477,10 @@
     "event": "你在Instagram上发了一组旅行照，收到了一堆赞和私信。有个品牌联系你问要不要做校园推广。",
     "include": "(SEX==1)&(AGE>=18)&(APP>=6)&(SOC>=4)&((MTH>=6)&(MTH<=8))",
     "weight": 5,
-    "effect": { "MNY": 2, "SOC": 1 },
+    "effect": {
+      "MNY": 2,
+      "SOC": 1
+    },
     "repeatable": false
   },
   {
@@ -18454,7 +18488,10 @@
     "event": "闺蜜失恋了，半夜三点给你打电话哭了一个小时。第二天你顶着黑眼圈去上课，但她说你是她最好的朋友。",
     "include": "(SEX==1)&(AGE>=18)&(SOC>=3)",
     "weight": 6,
-    "effect": { "SOC": 1, "HLT": -1 },
+    "effect": {
+      "SOC": 1,
+      "HLT": -1
+    },
     "repeatable": true
   },
   {
@@ -18462,7 +18499,10 @@
     "event": "瑜伽课上你终于做到了头倒立，全班给你鼓掌。教练说你核心力量进步很大。",
     "include": "(SEX==1)&(AGE>=18)&(HLT>=5)",
     "weight": 5,
-    "effect": { "HLT": 1, "HAP": 1 },
+    "effect": {
+      "HLT": 1,
+      "HAP": 1
+    },
     "repeatable": false
   },
   {
@@ -18470,7 +18510,10 @@
     "event": "学校附近新开了一家奶茶店，你和室友成了常客。期末周靠着一杯杯芋泥波波续命。",
     "include": "(SEX==1)&(AGE>=18)&((MTH==5)|(MTH==12))",
     "weight": 6,
-    "effect": { "HAP": 1, "MNY": -1 },
+    "effect": {
+      "HAP": 1,
+      "MNY": -1
+    },
     "repeatable": true
   },
   {
@@ -18478,7 +18521,10 @@
     "event": "独自去超市被一个陌生男人跟了三条街。你走进一家还在营业的餐厅假装等人，直到他离开。那天晚上你失眠了。",
     "include": "(SEX==1)&(AGE>=18)",
     "weight": 4,
-    "effect": { "HAP": -2, "PER": 1 },
+    "effect": {
+      "HAP": -2,
+      "PER": 1
+    },
     "repeatable": false
   },
   {
@@ -18486,7 +18532,10 @@
     "event": "你剪了一头短发，走进教室���同学差点没认出你。有人说好看，有人说可惜了，但你觉得轻松极了。",
     "include": "(SEX==1)&(AGE>=18)",
     "weight": 5,
-    "effect": { "HAP": 1, "APP": 1 },
+    "effect": {
+      "HAP": 1,
+      "APP": 1
+    },
     "repeatable": false
   },
   {
@@ -18494,7 +18543,10 @@
     "event": "和男同学组队做project，他全程对你说的方案视而不见，最后老师采纳的恰恰是你的方案。",
     "include": "(SEX==1)&(AGE>=18)&(INT>=5)",
     "weight": 5,
-    "effect": { "INT": 1, "HAP": 1 },
+    "effect": {
+      "INT": 1,
+      "HAP": 1
+    },
     "repeatable": false
   },
   {
@@ -18502,7 +18554,9 @@
     "event": "妈妈视频电话里又开始催你找男朋友了。你敷衍地笑了笑，挂了电话后叹了口气。",
     "include": "(SEX==1)&(AGE>=21)&((MTH==1)|(MTH==2))",
     "weight": 6,
-    "effect": { "HAP": -1 },
+    "effect": {
+      "HAP": -1
+    },
     "repeatable": true
   },
   {
@@ -18510,7 +18564,10 @@
     "event": "学校举办了一场Female Leadership论坛，台上的华人女CEO让你看到了新的可能性。",
     "include": "(SEX==1)&(AGE>=19)&(INT>=4)",
     "weight": 5,
-    "effect": { "PER": 1, "INT": 1 },
+    "effect": {
+      "PER": 1,
+      "INT": 1
+    },
     "repeatable": false
   },
   {
@@ -18518,7 +18575,9 @@
     "event": "你在二手平台卖闲置衣服和化妆品，没想到生意还不错，一个月赚了小几百刀。",
     "include": "(SEX==1)&(AGE>=18)&(SOC>=4)",
     "weight": 5,
-    "effect": { "MNY": 2 },
+    "effect": {
+      "MNY": 2
+    },
     "repeatable": false
   },
   {
@@ -18526,7 +18585,11 @@
     "event": "和姐妹们计划了一场girls trip去迈阿密，阳光沙滩比基尼，朋友圈炸了。",
     "include": "(SEX==1)&(AGE>=19)&(SOC>=5)&(MNY>=3)&((MTH==3)|(MTH==6)|(MTH==7))",
     "weight": 5,
-    "effect": { "HAP": 2, "SOC": 1, "MNY": -2 },
+    "effect": {
+      "HAP": 2,
+      "SOC": 1,
+      "MNY": -2
+    },
     "repeatable": false
   },
   {
@@ -18534,7 +18597,10 @@
     "event": "派对上有人往你杯子里放东西，幸好闺蜜眼尖发现了。你们立刻离开并报了警。",
     "include": "(SEX==1)&(AGE>=18)&(SOC>=3)",
     "weight": 3,
-    "effect": { "HAP": -2, "PER": 2 },
+    "effect": {
+      "HAP": -2,
+      "PER": 2
+    },
     "repeatable": false
   }
 ]

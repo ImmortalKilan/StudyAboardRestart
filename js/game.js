@@ -152,6 +152,19 @@ const STORYLINE_CFG = {
     ],
     progressChecks: [],
   },
+  party: {
+    gracePeriod: 6,
+    eventRate: 0.8,
+    deathChecks: [
+      { cond: s => s.HLT <= -3, event: 82020 },
+      { cond: s => s.MNY <= -3, event: 82091 },
+    ],
+    progressChecks: [],
+    flavor: () => {
+      const lines = ['你在组织下一场派对的细节。', '手机响个不停，全是派对邀请。', '你和朋友们在策划一个大活动。'];
+      return lines[Math.floor(Math.random() * lines.length)];
+    },
+  },
   ceo: {
     gracePeriod: 12,
     eventRate: 0.7,
@@ -1526,7 +1539,13 @@ function drawRandomEvent() {
         .filter(matchStoryline)
         .filter(ev => !ev.choices)
         .filter(ev => !ev.include || evalCondition(state, ev.include))
-        .filter(ev => !ev.exclude || !evalCondition(state, ev.exclude));
+        .filter(ev => !ev.exclude || !evalCondition(state, ev.exclude))
+        .filter(ev => {
+          if (!ev.stage || ev.stage === '*') return true;
+          if (state.storyline === 'idol') return ev.stage === state.idol_stage;
+          if (state.storyline === 'party') return ev.stage === state.party_stage;
+          return true;
+        });
       pool.forEach(ev => { ev._replay = true; });
     }
   } else {
@@ -2366,12 +2385,6 @@ function render() {
     const isHogwarts = state.storyline === 'hogwarts';
 
     const schoolBox = $('school-box');
-<<<<<<< HEAD
-    if (state.school && state.school !== '无') {
-      schoolBox.style.display = '';
-      $('school-display').textContent = state.country ? `${state.school} · ${state.country}` : state.school;
-    } else {
-=======
     const majorBox = $('major-box');
     const profBox = $('profession-box');
     const houseBox = $('house-box');
@@ -2380,7 +2393,6 @@ function render() {
       schoolBox.classList.add('hogwarts-fade-out');
       majorBox.classList.add('hogwarts-fade-out');
       profBox.classList.add('hogwarts-fade-out');
->>>>>>> da98d18a146ef690314b5fb549dc9de6212a1b25
       schoolBox.style.display = 'none';
       majorBox.style.display = 'none';
       profBox.style.display = 'none';
