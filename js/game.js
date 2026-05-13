@@ -10,7 +10,7 @@ const STAT_LABELS = {
   POP: '人气', POK: '牌技', MMR: '天梯分', FIT: '体能', CKL: '厨艺', ATH: '运动', MAG: '魔力',
   cul: '修为', dao: '大道', karma: '机缘', tribulation: '渡劫', realm: '境界'
 };
-const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG', 'HEAT', 'cul', 'dao', 'karma', 'tribulation']);
+const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG', 'HEAT', 'cul', 'dao', 'karma', 'tribulation', 'darkOmen', 'courage', 'alliance', 'knowledge']);
 const XIANXIA_KEYS = ['realm', 'cul', 'dao', 'karma', 'tribulation'];
 
 // ── Special Scoring Endings ──

@@ -1536,6 +1536,714 @@
       "HLT": -1
     }
   },
+
+  {
+    "id": 61800,
+    "storyline": "hogwarts",
+    "text": "黑魔法防御课上，教授演示了反咒——\"统统石化！\"一个学生被定住了。\"现在，谁来解除它？\"",
+    "include": "hogwartsYear<=2",
+    "weight": 6,
+    "choices": [
+      {
+        "text": "\"有限咒终！\"果断挥杖解咒",
+        "effect": { "MAG": 2, "PER": 1, "housePt": 10 }
+      },
+      {
+        "text": "先观察教授的杖法，模仿着施咒",
+        "effect": { "INT": 2, "MAG": 1 }
+      },
+      {
+        "text": "和旁边同学配合，一人吸引注意一人解咒",
+        "effect": { "SOC": 2, "MAG": 1 },
+        "set": { "defenseSkill": 1 }
+      }
+    ]
+  },
+  {
+    "id": 61801,
+    "storyline": "hogwarts",
+    "text": "咒语课上练习漂浮咒。教授纠正你的发音：\"是 Levi-OH-sa，不是 Levio-SAH！\"",
+    "include": "hogwartsYear=1",
+    "weight": 7,
+    "choices": [
+      {
+        "text": "反复练习发音，直到羽毛稳稳飞到天花板",
+        "effect": { "MAG": 2, "PER": 1, "housePt": 5 }
+      },
+      {
+        "text": "帮旁边手忙脚乱的同学纠正姿势",
+        "effect": { "SOC": 2, "MAG": 1 }
+      }
+    ]
+  },
+  {
+    "id": 61802,
+    "storyline": "hogwarts",
+    "text": "草药课上，你面前放着一盆曼德拉草。教授叮嘱所有人戴好耳罩：\"拔出来的时候它会尖叫，叫声能让人昏迷。\"",
+    "include": "hogwartsYear<=2",
+    "weight": 6,
+    "choices": [
+      {
+        "text": "屏住呼吸，精准地一把拔出换盆",
+        "effect": { "MAG": 1, "PER": 2, "housePt": 5 }
+      },
+      {
+        "text": "先给曼德拉草哼摇篮曲安抚它再拔",
+        "showExpr": "MAG>=3",
+        "effect": { "MAG": 2, "INT": 1, "housePt": 10 }
+      },
+      {
+        "text": "和同桌分工——一人按住根茎一人换盆",
+        "effect": { "SOC": 2, "MAG": 1 }
+      }
+    ]
+  },
+  {
+    "id": 61803,
+    "storyline": "hogwarts",
+    "text": "二年级的变形术更难了。今天的任务：把一只甲虫变成纽扣。你盯着那只不安分的虫子，举起魔杖——",
+    "include": "hogwartsYear=2",
+    "weight": 6,
+    "choices": [
+      {
+        "text": "全神贯注，一气呵成完美变形",
+        "showExpr": "MAG>=4",
+        "effect": { "MAG": 2, "INT": 1, "housePt": 10 }
+      },
+      {
+        "text": "用自己琢磨的咒语变体试试",
+        "effect": { "MAG": 1, "INT": 2 }
+      },
+      {
+        "text": "多变几次练手感，虽然纽扣上还留着花纹……",
+        "effect": { "MAG": 1, "PER": 1, "HAP": 1 }
+      }
+    ]
+  },
+  {
+    "id": 61804,
+    "storyline": "hogwarts",
+    "text": "一年级期末考试实操环节：你面前放着一把上了锁的箱子和三个瓶子——一瓶能让你穿过火焰，一瓶是毒药，一瓶是普通水。逻辑谜题贴在墙上。",
+    "include": "hogwartsYear=1",
+    "weight": 8,
+    "choices": [
+      {
+        "text": "冷静分析逻辑谜题，推理出正确的瓶子",
+        "showExpr": "INT>=5",
+        "effect": { "INT": 2, "MAG": 1, "housePt": 20 }
+      },
+      {
+        "text": "\"阿拉霍洞开！\"——直接用开锁咒绕过谜题",
+        "showExpr": "MAG>=3",
+        "effect": { "MAG": 2, "housePt": 10 }
+      },
+      {
+        "text": "仔细闻每个瓶子的气味，用魔药课的知识分辨成分",
+        "effect": { "PER": 2, "INT": 1, "housePt": 10 }
+      }
+    ]
+  },
+  {
+    "id": 61805,
+    "storyline": "hogwarts",
+    "text": "高年级选修课，教授教你们召唤守护神。\"想一段你最强烈的记忆——不一定是最快乐的，是最有力量的。\"你闭上眼睛，集中精神——",
+    "include": "hogwartsYear>=2",
+    "weight": 5,
+    "choices": [
+      {
+        "text": "想起收到霍格沃茨录取信的那一刻——世界为你打开了",
+        "effect": { "MAG": 2, "HAP": 2 }
+      },
+      {
+        "text": "想起第一次成功施咒的掌控感——魔法在指尖流动",
+        "effect": { "MAG": 2, "PER": 1 }
+      },
+      {
+        "text": "想起深夜公共休息室和朋友们的大笑——你不是一个人",
+        "effect": { "MAG": 1, "SOC": 2, "HAP": 1 }
+      }
+    ]
+  },
+  {
+    "id": 61806,
+    "storyline": "hogwarts",
+    "text": "魔药课挑战赛：谁能在下课前熬出合格的缩身药剂，免除本月全部作业。坩埚里的蒸汽已经变成了橙色——下一步是关键。",
+    "include": "hogwartsYear=2",
+    "weight": 6,
+    "choices": [
+      {
+        "text": "严格按配方，逆时针搅拌七圈后加入蝾螈血",
+        "effect": { "INT": 2, "PER": 1, "housePt": 5 }
+      },
+      {
+        "text": "凭直觉微调火候和配比——你觉得多半滴月光草会更好",
+        "showExpr": "INT>=5",
+        "effect": { "MAG": 1, "INT": 2, "housePt": 15 }
+      },
+      {
+        "text": "和旁边的同学交换笔记，互相校对步骤",
+        "effect": { "SOC": 1, "INT": 1, "HAP": 1 }
+      }
+    ]
+  },
+  {
+    "id": 61807,
+    "storyline": "hogwarts",
+    "text": "黑魔法防御课上，教授打开了一个不停摇晃的衣柜——博格特！它变成了你最害怕的东西。全班都在看着你。",
+    "include": "hogwartsYear<=2",
+    "weight": 6,
+    "choices": [
+      {
+        "text": "\"滑稽滑稽！\"把它变成荒谬的样子——恐惧在笑声中瓦解",
+        "effect": { "MAG": 2, "HAP": 2, "housePt": 10 }
+      },
+      {
+        "text": "强忍住恐惧，冷静分析它变形的弱点再出手",
+        "effect": { "MAG": 1, "INT": 2, "PER": 1 }
+      },
+      {
+        "text": "直面它不退后——用纯粹的意志力压制",
+        "showExpr": "PER>=5",
+        "effect": { "MAG": 2, "PER": 2, "housePt": 15 }
+      }
+    ]
+  },
+  {
+    "id": 61808,
+    "storyline": "hogwarts",
+    "text": "飞行课进阶训练，教练在教高级扫帚特技。\"谁敢试试韦斯莱翻转？俯冲到离地三米时猛拉扫帚——\"风在耳边呼啸。",
+    "include": "hogwartsYear<=2&canFly=1",
+    "weight": 5,
+    "choices": [
+      {
+        "text": "加速俯冲，在贴地瞬间猛拉扫帚完成翻转",
+        "effect": { "HLT": 1, "MAG": 1, "PER": 2, "HAP": 2 }
+      },
+      {
+        "text": "在高空反复练习翻滚动作，找到身体平衡点",
+        "effect": { "MAG": 1, "PER": 1, "INT": 1 }
+      },
+      {
+        "text": "自创一套花式动作组合，引得同学欢呼",
+        "effect": { "SOC": 2, "HAP": 2, "housePt": 5 }
+      }
+    ]
+  },
+  {
+    "id": 61809,
+    "storyline": "hogwarts",
+    "text": "选修课上你第一次接触古代符文。教授在黑板上画出一个发光的符号：\"这个符文代表'保护'。在羊皮纸上描摹它——如果你的意念足够纯粹，它会亮起来。\"",
+    "include": "hogwartsYear=2",
+    "weight": 5,
+    "choices": [
+      {
+        "text": "屏息凝神，一笔一划精确描摹",
+        "effect": { "MAG": 2, "INT": 1 }
+      },
+      {
+        "text": "研究符文背后的逻辑规律——为什么这个形状代表保护？",
+        "effect": { "INT": 3 }
+      },
+      {
+        "text": "尝试把'保护'和'力量'两个符文组合起来",
+        "showExpr": "INT>=5",
+        "effect": { "MAG": 2, "INT": 1, "housePt": 10 }
+      }
+    ]
+  },
+
+  {
+    "id": 61810,
+    "storyline": "hogwarts",
+    "text": "深夜你在公共休息室练习荧光咒。一只家养小精灵突然出现，惊慌失措地抓着你的袍子：\"求求你不要去三楼走廊！那里有可怕的东西在等着！多比不该说的……\"它一边说一边用熨斗烫自己的手。",
+    "include": "hogwartsYear=1",
+    "weight": 5,
+    "choices": [
+      {
+        "text": "蹲下来安慰它，耐心问清楚到底怎么回事",
+        "effect": { "SOC": 1, "INT": 1, "darkOmen": 1 }
+      },
+      {
+        "text": "既然有人不想让你去——那一定值得一看。今晚就去三楼",
+        "effect": { "MAG": 1, "PER": 1, "darkOmen": 1 },
+        "next": 61840
+      }
+    ]
+  },
+  {
+    "id": 61840,
+    "noRandom": true,
+    "storyline": "hogwarts",
+    "text": "三楼走廊尽头的门后传来低沉的咆哮声。你推开门缝——一只三头犬正蹲在活板门上，六只眼睛同时锁定了你！",
+    "choices": [
+      {
+        "text": "迅速记住布局：三头犬、活板门、铁链——它在守护什么？",
+        "effect": { "INT": 2, "PER": 1 },
+        "set": { "threeHeadedDog": 1 }
+      },
+      {
+        "text": "书上说大型魔法生物怕音乐——小声哼一首摇篮曲试试",
+        "showExpr": "INT>=5",
+        "effect": { "MAG": 2, "INT": 1 },
+        "set": { "threeHeadedDog": 1, "dogCalmed": 1 }
+      }
+    ]
+  },
+  {
+    "id": 61811,
+    "storyline": "hogwarts",
+    "text": "天文塔上观测星象时，你注意到火星亮得不正常，正在异常靠近土星。占卜课上教过，这种排列在历史上每一次出现，都伴随着黑暗势力的崛起。",
+    "include": "hogwartsYear<=2",
+    "weight": 4,
+    "choices": [
+      {
+        "text": "记录下精确坐标，回去翻《千年星图》对照历史记录",
+        "effect": { "INT": 2, "MAG": 1, "darkOmen": 1 }
+      },
+      {
+        "text": "把观测结果交给天文教授，请她判断",
+        "effect": { "SOC": 1, "INT": 1, "darkOmen": 1 }
+      },
+      {
+        "text": "用望远镜追踪火星轨迹，尝试推演未来走向",
+        "showExpr": "INT>=5",
+        "effect": { "INT": 2, "MAG": 2, "darkOmen": 1 }
+      }
+    ]
+  },
+  {
+    "id": 61812,
+    "storyline": "hogwarts",
+    "text": "图书馆关门后，禁书区传来低语声。你溜进去发现一本黑色封面的书正在自己翻页，书页上的文字像活的一样蠕动。",
+    "include": "hogwartsYear>=2&INT>=4",
+    "weight": 5,
+    "choices": [
+      {
+        "text": "用翻译咒解读书页上的内容——这可能是重要线索",
+        "effect": { "MAG": 2, "INT": 2, "darkOmen": 1 },
+        "set": { "darkKnowledge": 1 }
+      },
+      {
+        "text": "不碰书，但用记忆咒把书页内容记下来以后研究",
+        "effect": { "INT": 2, "PER": 1, "darkOmen": 1 },
+        "set": { "forbiddenBook": 1 }
+      },
+      {
+        "text": "这本书有自我意识——太危险了，合上它并报告图书管理员",
+        "effect": { "PER": 1, "SOC": 1, "housePt": 10 }
+      }
+    ]
+  },
+  {
+    "id": 61813,
+    "storyline": "hogwarts",
+    "text": "走廊墙壁上出现了带血的字迹：\"密室已经被打开，传人的敌人们，当心了。\"旁边地上是费尔奇被石化的猫。整个学校陷入了恐慌。",
+    "include": "hogwartsYear=2",
+    "weight": 5,
+    "choices": [
+      {
+        "text": "去图书馆查密室的历史——一千年前创始人之间到底发生了什么",
+        "effect": { "INT": 2, "MAG": 1, "darkOmen": 1 },
+        "set": { "chamberClue": 1 }
+      },
+      {
+        "text": "组织信得过的朋友轮流巡逻，互相保护",
+        "effect": { "SOC": 2, "PER": 1, "darkOmen": 1 }
+      },
+      {
+        "text": "研究石化咒的原理——搞清楚是什么生物造成的就能找到它",
+        "showExpr": "INT>=5",
+        "effect": { "INT": 2, "MAG": 2, "darkOmen": 1 },
+        "set": { "chamberClue": 1 }
+      }
+    ]
+  },
+  {
+    "id": 61814,
+    "storyline": "hogwarts",
+    "text": "你发现自己能听到墙壁里的声音——一种低沉的、嘶嘶的耳语：\"撕裂……杀戮……让我撕裂你……\"没有其他人听得到。",
+    "include": "hogwartsYear=2&darkOmen>=1",
+    "weight": 6,
+    "choices": [
+      {
+        "text": "跟着声音走——如果只有你能听到，也许只有你能阻止它",
+        "effect": { "MAG": 2, "PER": 1, "darkOmen": 1 },
+        "set": { "parseltongue": 1 }
+      },
+      {
+        "text": "把这件事告诉教授——这可能和密室血字有关",
+        "effect": { "SOC": 1, "INT": 1, "darkOmen": 1 }
+      }
+    ]
+  },
+  {
+    "id": 61815,
+    "storyline": "hogwarts",
+    "text": "禁林边缘，你发现一只独角兽倒在地上，银色的血液洒了一地。伤口不像野兽造成的——像是某种黑魔法诅咒。远处林间隐约有黑袍身影闪过。",
+    "include": "hogwartsYear<=2",
+    "weight": 4,
+    "choices": [
+      {
+        "text": "用草药课学过的治愈术帮它止血",
+        "effect": { "MAG": 2, "PER": 1, "HAP": 1, "darkOmen": 1 }
+      },
+      {
+        "text": "追踪那个黑袍身影——谁在猎杀独角兽？",
+        "showExpr": "PER>=4",
+        "effect": { "PER": 2, "MAG": 1, "darkOmen": 2 },
+        "set": { "sawDarkFigure": 1 }
+      },
+      {
+        "text": "立刻去找海格——他是禁林守护者，会知道怎么做",
+        "effect": { "SOC": 2, "darkOmen": 1 }
+      }
+    ]
+  },
+  {
+    "id": 61816,
+    "storyline": "hogwarts",
+    "text": "深夜游荡时，你在一间废弃教室里发现了一面巨大的镜子。镜框上刻着倒写的文字。你站到镜前——看到的不是自己的倒影，而是一个完全不同的画面：黑暗中一个模糊的身影正从裂缝中重生，周围的人在尖叫奔逃。",
+    "include": "hogwartsYear<=2",
+    "weight": 3,
+    "choices": [
+      {
+        "text": "仔细观察画面中的每一个细节——这面镜子在警告你什么",
+        "effect": { "INT": 2, "MAG": 1, "darkOmen": 1 },
+        "set": { "mirrorVision": 1 }
+      },
+      {
+        "text": "尝试用魔杖触碰镜面，和画面建立更深的连接",
+        "showExpr": "MAG>=4",
+        "effect": { "MAG": 3, "darkOmen": 1 },
+        "set": { "mirrorVision": 1 }
+      },
+      {
+        "text": "这是厄里斯魔镜——去图书馆查它的原理",
+        "effect": { "INT": 3, "darkOmen": 1 },
+        "set": { "mirrorVision": 1 }
+      }
+    ]
+  },
+  {
+    "id": 61817,
+    "storyline": "hogwarts",
+    "text": "黑湖的水面连续几天泛起暗红色的光。人鱼不再唱歌了，巨乌贼也躲进了深处。海格皱着眉说：\"上一次这样还是四十年前……那一年，有学生死了。\"",
+    "include": "hogwartsYear>=2&darkOmen>=1",
+    "weight": 4,
+    "choices": [
+      {
+        "text": "潜到湖边采集水样，用魔药知识分析成分",
+        "effect": { "INT": 2, "MAG": 1, "darkOmen": 1 }
+      },
+      {
+        "text": "用泡头咒潜入湖底，直接去和人鱼沟通",
+        "showExpr": "MAG>=5",
+        "effect": { "MAG": 2, "SOC": 1, "darkOmen": 1 }
+      },
+      {
+        "text": "翻阅四十年前的《预言家日报》合订本，查那次事件的真相",
+        "effect": { "INT": 3, "darkOmen": 1 },
+        "set": { "oldIncident": 1 }
+      }
+    ]
+  },
+
+  {
+    "id": 61820,
+    "storyline": "hogwarts",
+    "text": "神奇动物保护课上，你负责接近一只小鹰头马身有翼兽。它橙色的眼睛骄傲地盯着你，爪子不安地刨着地面。",
+    "include": "hogwartsYear<=2",
+    "weight": 6,
+    "choices": [
+      {
+        "text": "恭敬地鞠躬，保持眼神接触，等它回礼",
+        "effect": { "MAG": 1, "PER": 2, "HAP": 2 },
+        "set": { "hippogriffBond": 1 }
+      },
+      {
+        "text": "慢慢递出一只死雪貂——海格说过它们爱吃这个",
+        "effect": { "INT": 1, "SOC": 1, "MAG": 1 }
+      },
+      {
+        "text": "模仿它的姿态，像鹰一样展开双臂",
+        "showExpr": "PER>=4",
+        "effect": { "MAG": 2, "PER": 1, "HAP": 2 },
+        "set": { "hippogriffBond": 1 }
+      }
+    ]
+  },
+  {
+    "id": 61821,
+    "storyline": "hogwarts",
+    "text": "走廊上，一个斯莱特林高年级学生拦住你：\"听说你咒语课表现不错。我们几个在组织一个跨学院的学习小组——不是所有斯莱特林都像传言里那样。感兴趣吗？\"",
+    "include": "hogwartsYear<=2",
+    "weight": 5,
+    "choices": [
+      {
+        "text": "加入——和不同学院的人交流能学到更多",
+        "effect": { "SOC": 2, "MAG": 1, "INT": 1 }
+      },
+      {
+        "text": "带上自己的朋友一起去——多个人多条路",
+        "effect": { "SOC": 2, "PER": 1 }
+      },
+      {
+        "text": "提议在图书馆公开区域见面——保持开放也保持谨慎",
+        "effect": { "INT": 1, "SOC": 1, "PER": 1 }
+      }
+    ]
+  },
+  {
+    "id": 61822,
+    "storyline": "hogwarts",
+    "text": "学院杯积分赛最后一周。你的朋友在走廊被级长误判扣了二十分——明明是皮皮鬼搞的破坏。教授问你是否看到了经过。",
+    "include": "hogwartsYear<=2",
+    "weight": 5,
+    "choices": [
+      {
+        "text": "如实作证——公平比积分重要",
+        "effect": { "SOC": 2, "PER": 1, "housePt": 20 }
+      },
+      {
+        "text": "找皮皮鬼当面对质，让它自己去解释",
+        "effect": { "PER": 2, "MAG": 1 }
+      },
+      {
+        "text": "收集其他目击证人，用完整证据链说服教授",
+        "effect": { "INT": 2, "SOC": 1, "housePt": 20 }
+      }
+    ]
+  },
+  {
+    "id": 61823,
+    "storyline": "hogwarts",
+    "text": "最好的朋友深夜拉着你：\"我发现了一件事——午夜十二点，城堡的石像鬼会在月光下跳舞！走，一起去看！\"费尔奇肯定在巡逻。",
+    "include": "hogwartsYear<=2",
+    "weight": 5,
+    "choices": [
+      {
+        "text": "一起去！用\"悄声细语\"咒掩盖脚步声",
+        "effect": { "MAG": 1, "SOC": 2, "HAP": 2 }
+      },
+      {
+        "text": "先画一张城堡巡逻路线图，避开所有级长和猫",
+        "effect": { "INT": 2, "SOC": 1, "HAP": 2 }
+      },
+      {
+        "text": "带上隐形衣——万全准备再出发",
+        "showExpr": "invisibility_cloak=1",
+        "effect": { "MAG": 1, "INT": 1, "SOC": 1, "HAP": 3 }
+      }
+    ]
+  },
+  {
+    "id": 61824,
+    "storyline": "hogwarts",
+    "text": "你在七楼走廊来回走了三次，心中默念\"我需要一个练习的地方\"。一扇从未见过的门凭空出现——里面是一间完美的练功室：稻草人靶子、魔咒书架、甚至还有一个决斗假人。",
+    "include": "hogwartsYear>=2",
+    "weight": 4,
+    "set": { "found_ror": 1 },
+    "choices": [
+      {
+        "text": "对着决斗假人练习攻击咒语，打磨实战能力",
+        "effect": { "MAG": 2, "PER": 1 }
+      },
+      {
+        "text": "翻阅书架上那些图书馆没有的魔咒书",
+        "effect": { "INT": 2, "MAG": 1 }
+      },
+      {
+        "text": "把这个地方告诉朋友们，一起组队训练",
+        "effect": { "SOC": 2, "MAG": 1 }
+      }
+    ]
+  },
+  {
+    "id": 61825,
+    "storyline": "hogwarts",
+    "text": "学院之间的矛盾激化了。午饭时斯莱特林和格兰芬多的学生在大礼堂发生口角，双方都拔出了魔杖。你站在两群人中间。",
+    "include": "hogwartsYear<=2",
+    "weight": 5,
+    "choices": [
+      {
+        "text": "\"盔甲护身！\"在两边之间撑起护盾阻止冲突",
+        "showExpr": "MAG>=4",
+        "effect": { "MAG": 2, "SOC": 2, "housePt": 15 }
+      },
+      {
+        "text": "大声喝止——打架只会让两边都扣分，不值得",
+        "effect": { "SOC": 3, "PER": 1 }
+      },
+      {
+        "text": "悄悄去叫教授来处理——这事超出学生能解决的范围",
+        "effect": { "INT": 1, "SOC": 1, "housePt": 5 }
+      }
+    ]
+  },
+  {
+    "id": 61826,
+    "storyline": "hogwarts",
+    "text": "你在独眼女巫雕像后面发现了一条秘密通道。通道又窄又暗，地上有几十年前的脚印。远处传来微弱的风声——那头一定通往校外。",
+    "include": "hogwartsYear>=2",
+    "weight": 4,
+    "choices": [
+      {
+        "text": "一个人深入探索——通道尽头到底是什么？",
+        "effect": { "PER": 2, "MAG": 1, "INT": 1 }
+      },
+      {
+        "text": "用魔杖做标记，画出完整的通道地图",
+        "effect": { "INT": 2, "PER": 1 },
+        "set": { "secretPassage": 1 }
+      },
+      {
+        "text": "叫上最信任的朋友一起探险",
+        "effect": { "SOC": 2, "MAG": 1 }
+      }
+    ]
+  },
+  {
+    "id": 61827,
+    "storyline": "hogwarts",
+    "text": "一个赫奇帕奇的学生在大礼堂发起了\"家养小精灵权益促进会\"。\"它们不应该无偿劳动！谁要加入？\"大多数人在窃笑，但她的眼神很认真。",
+    "include": "hogwartsYear<=2",
+    "weight": 4,
+    "choices": [
+      {
+        "text": "公开支持她——不管别人怎么看，做对的事",
+        "effect": { "SOC": 2, "HAP": 1, "PER": 1 }
+      },
+      {
+        "text": "私下找她聊——理念没错但策略可以更聪明",
+        "effect": { "SOC": 1, "INT": 2 }
+      },
+      {
+        "text": "去厨房亲自问问小精灵们怎么想的",
+        "effect": { "SOC": 1, "INT": 1, "PER": 1 }
+      }
+    ]
+  },
+  {
+    "id": 61828,
+    "storyline": "hogwarts",
+    "text": "期末颁奖典礼前夜，你的学院落后第一名三十分。室友们在公共休息室热烈讨论：\"明天还有最后的学院贡献分——教授会根据本学期的特殊表现额外加分。\"",
+    "include": "hogwartsYear<=2",
+    "weight": 5,
+    "choices": [
+      {
+        "text": "连夜写一篇额外的魔药论文交给教授",
+        "effect": { "INT": 2, "MAG": 1, "housePt": 15 }
+      },
+      {
+        "text": "整理本学期帮助过的低年级学生名单——用行动说话",
+        "effect": { "SOC": 2, "housePt": 10, "HAP": 1 }
+      },
+      {
+        "text": "在走廊巡逻到半夜，抓了两个违规的学生",
+        "effect": { "PER": 2, "housePt": 10 }
+      }
+    ]
+  },
+
+
+  {
+    "id": 61900,
+    "storyline": "hogwarts",
+    "text": "你终于把这些碎片拼在一起了——星象异动、独角兽的银血、禁书区自翻页的书、墙壁里的低语——它们都在指向同一件事。你在图书馆查到了一段被涂抹的记录：五十年前，一个黑巫师曾试图打开某种通道，被校长阻止后消失了。但记录的最后一行写着：\"他说他会回来。\"",
+    "include": "darkOmen>=3&mainQuestStage!=1",
+    "weight": 200,
+    "logType": "hogwarts",
+    "set": {
+      "mainQuestStage": 1
+    },
+    "branch": [
+      "?61902"
+    ]
+  },
+  {
+    "id": 61901,
+    "storyline": "hogwarts",
+    "text": "三年级的第一堂黑魔法防御课上，新来的教授面色苍白，手在发抖。他在黑板上写下一个名字，又立刻擦掉了。\"今年的课程将侧重……实战。\"下课后你听到他和邓布利多在走廊低声争执：\"他们在禁林里发现了标记——和五十年前一模一样。\"",
+    "include": "hogwartsYear>=3&darkOmen<3&mainQuestStage!=1",
+    "weight": 200,
+    "logType": "hogwarts",
+    "set": {
+      "mainQuestStage": 1
+    },
+    "branch": [
+      "?61902"
+    ]
+  },
+  {
+    "id": 61902,
+    "noRandom": true,
+    "storyline": "hogwarts",
+    "text": "当晚你失眠了。窗外猫头鹰的叫声格外凄厉。你握着魔杖坐在床上，脑子里只有一个念头：有什么东西正在靠近霍格沃茨，而你可能是少数察觉到的人之一。你要怎么做？",
+    "logType": "hogwarts",
+    "choices": [
+      {
+        "text": "今晚就去禁林——那些标记、那个身影，你要亲眼确认",
+        "effect": { "courage": 2, "knowledge": 1, "MAG": 1 },
+        "next": 61903
+      },
+      {
+        "text": "整理所有线索写成报告，明天一早交给邓布利多",
+        "effect": { "knowledge": 2, "alliance": 1, "INT": 1 },
+        "next": 61904
+      },
+      {
+        "text": "去公共休息室叫醒你最信任的几个朋友——这件事你不想一个人扛",
+        "effect": { "alliance": 2, "courage": 1, "SOC": 1 },
+        "next": 61905
+      }
+    ]
+  },
+  {
+    "id": 61903,
+    "noRandom": true,
+    "storyline": "hogwarts",
+    "text": "月光下的禁林比白天大了十倍。你循着地上烧焦的痕迹深入林中——树皮上刻着骷髅蛇形的标记，还有新鲜的。在一片空地上你发现了仪式残留：画在地上的符文阵，中心放着一瓶独角兽血——已经被喝空了。有人正在用最黑暗的方式维持某种……存在。",
+    "logType": "hogwarts",
+    "effect": {
+      "courage": 1,
+      "knowledge": 1,
+      "darkOmen": 1
+    },
+    "set": {
+      "questPath1": "courage"
+    }
+  },
+  {
+    "id": 61904,
+    "noRandom": true,
+    "storyline": "hogwarts",
+    "text": "邓布利多看完你的报告，沉默了很久。然后他从柜子里取出一个石盆——冥想盆。\"你已经走到这一步了，那就让你看看全部真相。\"银色的记忆丝拉出，你把脸埋入盆中：五十年前的画面浮现——一个英俊的学生在密室中召唤蛇怪，在禁林里进行灵魂分裂的仪式。\"他把自己的灵魂撕成了碎片，\"邓布利多说，\"藏在不同的容器里。只要容器还在，他就不会真正死去。\"",
+    "logType": "hogwarts",
+    "effect": {
+      "knowledge": 2,
+      "INT": 1,
+      "darkOmen": 1
+    },
+    "set": {
+      "questPath1": "knowledge"
+    }
+  },
+  {
+    "id": 61905,
+    "noRandom": true,
+    "storyline": "hogwarts",
+    "text": "三个最信任的朋友揉着眼睛听完了你的分析。沉默之后，他们互相看了一眼。\"我认识一个斯莱特林的学长，他爸以前是食死徒，可能知道内情。\"\"我表姐在魔法部神秘事务司工作，我可以写信问。\"\"我去翻我们学院的私藏日志——一百年来的级长都在上面记过奇怪的事。\"一夜之间，你不再是一个人了。",
+    "logType": "hogwarts",
+    "effect": {
+      "alliance": 2,
+      "SOC": 1,
+      "darkOmen": 1
+    },
+    "set": {
+      "questPath1": "alliance"
+    }
+  },
+
   {
     "id": 62000,
     "storyline": "hogwarts",
