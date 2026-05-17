@@ -3417,21 +3417,21 @@ function updateMobileStatsStrip(strip) {
 }
 
 function updateCreationAvatar() {
-  const canvas = $('creation-avatar-canvas');
-  if (canvas) {
-    // Temporarily sync stats for preview
-    for (const k of STAT_KEYS) {
-      state[k] = (state.alloc[k] || 0);
-    }
-    // Also apply talent bonuses to the preview
-    for (const t of state.talentsPicked || []) {
-      if (t.effect) {
-        for (const [k, v] of Object.entries(t.effect)) {
-          if (STAT_KEYS.includes(k)) state[k] = (state[k] || 0) + v;
-        }
+  // Temporarily sync stats for preview
+  for (const k of STAT_KEYS) {
+    state[k] = (state.alloc[k] || 0);
+  }
+  // Also apply talent bonuses to the preview
+  for (const t of state.talentsPicked || []) {
+    if (t.effect) {
+      for (const [k, v] of Object.entries(t.effect)) {
+        if (STAT_KEYS.includes(k)) state[k] = (state[k] || 0) + v;
       }
     }
-    renderAvatar(canvas, state);
+  }
+  for (const id of ['creation-avatar-canvas', 'alloc-avatar-canvas']) {
+    const canvas = $(id);
+    if (canvas) renderAvatar(canvas, state);
   }
 }
 
@@ -3445,17 +3445,29 @@ async function main() {
 
   $('btn-random-appearance').addEventListener('click', () => {
     state.faceVariant = Math.floor(Math.random() * 10);
-    state.topVariant = Math.floor(Math.random() * 12);
-    state.bottomVariant = Math.floor(Math.random() * 6);
-    state.outfitColorId = Math.floor(Math.random() * 5);
+    state.topVariant = Math.floor(Math.random() * 24);
+    state.bottomVariant = Math.floor(Math.random() * 8);
+    state.outfitColorId = Math.floor(Math.random() * 16);
     updateCreationAvatar();
   });
+
+  // Skin tone picker (0=dark, 1=mid, 2=light)
+  for (let tone = 0; tone < 3; tone++) {
+    const btn = $(`skin-${tone}`);
+    if (!btn) continue;
+    btn.addEventListener('click', () => {
+      state.skinTone = tone;
+      for (let t = 0; t < 3; t++) $(`skin-${t}`).classList.toggle('active', t === tone);
+      updateCreationAvatar();
+    });
+  }
 
   $('talent-confirm').addEventListener('click', () => {
     for (const k of STAT_KEYS) {
       state.alloc[k] = 0;
     }
     renderAlloc();
+    updateCreationAvatar();
     
     // Programmatic Scroll to Step 2
     const container = $('creation-scroll-area');
@@ -3856,9 +3868,14 @@ async function main() {
   $('btn-start').addEventListener('click', () => {
     // Initialize random appearance before showing
     state.faceVariant = Math.floor(Math.random() * 10);
-    state.topVariant = Math.floor(Math.random() * 12);
-    state.bottomVariant = Math.floor(Math.random() * 6);
-    state.outfitColorId = Math.floor(Math.random() * 5);
+    state.topVariant = Math.floor(Math.random() * 24);
+    state.bottomVariant = Math.floor(Math.random() * 8);
+    state.outfitColorId = Math.floor(Math.random() * 16);
+    if (typeof state.skinTone !== 'number') state.skinTone = 1;
+    for (let t = 0; t < 3; t++) {
+      const el = $(`skin-${t}`);
+      if (el) el.classList.toggle('active', t === state.skinTone);
+    }
     state.sex = 0;
     $('sex-male').classList.add('active');
     $('sex-female').classList.remove('active');
@@ -3872,6 +3889,7 @@ async function main() {
   });
 
   renderTalentSelect(talents);
+  updateCreationAvatar();
   showScreen('start-screen');
 }
 

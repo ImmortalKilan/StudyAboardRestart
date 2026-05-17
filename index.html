@@ -11,6 +11,8 @@
   <main class="app">
 
     <section id="start-screen" class="screen active">
+      <div id="souls-container" class="souls-container"></div>
+      
       <!-- GitHub Promotion Area -->
       <div class="github-promo">
         <a href="https://github.com/ImmortalKilan/StudyAboardRestart" target="_blank" class="github-link" title="前往 GitHub">
@@ -22,7 +24,7 @@
       </div>
 
       <button id="ach-trophy-start-btn" class="ghost" title="成就墙" style="position: absolute; top: 20px; right: 24px; z-index: 100; display:flex; align-items:center; gap:6px;">
-        🏆 <span id="ach-trophy-start-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/50</span>
+        🏆 <span id="ach-trophy-start-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/42</span>
       </button>
       <div class="start-center">
         <h1 class="start-title">留学重开模拟器</h1>
@@ -33,23 +35,10 @@
 
     <section id="creation-screen" class="screen">
       <div class="creation-layout">
-        <!-- Left: Avatar Preview -->
-        <aside class="creation-left">
-          <div class="creation-avatar-wrap">
-            <canvas id="creation-avatar-canvas"></canvas>
-          </div>
-          <div class="creation-controls">
-            <div class="sex-row">
-              <button id="sex-male" class="chip active">男</button>
-              <button id="sex-female" class="chip">女</button>
-            </div>
-            <button id="btn-random-appearance" class="ghost small-btn">🎲 Fit Check</button>
-          </div>
-        </aside>
-
-        <!-- Right: Scrollable Steps -->
+        <!-- Scrollable Steps (talents → alloc → appearance) -->
         <div class="creation-right" id="creation-scroll-area">
-          <!-- Step 1: Talents -->
+
+          <!-- Step 0: Talents -->
           <div class="creation-step" id="step-talents">
             <header class="screen-head">
               <h1>重开中......</h1>
@@ -60,11 +49,11 @@
             <div id="talent-list" class="talent-grid"></div>
 
             <div class="footer-actions">
-              <button id="talent-confirm" class="primary" disabled>确认天赋</button>
+              <button id="talent-confirm" class="primary" disabled>确认天赋 →</button>
             </div>
           </div>
 
-          <!-- Step 2: Stats Allocation -->
+          <!-- Step 1: Stats Allocation -->
           <div class="creation-step" id="step-alloc">
             <header class="screen-head">
               <h1>分配属性</h1>
@@ -75,22 +64,44 @@
 
             <div id="talent-bonus-banner" class="talent-bonus-banner" style="display:none;"></div>
 
-            <div class="alloc-list">
+            <div class="alloc-layout">
+              <div class="alloc-avatar-wrap">
+                <canvas id="alloc-avatar-canvas"></canvas>
+                <p class="alloc-avatar-hint">属性会实时影响外貌</p>
+                <div class="appearance-section">
+                  <div class="appearance-label">性别</div>
+                  <div class="sex-row">
+                    <button id="sex-male" class="chip active">♂ 男</button>
+                    <button id="sex-female" class="chip">♀ 女</button>
+                  </div>
+                </div>
+                <div class="appearance-section">
+                  <div class="appearance-label">肤色</div>
+                  <div class="skin-row">
+                    <button id="skin-0" class="chip skin-chip skin-chip-dark" title="小麦色"></button>
+                    <button id="skin-1" class="chip skin-chip skin-chip-mid active" title="自然色"></button>
+                    <button id="skin-2" class="chip skin-chip skin-chip-light" title="白皙"></button>
+                  </div>
+                </div>
+                <button id="btn-random-appearance" class="ghost appearance-random-btn">🎲 随机发型/服装</button>
+              </div>
+              <div class="alloc-list">
               <div class="alloc-row"><span>社交</span><button class="step" id="minus-SOC">−</button><span class="alloc-val" id="alloc-SOC">0</span><button class="step" id="plus-SOC">＋</button><span class="alloc-bonus" id="bonus-SOC"></span></div>
               <div class="alloc-row"><span>智力</span><button class="step" id="minus-INT">−</button><span class="alloc-val" id="alloc-INT">0</span><button class="step" id="plus-INT">＋</button><span class="alloc-bonus" id="bonus-INT"></span></div>
               <div class="alloc-row"><span>家境</span><button class="step" id="minus-MNY">−</button><span class="alloc-val" id="alloc-MNY">0</span><button class="step" id="plus-MNY">＋</button><span class="alloc-bonus" id="bonus-MNY"></span></div>
               <div class="alloc-row"><span>健康</span><button class="step" id="minus-HLT">−</button><span class="alloc-val" id="alloc-HLT">0</span><button class="step" id="plus-HLT">＋</button><span class="alloc-bonus" id="bonus-HLT"></span></div>
               <div class="alloc-row"><span>毅力</span><button class="step" id="minus-PER">−</button><span class="alloc-val" id="alloc-PER">0</span><button class="step" id="plus-PER">＋</button><span class="alloc-bonus" id="bonus-PER"></span></div>
               <div class="alloc-row"><span>颜值</span><button class="step" id="minus-APP">−</button><span class="alloc-val" id="alloc-APP">0</span><button class="step" id="plus-APP">＋</button><span class="alloc-bonus" id="bonus-APP"></span></div>
+              </div>
             </div>
 
             <div class="footer-actions">
-              <button id="alloc-back-to-talent" class="ghost">返回修改天赋</button>
+              <button id="alloc-back-to-talent" class="ghost">← 返回天赋</button>
               <button id="alloc-random" class="ghost">随机分配</button>
-              <button id="alloc-start" class="primary" disabled>开始留学人生</button>
+              <button id="alloc-start" class="primary" disabled>↻ 立即重开</button>
             </div>
           </div>
-        </div>
+        </div><!-- end creation-right -->
       </div>
     </section>
 
@@ -110,17 +121,13 @@
             <span class="major-label">学校</span>
             <span id="school-display" class="major-val"></span>
           </div>
-          <div id="major-box" class="major-box">
+          <div class="major-box">
             <span class="major-label">专业</span>
             <span id="major-display" class="major-val">未定</span>
           </div>
           <div id="profession-box" class="major-box" style="display:none;">
             <span class="major-label">职业</span>
             <span id="profession-display" class="major-val"></span>
-          </div>
-          <div id="house-box" class="major-box hogwarts-house-box" style="display:none;">
-            <span class="major-label hogwarts-house-label">学院</span>
-            <span id="house-display" class="major-val hogwarts-house-val"></span>
           </div>
           <div class="major-box">
             <span class="major-label">恋爱</span>
@@ -142,7 +149,7 @@
               <button id="btn-summary" class="ghost" style="display:none;">查看总结</button>
               <button id="btn-restart" class="ghost">重开</button>
               <button id="ach-trophy-btn" class="ghost" title="成就墙" style="display:flex; align-items:center; gap:6px;">
-                🏆 <span id="ach-trophy-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/50</span>
+                🏆 <span id="ach-trophy-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/42</span>
               </button>
             </div>
           </div>
@@ -408,10 +415,7 @@
     <div class="ach-wall-panel">
       <div class="ach-wall-head">
         <div class="ach-wall-title">🏆&nbsp;&nbsp;成就</div>
-        <span id="ach-wall-count" class="ach-wall-count">0/50</span>
-        <button id="ach-export-btn" class="ach-io-btn" title="导出存档到文件">⬇ 导出</button>
-        <button id="ach-import-btn" class="ach-io-btn" title="从文件导入存档">⬆ 导入</button>
-        <input type="file" id="ach-import-file" accept=".json" style="display:none">
+        <span id="ach-wall-count" class="ach-wall-count">0/42</span>
         <button id="ach-wall-close" class="ach-wall-close" aria-label="关闭成就墙">✕</button>
       </div>
       <div id="ach-wall-grid" class="ach-wall-grid"></div>
