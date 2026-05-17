@@ -159,7 +159,6 @@ const STORYLINE_CFG = {
       idol: {    gracePeriod: 12,
     eventRate: 0.7,
     deathChecks: [
-      { cond: s => s.INT < 0, event: 82020 },
       { cond: s => s.HLT <= -2, event: 82021 },
     ],
     progressChecks: [],
@@ -168,7 +167,9 @@ const STORYLINE_CFG = {
     gracePeriod: 6,
     eventRate: 0.8,
     deathChecks: [
-      { cond: s => s.HLT <= -3, event: 82020 },
+      { cond: s => s.HLT < 2 && Math.random() < 0.25, event: 82022 },
+      { cond: s => s.HLT <= -3, event: 82021 },
+      { cond: s => s.SOC <= -3, event: 82020 },
       { cond: s => s.MNY <= -3, event: 82091 },
     ],
     progressChecks: [],
@@ -1821,6 +1822,23 @@ function advanceMonth() {
   }
 
   if (!state.storyline) {
+    const _statComboDeaths = [
+      { cond: s => s.INT <= 0 && s.overseas, event: 99931 },
+      { cond: s => s.SOC <= 0 && s.HAP <= 0 && s.overseas, event: 99932 },
+      { cond: s => s.MNY <= 0 && s.HLT <= 0 && s.overseas, event: 99933 },
+      { cond: s => s.PER <= 0 && s.MNY <= 0 && s.overseas, event: 99934 },
+      { cond: s => s.APP <= 0 && s.SOC <= 0 && s.overseas, event: 99935 },
+      { cond: s => s.INT <= 0 && s.PER <= 0 && s.overseas, event: 99936 },
+      { cond: s => s.HLT <= 0 && s.HAP <= 0 && s.overseas, event: 99937 },
+      { cond: s => s.SOC <= 0 && s.PER <= 0 && s.overseas, event: 99938 },
+    ];
+    const eligible = _statComboDeaths.filter(dc => dc.cond(state) && !state.firedEvents.has(dc.event));
+    if (eligible.length && Math.random() < 0.2) {
+      const pick = eligible[Math.floor(Math.random() * eligible.length)];
+      const ev = state.eventsMap.get(pick.event);
+      if (ev) applyEvent(ev);
+    }
+
     if (state.HLT <= -5) {
       pushLog('「结局：油尽灯枯」长期的忽视和透支终于压垮了你的身体。你在一个深夜倒下，再也没有醒来。人生就此画上句号。', 'ending');
       state.phase = 'ended';
