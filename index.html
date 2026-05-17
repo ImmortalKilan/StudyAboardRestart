@@ -24,7 +24,7 @@
       </div>
 
       <button id="ach-trophy-start-btn" class="ghost" title="成就墙" style="position: absolute; top: 20px; right: 24px; z-index: 100; display:flex; align-items:center; gap:6px;">
-        🏆 <span id="ach-trophy-start-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/42</span>
+        🏆 <span id="ach-trophy-start-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/50</span>
       </button>
       <div class="start-center">
         <h1 class="start-title">留学重开模拟器</h1>
@@ -121,7 +121,11 @@
             <span class="major-label">学校</span>
             <span id="school-display" class="major-val"></span>
           </div>
-          <div class="major-box">
+          <div id="house-box" class="major-box" style="display:none;">
+            <span class="major-label">学院</span>
+            <span class="hogwarts-house-label major-val"></span>
+          </div>
+          <div id="major-box" class="major-box">
             <span class="major-label">专业</span>
             <span id="major-display" class="major-val">未定</span>
           </div>
@@ -149,7 +153,7 @@
               <button id="btn-summary" class="ghost" style="display:none;">查看总结</button>
               <button id="btn-restart" class="ghost">重开</button>
               <button id="ach-trophy-btn" class="ghost" title="成就墙" style="display:flex; align-items:center; gap:6px;">
-                🏆 <span id="ach-trophy-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/42</span>
+                🏆 <span id="ach-trophy-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/50</span>
               </button>
             </div>
           </div>
@@ -415,7 +419,7 @@
     <div class="ach-wall-panel">
       <div class="ach-wall-head">
         <div class="ach-wall-title">🏆&nbsp;&nbsp;成就</div>
-        <span id="ach-wall-count" class="ach-wall-count">0/42</span>
+        <span id="ach-wall-count" class="ach-wall-count">0/50</span>
         <button id="ach-wall-close" class="ach-wall-close" aria-label="关闭成就墙">✕</button>
       </div>
       <div id="ach-wall-grid" class="ach-wall-grid"></div>
