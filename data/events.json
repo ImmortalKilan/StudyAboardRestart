@@ -41,8 +41,8 @@
         "next": 98008
       },
       {
-        "title": "写小说 / 练吉他",
-        "desc": "画画、写作、玩乐器，沉浸在创作中。",
+        "title": "写小说 / 画画",
+        "desc": "沉迷文字和画笔，享受从无到有的创造过程。",
         "next": 98004
       },
       {
@@ -54,10 +54,59 @@
       },
       {
         "title": "学古典乐器",
-        "desc": "钢琴/小提琴，请家教正经入门。",
+        "desc": "钢琴/小提琴，请家教正经入门。每天两小时雷打不动。",
         "requireExpr": "MNY>=3",
         "requireText": "需家境≥3",
         "next": 98010
+      },
+      {
+        "title": "自学编曲做 beat",
+        "desc": "FL Studio 破解版加 B 站教程，凌晨三点还在调合成器。",
+        "next": 98013
+      },
+      {
+        "title": "养蚕 / 解剖青蛙",
+        "desc": "对活的东西充满好奇，显微镜下的世界让你着迷。",
+        "next": 98011
+      },
+      {
+        "title": "拆遥控车研究齿轮",
+        "desc": "把家里所有能拆的东西都拆了，再想办法装回去。",
+        "next": 98012
+      },
+      {
+        "title": "考急救证做志愿者",
+        "desc": "去医院急诊科跟了一周班，见了真正的生死。",
+        "requireExpr": "PER>=3",
+        "requireText": "需毅力≥3",
+        "next": 98014
+      },
+      {
+        "title": "看医学纪录片入迷",
+        "desc": "从《人间世》看到《豪斯医生》，开始翻医学科普。",
+        "next": 98015
+      },
+      {
+        "title": "加入校辩论队",
+        "desc": "为了一个论点查三天资料，站在台上舌战群儒。",
+        "requireExpr": "SOC>=3",
+        "requireText": "需社交≥3",
+        "next": 98016
+      },
+      {
+        "title": "沉迷刑侦纪录片",
+        "desc": "研究案件逻辑和法律程序，觉得自己能当侦探。",
+        "next": 98017
+      },
+      {
+        "title": "用手机拍短片",
+        "desc": "写剧本、找同学演、自己剪，作品稚嫩但完整。",
+        "next": 98018
+      },
+      {
+        "title": "泡在 B 站学剪辑",
+        "desc": "达芬奇教程看了两百集，给班级活动剪了一个炸裂视频。",
+        "next": 98019
       }
     ]
   },
@@ -65,66 +114,213 @@
     "id": 98002,
     "text": "你用 Python 写了能和你对话的模型，虽然简陋，但看着程序跑起来的那一刻，你觉得自己发现了一种魔法。",
     "noRandom": true,
-    "set": { "hobby": "tech" },
-    "effect": { "INT": 1 }
+    "set": {
+      "hobby": "tech"
+    },
+    "effect": {
+      "INT": 1
+    }
   },
   {
     "id": 98003,
     "text": "一个暑假下来你赚了两千多块。你发现自己对「怎么把东西卖出去」这件事有着天然的敏感度和热情。",
     "noRandom": true,
-    "set": { "hobby": "business" },
-    "effect": { "MNY": 1 }
+    "set": {
+      "hobby": "business"
+    },
+    "effect": {
+      "MNY": 1
+    }
   },
   {
     "id": 98004,
     "text": "作品虽然稚嫩，但朋友们都说有感觉。你享受这种从无到有的创造过程，觉得这才是自己真正想做的事。",
     "noRandom": true,
-    "set": { "hobby": "art" },
-    "effect": { "APP": 1 }
+    "set": {
+      "hobby": "art"
+    },
+    "effect": {
+      "APP": 1
+    }
   },
   {
     "id": 98005,
     "text": "你把家里那台积灰的旧台式机彻底拆了一遍又装回去，还成功在上面跑起了 Arch Linux。在 Stack Overflow 找到答案的那一刻，你觉得这比任何游戏都上头。",
     "noRandom": true,
-    "set": { "hobby": "tech" },
-    "effect": { "INT": 1, "PER": 1 }
+    "set": {
+      "hobby": "tech"
+    },
+    "effect": {
+      "INT": 1,
+      "PER": 1
+    }
   },
   {
     "id": 98006,
     "text": "你给一个开源项目提了 PR，maintainer 回复了一句「LGTM」。第一次贡献被 merge 的那种成就感，跟期末考第一名完全不一样。",
     "noRandom": true,
-    "set": { "hobby": "tech" },
-    "effect": { "INT": 1, "SOC": 1 }
+    "set": {
+      "hobby": "tech"
+    },
+    "effect": {
+      "INT": 1,
+      "SOC": 1
+    }
   },
   {
     "id": 98007,
     "text": "夜市的霓虹灯下你支起一张折叠桌，从最初的拘谨到敢主动招呼路人。三个月后你已经能算清每一种货品的利润率。",
     "noRandom": true,
-    "set": { "hobby": "business" },
-    "effect": { "MNY": 1, "SOC": 1 }
+    "set": {
+      "hobby": "business"
+    },
+    "effect": {
+      "MNY": 1,
+      "SOC": 1
+    }
   },
   {
     "id": 98008,
     "text": "用爸妈给的本金小试身手，几次踩雷之后你开始研究 K 线、研报、行业逻辑。这场游戏比你想象的更有门道。",
     "noRandom": true,
-    "set": { "hobby": "business" },
-    "effect": { "MNY": 1, "INT": 1 }
+    "set": {
+      "hobby": "business"
+    },
+    "effect": {
+      "MNY": 1,
+      "INT": 1
+    }
   },
   {
     "id": 98009,
     "text": "你拍的几条短视频意外火了一条，评论区刷满「哥/姐好帅」。你第一次感受到镜头给人的反馈是多么直接。",
     "noRandom": true,
-    "set": { "hobby": "art" },
-    "effect": { "APP": 1, "SOC": 1 }
+    "set": {
+      "hobby": "art"
+    },
+    "effect": {
+      "APP": 1,
+      "SOC": 1
+    }
   },
   {
     "id": 98010,
     "text": "钢琴老师说你手指条件好，乐感也不错。每天两小时的练习虽然枯燥，但弹完一整首曲子的瞬间，整个夏天都安静了下来。",
     "noRandom": true,
-    "set": { "hobby": "art" },
-    "effect": { "APP": 1, "INT": 1 }
+    "set": {
+      "hobby": "music"
+    },
+    "effect": {
+      "APP": 1,
+      "INT": 1
+    }
   },
-
+  {
+    "id": 98011,
+    "text": "你用显微镜观察了洋葱表皮细胞，又解剖了一只青蛙。生命的精密结构让你震撼——每一个细胞都像一座微型工厂。",
+    "noRandom": true,
+    "set": {
+      "hobby": "science"
+    },
+    "effect": {
+      "INT": 1
+    }
+  },
+  {
+    "id": 98012,
+    "text": "遥控车被你拆成了两百多个零件，齿轮、轴承、电机。花了三天才装回去，但你搞懂了传动比是怎么回事。",
+    "noRandom": true,
+    "set": {
+      "hobby": "science"
+    },
+    "effect": {
+      "INT": 1,
+      "PER": 1
+    }
+  },
+  {
+    "id": 98013,
+    "text": "你用 FL Studio 做出了第一段完整的 beat。虽然混音稀烂，但那个副歌的旋律是你哼了一整天才抓住的——这是你的声音。",
+    "noRandom": true,
+    "set": {
+      "hobby": "music"
+    },
+    "effect": {
+      "INT": 1,
+      "APP": 1
+    }
+  },
+  {
+    "id": 98014,
+    "text": "急诊科的一周让你见识了真正的生死。有人被救回来，有人没有。你站在走廊里发了很久的呆，然后决定这辈子要做点什么。",
+    "noRandom": true,
+    "set": {
+      "hobby": "medical"
+    },
+    "effect": {
+      "PER": 1,
+      "INT": 1
+    }
+  },
+  {
+    "id": 98015,
+    "text": "从纪录片到医学科普书，你把人体解剖图翻了无数遍。朋友感冒了来问你吃什么药，你居然真能说出个所以然。",
+    "noRandom": true,
+    "set": {
+      "hobby": "medical"
+    },
+    "effect": {
+      "INT": 1
+    }
+  },
+  {
+    "id": 98016,
+    "text": "辩论赛决赛你在最后三十秒做了一段即兴总结，评委全票判你方胜。那种用逻辑把对手说得哑口无言的快感，让你上了瘾。",
+    "noRandom": true,
+    "set": {
+      "hobby": "law"
+    },
+    "effect": {
+      "SOC": 1,
+      "INT": 1
+    }
+  },
+  {
+    "id": 98017,
+    "text": "你把一部刑侦纪录片反复看了三遍，还自己画了案件时间线和逻辑图。你发现自己对「还原真相」这件事有一种执念。",
+    "noRandom": true,
+    "set": {
+      "hobby": "law"
+    },
+    "effect": {
+      "INT": 1,
+      "PER": 1
+    }
+  },
+  {
+    "id": 98018,
+    "text": "你拿着手机拍了一部五分钟的短片，找同学当演员，自己写剧本、打光、剪辑。虽然粗糙，但从头到尾是你的作品。",
+    "noRandom": true,
+    "set": {
+      "hobby": "film"
+    },
+    "effect": {
+      "APP": 1,
+      "SOC": 1
+    }
+  },
+  {
+    "id": 98019,
+    "text": "达芬奇的时间线你已经能闭着眼操作了。班级活动的视频被你剪出了电影预告片的感觉，全班传疯了。",
+    "noRandom": true,
+    "set": {
+      "hobby": "film"
+    },
+    "effect": {
+      "INT": 1,
+      "APP": 1
+    }
+  },
   {
     "id": 10001,
     "text": "中考结束，父母把几所学校的资料铺在桌上，让你做选择。这一步将决定接下来三年的轨道。",
@@ -172,43 +368,66 @@
     "id": 10002,
     "text": "你转入了国际高中。全英文授课，新世界的大门打开了。",
     "noRandom": true,
-    "set": { "hsType": "国际" },
+    "set": {
+      "hsType": "国际"
+    },
     "happyDelta": 1,
-    "effect": { "INT": 1 }
+    "effect": {
+      "INT": 1
+    }
   },
   {
     "id": 10003,
     "text": "你进了顶尖国际学校。校园像欧美校园剧里的样子，同学非富即贵。这里的视野，是别处给不了的。",
     "noRandom": true,
-    "set": { "hsType": "国际" },
+    "set": {
+      "hsType": "国际"
+    },
     "happyDelta": 2,
-    "effect": { "INT": 1, "APP": 1, "SOC": 1 }
+    "effect": {
+      "INT": 1,
+      "APP": 1,
+      "SOC": 1
+    }
   },
   {
     "id": 10004,
     "text": "你进了公立国际部。一边卷雅思托福，一边盯着体制内的应试节奏，鸡血与英文双管齐下。",
     "noRandom": true,
-    "set": { "hsType": "国际" },
+    "set": {
+      "hsType": "国际"
+    },
     "happyDelta": 0,
-    "effect": { "INT": 1, "PER": 1 }
+    "effect": {
+      "INT": 1,
+      "PER": 1
+    }
   },
   {
     "id": 10005,
     "text": "你继续在普通体制内高中奋斗。教室墙上写着「提高一分，干掉千人」。",
     "noRandom": true,
-    "set": { "hsType": "体制内" },
+    "set": {
+      "hsType": "体制内"
+    },
     "happyDelta": -1,
-    "effect": { "PER": 1 }
+    "effect": {
+      "PER": 1
+    }
   },
   {
     "id": 10006,
     "text": "你进了省重点。年级前 50 才有上一本的可能。竞争从开学第一天就开始了。",
     "noRandom": true,
-    "set": { "hsType": "体制内" },
+    "set": {
+      "hsType": "体制内"
+    },
     "happyDelta": -1,
-    "effect": { "INT": 1, "PER": 1 }
+    "effect": {
+      "INT": 1,
+      "PER": 1
+    }
   },
-
   {
     "id": 10010,
     "text": "学校举行留学说明会，你认真做了笔记。",
@@ -219,13 +438,18 @@
     "text": "你被拉去补习班，每天回到家已是深夜。",
     "include": "AGE=15&HS==国际&MNY>=4",
     "happyDelta": -1,
-    "effect": { "INT": 1 }
+    "effect": {
+      "INT": 1
+    }
   },
   {
     "id": 10012,
     "text": "你迷上了怪奇物语，开始尝试用英文跟读。",
     "include": "AGE=15&HS==国际",
-    "effect": { "INT": 1, "SOC": 1 }
+    "effect": {
+      "INT": 1,
+      "SOC": 1
+    }
   },
   {
     "id": 10013,
@@ -233,19 +457,24 @@
     "include": "AGE=15&HS==国际&HLT<=3",
     "happyDelta": -2
   },
-
   {
     "id": 10101,
     "text": "高二开始，托福班开课。第一次模考出分了。",
     "include": "AGE=16&HS==国际",
-    "branch": ["INT>=6?10102", "INT<=3?10103", "?10104"]
+    "branch": [
+      "INT>=6?10102",
+      "INT<=3?10103",
+      "?10104"
+    ]
   },
   {
     "id": 10102,
     "text": "你居然一次就上了100，老师在群里点名表扬你。",
     "noRandom": true,
     "happyDelta": 2,
-    "effect": { "INT": 1 }
+    "effect": {
+      "INT": 1
+    }
   },
   {
     "id": 10103,
@@ -259,12 +488,14 @@
     "noRandom": true,
     "happyDelta": -1
   },
-
   {
     "id": 10110,
     "text": "学校组织短期夏校交流，你报名了。",
     "include": "AGE=16&HS==国际&MNY>=5",
-    "effect": { "SOC": 2, "INT": 1 },
+    "effect": {
+      "SOC": 2,
+      "INT": 1
+    },
     "happyDelta": 2
   },
   {
@@ -277,14 +508,18 @@
     "id": 10112,
     "text": "你在社团里组织了一次英文辩论，大家都说你台风稳。",
     "include": "AGE=16&HS==国际&SOC>=5",
-    "effect": { "SOC": 1 },
+    "effect": {
+      "SOC": 1
+    },
     "happyDelta": 1
   },
   {
     "id": 10113,
     "text": "因为长期熬夜刷题，你大病一场住院一周。",
     "include": "AGE=16&HS==国际&HLT<=3",
-    "effect": { "HLT": -1 },
+    "effect": {
+      "HLT": -1
+    },
     "happyDelta": -2
   },
   {
@@ -292,18 +527,23 @@
     "text": "你暗恋的那个人也在准备出国。你心里一动。",
     "include": "AGE=16&HS==国际&APP>=5&relationship==单身"
   },
-
   {
     "id": 10201,
     "text": "高三。申请季正式开始。",
     "include": "AGE=17&HS==国际",
-    "branch": ["INT>=8&PER>=4?10202", "INT<=4|PER<=2?10203", "?10204"]
+    "branch": [
+      "INT>=8&PER>=4?10202",
+      "INT<=4|PER<=2?10203",
+      "?10204"
+    ]
   },
   {
     "id": 10202,
     "text": "你瞄准了Top30，文书写到凌晨三点也不觉得累。",
     "noRandom": true,
-    "effect": { "PER": 1 }
+    "effect": {
+      "PER": 1
+    }
   },
   {
     "id": 10203,
@@ -316,7 +556,6 @@
     "text": "你按部就班地推进每个DDL，目标稳健。",
     "noRandom": true
   },
-
   {
     "id": 10210,
     "text": "你考出了理想的标化成绩，朋友圈一片点赞。",
@@ -334,7 +573,9 @@
     "text": "妈妈把首付钱拿出来给你交了申请费。你沉默了很久。",
     "include": "AGE=17&HS==国际&MNY<=3",
     "happyDelta": -2,
-    "effect": { "PER": 1 }
+    "effect": {
+      "PER": 1
+    }
   },
   {
     "id": 10213,
@@ -342,23 +583,61 @@
     "include": "AGE=17&HS==国际&INT>=9&SOC>=6",
     "happyDelta": 4
   },
-
   {
     "id": 10220,
-    "text": "中介让你尽快敲定主申请国家——不同的国家，文书、标化、推荐信全套都不一样。你坐在书桌前，开始认真考虑：到底想去哪？",
+    "text": "中介根据你的家境和成绩，推荐了几个主申方向——不同国家的文书、标化、推荐信全套都不一样。你坐在书桌前，开始认真考虑：到底想去哪？",
     "include": "AGE=17&HS==国际",
     "fixedMonth": 9,
     "choices": [
-      { "text": "美国（藤校梦／自由灵活，但贵）", "set": { "countryIntent": "美国" } },
-      { "text": "英国（学制短／G5招牌响）", "set": { "countryIntent": "英国" } },
-      { "text": "澳洲（移民友好／阳光沙滩）", "set": { "countryIntent": "澳洲" } },
-      { "text": "欧洲（学费便宜／文化深厚）", "set": { "countryIntent": "欧洲" } },
-      { "text": "香港（离家近／中西合璧）", "set": { "countryIntent": "香港" } },
-      { "text": "日本（动漫情怀／东亚文化圈）", "set": { "countryIntent": "日本" } },
-      { "text": "新加坡（亚洲顶级／英文授课）", "set": { "countryIntent": "新加坡" } }
-    ]
+      {
+        "text": "美国（自由灵活）",
+        "showExpr": "(MNY>=5)&(INT>=3)",
+        "set": {
+          "countryIntent": "美国"
+        }
+      },
+      {
+        "text": "英国（学制短）",
+        "showExpr": "(MNY>=4)&(INT>=3)",
+        "set": {
+          "countryIntent": "英国"
+        }
+      },
+      {
+        "text": "澳洲（阳光沙滩）",
+        "set": {
+          "countryIntent": "澳洲"
+        }
+      },
+      {
+        "text": "欧洲（底蕴深厚）",
+        "set": {
+          "countryIntent": "欧洲"
+        }
+      },
+      {
+        "text": "香港（中西合璧）",
+        "showExpr": "INT>=4",
+        "set": {
+          "countryIntent": "香港"
+        }
+      },
+      {
+        "text": "日本（东亚文化）",
+        "set": {
+          "countryIntent": "日本"
+        }
+      },
+      {
+        "text": "新加坡（亚洲顶级）",
+        "showExpr": "INT>=6",
+        "set": {
+          "countryIntent": "新加坡"
+        }
+      }
+    ],
+    "pickN": 4
   },
-
   {
     "id": 10320,
     "text": "十二月，朋友圈被一波 ED 录取喜报刷屏。",
@@ -388,7 +667,9 @@
     "text": "你知道自己条件不算突出。看着同学一个个收到 offer，你只希望保底校别也把你拒了。半夜翻来覆去睡不着。",
     "noRandom": true,
     "happyDelta": -2,
-    "effect": { "PER": 1 }
+    "effect": {
+      "PER": 1
+    }
   },
   {
     "id": 10324,
@@ -396,7 +677,6 @@
     "noRandom": true,
     "happyDelta": 0
   },
-
   {
     "id": 10301,
     "text": "三月，录取季陆续放榜。你紧张地刷新着邮箱……",
@@ -438,225 +718,326 @@
     "text": "Congratulations! 你被Top20名校录取了！全家都疯了，你被设为家族群头像。朋友圈收到了 200+ 个赞。",
     "noRandom": true,
     "happyDelta": 5,
-    "set": { "school": "T20", "schoolTier": "top", "country": "美国" }
+    "set": {
+      "school": "T20",
+      "schoolTier": "top",
+      "country": "美国"
+    }
   },
   {
     "id": 10303,
     "text": "你收到了一封来自 Top50 大学的录取通知。结果不算惊艳，但也算稳稳上岸了。",
     "noRandom": true,
     "happyDelta": 3,
-    "set": { "school": "T50", "schoolTier": "mid", "country": "美国" }
+    "set": {
+      "school": "T50",
+      "schoolTier": "mid",
+      "country": "美国"
+    }
   },
   {
     "id": 10304,
     "text": "你被一所QS排名一百开外的学校录取了。不是梦校，但至少能出去了。算了，先出去再说。",
     "noRandom": true,
     "happyDelta": 1,
-    "set": { "school": "T100+", "schoolTier": "low", "country": "美国" }
+    "set": {
+      "school": "T100+",
+      "schoolTier": "low",
+      "country": "美国"
+    }
   },
   {
     "id": 10305,
     "text": "全聚德。所有学校都没录你。你决定转向高考或者 Gap 一年重新申请。",
     "noRandom": true,
     "happyDelta": -4,
-    "set": { "school": "无" }
+    "set": {
+      "school": "无"
+    }
   },
-
   {
     "id": 10306,
     "text": "你拿着新出的标化高分去找中介补交材料。焦急地等了两周后，收到了一封意想不到的邮件：",
     "include": "AGE=18&HS==国际&EVT?[17004]&country==美国&school!=T20&school!=无",
-    "branch": ["school==T50?10307", "school==T100+?10308"]
+    "branch": [
+      "school==T50?10307",
+      "school==T100+?10308"
+    ]
   },
   {
     "id": 10307,
     "text": "补交成绩后，一所Top20名校向你抛来了橄榄枝！你激动得差点把手机摔了。",
     "noRandom": true,
     "happyDelta": 4,
-    "set": { "school": "T20", "schoolTier": "top", "country": "美国" }
+    "set": {
+      "school": "T20",
+      "schoolTier": "top",
+      "country": "美国"
+    }
   },
   {
     "id": 10308,
     "text": "补交成绩后，一所Top50大学给了你offer。比之前的学校好了不少，你松了一口气。",
     "noRandom": true,
     "happyDelta": 3,
-    "set": { "school": "T50", "schoolTier": "mid", "country": "美国" }
+    "set": {
+      "school": "T50",
+      "schoolTier": "mid",
+      "country": "美国"
+    }
   },
-
   {
     "id": 10330,
     "text": "Offer 来自 UCL/IC/LSE/牛津/剑桥——你被 G5 录取了！家里相册被翻了出来，从小学奖状一路晒到推荐信。微信群里飘起一句句「学神」。",
     "noRandom": true,
     "happyDelta": 5,
-    "set": { "school": "G5", "schoolTier": "top", "country": "英国" }
+    "set": {
+      "school": "G5",
+      "schoolTier": "top",
+      "country": "英国"
+    }
   },
   {
     "id": 10331,
     "text": "你拿到了一所罗素集团大学的 offer。虽不是 G5，但红砖名校的招牌还是相当能打。家里人难掩骄傲，朋友圈刷了一晚上点赞。",
     "noRandom": true,
     "happyDelta": 3,
-    "set": { "school": "罗素", "schoolTier": "mid", "country": "英国" }
+    "set": {
+      "school": "罗素",
+      "schoolTier": "mid",
+      "country": "英国"
+    }
   },
   {
     "id": 10332,
     "text": "你被一所英国普通大学录取，QS 排名一百开外。妈妈安慰你说：「先去读，再升学」。你点点头，心里盘算着将来能不能转学到罗素。",
     "noRandom": true,
     "happyDelta": 1,
-    "set": { "school": "普通英校", "schoolTier": "low", "country": "英国" }
+    "set": {
+      "school": "普通英校",
+      "schoolTier": "low",
+      "country": "英国"
+    }
   },
   {
     "id": 10333,
     "text": "拒信一封接一封。你刷新着 UCAS 的状态，最后一所学校也 reject 了。Tier 4 签证的事谈不上了。你开始考虑 Gap year 重申，或者放弃英国。",
     "noRandom": true,
     "happyDelta": -4,
-    "set": { "school": "无" }
+    "set": {
+      "school": "无"
+    }
   },
-
   {
     "id": 10334,
     "text": "你被澳洲八大录取！悉尼/墨尔本的阳光在等你。",
     "noRandom": true,
     "happyDelta": 4,
-    "set": { "school": "澳八大", "schoolTier": "top", "country": "澳洲" }
+    "set": {
+      "school": "澳八大",
+      "schoolTier": "top",
+      "country": "澳洲"
+    }
   },
   {
     "id": 10335,
     "text": "你被一所澳洲普通公立大学录取。先出去再说。",
     "noRandom": true,
     "happyDelta": 2,
-    "set": { "school": "普通澳校", "schoolTier": "mid", "country": "澳洲" }
+    "set": {
+      "school": "普通澳校",
+      "schoolTier": "mid",
+      "country": "澳洲"
+    }
   },
   {
     "id": 10336,
     "text": "你被澳洲一所私立学校录取，学费昂贵，但好歹下签了。",
     "noRandom": true,
     "happyDelta": 0,
-    "set": { "school": "私校", "schoolTier": "low", "country": "澳洲" }
+    "set": {
+      "school": "私校",
+      "schoolTier": "low",
+      "country": "澳洲"
+    }
   },
   {
     "id": 10337,
     "text": "澳洲学校全聚德。你开始重新规划。",
     "noRandom": true,
     "happyDelta": -4,
-    "set": { "school": "无" }
+    "set": {
+      "school": "无"
+    }
   },
-
   {
     "id": 10338,
     "text": "你被欧洲顶尖名校录取（ETH/巴黎理工/慕尼黑工大）。学费几乎免费，但课程难度爆表。",
     "noRandom": true,
     "happyDelta": 5,
-    "set": { "school": "顶尖欧校", "schoolTier": "top", "country": "欧洲" }
+    "set": {
+      "school": "顶尖欧校",
+      "schoolTier": "top",
+      "country": "欧洲"
+    }
   },
   {
     "id": 10339,
     "text": "你被欧洲一所公立大学录取。学费便宜，性价比拉满。",
     "noRandom": true,
     "happyDelta": 3,
-    "set": { "school": "公立大学", "schoolTier": "mid", "country": "欧洲" }
+    "set": {
+      "school": "公立大学",
+      "schoolTier": "mid",
+      "country": "欧洲"
+    }
   },
   {
     "id": 10340,
     "text": "你被欧洲一所普通学校录取。先去再说，欧元区的体验本身就值。",
     "noRandom": true,
     "happyDelta": 1,
-    "set": { "school": "普通欧校", "schoolTier": "low", "country": "欧洲" }
+    "set": {
+      "school": "普通欧校",
+      "schoolTier": "low",
+      "country": "欧洲"
+    }
   },
   {
     "id": 10341,
     "text": "欧洲学校全聚德。语言关或者标化没过。",
     "noRandom": true,
     "happyDelta": -4,
-    "set": { "school": "无" }
+    "set": {
+      "school": "无"
+    }
   },
-
   {
     "id": 10342,
     "text": "你被港三（港大/港中文/港科）录取！亚洲顶级，离家又近。",
     "noRandom": true,
     "happyDelta": 5,
-    "set": { "school": "港三", "schoolTier": "top", "country": "香港" }
+    "set": {
+      "school": "港三",
+      "schoolTier": "top",
+      "country": "香港"
+    }
   },
   {
     "id": 10343,
     "text": "你被港八之一录取（理工/城大/浸会等）。",
     "noRandom": true,
     "happyDelta": 3,
-    "set": { "school": "港八", "schoolTier": "mid", "country": "香港" }
+    "set": {
+      "school": "港八",
+      "schoolTier": "mid",
+      "country": "香港"
+    }
   },
   {
     "id": 10344,
     "text": "你被香港一所普通大学录取。",
     "noRandom": true,
     "happyDelta": 1,
-    "set": { "school": "普通港校", "schoolTier": "low", "country": "香港" }
+    "set": {
+      "school": "普通港校",
+      "schoolTier": "low",
+      "country": "香港"
+    }
   },
   {
     "id": 10345,
     "text": "香港学校全聚德。",
     "noRandom": true,
     "happyDelta": -4,
-    "set": { "school": "无" }
+    "set": {
+      "school": "无"
+    }
   },
-
   {
     "id": 10346,
     "text": "你被东京大学/京都大学录取！日本最高学府向你敞开大门。",
     "noRandom": true,
     "happyDelta": 5,
-    "set": { "school": "帝大", "schoolTier": "top", "country": "日本" }
+    "set": {
+      "school": "帝大",
+      "schoolTier": "top",
+      "country": "日本"
+    }
   },
   {
     "id": 10347,
     "text": "你被早稻田/庆应/MARCH 之一录取。日本一线私立的牌子。",
     "noRandom": true,
     "happyDelta": 3,
-    "set": { "school": "早庆", "schoolTier": "mid", "country": "日本" }
+    "set": {
+      "school": "早庆",
+      "schoolTier": "mid",
+      "country": "日本"
+    }
   },
   {
     "id": 10348,
     "text": "你被日本一所普通大学录取。",
     "noRandom": true,
     "happyDelta": 1,
-    "set": { "school": "普通日校", "schoolTier": "low", "country": "日本" }
+    "set": {
+      "school": "普通日校",
+      "schoolTier": "low",
+      "country": "日本"
+    }
   },
   {
     "id": 10349,
     "text": "日本学校全聚德。N1 没过或留考分数太低。",
     "noRandom": true,
     "happyDelta": -4,
-    "set": { "school": "无" }
+    "set": {
+      "school": "无"
+    }
   },
-
   {
     "id": 10350,
     "text": "你被新加坡国立大学/南洋理工录取！亚洲顶尖，全英文授课。",
     "noRandom": true,
     "happyDelta": 5,
-    "set": { "school": "新二", "schoolTier": "top", "country": "新加坡" }
+    "set": {
+      "school": "新二",
+      "schoolTier": "top",
+      "country": "新加坡"
+    }
   },
   {
     "id": 10351,
     "text": "你被新加坡管理大学录取。商科金字招牌。",
     "noRandom": true,
     "happyDelta": 3,
-    "set": { "school": "SMU", "schoolTier": "mid", "country": "新加坡" }
+    "set": {
+      "school": "SMU",
+      "schoolTier": "mid",
+      "country": "新加坡"
+    }
   },
   {
     "id": 10352,
     "text": "你被新加坡一所私立大学录取。",
     "noRandom": true,
     "happyDelta": 1,
-    "set": { "school": "普通新校", "schoolTier": "low", "country": "新加坡" }
+    "set": {
+      "school": "普通新校",
+      "schoolTier": "low",
+      "country": "新加坡"
+    }
   },
   {
     "id": 10353,
     "text": "新加坡学校全聚德。",
     "noRandom": true,
     "happyDelta": -4,
-    "set": { "school": "无" }
+    "set": {
+      "school": "无"
+    }
   },
-
   {
     "id": 10310,
     "text": "签证一次过，你长舒一口气。",
@@ -674,22 +1055,34 @@
     "text": "送机那天妈妈在机场哭了。你头也不敢回。",
     "include": "AGE=18&HS==国际&school!=无",
     "happyDelta": -1,
-    "set": { "overseas": 1 },
-    "effect": { "PER": 1 }
+    "set": {
+      "overseas": 1
+    },
+    "effect": {
+      "PER": 1
+    }
   },
-
   {
     "id": 10401,
     "text": "你正式落地海外，开启大一生活。",
     "include": "AGE=19&HS==国际&school!=无",
-    "set": { "profession": "本科生", "overseas": 1 },
-    "branch": ["SOC>=6?10402", "SOC<=3?10403", "?10404"]
+    "set": {
+      "profession": "本科生",
+      "overseas": 1
+    },
+    "branch": [
+      "SOC>=6?10402",
+      "SOC<=3?10403",
+      "?10404"
+    ]
   },
   {
     "id": 10402,
     "text": "Orientation周你交到了一群朋友，有本地人也有同胞。",
     "noRandom": true,
-    "effect": { "SOC": 2 },
+    "effect": {
+      "SOC": 2
+    },
     "happyDelta": 3
   },
   {
@@ -704,20 +1097,44 @@
     "noRandom": true,
     "happyDelta": 1
   },
-
   {
     "id": 10406,
     "text": "新生季的喧嚣过去了。看着窗外异国的天色，你开始认真思考——这一年要怎么过？",
     "include": "AGE=19&HS==国际&school!=无&overseas==1",
     "fixedMonth": 3,
     "choices": [
-      { "text": "拼学业，把 GPA 锁死", "effect": { "INT": 2 }, "resultText": "你把作息调成图书馆作息，期中前 GPA 已经稳了。" },
-      { "text": "全力融入当地圈子，把语言练到母语水平", "effect": { "SOC": 2, "PER": 1 }, "resultText": "你硬着头皮跟本地同学一起开 party、看球赛，舌头慢慢转过来了。" },
-      { "text": "保持原有圈子，和同胞抱团取暖", "effect": { "SOC": 1, "HLT": 1 }, "resultText": "你和华人朋友们一起做饭、刷剧、互相打气。日子过得舒坦。" },
-      { "text": "兼顾不下，先保平安", "effect": { "HLT": 1 }, "resultText": "你决定先稳住身体和情绪，能毕业就行。" }
+      {
+        "text": "拼学业，把 GPA 锁死",
+        "effect": {
+          "INT": 2
+        },
+        "resultText": "你把作息调成图书馆作息，期中前 GPA 已经稳了。"
+      },
+      {
+        "text": "全力融入当地圈子，把语言练到母语水平",
+        "effect": {
+          "SOC": 2,
+          "PER": 1
+        },
+        "resultText": "你硬着头皮跟本地同学一起开 party、看球赛，舌头慢慢转过来了。"
+      },
+      {
+        "text": "保持原有圈子，和同胞抱团取暖",
+        "effect": {
+          "SOC": 1,
+          "HLT": 1
+        },
+        "resultText": "你和华人朋友们一起做饭、刷剧、互相打气。日子过得舒坦。"
+      },
+      {
+        "text": "兼顾不下，先保平安",
+        "effect": {
+          "HLT": 1
+        },
+        "resultText": "你决定先稳住身体和情绪，能毕业就行。"
+      }
     ]
   },
-
   {
     "id": 10410,
     "text": "高数挂科警告，你第一次去office hour。",
@@ -734,7 +1151,9 @@
     "id": 10412,
     "text": "你想家想到失眠，连续一周靠泡面度日。",
     "include": "AGE=19&school!=无&HS==国际&PER<=3",
-    "effect": { "HLT": -1 },
+    "effect": {
+      "HLT": -1
+    },
     "happyDelta": -3
   },
   {
@@ -747,35 +1166,87 @@
     "id": 10415,
     "text": "你打了份校内零工补贴生活费。",
     "include": "AGE=19&school!=无&HS==国际&MNY<=4",
-    "effect": { "MNY": 1, "PER": 1 }
+    "effect": {
+      "MNY": 1,
+      "PER": 1
+    }
   },
-
   {
     "id": 10500,
     "text": "大一快结束了，专业方向要在暑假前定下来。你翻着选课手册，反复掂量。",
     "include": "AGE=19&HS==国际",
     "fixedMonth": 9,
+    "pickN": 4,
     "choices": [
       {
         "title": "计算机科学（CS）",
         "desc": "好就业、加班多，码农的人生从这里开始。",
-        "requireExpr": "INT>=4",
-        "requireText": "需智力≥4",
+        "requireExpr": "INT>=5",
+        "requireText": "需智力≥5",
         "next": 10502
       },
       {
         "title": "商科 / 金融",
         "desc": "Networking 是核心生产力，朋友圈晒的是西装与游艇。",
-        "requireExpr": "MNY>=3|SOC>=4",
-        "requireText": "需家境≥3 或社交≥4",
+        "requireExpr": "MNY>=5|SOC>=5",
+        "requireText": "需家境≥5 或社交≥5",
         "next": 10503
       },
       {
         "title": "文艺 / 艺术",
         "desc": "热爱大于一切，做自己的作品胜过万贯家财。",
-        "requireExpr": "APP>=3",
-        "requireText": "需颜值≥3",
+        "requireExpr": "APP>=4",
+        "requireText": "需颜值≥4",
         "next": 10504
+      },
+      {
+        "title": "电子工程（EE）",
+        "desc": "芯片、电路、信号处理——用电子改变世界。",
+        "requireExpr": "INT>=6",
+        "requireText": "需智力≥6",
+        "next": 10520
+      },
+      {
+        "title": "机械工程（ME）",
+        "desc": "齿轮、结构、制造——把图纸变成实物的快感。",
+        "requireExpr": "INT>=6&PER>=3",
+        "requireText": "需智力≥6且毅力≥3",
+        "next": 10521
+      },
+      {
+        "title": "生物工程（BIO）",
+        "desc": "基因、细胞、发酵——生命科学的前沿与深坑。",
+        "requireExpr": "INT>=4",
+        "requireText": "需智力≥4",
+        "next": 10522
+      },
+      {
+        "title": "医学（MED）",
+        "desc": "漫长的学制、沉重的责任、救人的成就感。",
+        "requireExpr": "INT>=5&PER>=4",
+        "requireText": "需智力≥5且毅力≥4",
+        "next": 10523
+      },
+      {
+        "title": "法学",
+        "desc": "逻辑、正义、无尽的阅读量——法律是最锋利的武器。",
+        "requireExpr": "INT>=4&SOC>=3",
+        "requireText": "需智力≥4且社交≥3",
+        "next": 10524
+      },
+      {
+        "title": "电影",
+        "desc": "镜头语言、叙事结构——用影像讲述世界。",
+        "requireExpr": "APP>=3|INT>=4",
+        "requireText": "需颜值≥3或智力≥4",
+        "next": 10525
+      },
+      {
+        "title": "音乐",
+        "desc": "和声、编曲、舞台——用声音表达自己。",
+        "requireExpr": "APP>=3|PER>=4",
+        "requireText": "需颜值≥3或毅力≥4",
+        "next": 10526
       },
       {
         "title": "随大流，先不定",
@@ -787,67 +1258,228 @@
   {
     "id": 10501,
     "text": "大二，专业课开始变难。其实你心里早就有答案了——从那个暑假开始，方向就已经定了。",
-    "include": "AGE=20&school!=无&HS==国际&major!=CS&major!=商科&major!=文艺",
-    "branch": ["hobby==tech?10505", "hobby==business?10506", "hobby==art?10507", "?10508"]
+    "include": "AGE=20&school!=无&HS==国际&major!=CS&major!=商科&major!=文艺&major!=EE&major!=ME&major!=BIO&major!=MED&major!=法学&major!=电影&major!=音乐",
+    "branch": [
+      "hobby==tech?10505",
+      "hobby==business?10506",
+      "hobby==art?10507",
+      "hobby==science?10509",
+      "hobby==music?10530",
+      "hobby==medical?10531",
+      "hobby==law?10532",
+      "hobby==film?10533",
+      "?10508"
+    ]
   },
   {
     "id": 10505,
     "noRandom": true,
     "text": "",
-    "branch": ["10502:60", "10503:25", "10504:15"]
+    "branch": [
+      "10502:34",
+      "10520:33",
+      "10521:33"
+    ]
   },
   {
     "id": 10506,
     "noRandom": true,
     "text": "",
-    "branch": ["10502:20", "10503:60", "10504:20"]
+    "branch": [
+      "10503:50",
+      "10524:50"
+    ]
   },
   {
     "id": 10507,
     "noRandom": true,
     "text": "",
-    "branch": ["10502:15", "10503:20", "10504:65"]
+    "branch": [
+      "10504:34",
+      "10525:33",
+      "10526:33"
+    ]
   },
   {
     "id": 10508,
     "noRandom": true,
     "text": "",
-    "branch": ["10502:40", "10503:35", "10504:25"]
+    "branch": [
+      "10502:10",
+      "10503:10",
+      "10504:10",
+      "10520:10",
+      "10521:10",
+      "10522:10",
+      "10523:10",
+      "10524:10",
+      "10525:10",
+      "10526:10"
+    ]
+  },
+  {
+    "id": 10509,
+    "noRandom": true,
+    "text": "",
+    "branch": [
+      "10522:34",
+      "10521:33",
+      "10520:33"
+    ]
+  },
+  {
+    "id": 10530,
+    "noRandom": true,
+    "text": "",
+    "branch": [
+      "10526:80",
+      "10504:20"
+    ]
+  },
+  {
+    "id": 10531,
+    "noRandom": true,
+    "text": "",
+    "branch": [
+      "10523:70",
+      "10522:30"
+    ]
+  },
+  {
+    "id": 10532,
+    "noRandom": true,
+    "text": "",
+    "branch": [
+      "10524:80",
+      "10503:20"
+    ]
+  },
+  {
+    "id": 10533,
+    "noRandom": true,
+    "text": "",
+    "branch": [
+      "10525:70",
+      "10504:30"
+    ]
   },
   {
     "id": 10502,
     "text": "你最终选了 CS。第一节算法课讲到指针时整个教室都在挠头，你却莫名兴奋——把抽象逻辑变成代码的过程，让你想起小时候第一次拼乐高。LeetCode 标签上的红点开始一天天减少。",
     "noRandom": true,
     "logType": "major",
-    "set": { "profession": "理工生", "major": "CS" }
+    "set": {
+      "profession": "理工生",
+      "major": "CS"
+    }
   },
   {
     "id": 10503,
     "text": "你选了商科 / 金融。Networking 是隐性必修课，西装和名片是入场券。你跟着学长跑了几场招聘宣讲会，回来时磨破了一双鞋——但你笑着说这才像样。",
     "noRandom": true,
     "logType": "major",
-    "set": { "profession": "商科生", "major": "商科" }
+    "set": {
+      "profession": "商科生",
+      "major": "商科"
+    }
   },
   {
     "id": 10504,
     "text": "你选了文艺。教授在第一堂课说：「这门学科不会让你致富，但会让你看清世界。」你点点头，把那句话工工整整抄进了笔记本扉页。",
     "noRandom": true,
     "logType": "major",
-    "set": { "profession": "文科生", "major": "文艺" }
+    "set": {
+      "profession": "文科生",
+      "major": "文艺"
+    }
   },
-
+  {
+    "id": 10520,
+    "text": "你选了电子工程。第一节模电课画满了运放电路图，你盯着虚短虚断想了整节课——然后突然顿悟了。这种从混沌到清晰的瞬间让你上瘾。",
+    "noRandom": true,
+    "logType": "major",
+    "set": {
+      "profession": "理工生",
+      "major": "EE"
+    }
+  },
+  {
+    "id": 10521,
+    "text": "你选了机械工程。第一节制图课对着三视图画了一整天，投影关系终于对上的瞬间，你觉得世界都清晰了。以后的日子将和齿轮、轴承、有限元打交道。",
+    "noRandom": true,
+    "logType": "major",
+    "set": {
+      "profession": "理工生",
+      "major": "ME"
+    }
+  },
+  {
+    "id": 10522,
+    "text": "你选了生物工程。分子生物学课上教授讲中心法��，DNA→RNA→蛋白质，你觉得生命就是最精密的代码。实验室的移液枪将成为你最亲密的伙伴。",
+    "noRandom": true,
+    "logType": "major",
+    "set": {
+      "profession": "理工生",
+      "major": "BIO"
+    }
+  },
+  {
+    "id": 10523,
+    "text": "你选了医学。系主任在开学典礼上说：「从今天起你们的每一个决定都关乎生死。」你握紧了白大褂的衣角，知道这条路很长，但你愿意走。",
+    "noRandom": true,
+    "logType": "major",
+    "set": {
+      "profession": "医学生",
+      "major": "MED"
+    }
+  },
+  {
+    "id": 10524,
+    "text": "你选了法学。第一堂课教授用苏格拉底式提问法 cold call 你，全班两百人盯着你。你硬着头皮回答完，手心全是汗——但你知道这里是属于你的战场。",
+    "noRandom": true,
+    "logType": "major",
+    "set": {
+      "profession": "法学生",
+      "major": "法学"
+    }
+  },
+  {
+    "id": 10525,
+    "text": "你选了电影。第一节课放了一部黑泽明的片子，全班都在玩手机只有你看哭了。散场后教授找你聊了半小时——他说看得出来你是真的爱电影。",
+    "noRandom": true,
+    "logType": "major",
+    "set": {
+      "profession": "文科生",
+      "major": "电影"
+    }
+  },
+  {
+    "id": 10526,
+    "text": "你选了音乐。��乐课上教授让你唱了一首自选曲，听完说：「底子不错，但别急着表达感情，先把基本功磨好。」这条路需要天���，更需要时间。",
+    "noRandom": true,
+    "logType": "major",
+    "set": {
+      "profession": "文科生",
+      "major": "音乐"
+    }
+  },
   {
     "id": 10510,
     "text": "你做了第一份本地实习，加薪不多但写进了简历。",
     "include": "AGE=20&school!=无&HS==国际&SOC>=5",
-    "effect": { "SOC": 1, "PER": 1 },
+    "effect": {
+      "SOC": 1,
+      "PER": 1
+    },
     "happyDelta": 2
   },
   {
     "id": 10512,
     "text": "你加入了中国学生会，认识了一群志同道合的人。",
     "include": "AGE=20&school!=无&HS==国际&SOC>=4",
-    "effect": { "SOC": 1 },
+    "effect": {
+      "SOC": 1
+    },
     "happyDelta": 1
   },
   {
@@ -855,14 +1487,19 @@
     "text": "你被指控学术不端，差点被退学。",
     "include": "AGE=20&school!=无&HS==国际&INT<=4&PER<=3",
     "happyDelta": -5,
-    "effect": { "PER": -2 }
+    "effect": {
+      "PER": -2
+    }
   },
-
   {
     "id": 10601,
     "text": "大三，开始考虑读研还是直接找工作。",
     "include": "AGE=21&school!=无&HS==国际",
-    "branch": ["INT>=8?10602", "MNY<=3?10603", "?10604"]
+    "branch": [
+      "INT>=8?10602",
+      "MNY<=3?10603",
+      "?10604"
+    ]
   },
   {
     "id": 10602,
@@ -881,19 +1518,22 @@
     "text": "你打算先找工作，攒身份再说。",
     "noRandom": true
   },
-
   {
     "id": 10610,
     "text": "你拿到了大厂的暑期实习offer。",
     "include": "AGE=21&school!=无&HS==国际&INT>=7&SOC>=5",
     "happyDelta": 4,
-    "effect": { "MNY": 2 }
+    "effect": {
+      "MNY": 2
+    }
   },
   {
     "id": 10611,
     "text": "你被诊断出抑郁，开始看校内心理咨询。",
     "include": "AGE=21&school!=无&HS==国际&HAP<=2",
-    "effect": { "HLT": -1 },
+    "effect": {
+      "HLT": -1
+    },
     "happyDelta": 1
   },
   {
@@ -902,97 +1542,129 @@
     "include": "AGE=21&school!=无&HS==国际",
     "happyDelta": -2
   },
-
   {
     "id": 10701,
     "text": "毕业季到了。四年时光转瞬即逝，拨穗的那一刻你百感交集。接下来的路，该怎么走？",
     "include": "AGE=22&school!=无&HS==国际",
     "fixedMonth": 6,
     "choices": [
-      { "text": "申请研究生，继续深造", "next": 10706 },
-      { "text": "直接找工作，进入社会", "next": 10707 }
+      {
+        "text": "申请研究生，继续深造",
+        "next": 10706
+      },
+      {
+        "text": "直接找工作，进入社会",
+        "next": 10707
+      }
     ]
   },
   {
     "id": 10706,
     "noRandom": true,
     "text": "",
-    "branch": ["INT>=7?10703", "INT>=5?10708", "?10709"]
+    "branch": [
+      "INT>=7?10703",
+      "INT>=5?10708",
+      "?10709"
+    ]
   },
   {
     "id": 10707,
     "noRandom": true,
     "text": "",
-    "branch": ["(INT>=8)&(SOC>=6)?10702", "(MNY>=6)&(SOC>=4)?10704", "SOC>=4?10710", "?10705"]
+    "branch": [
+      "(INT>=8)&(SOC>=6)?10702",
+      "(MNY>=6)&(SOC>=4)?10704",
+      "SOC>=4?10710",
+      "?10705"
+    ]
   },
   {
     "id": 10702,
     "text": "你拿到了海外大厂的全职offer。签约那天你发了条朋友圈，点赞数破了纪录。",
     "noRandom": true,
     "happyDelta": 5,
-    "set": { "profession": "海外打工人" }
+    "set": {
+      "profession": "海外打工人"
+    }
   },
   {
     "id": 10703,
     "text": "你拿到了名校研究生offer，继续深造。导师是领域里的大牛，未来可期。",
     "noRandom": true,
     "happyDelta": 3,
-    "set": { "profession": "研究生" }
+    "set": {
+      "profession": "研究生"
+    }
   },
   {
     "id": 10708,
     "text": "你拿到了一所还不错的学校的研究生offer。虽然不是顶校，但至少还能继续学。",
     "noRandom": true,
     "happyDelta": 1,
-    "set": { "profession": "研究生" }
+    "set": {
+      "profession": "研究生"
+    }
   },
   {
     "id": 10709,
     "text": "研究生申请全军覆没。GPA不够、推荐信太弱……你不得不先Gap一年，重新准备。",
     "noRandom": true,
     "happyDelta": -3,
-    "set": { "profession": "Gap Year" }
+    "set": {
+      "profession": "Gap Year"
+    }
   },
   {
     "id": 10704,
     "text": "海外没找到理想的工作，但你回国后凭着海归背景进了一家不错的外企。",
     "noRandom": true,
     "happyDelta": 1,
-    "set": { "profession": "海归" }
+    "set": {
+      "profession": "海归"
+    }
   },
   {
     "id": 10710,
     "text": "你回国后找了份工作，公司不大但好歹是个起点。爸妈松了一口气。",
     "noRandom": true,
     "happyDelta": 0,
-    "set": { "profession": "打工人" }
+    "set": {
+      "profession": "打工人"
+    }
   },
   {
     "id": 10705,
     "text": "投了几百份简历，面试了几十家，全部石沉大海。你回国后窝在家里，不知道下一步该怎么走。",
     "noRandom": true,
     "happyDelta": -4,
-    "set": { "profession": "待业" }
+    "set": {
+      "profession": "待业"
+    }
   },
-
-
   {
-    "id": 11010,
+    "id": 11020,
     "text": "体制内高中生活开始了。班主任第一天就立规矩：手机上交，早自习6点半。",
     "include": "AGE=15&HS==体制内"
   },
   {
-    "id": 11011,
+    "id": 11021,
     "text": "月考排名贴在教室后面，你盯着自己的名字看了很久。",
     "include": "AGE=15&HS==体制内",
-    "branch": ["INT>=6?11012", "INT<=3?11013", "?11014"]
+    "branch": [
+      "INT>=6?11012",
+      "INT<=3?11013",
+      "?11014"
+    ]
   },
   {
     "id": 11012,
     "text": "年级前五十，老师在班会上表扬了你。",
     "noRandom": true,
     "happyDelta": 2,
-    "effect": { "INT": 1 }
+    "effect": {
+      "INT": 1
+    }
   },
   {
     "id": 11013,
@@ -1017,60 +1689,103 @@
     "text": "体育课被临时取消改上数学，全班哀嚎。",
     "include": "AGE=15&HS==体制内",
     "happyDelta": -1,
-    "effect": { "INT": 1 }
+    "effect": {
+      "INT": 1
+    }
   },
-
   {
     "id": 11101,
     "text": "高二了，文理分科（或选科）。你想了想自己一直以来感兴趣的东西，做出了选择。",
     "include": "AGE=16&HS==体制内",
-    "branch": ["hobby==tech?11105", "hobby==business?11108", "hobby==art?11106", "?11107"]
+    "branch": [
+      "hobby==tech?11105",
+      "hobby==science?11105",
+      "hobby==medical?11105",
+      "hobby==business?11108",
+      "hobby==law?11108",
+      "hobby==art?11106",
+      "hobby==film?11106",
+      "hobby==music?11109",
+      "?11107"
+    ]
   },
   {
     "id": 11102,
     "text": "你选了理科/物化生，班主任说你是好苗子。",
     "noRandom": true,
-    "set": { "major": "理科" },
-    "effect": { "INT": 1 },
+    "set": {
+      "major": "理科"
+    },
+    "effect": {
+      "INT": 1
+    },
     "happyDelta": 1
   },
   {
     "id": 11103,
     "text": "你选了文科/史政地，作文模版开始背了。",
     "noRandom": true,
-    "set": { "major": "文科" },
-    "effect": { "SOC": 1 }
+    "set": {
+      "major": "文科"
+    },
+    "effect": {
+      "SOC": 1
+    }
   },
   {
     "id": 11104,
     "text": "随大流选了理科，虽然物理已经开始听不懂了。",
     "noRandom": true,
-    "set": { "major": "理科" },
+    "set": {
+      "major": "理科"
+    },
     "happyDelta": -1
   },
   {
     "id": 11105,
     "noRandom": true,
     "text": "",
-    "branch": ["11102:70", "11103:30"]
+    "branch": [
+      "11102:70",
+      "11103:30"
+    ]
   },
   {
     "id": 11106,
     "noRandom": true,
     "text": "",
-    "branch": ["11102:30", "11103:70"]
+    "branch": [
+      "11102:30",
+      "11103:70"
+    ]
   },
   {
     "id": 11107,
     "noRandom": true,
     "text": "",
-    "branch": ["11102:55", "11103:35", "11104:10"]
+    "branch": [
+      "11102:55",
+      "11103:35",
+      "11104:10"
+    ]
   },
   {
     "id": 11108,
     "noRandom": true,
     "text": "",
-    "branch": ["11102:40", "11103:60"]
+    "branch": [
+      "11102:40",
+      "11103:60"
+    ]
+  },
+  {
+    "id": 11109,
+    "noRandom": true,
+    "text": "",
+    "branch": [
+      "11103:60",
+      "11102:40"
+    ]
   },
   {
     "id": 11110,
@@ -1082,7 +1797,10 @@
     "id": 11111,
     "text": "你报了一个数学竞赛辅导班，每周末都在刷题。",
     "include": "AGE=16&HS==体制内&INT>=7",
-    "effect": { "INT": 1, "PER": 1 },
+    "effect": {
+      "INT": 1,
+      "PER": 1
+    },
     "happyDelta": -1
   },
   {
@@ -1091,18 +1809,23 @@
     "include": "AGE=16&HS==体制内&PER<=3",
     "happyDelta": -2
   },
-
   {
     "id": 11201,
     "text": "高三了。高考倒计时牌挂在黑板上方，全班进入战时状态。",
     "include": "AGE=17&HS==体制内",
-    "branch": ["INT>=8&PER>=6?11202", "INT<=3|PER<=2?11203", "?11204"]
+    "branch": [
+      "INT>=8&PER>=6?11202",
+      "INT<=3|PER<=2?11203",
+      "?11204"
+    ]
   },
   {
     "id": 11202,
     "text": "你是年级尖子，老师说你冲985没问题。你每天刷题到凌晨一点。",
     "noRandom": true,
-    "effect": { "PER": 1 },
+    "effect": {
+      "PER": 1
+    },
     "happyDelta": -1
   },
   {
@@ -1110,7 +1833,9 @@
     "text": "你已经彻底摆烂了，上课睡觉下课打游戏。",
     "noRandom": true,
     "happyDelta": -1,
-    "effect": { "PER": -1 }
+    "effect": {
+      "PER": -1
+    }
   },
   {
     "id": 11204,
@@ -1122,13 +1847,17 @@
     "text": "百日誓师大会，全年级在操场上宣誓。你热血沸腾了三分钟。",
     "include": "AGE=17&HS==体制内",
     "happyDelta": 1,
-    "effect": { "PER": 1 }
+    "effect": {
+      "PER": 1
+    }
   },
   {
     "id": 11211,
     "text": "你妈给你炖了一个月的鸡汤，体重涨了五斤。",
     "include": "AGE=17&HS==体制内",
-    "effect": { "HLT": 1 },
+    "effect": {
+      "HLT": 1
+    },
     "happyDelta": 1
   },
   {
@@ -1137,7 +1866,6 @@
     "include": "AGE=17&HS==体制内&INT>=6",
     "happyDelta": 2
   },
-
   {
     "id": 11301,
     "text": "六月，高考成绩出来了。你颤抖着手打开查分网站……",
@@ -1155,29 +1883,40 @@
     "text": "你考进了985名校！录取通知书到的那天，全家放鞭炮庆祝。亲戚群里你成了「别人家的孩子」。",
     "noRandom": true,
     "happyDelta": 5,
-    "set": { "school": "985" },
-    "effect": { "SOC": 1 }
+    "set": {
+      "school": "985"
+    },
+    "effect": {
+      "SOC": 1
+    }
   },
   {
     "id": 11303,
     "text": "你被211大学录取了。录取通知书上印着学校的校徽，稳稳上岸。不是最好的，但也不差。",
     "noRandom": true,
     "happyDelta": 3,
-    "set": { "school": "211" }
+    "set": {
+      "school": "211"
+    }
   },
   {
     "id": 11304,
     "text": "你上了一所普通一本。录取通知书到的那天，你心情复杂。「努努力，还有机会！」你告诉自己。",
     "noRandom": true,
     "happyDelta": 1,
-    "set": { "school": "普本" }
+    "set": {
+      "school": "普本"
+    }
   },
   {
     "id": 11305,
     "text": "分数线都没过。你上了一所大专，学了个实用技术。毕业后进了工厂，每天看danking直播。三班倒的日子里你偶尔会想，如果当年再努力一点……但人生没有如果。你的留学梦到此结束了。",
     "noRandom": true,
     "happyDelta": -4,
-    "set": { "school": "大专", "profession": "蓝领" },
+    "set": {
+      "school": "大专",
+      "profession": "蓝领"
+    },
     "end": true
   },
   {
@@ -1191,21 +1930,30 @@
     "text": "开学前你在网上认识了未来室友，聊得还挺投机。",
     "include": "AGE=18&HS==体制内&school!=大专&SOC>=4",
     "happyDelta": 1,
-    "effect": { "SOC": 1 }
+    "effect": {
+      "SOC": 1
+    }
   },
-
   {
     "id": 11401,
     "text": "大一。你在国内大学报到了。室友来自五湖四海。",
     "include": "AGE=19&HS==体制内&school!=大专",
-    "set": { "profession": "本科生" },
-    "branch": ["SOC>=6?11402", "SOC<=3?11403", "?11404"]
+    "set": {
+      "profession": "本科生"
+    },
+    "branch": [
+      "SOC>=6?11402",
+      "SOC<=3?11403",
+      "?11404"
+    ]
   },
   {
     "id": 11402,
     "text": "你很快融入了宿舍和班级，成了社交达人。",
     "noRandom": true,
-    "effect": { "SOC": 2 },
+    "effect": {
+      "SOC": 2
+    },
     "happyDelta": 3
   },
   {
@@ -1225,70 +1973,97 @@
     "text": "你开始关注出国留学。室友说你疯了，但你默默收藏了一堆帖子。",
     "include": "AGE=19&HS==体制内&INT>=6",
     "happyDelta": 1,
-    "effect": { "INT": 1 }
+    "effect": {
+      "INT": 1
+    }
   },
   {
     "id": 11411,
     "text": "大学英语四级一次过了，你觉得自己行。",
     "include": "AGE=19&HS==体制内&INT>=5",
     "happyDelta": 1,
-    "effect": { "INT": 1 }
+    "effect": {
+      "INT": 1
+    }
   },
   {
     "id": 11412,
     "text": "你开始自学雅思/托福，图书馆里每天泡到闭馆。",
     "include": "AGE=19&HS==体制内&PER>=5&INT>=5",
-    "effect": { "INT": 1, "PER": 1 },
+    "effect": {
+      "INT": 1,
+      "PER": 1
+    },
     "happyDelta": -1
   },
   {
     "id": 11413,
     "text": "食堂饭菜太难吃了，你开始天天点外卖。体重飙升。",
     "include": "AGE=19&HS==体制内",
-    "effect": { "HLT": -1 },
+    "effect": {
+      "HLT": -1
+    },
     "happyDelta": -1
   },
-
   {
     "id": 11501,
     "text": "大二。你开始认真考虑未来：考研、出国、还是就业？",
     "include": "AGE=20&HS==体制内&school!=大专",
-    "branch": ["INT>=7&MNY>=4?11502", "INT>=7?11503", "MNY>=6?11504", "?11505"]
+    "branch": [
+      "INT>=7&MNY>=4?11502",
+      "INT>=7?11503",
+      "MNY>=6?11504",
+      "?11505"
+    ]
   },
   {
     "id": 11502,
     "text": "你决定出国读研，开始准备GRE/托福。",
     "noRandom": true,
-    "set": { "profession": "准留学生" },
-    "effect": { "INT": 1 },
+    "set": {
+      "profession": "准留学生"
+    },
+    "effect": {
+      "INT": 1
+    },
     "happyDelta": -1
   },
   {
     "id": 11503,
     "text": "你决定考研，目标是国内名校。",
     "noRandom": true,
-    "set": { "profession": "考研党" },
-    "effect": { "PER": 1 },
+    "set": {
+      "profession": "考研党"
+    },
+    "effect": {
+      "PER": 1
+    },
     "happyDelta": -1
   },
   {
     "id": 11504,
     "text": "家里有关系，你打算毕业后直接进家族企业。",
     "noRandom": true,
-    "set": { "profession": "少爷/千金" },
+    "set": {
+      "profession": "少爷/千金"
+    },
     "happyDelta": 2
   },
   {
     "id": 11505,
     "text": "你还是先混着吧，车到山前必有路。",
     "noRandom": true,
-    "set": { "profession": "迷茫大学生" }
+    "set": {
+      "profession": "迷茫大学生"
+    }
   },
   {
     "id": 11510,
     "text": "你报了留学中介，一套方案下来花了三万块。",
     "include": "AGE=20&HS==体制内&profession==准留学生&MNY>=4",
-    "effect": { "MNY": -1 },
+    "effect": {
+      "MNY": -1
+    },
     "happyDelta": -1
   },
   {
@@ -1296,7 +2071,9 @@
     "text": "你的GPA排到了年级前10%，保研有望。",
     "include": "AGE=20&HS==体制内&INT>=8&PER>=6",
     "happyDelta": 3,
-    "effect": { "INT": 1 }
+    "effect": {
+      "INT": 1
+    }
   },
   {
     "id": 11512,
@@ -1304,14 +2081,12 @@
     "include": "AGE=20&HS==体制内&profession==考研党",
     "happyDelta": -3
   },
-
   {
     "id": 11601,
     "text": "大三，申请季/考研冲刺。",
     "include": "AGE=21&HS==体制内&school!=大专",
     "branch": [
-      "profession==准留学生&INT>=8?11602",
-      "profession==准留学生&INT>=5?11603",
+      "profession==准留学生?11607",
       "profession==考研党&INT>=7&PER>=6?11604",
       "profession==考研党?11605",
       "?11606"
@@ -1322,47 +2097,84 @@
     "text": "你拿到了海外名校的研究生offer！还附带奖学金。",
     "noRandom": true,
     "happyDelta": 5,
-    "set": { "school": "海外硕", "profession": "准研究生", "overseas": 1 },
-    "effect": { "MNY": 1 }
+    "set": {
+      "school": "海外硕",
+      "profession": "准研究生",
+      "overseas": 1,
+      "country": "美国",
+      "schoolTier": "top"
+    },
+    "effect": {
+      "MNY": 1
+    }
   },
   {
     "id": 11603,
     "text": "你被一所海外普通大学录取读研。学费不便宜，但好歹出去了。",
     "noRandom": true,
     "happyDelta": 2,
-    "set": { "school": "海外硕", "profession": "准研究生", "overseas": 1 },
-    "effect": { "MNY": -1 }
+    "set": {
+      "school": "海外硕",
+      "profession": "准研究生",
+      "overseas": 1,
+      "country": "美国",
+      "schoolTier": "low"
+    },
+    "effect": {
+      "MNY": -1
+    }
   },
   {
     "id": 11604,
     "text": "考研上岸！你被国内985研究生录取。",
     "noRandom": true,
     "happyDelta": 4,
-    "set": { "profession": "研究生" },
-    "effect": { "INT": 1 }
+    "set": {
+      "profession": "研究生"
+    },
+    "effect": {
+      "INT": 1
+    }
   },
   {
     "id": 11605,
-    "text": "考研落榜。400万考生里，你是被刷下去的那一半。你开始海投简历，最终进了一家小公司做着996的工作。出国的念头渐渐被房租和KPI埋没了。",
+    "text": "考研落榜。400万考生里，你是被刷下的那一半。宿舍里你盯着天花板想了一晚上。",
     "noRandom": true,
-    "happyDelta": -4,
-    "set": { "profession": "打工人" },
-    "end": true
+    "happyDelta": -3,
+    "choices": [
+      {
+        "text": "咬牙转申留学，还来得及",
+        "showExpr": "MNY>=3",
+        "next": 11660
+      },
+      {
+        "text": "二战考研，再来一次",
+        "showExpr": "PER>=5",
+        "next": 11661
+      },
+      {
+        "text": "算了，找工作吧",
+        "next": 11662
+      }
+    ]
   },
   {
     "id": 11606,
-    "text": "你既没考研也没出国，在招聘网站上投了三百份简历。最后进了一家还算体面的公司，过上了朝九晚六的生活。留学？那是另一个平行宇宙的事了。",
+    "text": "你既没考研也没准备出国，整天在宿舍里刷手机。日子一天天过去，你开始焦虑了。",
     "noRandom": true,
-    "set": { "profession": "上班族" },
     "happyDelta": -2,
-    "end": true
+    "set": {
+      "profession": "迷茫大学生"
+    }
   },
   {
     "id": 11610,
     "text": "签证顺利拿到，你订好了机票。妈妈开始天天叮嘱你注意安全。",
     "include": "AGE=21&HS==体制内&school==海外硕",
     "happyDelta": 1,
-    "effect": { "PER": 1 }
+    "effect": {
+      "PER": 1
+    }
   },
   {
     "id": 11611,
@@ -1370,33 +2182,641 @@
     "include": "AGE=21&HS==体制内&profession==研究生",
     "happyDelta": -2
   },
-
   {
     "id": 11701,
     "text": "本科毕业了。你拍了毕业照，和室友喝了最后一顿酒。明天起，大家各奔东西。",
     "include": "AGE=22&HS==体制内",
     "fixedMonth": 6,
-    "branch": ["profession==准研究生&overseas==1?11702", "profession==研究生?11703", "?11704"]
+    "branch": [
+      "profession==准研究生&overseas==1?11702",
+      "profession==研究生?11703",
+      "?11704"
+    ]
   },
   {
     "id": 11702,
     "text": "你拖着两个大箱子走进了机场。妈妈在安检口哭了，爸爸拍了拍你的肩膀说「好好照顾自己」。飞机起飞的那一刻，你的留学生活正式开始了。",
     "noRandom": true,
     "happyDelta": 2,
-    "set": { "profession": "海外研究生" },
-    "effect": { "PER": 1 }
+    "set": {
+      "profession": "海外研究生"
+    },
+    "effect": {
+      "PER": 1
+    }
   },
   {
     "id": 11703,
     "text": "研一的日子比想象中更忙。导师的课题压得你喘不过气来，但至少方向是对的。",
     "noRandom": true,
     "happyDelta": 1,
-    "set": { "profession": "研究生" }
+    "set": {
+      "profession": "研究生"
+    }
   },
   {
     "id": 11704,
     "text": "你收拾好行李离开了住了四年的宿舍。走廊里空荡荡的，你的大学时代结束了。",
     "noRandom": true,
     "happyDelta": -1
+  },
+  {
+    "id": 11520,
+    "text": "中介根据你的本科背景和预算，推荐了几个研究生申请方向。你开始做功课：到底去哪个国家读硕？",
+    "include": "AGE=20&HS==体制内&profession==准留学生",
+    "fixedMonth": 10,
+    "pickN": 4,
+    "choices": [
+      {
+        "text": "美国（2年制，贵，但含金量高）",
+        "showExpr": "(MNY>=4)&(INT>=4)",
+        "set": {
+          "countryIntent": "美国"
+        }
+      },
+      {
+        "text": "英国（1年硕，快，G5有面子）",
+        "showExpr": "(MNY>=3)&(INT>=3)",
+        "set": {
+          "countryIntent": "英国"
+        }
+      },
+      {
+        "text": "澳洲（好移民，阳光沙滩）",
+        "set": {
+          "countryIntent": "澳洲"
+        }
+      },
+      {
+        "text": "欧洲（学费便宜甚至免费）",
+        "set": {
+          "countryIntent": "欧洲"
+        }
+      },
+      {
+        "text": "香港（离家近，1年制）",
+        "showExpr": "INT>=4",
+        "set": {
+          "countryIntent": "香港"
+        }
+      },
+      {
+        "text": "日本（学费低，需要学日语）",
+        "set": {
+          "countryIntent": "日本"
+        }
+      },
+      {
+        "text": "新加坡（亚洲顶级，极卷）",
+        "showExpr": "INT>=6",
+        "set": {
+          "countryIntent": "新加坡"
+        }
+      }
+    ]
+  },
+  {
+    "id": 11607,
+    "noRandom": true,
+    "branch": [
+      "countryIntent==英国&INT>=8?11630",
+      "countryIntent==英国&INT>=5?11631",
+      "countryIntent==英国?11632",
+      "countryIntent==澳洲&INT>=7?11634",
+      "countryIntent==澳洲&INT>=4?11635",
+      "countryIntent==澳洲?11636",
+      "countryIntent==欧洲&INT>=8?11638",
+      "countryIntent==欧洲&INT>=5?11639",
+      "countryIntent==欧洲?11640",
+      "countryIntent==香港&INT>=8?11642",
+      "countryIntent==香港&INT>=5?11643",
+      "countryIntent==香港?11644",
+      "countryIntent==日本&INT>=8?11646",
+      "countryIntent==日本&INT>=5?11647",
+      "countryIntent==日本?11648",
+      "countryIntent==新加坡&INT>=8?11650",
+      "countryIntent==新加坡&INT>=6?11651",
+      "countryIntent==新加坡?11652",
+      "INT>=8?11620",
+      "INT>=5?11621",
+      "?11622"
+    ]
+  },
+  {
+    "id": 11620,
+    "text": "你拿到了美国Top20名校的研究生offer！还附带RA奖学金。家里人激动得不行。",
+    "noRandom": true,
+    "happyDelta": 5,
+    "set": {
+      "school": "海外硕",
+      "schoolTier": "top",
+      "country": "美国",
+      "profession": "准研究生",
+      "overseas": 1
+    },
+    "effect": {
+      "MNY": 1
+    }
+  },
+  {
+    "id": 11621,
+    "text": "你被美国一所Top50大学的研究生项目录取了。不是最顶尖的，但在美国读硕，履历不会差。",
+    "noRandom": true,
+    "happyDelta": 3,
+    "set": {
+      "school": "海外硕",
+      "schoolTier": "mid",
+      "country": "美国",
+      "profession": "准研究生",
+      "overseas": 1
+    }
+  },
+  {
+    "id": 11622,
+    "text": "你被美国一所普通大学的研究生项目录取。学费不便宜，但好歹出去了。",
+    "noRandom": true,
+    "happyDelta": 1,
+    "set": {
+      "school": "海外硕",
+      "schoolTier": "low",
+      "country": "美国",
+      "profession": "准研究生",
+      "overseas": 1
+    },
+    "effect": {
+      "MNY": -1
+    }
+  },
+  {
+    "id": 11630,
+    "text": "你拿到了G5的硕士offer！一年制虽短，但含金量拉满。朋友圈炸了。",
+    "noRandom": true,
+    "happyDelta": 5,
+    "set": {
+      "school": "海外硕",
+      "schoolTier": "top",
+      "country": "英国",
+      "profession": "准研究生",
+      "overseas": 1
+    },
+    "effect": {
+      "MNY": 1
+    }
+  },
+  {
+    "id": 11631,
+    "text": "你被一所罗素集团大学的硕士项目录取。一年后回来也是海归金招牌。",
+    "noRandom": true,
+    "happyDelta": 3,
+    "set": {
+      "school": "海外硕",
+      "schoolTier": "mid",
+      "country": "英国",
+      "profession": "准研究生",
+      "overseas": 1
+    }
+  },
+  {
+    "id": 11632,
+    "text": "你被英国一所普通大学录取读硕。朋友圈有人悄悄议论「水硕」，但你不在乎。",
+    "noRandom": true,
+    "happyDelta": 1,
+    "set": {
+      "school": "海外硕",
+      "schoolTier": "low",
+      "country": "英国",
+      "profession": "准研究生",
+      "overseas": 1
+    },
+    "effect": {
+      "MNY": -1
+    }
+  },
+  {
+    "id": 11634,
+    "text": "你拿到了澳洲八大的硕士offer！墨尔本还是悉尼，你开始纠结。",
+    "noRandom": true,
+    "happyDelta": 4,
+    "set": {
+      "school": "海外硕",
+      "schoolTier": "top",
+      "country": "澳洲",
+      "profession": "准研究生",
+      "overseas": 1
+    }
+  },
+  {
+    "id": 11635,
+    "text": "你被一所澳洲普通公立大学录取。学费还行，关键是移民加分。",
+    "noRandom": true,
+    "happyDelta": 2,
+    "set": {
+      "school": "海外硕",
+      "schoolTier": "mid",
+      "country": "澳洲",
+      "profession": "准研究生",
+      "overseas": 1
+    }
+  },
+  {
+    "id": 11636,
+    "text": "你被澳洲一所私立学校录取，学费贵但门槛低。先出去再说。",
+    "noRandom": true,
+    "happyDelta": 0,
+    "set": {
+      "school": "海外硕",
+      "schoolTier": "low",
+      "country": "澳洲",
+      "profession": "准研究生",
+      "overseas": 1
+    },
+    "effect": {
+      "MNY": -1
+    }
+  },
+  {
+    "id": 11638,
+    "text": "你被欧洲顶尖大学的硕士项目录取！学费几乎为零，爸妈感动哭了。",
+    "noRandom": true,
+    "happyDelta": 4,
+    "set": {
+      "school": "海外硕",
+      "schoolTier": "top",
+      "country": "欧洲",
+      "profession": "准研究生",
+      "overseas": 1
+    },
+    "effect": {
+      "MNY": 1
+    }
+  },
+  {
+    "id": 11639,
+    "text": "你被欧洲一所公立大学录取。学费便宜，但要适应小语种环境。",
+    "noRandom": true,
+    "happyDelta": 2,
+    "set": {
+      "school": "海外硕",
+      "schoolTier": "mid",
+      "country": "欧洲",
+      "profession": "准研究生",
+      "overseas": 1
+    }
+  },
+  {
+    "id": 11640,
+    "text": "你被欧洲一所普通大学录取读硕。学费低是真的低，但排名也是真的低。",
+    "noRandom": true,
+    "happyDelta": 0,
+    "set": {
+      "school": "海外硕",
+      "schoolTier": "low",
+      "country": "欧洲",
+      "profession": "准研究生",
+      "overseas": 1
+    }
+  },
+  {
+    "id": 11642,
+    "text": "你拿到了港三（港大/科大/中大）的硕士offer！一年制，离家近，性价比拉满。",
+    "noRandom": true,
+    "happyDelta": 4,
+    "set": {
+      "school": "海外硕",
+      "schoolTier": "top",
+      "country": "香港",
+      "profession": "准研究生",
+      "overseas": 1
+    }
+  },
+  {
+    "id": 11643,
+    "text": "你被香港一所不错的大学录取读硕。虽然不是港三，但也是体面的学校。",
+    "noRandom": true,
+    "happyDelta": 2,
+    "set": {
+      "school": "海外硕",
+      "schoolTier": "mid",
+      "country": "香港",
+      "profession": "准研究生",
+      "overseas": 1
+    }
+  },
+  {
+    "id": 11644,
+    "text": "你被香港一所普通大学的硕士项目录取。学费不算太贵，先去再说。",
+    "noRandom": true,
+    "happyDelta": 1,
+    "set": {
+      "school": "海外硕",
+      "schoolTier": "low",
+      "country": "香港",
+      "profession": "准研究生",
+      "overseas": 1
+    }
+  },
+  {
+    "id": 11646,
+    "text": "你拿到了日本帝大（东大/京大/阪大）的研究生内诺！导师亲自发的邮件。",
+    "noRandom": true,
+    "happyDelta": 4,
+    "set": {
+      "school": "海外硕",
+      "schoolTier": "top",
+      "country": "日本",
+      "profession": "准研究生",
+      "overseas": 1
+    }
+  },
+  {
+    "id": 11647,
+    "text": "你被早庆的大学院录取了。虽然日语还不太利索，但边读边学。",
+    "noRandom": true,
+    "happyDelta": 2,
+    "set": {
+      "school": "海外硕",
+      "schoolTier": "mid",
+      "country": "日本",
+      "profession": "准研究生",
+      "overseas": 1
+    }
+  },
+  {
+    "id": 11648,
+    "text": "你被日本一所普通私立大学录取。学费便宜，还能打工。",
+    "noRandom": true,
+    "happyDelta": 1,
+    "set": {
+      "school": "海外硕",
+      "schoolTier": "low",
+      "country": "日本",
+      "profession": "准研究生",
+      "overseas": 1
+    }
+  },
+  {
+    "id": 11650,
+    "text": "你拿到了NUS/NTU的硕士offer！亚洲Top2，简历上最亮眼的一行。",
+    "noRandom": true,
+    "happyDelta": 5,
+    "set": {
+      "school": "海外硕",
+      "schoolTier": "top",
+      "country": "新加坡",
+      "profession": "准研究生",
+      "overseas": 1
+    },
+    "effect": {
+      "MNY": 1
+    }
+  },
+  {
+    "id": 11651,
+    "text": "你被SMU录取读硕。商科氛围浓厚，新加坡的就业市场等着你。",
+    "noRandom": true,
+    "happyDelta": 3,
+    "set": {
+      "school": "海外硕",
+      "schoolTier": "mid",
+      "country": "新加坡",
+      "profession": "准研究生",
+      "overseas": 1
+    }
+  },
+  {
+    "id": 11652,
+    "text": "你被新加坡一所普通私校录取。不是NUS/NTU，但好歹在新加坡。",
+    "noRandom": true,
+    "happyDelta": 1,
+    "set": {
+      "school": "海外硕",
+      "schoolTier": "low",
+      "country": "新加坡",
+      "profession": "准研究生",
+      "overseas": 1
+    }
+  },
+  {
+    "id": 11660,
+    "text": "你开始疯狂刷雅思/托福，同时联系中介准备材料。虽然比别人晚了一年，但你拼了。",
+    "noRandom": true,
+    "set": {
+      "profession": "准留学生"
+    },
+    "effect": {
+      "PER": 1,
+      "INT": 1
+    },
+    "happyDelta": -1
+  },
+  {
+    "id": 11661,
+    "text": "你在出租屋里租了个小桌子，开始第二轮备考。窗外是别人的毕业季，你埋头刷题。",
+    "noRandom": true,
+    "set": {
+      "profession": "二战考研"
+    },
+    "effect": {
+      "PER": 2
+    },
+    "happyDelta": -2
+  },
+  {
+    "id": 11662,
+    "text": "你开始海投简历。三个月后进了一家小公司，做着996的工作。出国的念头渐渐被房租和KPI埋没了。",
+    "noRandom": true,
+    "set": {
+      "profession": "打工人"
+    },
+    "happyDelta": -2,
+    "end": true
+  },
+  {
+    "id": 11670,
+    "text": "中介帮你梳理了一遍条件，推荐了几个方向。虽然起步晚了，但你的本科成绩还算能打。",
+    "include": "AGE=22&HS==体制内&profession==准留学生&school!=海外硕",
+    "fixedMonth": 3,
+    "pickN": 4,
+    "choices": [
+      {
+        "text": "美国（2年制，贵，但含金量高）",
+        "showExpr": "(MNY>=4)&(INT>=4)",
+        "set": {
+          "countryIntent": "美国"
+        }
+      },
+      {
+        "text": "英国（1年硕，快，性价比高）",
+        "showExpr": "(MNY>=3)&(INT>=3)",
+        "set": {
+          "countryIntent": "英国"
+        }
+      },
+      {
+        "text": "澳洲（好移民，阳光沙滩）",
+        "set": {
+          "countryIntent": "澳洲"
+        }
+      },
+      {
+        "text": "欧洲（学费便宜甚至免费）",
+        "set": {
+          "countryIntent": "欧洲"
+        }
+      },
+      {
+        "text": "香港（离家近，1年制）",
+        "showExpr": "INT>=4",
+        "set": {
+          "countryIntent": "香港"
+        }
+      },
+      {
+        "text": "日本（学费低，需要学日语）",
+        "set": {
+          "countryIntent": "日本"
+        }
+      },
+      {
+        "text": "新加坡（亚洲顶级，极卷）",
+        "showExpr": "INT>=6",
+        "set": {
+          "countryIntent": "新加坡"
+        }
+      }
+    ]
+  },
+  {
+    "id": 11671,
+    "text": "比别人晚了一年，但申请季的结果终于来了……",
+    "include": "AGE=22&HS==体制内&profession==准留学生&school!=海外硕",
+    "fixedMonth": 6,
+    "branch": [
+      "?11607"
+    ]
+  },
+  {
+    "id": 11675,
+    "text": "二战成绩出来了。你颤抖着手打开查分网站……",
+    "include": "AGE=22&HS==体制内&profession==二战考研",
+    "fixedMonth": 3,
+    "branch": [
+      "INT>=8&PER>=7?11676",
+      "INT>=6&PER>=5?11677",
+      "?11678"
+    ]
+  },
+  {
+    "id": 11676,
+    "text": "二战上岸！你被985研究生录取了。一年的苦没有白吃。",
+    "noRandom": true,
+    "happyDelta": 5,
+    "set": {
+      "profession": "研究生"
+    },
+    "effect": {
+      "INT": 1,
+      "PER": 1
+    }
+  },
+  {
+    "id": 11677,
+    "text": "分数刚好压线，你被调剂到了一所普通高校的研究生。不完美，但至少上岸了。",
+    "noRandom": true,
+    "happyDelta": 2,
+    "set": {
+      "profession": "研究生"
+    }
+  },
+  {
+    "id": 11678,
+    "text": "又落榜了。两年青春换来两张落榜通知。你终于接受了现实，开始找工作。",
+    "noRandom": true,
+    "happyDelta": -4,
+    "set": {
+      "profession": "打工人"
+    },
+    "effect": {
+      "HAP": -2
+    },
+    "end": true
+  },
+  {
+    "id": 11680,
+    "text": "刷朋友圈看到高中同学在伦敦街头拍的照片，配文「人生真的要多出去看看」。你盯着屏幕想了很久。室友说：「现在申还来得及，英澳那边 rolling 录取，deadline 还没截。」",
+    "include": "AGE=22&HS==体制内&profession==迷茫大学生",
+    "fixedMonth": 10,
+    "choices": [
+      {
+        "text": "试试吧，死马当活马医",
+        "showExpr": "MNY>=2",
+        "next": 11681
+      },
+      {
+        "text": "算了，还是老老实实找工作",
+        "next": 11682
+      }
+    ]
+  },
+  {
+    "id": 11681,
+    "text": "你花了两周速成雅思，中介帮你赶工了一份文书。虽然仓促，但至少递出去了。",
+    "noRandom": true,
+    "set": {
+      "profession": "准留学生"
+    },
+    "effect": {
+      "PER": 1
+    },
+    "happyDelta": 1
+  },
+  {
+    "id": 11682,
+    "text": "你在招聘网站上投了三百份简历。最后进了一家还算体面的公司，过上了朝九晚六的生活。留学？那是另一个平行宇宙的事了。",
+    "noRandom": true,
+    "set": {
+      "profession": "上班族"
+    },
+    "happyDelta": -1,
+    "end": true
+  },
+  {
+    "id": 11690,
+    "text": "导师把你叫到办公室，说他有个海外合作项目——对方学校可以联合培养，出去一年，学费对方出。「机会难得，你考虑一下。」",
+    "include": "AGE=23&HS==体制内&profession==研究生&INT>=6",
+    "choices": [
+      {
+        "text": "去！这种机会不能错过",
+        "next": 11691
+      },
+      {
+        "text": "不去了，在国内安心毕业",
+        "next": 11692
+      }
+    ]
+  },
+  {
+    "id": 11691,
+    "text": "你办好了签证，拖着行李箱走进了异国的实验室。导师的合作伙伴人很好，给你安排了独立的课题。你的世界一下子打开了。",
+    "noRandom": true,
+    "set": {
+      "overseas": 1,
+      "country": "美国",
+      "profession": "联培研究生"
+    },
+    "effect": {
+      "INT": 2,
+      "SOC": 1
+    },
+    "happyDelta": 3
+  },
+  {
+    "id": 11692,
+    "text": "你婉拒了导师。他有点失望但表示理解。你继续在实验室埋头做课题，朝着按时毕业的目标推进。",
+    "noRandom": true,
+    "effect": {
+      "PER": 1
+    },
+    "happyDelta": 0
   }
 ]

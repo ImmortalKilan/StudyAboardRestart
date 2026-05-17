@@ -929,6 +929,50 @@ body.in-game .left-panel {
 .log-entry.log-major .log-text {
   color: #7ab8e0 !important;
 }
+.log-entry.log-easter {
+  position: relative;
+  border: 1px solid rgba(60, 60, 60, 0.8);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin: 6px 0;
+  background: linear-gradient(135deg, #0d0d0d 0%, #1a1a2e 25%, #0d0d0d 50%, #1a0d1a 75%, #0d0d0d 100%);
+  background-size: 200% 200%;
+  animation: easter-shimmer 3s ease infinite;
+  box-shadow:
+    0 0 8px rgba(120, 60, 200, 0.3),
+    0 0 16px rgba(60, 180, 200, 0.15),
+    inset 0 0 12px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+}
+.log-entry.log-easter::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  padding: 1px;
+  background: linear-gradient(135deg, #ff006e, #8338ec, #3a86ff, #06d6a0, #ffbe0b, #ff006e);
+  background-size: 300% 300%;
+  animation: easter-border 4s linear infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+.log-entry.log-easter .log-text {
+  color: #e8e0f0 !important;
+  text-shadow: 0 0 6px rgba(160, 100, 255, 0.4);
+}
+.log-entry.log-easter .log-tag {
+  color: #c0a0ff;
+}
+@keyframes easter-shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+@keyframes easter-border {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
 .log-entry.log-ending {
   position: relative;
   border: 1px solid rgba(224, 100, 80, 0.55);

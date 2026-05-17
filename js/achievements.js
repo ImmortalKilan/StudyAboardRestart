@@ -54,6 +54,16 @@ export const ACHIEVEMENTS = [
   { id: 'end_athlete',      name: '体坛之巅',     icon: '🏆', rarity: 'epic',      cat: '终局',   desc: '成为了职业体育的传奇' },
   { id: 'end_thief',        name: '幽灵评级',     icon: '👻', rarity: 'epic',      cat: '终局',   desc: '达到了影子协会最高评级' },
   { id: 'end_hogwarts',     name: '救世之星',     icon: '⚡', rarity: 'legendary', cat: '终局',   desc: '用老魔杖击败了伏地魔' },
+
+  // ── 跨界彩蛋 ──────────────────────────────────────────────────────────────
+  { id: 'easter_rhythm',     name: '节奏大师',     icon: '🎹', rarity: 'epic',      cat: '彩蛋',   desc: '音乐爱好者×CS×日本：做出了上架的音游' },
+  { id: 'easter_viral',      name: '病毒式传播',   icon: '📹', rarity: 'epic',      cat: '彩蛋',   desc: '电影爱好者×商科×美国：校园纪录片爆红' },
+  { id: 'easter_novelist',   name: '跨界作家',     icon: '📖', rarity: 'epic',      cat: '彩蛋',   desc: '法律爱好者×文艺×英国：法律小说出版' },
+  { id: 'easter_coral',      name: '科学影像师',   icon: '🪸', rarity: 'epic',      cat: '彩蛋',   desc: '科学爱好者×电影×澳洲：珊瑚纪录片被BBC转发' },
+  { id: 'easter_synth',      name: '声音炼金师',   icon: '🔊', rarity: 'epic',      cat: '彩蛋',   desc: '音乐爱好者×理科×欧洲：物理建模合成器走红' },
+  { id: 'easter_medtech',    name: '赛博华佗',     icon: '🧬', rarity: 'epic',      cat: '彩蛋',   desc: '医学爱好者×CS×新加坡：AI辅助诊断获奖' },
+  { id: 'easter_courtroom',  name: '模拟大律师',   icon: '⚖️', rarity: 'epic',      cat: '彩蛋',   desc: '法律爱好者×商科×香港：模拟庭审全场最佳' },
+  { id: 'easter_nomad',      name: '数字游牧',     icon: '🌍', rarity: 'epic',      cat: '彩蛋',   desc: '科技爱好者×商科×欧洲：远程创业走遍三国' },
 ];
 
 let _unlocked = new Set();
@@ -180,7 +190,7 @@ function _renderWall() {
   const countEl = document.getElementById('ach-wall-count');
   if (countEl) countEl.textContent = `${_unlocked.size} / ${ACHIEVEMENTS.length}`;
 
-  const cats = ['里程碑', '感情', '剧情', '终局'];
+  const cats = ['里程碑', '感情', '剧情', '终局', '彩蛋'];
   for (const cat of cats) {
     const items = ACHIEVEMENTS.filter(a => a.cat === cat);
     if (!items.length) continue;

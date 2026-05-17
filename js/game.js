@@ -25,7 +25,13 @@ const LEGENDARY_ENDINGS = new Set([
   81090, // Poker God
   86105, 86120, 86136, // Athlete Top Tier (NBA状元, World Cup Champion, Frisbee Worlds Champion)
   87190, // Thief Ghost Rating
-  61611 // Hogwarts: defeated Voldemort with Elder Wand
+  61611, // Hogwarts: defeated Voldemort with Elder Wand
+  48190, 48191, // EE: 半导体教父, 芯片独角兽
+  48290, 48291, // ME: 总工程师, 智造独角兽
+  48390, 48391, // BIO: 新药教父, 生物医药独角兽
+  48590, 48591, // MED: 科室主任, 新术式命名
+  48790, 48791, // LAW: 管理合伙人, 首席大检察官
+  48990, 48991  // Film: 金棕榈独立导演, 百亿票房商业导演
 ]);
 
 const GOOD_ENDINGS = new Set([
@@ -34,7 +40,13 @@ const GOOD_ENDINGS = new Set([
   84091, // Fitness Influencer
   85091, 85092, // Chef 2-Star / 1-Star
   90050, 90052, 90054, 90056, // Late dropout good endings
-  61612, 61613 // Hogwarts: defeated Voldemort (patronus / resurrection)
+  61612, 61613, // Hogwarts: defeated Voldemort (patronus / resurrection)
+  48192, // EE: 转码逆袭
+  48292, // ME: 转码逆袭
+  48392, // BIO: 生信逆袭
+  48592, // MED: 受人尊敬的主治
+  48792, // LAW: 知名人权律师
+  48992  // Film: 奥斯卡编剧
 ]);
 
 function deriveRealm(cul) {
@@ -172,8 +184,8 @@ const STORYLINE_CFG = {
       { cond: s => s.MNY <= -2, event: 82095 },
     ],
     progressChecks: [
-      { cond: s => s.SOC >= 23 && s.MNY >= 18, event: 82090 },
-      { cond: s => s.age >= 30, event: 82096 },
+      { cond: s => (s.age - s.storylineStart) >= 2 && s.SOC >= 30 && s.MNY >= 10, event: 82090 },
+      { cond: s => (s.age - s.storylineStart) >= 2, event: 82096 },
     ],
   },
   poker: {
@@ -1169,14 +1181,21 @@ function maybeGraduateFromSchool() {
 function assignFallbackMajor() {
   if (state.major) return;
   const options = state.hsType === '体制内'
-    ? [['理科', 55], ['文科', 45]]
-    : [['CS', 40], ['商科', 35], ['文艺', 25]];
+    ? [['理科', 30], ['文科', 30], ['MED', 20], ['法学', 20]]
+    : [['CS', 10], ['商科', 10], ['文艺', 10], ['EE', 10], ['ME', 10], ['BIO', 10], ['MED', 10], ['法学', 10], ['电影', 10], ['音乐', 10]];
   for (const opt of options) {
-    if (opt[0] === 'CS' && state.INT >= 6) opt[1] += 20;
-    if (opt[0] === '商科' && state.MNY >= 6) opt[1] += 20;
-    if (opt[0] === '文艺' && (state.APP >= 5 || state.SOC >= 6)) opt[1] += 15;
-    if (opt[0] === '理科' && state.INT >= 6) opt[1] += 20;
-    if (opt[0] === '文科' && state.SOC >= 6) opt[1] += 15;
+    if (opt[0] === 'CS' && state.INT >= 6) opt[1] += 15;
+    if (opt[0] === '商科' && state.MNY >= 6) opt[1] += 15;
+    if (opt[0] === '文艺' && (state.APP >= 5 || state.SOC >= 6)) opt[1] += 10;
+    if (opt[0] === '理科' && state.INT >= 6) opt[1] += 15;
+    if (opt[0] === '文科' && state.SOC >= 6) opt[1] += 10;
+    if (opt[0] === 'EE' && state.INT >= 6) opt[1] += 15;
+    if (opt[0] === 'ME' && state.INT >= 5 && state.PER >= 5) opt[1] += 15;
+    if (opt[0] === 'BIO' && state.INT >= 6) opt[1] += 15;
+    if (opt[0] === 'MED' && state.INT >= 7 && state.PER >= 6) opt[1] += 15;
+    if (opt[0] === '法学' && state.INT >= 6 && state.SOC >= 5) opt[1] += 15;
+    if (opt[0] === '电影' && state.APP >= 5) opt[1] += 10;
+    if (opt[0] === '音乐' && (state.APP >= 5 || state.PER >= 6)) opt[1] += 10;
   }
   const total = options.reduce((s, o) => s + o[1], 0);
   let r = Math.random() * total;
@@ -1497,6 +1516,16 @@ function _checkEventAchievements(ev) {
   if (ev.end && state.storyline === 'xianxia' && (state.cul || 0) >= 1000) {
     unlockAchievement('end_xianxia');
   }
+
+  // Easter egg combo achievements
+  if (id === 49640) unlockAchievement('easter_rhythm');
+  if (id === 49641) unlockAchievement('easter_viral');
+  if (id === 49642) unlockAchievement('easter_novelist');
+  if (id === 49643) unlockAchievement('easter_coral');
+  if (id === 49644) unlockAchievement('easter_synth');
+  if (id === 49645) unlockAchievement('easter_medtech');
+  if (id === 49646) unlockAchievement('easter_courtroom');
+  if (id === 49647) unlockAchievement('easter_nomad');
 }
 
 function pushLog(text, typeOverride) {
