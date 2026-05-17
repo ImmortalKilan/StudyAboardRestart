@@ -2414,6 +2414,11 @@ function render() {
     const isHogwarts = state.storyline === 'hogwarts';
 
     const schoolBox = $('school-box');
+
+    if (state.school && state.school !== '无') {
+      schoolBox.style.display = '';
+      $('school-display').textContent = state.country ? `${state.school} · ${state.country}` : state.school;
+    } else {
     const majorBox = $('major-box');
     const profBox = $('profession-box');
     const houseBox = $('house-box');
