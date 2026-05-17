@@ -2432,6 +2432,8 @@ function render() {
     const isHogwarts = state.storyline === 'hogwarts';
 
     const schoolBox = $('school-box');
+
+
     const majorBox = $('major-box');
     const profBox = $('profession-box');
     const houseBox = $('house-box');
