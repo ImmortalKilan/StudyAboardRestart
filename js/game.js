@@ -128,8 +128,8 @@ const STORYLINE_CFG = {
     gracePeriod: 12,
     eventRate: 0.8,
     deathChecks: [
-      { cond: s => (s.HLT || 0) <= 2, event: 85080 },
-      { cond: s => (s.HAP || 0) <= 2, event: 85081 },
+      { cond: s => (s.HLT || 0) <= 0, event: 85080 },
+      { cond: s => (s.HAP || 0) <= 0, event: 85081 },
       { cond: s => (s.SOC || 0) <= 0, event: 85095 },
     ],
     progressChecks: [],
@@ -138,8 +138,8 @@ const STORYLINE_CFG = {
     gracePeriod: 12,
     eventRate: 0.8,
     deathChecks: [
-      { cond: s => (s.HLT || 0) <= 2, event: 86151 },
-      { cond: s => (s.HAP || 0) <= 2, event: 86152 },
+      { cond: s => (s.HLT || 0) <= 0, event: 86151 },
+      { cond: s => (s.HAP || 0) <= 0, event: 86152 },
       { cond: s => (s.SOC || 0) <= 0, event: 86153 },
     ],
     progressChecks: [],
@@ -2272,7 +2272,9 @@ function renderTalentSelect(talents) {
         state.talentsPicked.push(t);
         el.classList.add('picked');
       }
-      $('talent-confirm').disabled = state.talentsPicked.length !== 3;
+      const cnt = state.talentsPicked.length;
+      $('talent-confirm').disabled = cnt !== 3;
+      $('talent-confirm').textContent = cnt === 3 ? '确认天赋 →' : `确认天赋（${cnt}/3）`;
       if (typeof updateCreationAvatar === 'function') updateCreationAvatar();
     });
     list.appendChild(el);
@@ -2886,6 +2888,7 @@ function render() {
 
   updateAutoButtons();
   if (_mobileStatsStripUpdate) _mobileStatsStripUpdate();
+  if (_mobileStatsGridUpdate) _mobileStatsGridUpdate();
 }
 
 function updateAutoButtons() {
@@ -3306,6 +3309,7 @@ function showScreen(id) {
 }
 
 let _mobileStatsStripUpdate = null;
+let _mobileStatsGridUpdate = null;
 
 function initStripDrag(el) {
   let isDown = false, startX, scrollLeft;
@@ -3335,12 +3339,25 @@ function rearrangeMobileLayout(entering) {
   if (!leftPanel || !rightHead || !gameLayout) return;
 
   if (entering && isMobile) {
-    leftPanel.insertBefore(rightHead, leftPanel.children[1]);
+    // 创建属性 grid（替代原来的按钮区，放在头像右侧）
+    if (!leftPanel.querySelector('.mobile-stats-grid')) {
+      const grid = document.createElement('div');
+      grid.className = 'mobile-stats-grid';
+      leftPanel.appendChild(grid);
+      _mobileStatsGridUpdate = () => updateMobileStatsGrid(grid);
+      _mobileStatsGridUpdate();
+    }
 
+    // 创建底部条，并把按钮区(right-head)移进来
     if (!gameLayout.querySelector('.mobile-stats-strip')) {
       const strip = document.createElement('div');
       strip.className = 'mobile-stats-strip';
       gameLayout.insertBefore(strip, rightPanel);
+      // 时间 chip 在最左侧
+      const timeChip = document.createElement('div');
+      timeChip.className = 'mp-strip-time';
+      strip.appendChild(timeChip);
+      strip.appendChild(rightHead);   // 按钮区在时间右边
       initStripDrag(strip);
       _mobileStatsStripUpdate = () => updateMobileStatsStrip(strip);
       _mobileStatsStripUpdate();
@@ -3349,71 +3366,96 @@ function rearrangeMobileLayout(entering) {
     if (!gameLayout.querySelector('.mobile-fs-toggle')) {
       const toggle = document.createElement('div');
       toggle.className = 'mobile-fs-toggle';
-      toggle.innerHTML = '<svg class="fs-arrow" viewBox="0 0 28 14"><polyline points="6,12 14,4 22,12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      toggle.innerHTML = '<svg class="fs-arrow" viewBox="0 0 42 14"><polyline points="10,12 21,4 32,12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
       toggle.addEventListener('click', () => {
         gameLayout.classList.toggle('mobile-fs');
       });
       rightPanel.insertBefore(toggle, rightPanel.firstChild);
     }
   } else if (!entering) {
-    if (rightPanel && rightHead.parentElement === leftPanel) {
+    // 还原：把 right-head 放回 right-panel
+    const strip = gameLayout.querySelector('.mobile-stats-strip');
+    if (rightPanel && strip && rightHead.parentElement === strip) {
       rightPanel.insertBefore(rightHead, rightPanel.querySelector('.mobile-fs-toggle') || rightPanel.firstChild);
     }
-    const strip = gameLayout.querySelector('.mobile-stats-strip');
     if (strip) strip.remove();
+    const grid = leftPanel.querySelector('.mobile-stats-grid');
+    if (grid) grid.remove();
     const toggle = rightPanel?.querySelector('.mobile-fs-toggle');
     if (toggle) toggle.remove();
     gameLayout.classList.remove('mobile-fs');
     _mobileStatsStripUpdate = null;
+    _mobileStatsGridUpdate = null;
   }
 }
 
+// Strip 只放时间 chip + 按钮区（right-head 已移入 DOM）
 function updateMobileStatsStrip(strip) {
   if (!strip) return;
+  // 清空除时间chip和right-head外的其他残留
+  Array.from(strip.children).forEach(ch => {
+    if (!ch.classList.contains('right-head') && !ch.classList.contains('mp-strip-time')) ch.remove();
+  });
+  // 更新时间文本
+  const timeChip = strip.querySelector('.mp-strip-time');
+  const timeEl = document.getElementById('time-display');
+  if (timeChip && timeEl) timeChip.textContent = timeEl.textContent;
+}
+
+// 头像右侧的属性 grid：时间 + 2x4 stat 单元格 + 信息 chip 列表
+function updateMobileStatsGrid(grid) {
+  if (!grid) return;
   const s = state;
-  let html = '';
 
   const timeEl = document.getElementById('time-display');
   const timeText = timeEl ? timeEl.textContent : `${s.age}岁`;
-  html += `<div class="ms-chip ms-chip-time"><span class="ms-val">${timeText}</span></div>`;
 
-  const allKeys = [...STAT_KEYS, 'HAP'];
-  for (const k of allKeys) {
+  // 基础 7 项：社/智/家/乐 + 健/毅/颜（HAP 放在第4格）
+  // 触发剧情后追加 career stat 凑成 2x4（用 show* 标志判断）
+  const baseKeys = ['SOC', 'INT', 'MNY', 'HAP', 'HLT', 'PER', 'APP'];
+  const careerKeys = ['POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG'];
+
+  let cellsHtml = '';
+  for (const k of baseKeys) {
     const v = s[k] ?? 0;
     const label = STAT_LABELS[k] || k;
     const pct = Math.max(0, Math.min(100, (v / 30) * 100));
-    html += `<div class="ms-chip"><span class="ms-label">${label}</span><div class="ms-bar"><div class="ms-bar-fill" style="width:${pct}%"></div></div><span class="ms-val">${v}</span></div>`;
+    cellsHtml += `<div class="msg-cell"><span class="msg-label">${label}</span><div class="msg-bar"><div class="msg-bar-fill" style="width:${pct}%"></div></div><span class="msg-val">${v}</span></div>`;
+  }
+  for (const k of careerKeys) {
+    if (s['show' + k]) {
+      const v = s[k] || 0;
+      const label = STAT_LABELS[k] || k;
+      const cap = (k === 'MMR') ? 4000 : 100;
+      const pct = Math.max(0, Math.min(100, (v / cap) * 100));
+      cellsHtml += `<div class="msg-cell career"><span class="msg-label">${label}</span><div class="msg-bar"><div class="msg-bar-fill" style="width:${pct}%"></div></div><span class="msg-val">${v}</span></div>`;
+    }
   }
 
-  if (s.POP != null) html += `<div class="ms-chip"><span class="ms-label">${STAT_LABELS.POP}</span><span class="ms-val">${s.POP}</span></div>`;
-  if (s.POK != null) html += `<div class="ms-chip"><span class="ms-label">${STAT_LABELS.POK}</span><span class="ms-val">${s.POK}</span></div>`;
-  if (s.FIT != null) html += `<div class="ms-chip"><span class="ms-label">${STAT_LABELS.FIT}</span><span class="ms-val">${s.FIT}</span></div>`;
-  if (s.CKL != null) html += `<div class="ms-chip"><span class="ms-label">${STAT_LABELS.CKL}</span><span class="ms-val">${s.CKL}</span></div>`;
-  if (s.ATH != null) html += `<div class="ms-chip"><span class="ms-label">${STAT_LABELS.ATH}</span><span class="ms-val">${s.ATH}</span></div>`;
-  if (s.MMR != null) html += `<div class="ms-chip"><span class="ms-label">${STAT_LABELS.MMR}</span><span class="ms-val">${s.MMR}</span></div>`;
-
+  // 信息 chip 区：专业 / 学校 / 恋爱 / 职业 / 剧情
+  let infoHtml = '';
   const majorEl = document.getElementById('major-display');
-  if (majorEl) html += `<div class="ms-chip ms-chip-info"><span class="ms-label">专业</span><span class="ms-val">${majorEl.textContent}</span></div>`;
-
-  const relEl = document.getElementById('relationship-display');
-  if (relEl) html += `<div class="ms-chip ms-chip-info"><span class="ms-label">恋爱</span><span class="ms-val">${relEl.textContent}</span></div>`;
-
+  if (majorEl) infoHtml += `<div class="msg-info-chip"><span class="msg-info-label">专业</span><span class="msg-info-val">${majorEl.textContent}</span></div>`;
+  // 学校/职业 始终显示，没数据时给占位文案，保证右上区域不留白
   const schoolEl = document.getElementById('school-display');
-  if (schoolEl && schoolEl.parentElement.style.display !== 'none') {
-    html += `<div class="ms-chip ms-chip-info"><span class="ms-label">学校</span><span class="ms-val">${schoolEl.textContent}</span></div>`;
-  }
-
+  const schoolText = schoolEl && schoolEl.parentElement && schoolEl.parentElement.style.display !== 'none'
+    ? schoolEl.textContent : (s.school && s.school !== '无' ? s.school : '在读');
+  infoHtml += `<div class="msg-info-chip"><span class="msg-info-label">学校</span><span class="msg-info-val">${schoolText}</span></div>`;
+  const relEl = document.getElementById('relationship-display');
+  if (relEl) infoHtml += `<div class="msg-info-chip"><span class="msg-info-label">恋爱</span><span class="msg-info-val">${relEl.textContent}</span></div>`;
   const profEl = document.getElementById('profession-display');
-  if (profEl && profEl.parentElement.style.display !== 'none') {
-    html += `<div class="ms-chip ms-chip-info"><span class="ms-label">职业</span><span class="ms-val">${profEl.textContent}</span></div>`;
-  }
-
+  const profText = profEl && profEl.parentElement && profEl.parentElement.style.display !== 'none'
+    ? profEl.textContent : (s.profession || '高中生');
+  infoHtml += `<div class="msg-info-chip"><span class="msg-info-label">职业</span><span class="msg-info-val">${profText}</span></div>`;
   const storyEl = document.getElementById('storyline-display');
-  if (storyEl && storyEl.parentElement.style.display !== 'none') {
-    html += `<div class="ms-chip ms-chip-storyline"><span class="ms-label">剧情</span><span class="ms-val">${storyEl.textContent}</span></div>`;
+  if (storyEl && storyEl.parentElement && storyEl.parentElement.style.display !== 'none') {
+    infoHtml += `<div class="msg-info-chip msg-info-storyline"><span class="msg-info-label">剧情</span><span class="msg-info-val">${storyEl.textContent}</span></div>`;
   }
 
-  strip.innerHTML = html;
+  grid.innerHTML = `
+    <div class="msg-cells">${cellsHtml}</div>
+    ${infoHtml ? `<div class="msg-info">${infoHtml}</div>` : ''}
+  `;
 }
 
 function updateCreationAvatar() {
@@ -3434,6 +3476,37 @@ function updateCreationAvatar() {
     if (canvas) renderAvatar(canvas, state);
   }
 }
+
+// ── 修复 iOS Safari viewport 高度问题 ──────────────────────────────────────
+// iOS Safari 上 URL 栏会让 100vh / 100dvh 计算异常，导致 .app 高度不对，
+// 进游戏一开始下方留白，需要手动滑动一下才会重排。
+// 解决方案：用 visualViewport API（iOS 13+ 支持）实时获取真实可见高度，
+// 直接给 .app 设置 px 高度，比纯 CSS 单位可靠得多。
+function _syncViewportHeight() {
+  // 优先 visualViewport（监听 URL 栏变化最准），fallback innerHeight
+  const h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+  document.documentElement.style.setProperty('--vh', `${h * 0.01}px`);
+  document.documentElement.style.setProperty('--app-height', `${h}px`);
+  // 直接给 .app / .screen 强制高度，绕过浏览器的 vh 计算 bug
+  const app = document.querySelector('.app');
+  if (app) app.style.height = `${h}px`;
+  document.querySelectorAll('.screen').forEach(el => {
+    el.style.height = `${h}px`;
+  });
+}
+
+// 监听各种触发点
+_syncViewportHeight();
+window.addEventListener('resize', _syncViewportHeight);
+window.addEventListener('orientationchange', () => setTimeout(_syncViewportHeight, 100));
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', _syncViewportHeight);
+  window.visualViewport.addEventListener('scroll', _syncViewportHeight);
+}
+// iOS 加载后 URL 栏可能继续动，多次延迟同步保险
+[100, 300, 600, 1200].forEach(ms => setTimeout(_syncViewportHeight, ms));
+// 首帧后再同步一次
+requestAnimationFrame(_syncViewportHeight);
 
 async function main() {
   initAchievements();
@@ -3477,6 +3550,15 @@ async function main() {
     }
     // Reset the internal scroll of the new step for mobile
     setTimeout(() => { target.scrollTop = 0; }, 300);
+
+    // Mobile: move alloc-banner below avatar, above stats
+    if (window.matchMedia('(max-width: 760px)').matches) {
+      const banner = target.querySelector('.alloc-banner');
+      const allocList = target.querySelector('.alloc-list');
+      if (banner && allocList && banner.nextElementSibling !== allocList) {
+        allocList.parentNode.insertBefore(banner, allocList);
+      }
+    }
   });
 
   for (const k of STAT_KEYS) {

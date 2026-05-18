@@ -18,7 +18,7 @@
   --sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
 }
 
-* { box-sizing: border-box; user-select: none; touch-action: manipulation; }
+* { box-sizing: border-box; user-select: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 
 html, body {
   margin: 0;
@@ -28,7 +28,9 @@ html, body {
   font-family: var(--sans);
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
-  min-height: 100vh;
+  min-height: 100dvh;
+  /* Fallback for browsers without dvh: JS sets --vh */
+  min-height: calc(var(--vh, 1vh) * 100);
 }
 
 body {
@@ -116,7 +118,8 @@ body.in-creation .app {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: calc(100vh - 120px);
+  min-height: calc(100dvh - 120px);
+  min-height: calc(var(--vh, 1vh) * 100 - 120px);
   text-align: center;
 }
 
@@ -526,7 +529,20 @@ body.in-creation .app {
     text-align: center;
   }
   .talent-grid {
-    grid-template-columns: repeat(2, 1fr); /* 2 columns on mobile for better fit */
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+  .talent-card {
+    padding: 6px 8px;
+    border-left-width: 3px;
+  }
+  .t-name {
+    font-size: 12px;
+    margin-bottom: 1px;
+  }
+  .t-desc {
+    font-size: 10px;
+    line-height: 1.3;
   }
 }
 
@@ -1162,6 +1178,8 @@ body.in-game .left-panel {
   flex-direction: column;
   cursor: pointer;
   overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
 }
 
 body.in-game .right-panel {
@@ -1169,6 +1187,7 @@ body.in-game .right-panel {
   min-height: 0;
   border-radius: 0;
 }
+
 .right-head {
   padding: 14px 18px;
   border-bottom: 1px solid var(--line);
@@ -2142,7 +2161,7 @@ body.in-summary {
 }
 
 @media (max-width: 760px) {
-  .app { padding: 0; height: 100vh; overflow: hidden; }
+  .app { padding: 0; height: 100dvh; height: calc(var(--vh, 1vh) * 100); overflow: hidden; }
   .game-layout {
     grid-template-columns: 1fr;
     display: flex;
@@ -2162,112 +2181,307 @@ body.in-summary {
     position: relative;
   }
 
-  /* ── Mobile: top area = avatar row + stats strip ── */
+  /* ── Mobile: 头像 + 属性 grid 用 flex 布局，避免 grid 1fr 分配空隙 ── */
   body.in-game .left-panel {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto;
-    gap: 0 8px;
+    display: flex !important;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 6px;
     height: auto;
     max-height: none;
     overflow: visible;
     border-radius: 0;
     border-bottom: none;
     margin-bottom: 0;
-    padding: 6px 8px;
-    align-items: stretch;
+    padding: 6px 4px;
+    width: 100%;
   }
 
-  /* Avatar: left half */
+  /* Avatar: left half — make it square so the character isn't squished */
   body.in-game .avatar-wrap {
-    grid-column: 1;
-    grid-row: 1;
-    width: 100%;
+    flex-shrink: 0;
+    width: clamp(120px, 38vw, 200px);
     height: auto;
-    aspect-ratio: 2 / 3;
-    max-height: 200px;
+    aspect-ratio: 1 / 1;
     margin: 0;
     border-radius: 6px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.4);
     position: static;
   }
 
-  /* Hide all non-avatar children in left-panel (they go into the strip) */
-  body.in-game .left-panel > *:not(.avatar-wrap):not(.right-head) {
+  /* Hide non-essential children in left-panel (they go into the strip)
+     KEEP: avatar-wrap, mobile-stats-grid */
+  body.in-game .left-panel > *:not(.avatar-wrap):not(.mobile-stats-grid) {
     display: none !important;
   }
 
-  /* Buttons: right half, stretch to match avatar height */
-  body.in-game .left-panel > .right-head {
-    grid-column: 2;
-    grid-row: 1;
-    position: static;
-    width: 100%;
-    height: 100%;
-    border: none;
-    padding: 0;
-    background: transparent;
-    z-index: 10;
+  /* Stats grid: right half of left-panel (replaces buttons area) */
+  body.in-game .mobile-stats-grid {
+    flex: 1 1 0;
+    min-width: 0;
     display: flex;
     flex-direction: column;
+    gap: 6px;
+    padding: 0;
   }
-  body.in-game .right-head {
+  body.in-game .mobile-stats-grid .msg-time {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--warm);
+    background: linear-gradient(135deg, rgba(201,169,120,0.15), rgba(201,169,120,0.05));
+    border: 1px solid rgba(201,169,120,0.35);
+    border-radius: 6px;
+    padding: 7px 8px;
+    text-align: center;
+    flex-shrink: 0;
+    letter-spacing: 0.04em;
+  }
+  body.in-game .mobile-stats-grid .msg-cells {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    flex: 1;
+    width: 100%;
+  }
+  body.in-game .mobile-stats-grid .msg-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 2px;
+    background: var(--card-2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    gap: 3px;
+    min-width: 0;
+  }
+  body.in-game .mobile-stats-grid .msg-label {
+    color: var(--ink-faint);
+    font-size: 12px;
+    line-height: 1;
+    letter-spacing: 0.05em;
+  }
+  body.in-game .mobile-stats-grid .msg-bar {
+    width: 85%;
+    height: 3px;
+    background: var(--bg-2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  body.in-game .mobile-stats-grid .msg-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width .25s ease;
+  }
+  body.in-game .mobile-stats-grid .msg-val {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--accent);
+    line-height: 1;
+  }
+  body.in-game .mobile-stats-grid .msg-cell.career {
+    border-color: rgba(245, 182, 66, 0.5);
+    background: linear-gradient(135deg, rgba(245, 182, 66, 0.10), var(--card-2));
+  }
+  body.in-game .mobile-stats-grid .msg-cell.career .msg-val { color: var(--grade-3); }
+  body.in-game .mobile-stats-grid .msg-cell.career .msg-bar-fill { background: var(--grade-3); }
+
+  /* 信息chip：grid 底部，2 列 */
+  body.in-game .mobile-stats-grid .msg-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    margin-top: 2px;
+    width: 100%;
+  }
+  body.in-game .mobile-stats-grid .msg-info-chip {
+    display: flex;
+    flex-direction: column;     /* 改成纵向：label在上、value在下，给value全宽度 */
+    align-items: stretch;
+    justify-content: center;
+    gap: 2px;
+    padding: 6px 10px;
+    background: var(--card-2);
+    border: 1px dashed rgba(180,180,180,0.3);
+    border-radius: 6px;
+    min-width: 0;
+  }
+  body.in-game .mobile-stats-grid .msg-info-label {
+    color: var(--ink-faint);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    line-height: 1;
+  }
+  body.in-game .mobile-stats-grid .msg-info-val {
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+  }
+  body.in-game .mobile-stats-grid .msg-info-storyline {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, rgba(245,182,66,0.10), var(--card-2));
+    border-color: rgba(245,182,66,0.4);
+  }
+  body.in-game .mobile-stats-grid .msg-info-storyline .msg-info-val {
+    color: var(--grade-3);
+  }
+
+  /* Action buttons hosted inside strip (right-head moved here) */
+  body.in-game .mobile-stats-strip .right-head {
+    display: flex;
+    align-items: center;
     border: none;
     padding: 0;
     background: transparent;
+    flex: 1;          /* 撑满整条 */
+    min-width: 0;
   }
-  body.in-game .right-head h2 {
-    display: none;
-  }
-  body.in-game .right-actions {
+  body.in-game .mobile-stats-strip .right-head h2 { display: none; }
+  body.in-game .mobile-stats-strip .right-actions {
     display: flex !important;
-    flex-wrap: wrap;
-    align-content: stretch;
     gap: 5px;
+    flex: 1;          /* 占满 right-head */
     width: 100%;
-    height: 100%;
   }
-  body.in-game .right-actions .ghost {
+  body.in-game .mobile-stats-strip .right-actions .ghost {
     background: var(--card-2);
     border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 0 6px;
+    border-radius: 8px;
+    padding: 6px 10px;
     font-size: 12px;
     color: var(--ink-soft);
-    text-align: center;
+    white-space: nowrap;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex: 1 1 45%;
-    min-height: 0;
+    height: 32px;
+    flex: 1 1 0;       /* basis:0 → 真·均分剩余空间 */
+    min-width: 0;
+    transition: background .15s ease, border-color .15s ease, color .15s ease, transform .1s ease;
   }
-  body.in-game #ach-trophy-btn {
-    flex: 1 1 45%;
-    justify-content: center;
+  body.in-game .mobile-stats-strip .right-actions .ghost:active {
+    transform: scale(0.96);
+  }
+  /* Active 状态：用更高特异性盖掉默认 */
+  body.in-game .mobile-stats-strip .right-actions .ghost.active {
+    background: linear-gradient(135deg, var(--accent), rgba(74,157,229,0.85));
+    border-color: var(--accent);
+    color: #0f1420;
+    font-weight: 700;
+    box-shadow: 0 0 12px rgba(74,157,229,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+  }
+  body.in-game .mobile-stats-strip #ach-trophy-btn {
     background: rgba(241, 196, 15, 0.08);
-    border: 1px solid rgba(241, 196, 15, 0.2);
-    border-radius: 10px;
+    border-color: rgba(241, 196, 15, 0.25);
+    flex: 1 1 0;     /* 一并均分 */
   }
 
-  /* ── Mobile stats strip: horizontal scrollable bar ── */
-  body.in-game .mobile-stats-strip {
+  /* 时间 chip 在 strip 左侧 */
+  body.in-game .mobile-stats-strip .mp-strip-time {
+    padding: 6px 14px;
+    background: linear-gradient(135deg, rgba(201,169,120,0.18), rgba(201,169,120,0.06));
+    border: 1px solid rgba(201,169,120,0.4);
+    border-radius: 8px;
+    color: var(--warm);
+    font-weight: 700;
+    font-size: 13px;
+    height: 32px;
     display: flex;
     align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    white-space: nowrap;
+    letter-spacing: 0.04em;
+  }
+  /* 分隔条：按钮组和信息chip之间 */
+  body.in-game .mobile-stats-strip .ms-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--line);
+    flex-shrink: 0;
+    margin: 0 4px;
+  }
+  /* 信息 chip 改成虚线透明边框，和实心按钮区分 */
+  body.in-game .mobile-stats-strip .ms-chip-info {
+    background: transparent;
+    border-style: dashed;
+    border-color: rgba(180,180,180,0.35);
+  }
+
+  /* ── Mobile stats strip: 时间 + 按钮区，grid 布局强制按钮区铺满 ── */
+  body.in-game .mobile-stats-strip {
+    display: grid;
+    grid-template-columns: auto 1fr;  /* 时间(intrinsic) | 按钮区(剩余全占) */
+    align-items: center;
     gap: 6px;
-    padding: 8px 10px;
-    overflow-x: scroll;
+    padding: 8px 6px;
+    overflow-x: hidden;
     overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-x !important;
     white-space: nowrap;
     background: var(--card);
     border-bottom: 1px solid var(--line);
     flex-shrink: 0;
-    scrollbar-width: none;
-    cursor: grab;
+    position: relative;
+    width: 100%;
   }
   body.in-game .mobile-stats-strip:active { cursor: grabbing; }
-  body.in-game .mobile-stats-strip::-webkit-scrollbar { display: none; }
+  /* 细的滚动条提示可滑动 */
+  body.in-game .mobile-stats-strip {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(180,180,180,0.35) transparent;
+  }
+  body.in-game .mobile-stats-strip::-webkit-scrollbar {
+    height: 3px;
+  }
+  body.in-game .mobile-stats-strip::-webkit-scrollbar-thumb {
+    background: rgba(180,180,180,0.35);
+    border-radius: 3px;
+  }
+  body.in-game .mobile-stats-strip::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* 展开模式：所有属性平铺成多行 */
+  body.in-game .mobile-stats-strip.expanded {
+    flex-wrap: wrap;
+    overflow-x: hidden;
+    white-space: normal;
+    -webkit-mask-image: none;
+            mask-image: none;
+    padding-bottom: 10px;
+  }
+  body.in-game .mobile-stats-strip.expanded .ms-chip {
+    flex: 0 1 auto;
+  }
+
+  /* 展开/收起按钮（贴在条的末尾） */
+  body.in-game .mobile-stats-strip .ms-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 10px;
+    background: rgba(201,169,120,0.12);
+    border: 1px solid rgba(201,169,120,0.3);
+    border-radius: 8px;
+    font-size: 11px;
+    color: var(--warm);
+    cursor: pointer;
+    flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body.in-game .mobile-stats-strip .ms-toggle::after {
+    content: '▾';
+    transition: transform .2s ease;
+  }
+  body.in-game .mobile-stats-strip.expanded .ms-toggle::after {
+    transform: rotate(180deg);
+  }
 
   body.in-game .mobile-stats-strip * {
     touch-action: pan-x;
@@ -2351,7 +2565,7 @@ body.in-summary {
     -webkit-tap-highlight-color: transparent;
   }
   body.in-game .mobile-fs-toggle .fs-arrow {
-    width: 28px;
+    width: 42px;
     height: 14px;
     color: var(--ink-faint);
     transition: transform .3s ease, color .2s ease;
@@ -3217,4 +3431,166 @@ body.in-summary {
 .poster-rank.rank-A, #poster-footer-rank.rank-A { color: #e67e22; }
 .poster-rank.rank-B, #poster-footer-rank.rank-B { color: #3498db; }
 .poster-rank.rank-C, #poster-footer-rank.rank-C { color: #95a5a6; }
+
+/* ── Mobile alloc page: compact one-screen layout ── */
+@media (max-width: 760px) {
+  /* Tighter header */
+  #step-alloc .screen-head h1 {
+    font-size: 20px;
+    margin-bottom: 2px;
+  }
+  #step-alloc .screen-head .sub {
+    font-size: 11px;
+    margin-bottom: 8px;
+  }
+  #step-alloc .screen-head {
+    margin-bottom: 0;
+  }
+
+  /* Remaining-points banner — prominent */
+  #step-alloc .alloc-banner {
+    padding: 8px 14px;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    background: linear-gradient(135deg, rgba(74,157,229,0.12), rgba(74,157,229,0.04));
+    border-color: rgba(74,157,229,0.3);
+  }
+  #step-alloc .alloc-banner span {
+    font-size: 20px;
+  }
+
+  /* Compact talent bonus banner */
+  #step-alloc .talent-bonus-banner {
+    padding: 6px 10px;
+    margin-bottom: 6px;
+    gap: 6px;
+  }
+
+  /* Avatar area: avatar on top, controls row below */
+  #step-alloc .alloc-layout {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  #step-alloc .alloc-avatar-wrap {
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px;
+  }
+  #step-alloc .alloc-avatar-wrap canvas {
+    width: 240px;
+    height: 240px;
+  }
+  #step-alloc .alloc-avatar-hint {
+    display: none;
+  }
+  #step-alloc .alloc-avatar-wrap .appearance-section {
+    margin-top: 0;
+    gap: 4px;
+    align-items: center;
+    width: 100%;
+  }
+  #step-alloc .alloc-avatar-wrap .appearance-label {
+    font-size: 10px;
+    text-align: center;
+    width: 100%;
+  }
+  #step-alloc .alloc-avatar-wrap .sex-row {
+    gap: 6px;
+    margin-bottom: 0;
+    justify-content: center;
+    width: 100%;
+  }
+  #step-alloc .alloc-avatar-wrap .sex-row .chip {
+    padding: 4px 12px;
+    font-size: 12px;
+  }
+  #step-alloc .alloc-avatar-wrap .skin-chip {
+    width: 26px;
+    height: 26px;
+  }
+  #step-alloc .alloc-avatar-wrap .skin-row {
+    gap: 8px;
+    justify-content: center;
+    width: 100%;
+  }
+  #step-alloc .alloc-avatar-wrap .appearance-random-btn {
+    font-size: 12px;
+    padding: 6px 10px;
+    margin-top: 0;
+    width: 80%;
+    text-align: center;
+    align-self: center;
+  }
+
+  /* Stats grid: 2 columns, aligned */
+  #step-alloc .alloc-list {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+  }
+  #step-alloc .alloc-row {
+    grid-template-columns: 32px 28px 28px 28px 1fr;
+    gap: 2px;
+    padding: 7px 8px;
+    font-size: 13px;
+  }
+  #step-alloc .alloc-row > span:first-child {
+    width: 32px;
+    text-align: left;
+  }
+  #step-alloc .alloc-row .step {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    padding: 0;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #step-alloc .alloc-val {
+    font-size: 14px;
+    text-align: center;
+  }
+  #step-alloc .alloc-bonus {
+    font-size: 12px;
+    padding-left: 2px;
+    text-align: left;
+  }
+
+  /* Footer buttons */
+  #step-alloc .footer-actions {
+    margin-top: 8px;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+  #step-alloc .footer-actions button {
+    padding: 10px 18px;
+    font-size: 14px;
+  }
+}
+
+/* ── Mobile talent grid: 2-col compact ── */
+@media (max-width: 760px) {
+  .talent-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+  .talent-card {
+    padding: 8px 10px;
+    border-left-width: 3px;
+  }
+  .t-name {
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+  .t-desc {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+}
 
