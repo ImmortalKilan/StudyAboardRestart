@@ -699,9 +699,9 @@
       "countryIntent==香港&INT>=7?10343",
       "countryIntent==香港&INT>=4?10344",
       "countryIntent==香港?10345",
-      "countryIntent==日本&INT>=9?10346",
-      "countryIntent==日本&INT>=6?10347",
-      "countryIntent==日本&INT>=3?10348",
+      "countryIntent==日本&INT>=6?10346",
+      "countryIntent==日本&INT>=3?10347",
+      "countryIntent==日本&INT>=1?10348",
       "countryIntent==日本?10349",
       "countryIntent==新加坡&INT>=9?10350",
       "countryIntent==新加坡&INT>=6?10351",
@@ -989,11 +989,125 @@
   },
   {
     "id": 10349,
-    "text": "日本学校全聚德。N1 没过或留考分数太低。",
+    "text": "坏消息——N1 没过，留考分数也不够。日本的学校全部落选了。你在东京的语言学校宿舍里发了一整天的呆。",
+    "noRandom": true,
+    "happyDelta": -3,
+    "choices": [
+      {
+        "text": "不甘心，再考一年（语言学校浪人）",
+        "next": 10349001
+      },
+      {
+        "text": "算了，转申其他国家",
+        "next": 10349002
+      },
+      {
+        "text": "放弃留学，回国发展",
+        "next": 10349003
+      }
+    ]
+  },
+  {
+    "id": 10349001,
+    "text": "你决定留在日本再拼一年。白天上语言学校，晚上刷留考真题，周末去图书馆背N1词汇。便利店的饭团成了你最好的朋友。",
+    "noRandom": true,
+    "effect": { "INT": 1, "PER": 2 },
+    "happyDelta": -1,
+    "branch": [
+      "INT>=5?10349011",
+      "INT>=3?10349012",
+      "?10349013"
+    ]
+  },
+  {
+    "id": 10349011,
+    "text": "浪人一年后，你的N1高分通过，留考成绩也大幅提升。早稻田/庆应向你发来了合格通知！这一年的苦没有白吃。",
+    "noRandom": true,
+    "happyDelta": 4,
+    "set": {
+      "school": "早庆",
+      "schoolTier": "mid",
+      "country": "日本"
+    }
+  },
+  {
+    "id": 10349012,
+    "text": "浪人一年，N1勉强过了，留考成绩一般。你被一所普通日本大学录取。虽然不是名校，但好歹上岸了。",
+    "noRandom": true,
+    "happyDelta": 1,
+    "set": {
+      "school": "普通日校",
+      "schoolTier": "low",
+      "country": "日本"
+    }
+  },
+  {
+    "id": 10349013,
+    "text": "浪人一年，N1还是差几分，留考成绩也没什么起色。你在东京的便利店打工时，突然觉得自己可能不适合考试这条路。",
+    "noRandom": true,
+    "happyDelta": -3,
+    "choices": [
+      {
+        "text": "不管了，先上个专门学校学技术",
+        "next": 10349014
+      },
+      {
+        "text": "认了，回国重新开始",
+        "next": 10349003
+      }
+    ]
+  },
+  {
+    "id": 10349014,
+    "text": "你进了一所日本专门学校学动画/IT/料理。虽然不是正规大学，但至少有个方向了。在日本的生活还在继续。",
+    "noRandom": true,
+    "happyDelta": 1,
+    "set": {
+      "school": "专门学校",
+      "schoolTier": "low",
+      "country": "日本"
+    }
+  },
+  {
+    "id": 10349002,
+    "text": "你决定放弃日本，紧急转申其他国家。时间紧迫，选择有限，但总比原地等死强。",
+    "noRandom": true,
+    "happyDelta": -1,
+    "branch": [
+      "INT>=5?10349021",
+      "?10349022"
+    ]
+  },
+  {
+    "id": 10349021,
+    "text": "虽然仓促转申，但凭借还不错的成绩，你拿到了一所海外大学的offer。不是最理想的，但也不差。",
+    "noRandom": true,
+    "happyDelta": 1,
+    "set": {
+      "school": "T100+",
+      "schoolTier": "mid",
+      "country": "美国"
+    }
+  },
+  {
+    "id": 10349022,
+    "text": "仓促转申的结果不太理想，你只拿到了一所排名靠后的学校。但好歹能出去了。",
+    "noRandom": true,
+    "happyDelta": -1,
+    "set": {
+      "school": "州大",
+      "schoolTier": "low",
+      "country": "美国"
+    }
+  },
+  {
+    "id": 10349003,
+    "text": "你买了回国的机票。坐在成田机场等登机的时候，看着窗外的飞机起落，心里五味杂陈。留学梦碎了，但人生还长。",
     "noRandom": true,
     "happyDelta": -4,
     "set": {
-      "school": "无"
+      "school": "无",
+      "overseas": 0
     }
   },
   {
@@ -2291,8 +2405,8 @@
       "countryIntent==香港&INT>=8?11642",
       "countryIntent==香港&INT>=5?11643",
       "countryIntent==香港?11644",
-      "countryIntent==日本&INT>=8?11646",
-      "countryIntent==日本&INT>=5?11647",
+      "countryIntent==日本&INT>=5?11646",
+      "countryIntent==日本&INT>=2?11647",
       "countryIntent==日本?11648",
       "countryIntent==新加坡&INT>=8?11650",
       "countryIntent==新加坡&INT>=6?11651",

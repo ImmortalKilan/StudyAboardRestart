@@ -212,6 +212,41 @@ function shortCode() {
 
 const ROOM_PREFIX = 'sasr-mp-';  // PeerJS id 前缀，避免和其他游戏冲突
 
+// ── 信令 & ICE 配置 ────────────────────────────────────────────────────────
+// 自建 PeerJS 信令服务器（设为 null 则回退到默认 0.peerjs.com）
+const CUSTOM_PEER_SERVER = { host: 'studyaboardrestart.onrender.com', port: 443, secure: true, path: '/mp' };
+
+// ICE 服务器：STUN 免费，TURN 用于 P2P 打洞失败时中继（跨国必备）
+const ICE_SERVERS = [
+  { urls: 'stun:stun.l.google.com:19302' },
+  { urls: 'stun:stun.nextcloud.com:443' },
+  // 免费 TURN（有带宽限制，测试够用；正式上线建议换付费的）
+  {
+    urls: 'turn:openrelay.metered.ca:443',
+    username: 'openrelayproject',
+    credential: 'openrelayproject',
+  },
+  {
+    urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+    username: 'openrelayproject',
+    credential: 'openrelayproject',
+  },
+];
+
+function _peerOptions(extraId) {
+  const opts = {
+    debug: 0,
+    config: { iceServers: ICE_SERVERS },
+  };
+  if (CUSTOM_PEER_SERVER) {
+    opts.host = CUSTOM_PEER_SERVER.host;
+    opts.port = CUSTOM_PEER_SERVER.port || 443;
+    opts.secure = CUSTOM_PEER_SERVER.secure !== false;
+    if (CUSTOM_PEER_SERVER.path) opts.path = CUSTOM_PEER_SERVER.path;
+  }
+  return opts;
+}
+
 export async function createRoom(nickname) {
   await ensurePeerJSLoaded();
   mp.myNickname = nickname || '玩家';
@@ -219,7 +254,7 @@ export async function createRoom(nickname) {
   mp.roomCode = shortCode();
   return new Promise((resolve, reject) => {
     const peerId = ROOM_PREFIX + mp.roomCode;
-    mp.peer = new Peer(peerId, { debug: 0 });
+    mp.peer = new Peer(peerId, _peerOptions());
     let opened = false;
     mp.peer.on('open', () => {
       opened = true;
@@ -242,7 +277,7 @@ export async function joinRoom(code, nickname) {
   mp.isHost = false;
   mp.roomCode = code.toUpperCase();
   return new Promise((resolve, reject) => {
-    mp.peer = new Peer({ debug: 0 });
+    mp.peer = new Peer(_peerOptions());
     mp.peer.on('open', () => {
       const conn = mp.peer.connect(ROOM_PREFIX + mp.roomCode, { reliable: true });
       mp.conn = conn;
@@ -338,7 +373,7 @@ export function resetMpState() {
 }
 
 // 同学聚会触发年龄（满足任一即触发）
-export const REUNION_AGES = [25, 30, 35];
+export const REUNION_AGES = [23, 28, 33];
 
 // 蝴蝶效应：关键机会事件 ID 列表（在这些事件上拒绝/放弃 → 推送给对方）
 // game.js 在 resolveChoice 时检测 ev.butterflyKey，把对应事件推给对方

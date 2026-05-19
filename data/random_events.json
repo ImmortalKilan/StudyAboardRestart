@@ -5,7 +5,7 @@
     "effect": {
       "HAP": -1
     },
-    "include": "(SOC<4)&(AGE>=18)",
+    "include": "(SOC<4)&(AGE>=18)&(AGE<=24)",
     "weight": 5,
     "branch": [
       "11002:6",
@@ -92,7 +92,7 @@
       "INT": 5,
       "PER": 3
     },
-    "include": "(SOC<3)&(INT>7)&(AGE>=18)",
+    "include": "(SOC<3)&(INT>7)&(AGE>=18)&(AGE<=24)",
     "weight": 2
   },
   {
@@ -1045,7 +1045,7 @@
       "HAP": 2,
       "HLT": -2
     },
-    "include": "(INT>8)&(PER>9)&(HLT<4)&(SOC<3)&(AGE>=18)",
+    "include": "(INT>8)&(PER>9)&(HLT<4)&(SOC<3)&(AGE>=18)&(AGE<=26)",
     "weight": 2
   },
   {
@@ -1435,7 +1435,8 @@
   {
     "id": 30052,
     "event": "你在宿舍楼下的自动贩卖机买了一罐可乐，结果机器卡了一下，掉下来两罐。今天运气不错。",
-    "weight": 6
+    "weight": 6,
+    "include": "(AGE<=24)"
   },
   {
     "id": 30053,
@@ -1455,7 +1456,8 @@
   {
     "id": 30056,
     "event": "你热披萨的时候，以极快的手速在微波炉倒计时停在 0:01 秒时拉开了门，没有吵醒室友。你是微波炉特工。",
-    "weight": 6
+    "weight": 6,
+    "include": "(AGE<=24)"
   },
   {
     "id": 30057,
@@ -2336,7 +2338,7 @@
   {
     "id": 40010,
     "event": "你进了大学的实验室，导师分配了一个课题。你满怀期待地开始了科研之路。",
-    "include": "(AGE>=19)&((MAJOR==理科)|(MAJOR==CS))",
+    "include": "(AGE>=19)&((MAJOR==理科)|(MAJOR==CS))&(AGE<=26)",
     "exclude": "EVT?[40010]",
     "weight": 3,
     "branch": [
@@ -2366,7 +2368,7 @@
   {
     "id": 40013,
     "event": "实验室的压力让你喘不过气来。每天早十晚十一，周末也不例外。",
-    "include": "(AGE>=19)&((MAJOR==理科)|(MAJOR==CS))&(PER>5)",
+    "include": "(AGE>=19)&((MAJOR==理科)|(MAJOR==CS))&(PER>5)&(AGE<=26)",
     "weight": 4,
     "effect": {
       "HLT": -2,
@@ -2400,7 +2402,7 @@
   {
     "id": 40020,
     "event": "你和实验室的一个同学因为共享仪器的问题吵了起来。",
-    "include": "(AGE>=19)&(MAJOR==理科)&(SOC<5)",
+    "include": "(AGE>=19)&(MAJOR==理科)&(SOC<5)&(AGE<=26)",
     "weight": 3,
     "branch": [
       "40021:3",
@@ -2438,7 +2440,7 @@
   {
     "id": 40030,
     "event": "照镜子的时候你发现发际线又后退了一厘米。室友说这是理工人的勋章。",
-    "include": "(AGE>=19)&((MAJOR==理科)|(MAJOR==CS))&(PER>4)",
+    "include": "(AGE>=19)&((MAJOR==理科)|(MAJOR==CS))&(PER>4)&(AGE<=24)",
     "weight": 5,
     "effect": {
       "APP": -1,
@@ -2448,7 +2450,7 @@
   {
     "id": 40035,
     "event": "你已经连续一个月没有和实验室以外的人说过话了。上次参加社交活动是什么时候？想不起来了。",
-    "include": "(AGE>=19)&((MAJOR==理科)|(MAJOR==CS))&(INT>6)",
+    "include": "(AGE>=19)&((MAJOR==理科)|(MAJOR==CS))&(INT>6)&(AGE<=26)",
     "weight": 4,
     "effect": {
       "SOC": -2,
@@ -2496,7 +2498,7 @@
   {
     "id": 40050,
     "event": "导师要求每天写日报、每周写周报、每月写月报。你觉得自己像在写日记不是做科研。",
-    "include": "(AGE>=19)&(MAJOR==理科)&(PER<6)",
+    "include": "(AGE>=19)&(MAJOR==理科)&(PER<6)&(AGE<=26)",
     "weight": 3,
     "effect": {
       "HAP": -2,
@@ -2537,7 +2539,7 @@
   {
     "id": 40060,
     "event": "实验室发生了安全事故！你的试剂瓶打翻了，腐蚀性液体溅到了手上。",
-    "include": "(AGE>=19)&(MAJOR==理科)",
+    "include": "(AGE>=19)&(MAJOR==理科)&(AGE<=26)",
     "weight": 2,
     "effect": {
       "HLT": -2,
@@ -2629,7 +2631,7 @@
   {
     "id": 40090,
     "event": "实验室聚餐，导师喝多了说了一句「你们这些学生啊，比我当年差远了」。全桌沉默。",
-    "include": "(AGE>=19)&(MAJOR==理科)",
+    "include": "(AGE>=19)&(MAJOR==理科)&(AGE<=26)",
     "weight": 4,
     "effect": {
       "HAP": -1
@@ -2649,7 +2651,7 @@
   {
     "id": 40092,
     "event": "你在实验室养的细胞全部污染死了，一个月的工作付之东流。你对着培养皿沉默了十分钟。",
-    "include": "(AGE>=19)&(MAJOR==理科)",
+    "include": "(AGE>=19)&(MAJOR==理科)&(AGE<=26)",
     "weight": 3,
     "effect": {
       "HAP": -3,
@@ -2671,7 +2673,7 @@
   {
     "id": 40094,
     "event": "你被导师PUA了：「你这个进度，读博都不够格。」你回到宿舍心态崩了。",
-    "include": "(AGE>=19)&(MAJOR==理科)&(PER<6)",
+    "include": "(AGE>=19)&(MAJOR==理科)&(PER<6)&(AGE<=26)",
     "weight": 3,
     "effect": {
       "HAP": -4,
@@ -2804,7 +2806,7 @@
   {
     "id": 41015,
     "event": "期末论文要求写一万字，你坐在电脑前从早写到晚，写到第三千字的时候开始怀疑人生。",
-    "include": "(AGE>=19)&(MAJOR==文科)",
+    "include": "(AGE>=19)&(MAJOR==文科)&(AGE<=24)",
     "weight": 5,
     "branch": [
       "41016:4",
@@ -2963,7 +2965,7 @@
   {
     "id": 41060,
     "event": "你开始准备教师资格证考试。室友说你这是要当园丁了。",
-    "include": "(AGE>=20)&(MAJOR==文科)&(PER>4)",
+    "include": "(AGE>=20)&(MAJOR==文科)&(PER>4)&(AGE<=24)",
     "exclude": "EVT?[41060]",
     "weight": 3,
     "effect": {
@@ -3131,7 +3133,7 @@
   {
     "id": 42020,
     "event": "数据结构与算法课的期末考试，你盯着那道动态规划题发呆了四十分钟。",
-    "include": "(AGE>=20)&(MAJOR==CS)&(INT<6)",
+    "include": "(AGE>=20)&(MAJOR==CS)&(INT<6)&(AGE<=24)",
     "weight": 4,
     "effect": {
       "HAP": -2
@@ -3170,7 +3172,7 @@
   {
     "id": 42030,
     "event": "教授安排你和团队做一个完整的软件工程项目。",
-    "include": "(AGE>=20)&(MAJOR==CS)&(SOC>4)",
+    "include": "(AGE>=20)&(MAJOR==CS)&(SOC>4)&(AGE<=24)",
     "weight": 3,
     "branch": [
       "42031:5",
@@ -3201,7 +3203,7 @@
   {
     "id": 42035,
     "event": "你在实验室帮教授做RA，负责跑机器学习模型。GPU一跑就是几天，你成了调参侠。",
-    "include": "(AGE>=20)&(MAJOR==CS)&(INT>7)",
+    "include": "(AGE>=20)&(MAJOR==CS)&(INT>7)&(AGE<=26)",
     "weight": 3,
     "effect": {
       "INT": 2,
@@ -3273,7 +3275,7 @@
   {
     "id": 42065,
     "event": "你在宿舍搭了一个小服务器跑自己写的bot。室友嫌它太吵，但你乐在其中。",
-    "include": "(AGE>=20)&(MAJOR==CS)&(INT>6)",
+    "include": "(AGE>=20)&(MAJOR==CS)&(INT>6)&(AGE<=24)",
     "weight": 4,
     "effect": {
       "INT": 1,
@@ -6999,7 +7001,7 @@
   {
     "id": 44100,
     "event": "理科的尽头是深造还是就业？拿着理学学士/硕士学位，你站在了实验室和写字楼的交叉口。",
-    "include": "(AGE>=22)&(MAJOR==理科)&(profession==求职中)",
+    "include": "(AGE>=22)&(MAJOR==理科)&(profession==求职中)&(AGE<=26)",
     "exclude": "EVT?[44100]",
     "weight": 100,
     "branch": [
@@ -14058,7 +14060,7 @@
   {
     "id": 84000,
     "event": "深蹲做到最后一组时，一个晒得黝黑的壮汉走过来盯着你看了半天。他说自己是职业健美教练，你的骨架比例和肌肉起点非常适合上台比赛，问你有没有兴趣认真练。",
-    "include": "(HLT>=10)&(AGE>=17)&(AGE<=24)",
+    "include": "(HLT>=10)&(AGE>=17)",
     "weight": 20,
     "choices": [
       {
@@ -19176,7 +19178,7 @@
   {
     "id": 47001,
     "event": "你第一次去 Costco 采购，推着比你还大的购物车，买了一箱48瓶装的水和够吃半年的冷冻披萨。室友说你终于像个美国人了。",
-    "include": "(country==美国)&(AGE>=19)",
+    "include": "(country==美国)&(AGE>=19)&(AGE<=24)",
     "weight": 6,
     "effect": {
       "HAP": 1
@@ -19201,7 +19203,7 @@
   {
     "id": 47004,
     "event": "感恩节室友都回家了，整栋宿舍空得像鬼片。你一个人吃了一整只超市烤鸡，配着跟妈妈的视频电话，居然觉得还挺温馨。",
-    "include": "(country==美国)&(AGE>=19)&(SOC<=5)&(MTH>=11)&(MTH<=11)",
+    "include": "(country==美国)&(AGE>=19)&(SOC<=5)&(MTH>=11)&(MTH<=11)&(AGE<=24)",
     "weight": 8,
     "effect": {
       "HAP": -1,
@@ -19301,7 +19303,7 @@
   {
     "id": 47015,
     "event": "教授说期末是 take-home exam，你以为可以轻松抄。结果题目比闭卷还难十倍，你在图书馆从早写到晚，写了15页。",
-    "include": "(country==美国)&(AGE>=19)&(INT>=5)",
+    "include": "(country==美国)&(AGE>=19)&(INT>=5)&(AGE<=24)",
     "weight": 6,
     "effect": {
       "INT": 1,
@@ -19367,7 +19369,7 @@
   {
     "id": 47104,
     "event": "英国室友每天下午准时泡茶，你从嗤之以鼻到入乡随俗。现在你也有了自己的马克杯和专属茶包品牌。",
-    "include": "(country==英国)&(AGE>=19)",
+    "include": "(country==英国)&(AGE>=19)&(AGE<=24)",
     "weight": 9,
     "effect": {
       "HAP": 1,
@@ -19377,7 +19379,7 @@
   {
     "id": 47105,
     "event": "你交了一篇自认为很不错的 essay，导师用红笔批了满满三页——红得像犯罪现场。最后一行写着：「Not bad for a first attempt.」你查了一下，这在英国已经算夸奖了。",
-    "include": "(country==英国)&(AGE>=19)&(INT>=5)",
+    "include": "(country==英国)&(AGE>=19)&(INT>=5)&(AGE<=26)",
     "weight": 6,
     "effect": {
       "INT": 1,
@@ -19422,7 +19424,7 @@
   {
     "id": 47110,
     "event": "宿舍的暖气又坏了，房东说「Someone will come have a look」，然后你等了两周。你穿着羽绒服在被窝里写论文，手指冻得打字都在哆嗦。",
-    "include": "(country==英国)&(AGE>=19)&(MTH>=11|MTH<=2)",
+    "include": "(country==英国)&(AGE>=19)&(MTH>=11|MTH<=2)&(AGE<=24)",
     "weight": 6,
     "effect": {
       "HLT": -1,
@@ -19441,7 +19443,7 @@
   {
     "id": 47112,
     "event": "周末你去了 Camden Market，在 vintage 摊上淘到一件超酷的二手皮衣。回去穿给室友看，他说你像个90年代的摇滚明星。",
-    "include": "(country==英国)&(AGE>=19)&(APP>=4)",
+    "include": "(country==英国)&(AGE>=19)&(APP>=4)&(AGE<=24)",
     "weight": 5,
     "effect": {
       "HAP": 1,
@@ -19451,7 +19453,7 @@
   {
     "id": 47113,
     "event": "你在图书馆占座去上厕所，回来发现座位被人收走了——英国大学图书馆有「离开15分钟自动释放」的规矩。你站在原地，手里端着咖啡，一脸茫然。",
-    "include": "(country==英国)&(AGE>=19)",
+    "include": "(country==英国)&(AGE>=19)&(AGE<=24)",
     "weight": 8
   },
   {
@@ -19476,7 +19478,7 @@
   {
     "id": 47116,
     "event": "你试着做了一顿中餐，英国室友尝了一口沉默了五秒，然后说：「This is genuinely the best thing I've eaten in this country.」——考虑到英国菜的水平，你不确定这算不算夸奖。",
-    "include": "(country==英国)&(AGE>=19)",
+    "include": "(country==英国)&(AGE>=19)&(AGE<=24)",
     "weight": 8,
     "effect": {
       "SOC": 1,
@@ -19501,7 +19503,7 @@
   {
     "id": 47201,
     "event": "你打开宿舍门，墙上趴着一只手掌大的蜘蛛。你尖叫了三声，澳洲室友淡定地用纸巾捏走，说「这个还算小的」。",
-    "include": "(country==澳洲)&(AGE>=19)",
+    "include": "(country==澳洲)&(AGE>=19)&(AGE<=24)",
     "weight": 8,
     "effect": {
       "HAP": -1
@@ -19520,7 +19522,7 @@
   {
     "id": 47203,
     "event": "澳洲室友硬拉你去海边学冲浪。你被浪拍了十几次，喝了半肚子海水。但站上冲浪板的那一秒，你懂了他为什么每天五点起。",
-    "include": "(country==澳洲)&(AGE>=19)&(SOC>=4)",
+    "include": "(country==澳洲)&(AGE>=19)&(SOC>=4)&(AGE<=24)",
     "weight": 6,
     "effect": {
       "HLT": 1,
@@ -19555,7 +19557,7 @@
   {
     "id": 47207,
     "event": "澳洲的紫外线不是开玩笑的。你出门没涂防晒霜，两个小时后脸红得像煮熟的虾。室友递给你一瓶芦荟胶，说「Welcome to Australia, mate」。",
-    "include": "(country==澳洲)&(AGE>=19)&(MTH>=10|MTH<=3)",
+    "include": "(country==澳洲)&(AGE>=19)&(MTH>=10|MTH<=3)&(AGE<=24)",
     "weight": 8,
     "effect": {
       "HLT": -1
@@ -19624,7 +19626,7 @@
   {
     "id": 47215,
     "event": "学校邮件通知有蛇出没，建议走路注意脚下。你看完邮件后在宿舍里蹲了一整天没出门。",
-    "include": "(country==澳洲)&(AGE>=19)",
+    "include": "(country==澳洲)&(AGE>=19)&(AGE<=24)",
     "weight": 6,
     "effect": {
       "HAP": -1
@@ -19681,7 +19683,7 @@
   {
     "id": 47305,
     "event": "学校食堂一顿饭只要 €2.5，味道还不错。你发现欧洲大学的性价比可能是全球最高的。",
-    "include": "(country==欧洲)&(AGE>=19)",
+    "include": "(country==欧洲)&(AGE>=19)&(AGE<=24)",
     "weight": 8,
     "effect": {
       "HAP": 1,
@@ -19691,7 +19693,7 @@
   {
     "id": 47306,
     "event": "意大利/法国室友每天做饭到深夜，厨房变成了战场。但他端了一盘完美的意面给你，你决定原谅他。",
-    "include": "(country==欧洲)&(AGE>=19)&(SOC>=4)",
+    "include": "(country==欧洲)&(AGE>=19)&(SOC>=4)&(AGE<=24)",
     "weight": 6,
     "effect": {
       "HAP": 1,
@@ -19787,7 +19789,7 @@
   {
     "id": 47316,
     "event": "你修的一门哲学课期末考是口试。教授坐在你对面，眼镜滑到鼻尖，问你：「你觉得什么是存在？」你用二外磕磕巴巴讲了二十分钟，出来时一身冷汗。",
-    "include": "(country==欧洲)&(AGE>=19)&(INT>=4)",
+    "include": "(country==欧洲)&(AGE>=19)&(INT>=4)&(AGE<=24)",
     "weight": 5,
     "effect": {
       "INT": 1,
@@ -19806,7 +19808,7 @@
   {
     "id": 47402,
     "event": "香港的房租太贵了。你的宿舍只有五平米，床和书桌之间的距离刚好够转身。你戏称自己住在「太空舱」。",
-    "include": "(country==香港)&(AGE>=19)",
+    "include": "(country==香港)&(AGE>=19)&(AGE<=24)",
     "exclude": "EVT?[47402]",
     "weight": 8,
     "effect": {
@@ -19817,7 +19819,7 @@
   {
     "id": 47403,
     "event": "台风「挂八号风球」，全港停课停工！你在宿舍里躺了一天吃零食看电影，窗外风雨交加。感觉这是来香港之后最爽的一天。",
-    "include": "(country==香港)&(AGE>=19)&(MTH>=7)&(MTH<=9)",
+    "include": "(country==香港)&(AGE>=19)&(MTH>=7)&(MTH<=9)&(AGE<=24)",
     "weight": 6,
     "effect": {
       "HAP": 2
@@ -19864,7 +19866,7 @@
   {
     "id": 47408,
     "event": "你去学校的 canteen 吃饭，一份烧腊饭只要30港币，叉烧肥瘦相间，配上甜酱油拌饭——你觉得这是你留学期间吃过的最好的食堂。",
-    "include": "(country==香港)&(AGE>=19)",
+    "include": "(country==香港)&(AGE>=19)&(AGE<=24)",
     "weight": 8,
     "effect": {
       "HAP": 1
@@ -19873,7 +19875,7 @@
   {
     "id": 47409,
     "event": "香港的夏天热到你怀疑人生。35度加上90%的湿度，从宿舍走到教学楼五分钟你就湿透了。你开始理解为什么香港人把空调开到16度。",
-    "include": "(country==香港)&(AGE>=19)&(MTH>=6)&(MTH<=9)",
+    "include": "(country==香港)&(AGE>=19)&(MTH>=6)&(MTH<=9)&(AGE<=24)",
     "weight": 8,
     "effect": {
       "HLT": -1
@@ -20037,7 +20039,7 @@
   {
     "id": 47512,
     "event": "你被教授布置了一篇全日语的期末论文。你在图书馆查了三天字典，写了三千字，其中一半是从论文模板里抄的句式。教授居然给了你 B+。",
-    "include": "(country==日本)&(AGE>=19)&(INT>=4)",
+    "include": "(country==日本)&(AGE>=19)&(INT>=4)&(AGE<=24)",
     "weight": 6,
     "effect": {
       "INT": 1
@@ -20062,7 +20064,7 @@
   {
     "id": 47515,
     "event": "你开始习惯24小时便利店的存在。凌晨三点去买饭团和炸鸡块已经成了你的日常。7-11是你的深夜食堂。",
-    "include": "(country==日本)&(AGE>=19)",
+    "include": "(country==日本)&(AGE>=19)&(AGE<=24)",
     "weight": 9,
     "effect": {
       "HAP": 1
@@ -20090,7 +20092,7 @@
   {
     "id": 47602,
     "event": "新加坡的热是一种从早到晚不变的、稳定的、令人绝望的35度。你从宿舍走到教学楼十分钟，衣服已经能拧出水来。",
-    "include": "(country==新加坡)&(AGE>=19)",
+    "include": "(country==新加坡)&(AGE>=19)&(AGE<=24)",
     "weight": 8,
     "effect": {
       "HLT": -1
@@ -20248,7 +20250,7 @@
   {
     "id": 48003,
     "event": "实验室的示波器又被上一组人调乱了，你花了半小时才把波形调回来。EE 人的日常。",
-    "include": "(AGE>=20)&(MAJOR==EE)",
+    "include": "(AGE>=20)&(MAJOR==EE)&(AGE<=26)",
     "weight": 5,
     "effect": {
       "PER": 1
@@ -20257,7 +20259,7 @@
   {
     "id": 48004,
     "event": "信号与系统期末考，拉普拉斯变换和傅里叶变换在你脑子里搅成一团。你盯着卷子上的积分号发呆。",
-    "include": "(AGE>=20)&(MAJOR==EE)",
+    "include": "(AGE>=20)&(MAJOR==EE)&(AGE<=24)",
     "weight": 4,
     "effect": {
       "HAP": -1
@@ -20295,7 +20297,7 @@
   {
     "id": 48008,
     "event": "你在实验室调了一整天的电路，最后发现问题出在一根接触不良的杜邦线上。你盯着那根线看了十秒，深呼吸。",
-    "include": "(AGE>=20)&(MAJOR==EE)",
+    "include": "(AGE>=20)&(MAJOR==EE)&(AGE<=26)",
     "weight": 5,
     "effect": {
       "PER": 1,
@@ -20315,7 +20317,7 @@
   {
     "id": 48095,
     "event": "你帮室友修了一个坏掉的充电器，拆开一看是个电容鼓包了。换上新的，满血复活。室友封你为「宿舍首席硬件工程师」。",
-    "include": "(AGE>=20)&(MAJOR==EE)",
+    "include": "(AGE>=20)&(MAJOR==EE)&(AGE<=24)",
     "weight": 4,
     "effect": {
       "SOC": 1,
@@ -20325,7 +20327,7 @@
   {
     "id": 48010,
     "event": "你加入了教授的芯片设计实验室，开始学习 Verilog 和数字电路设计。",
-    "include": "(AGE>=20)&(MAJOR==EE)&(PER>6)",
+    "include": "(AGE>=20)&(MAJOR==EE)&(PER>6)&(AGE<=26)",
     "exclude": "EVT?[48010]",
     "weight": 3,
     "branch": [
@@ -20449,7 +20451,7 @@
   {
     "id": 48030,
     "event": "室友问你毕业后打算做什么，你说想做芯片。他说：「现在不都转CS了吗？」你沉默了三秒。",
-    "include": "(AGE>=20)&(MAJOR==EE)",
+    "include": "(AGE>=20)&(MAJOR==EE)&(AGE<=24)",
     "weight": 4,
     "effect": {
       "HAP": -1
@@ -20599,7 +20601,7 @@
   {
     "id": 48070,
     "event": "你在实验室焊板子的时候，闻到了一股焦味。低头一看，电容炸了，桌上一片狼藉。",
-    "include": "(AGE>=20)&(MAJOR==EE)",
+    "include": "(AGE>=20)&(MAJOR==EE)&(AGE<=26)",
     "weight": 4,
     "effect": {
       "HAP": -1,
@@ -20609,7 +20611,7 @@
   {
     "id": 48075,
     "event": "你花了不少钱买了一套自己的焊接工具和示波器，在宿舍搭了一个迷你工作台。室友说你疯了。",
-    "include": "(AGE>=20)&(MAJOR==EE)&(MNY>6)",
+    "include": "(AGE>=20)&(MAJOR==EE)&(MNY>6)&(AGE<=24)",
     "exclude": "EVT?[48075]",
     "weight": 3,
     "effect": {
@@ -20967,7 +20969,7 @@
   {
     "id": 48202,
     "event": "材料力学期末考，你对着莫尔圆画了半小时，最后发现自己正负号搞反了。",
-    "include": "(AGE>=20)&(MAJOR==ME)",
+    "include": "(AGE>=20)&(MAJOR==ME)&(AGE<=24)",
     "weight": 5,
     "effect": {
       "INT": 1,
@@ -21088,7 +21090,7 @@
   {
     "id": 48214,
     "event": "实验室里测材料拉伸曲线，试样「啪」一声断了，数据完美地画出了应力-应变曲线。你终于把课本上的抽象概念和现实连起来了。",
-    "include": "(AGE>=20)&(MAJOR==ME)",
+    "include": "(AGE>=20)&(MAJOR==ME)&(AGE<=26)",
     "weight": 4,
     "effect": {
       "INT": 1
@@ -21097,7 +21099,7 @@
   {
     "id": 48215,
     "event": "教授让你帮忙在实验室搭一台振动测试平台。你花了两周，从选传感器到写数据采集程序全部自己搞定。",
-    "include": "(AGE>=20)&(MAJOR==ME)&(PER>6)",
+    "include": "(AGE>=20)&(MAJOR==ME)&(PER>6)&(AGE<=26)",
     "weight": 3,
     "effect": {
       "PER": 2,
@@ -21118,7 +21120,7 @@
   {
     "id": 48217,
     "event": "你自己设计并加工了一个微型斯特林发动机，点火后居然真的转起来了。实验室的同学们都围过来看。",
-    "include": "(AGE>=20)&(MAJOR==ME)&(INT>7)&(PER>6)",
+    "include": "(AGE>=20)&(MAJOR==ME)&(INT>7)&(PER>6)&(AGE<=26)",
     "weight": 3,
     "effect": {
       "INT": 1,
@@ -21220,7 +21222,7 @@
   {
     "id": 48232,
     "event": "你买了一套自己的工具箱，从扳手到游标卡尺一应俱全。室友问你是不是要开修车店，你笑而不语。",
-    "include": "(AGE>=20)&(MAJOR==ME)&(MNY>6)",
+    "include": "(AGE>=20)&(MAJOR==ME)&(MNY>6)&(AGE<=24)",
     "weight": 3,
     "effect": {
       "MNY": -1,
@@ -21231,7 +21233,7 @@
   {
     "id": 48233,
     "event": "你帮同学修了一辆坏掉的自行车，拆开变速器调了半小时就搞定了。从此你在宿舍楼里的外号变成了「扳手哥/扳手姐」。",
-    "include": "(AGE>=20)&(MAJOR==ME)",
+    "include": "(AGE>=20)&(MAJOR==ME)&(AGE<=24)",
     "weight": 4,
     "effect": {
       "SOC": 1,
@@ -21241,7 +21243,7 @@
   {
     "id": 48235,
     "event": "你的课程论文被导师推荐到了 ASME 国际会议，还被选为口头报告。你第一次站在国际学术舞台上。",
-    "include": "(AGE>=20)&(MAJOR==ME)&(INT>9)",
+    "include": "(AGE>=20)&(MAJOR==ME)&(INT>9)&(AGE<=26)",
     "weight": 2,
     "exclude": "EVT?[48235]",
     "effect": {
@@ -21253,7 +21255,7 @@
   {
     "id": 48236,
     "event": "你独立完成了一套完整的行星齿轮箱设计，从计算到建模到加工到装配，精度控制在 0.01mm 以内。导师说你可以直接去工厂当总工了。",
-    "include": "(AGE>=21)&(MAJOR==ME)&(INT>8)&(PER>7)",
+    "include": "(AGE>=21)&(MAJOR==ME)&(INT>8)&(PER>7)&(AGE<=26)",
     "weight": 2,
     "exclude": "EVT?[48236]",
     "effect": {
@@ -21625,7 +21627,7 @@
   {
     "id": 48302,
     "event": "有机化学期末考，你对着一堆六元环和取代基命名写了三个小时。走出考场的时候你发誓再也不想看到苯环了。",
-    "include": "(AGE>=20)&(MAJOR==BIO)",
+    "include": "(AGE>=20)&(MAJOR==BIO)&(AGE<=24)",
     "weight": 8,
     "effect": {
       "INT": 1,
@@ -21635,7 +21637,7 @@
   {
     "id": 48303,
     "event": "生物化学课讲代谢通路，糖酵解、三羧酸循环、电子传递链……你画了一张巨大的代谢图贴在墙上，室友以为你在搞邪教。",
-    "include": "(AGE>=20)&(MAJOR==BIO)",
+    "include": "(AGE>=20)&(MAJOR==BIO)&(AGE<=24)",
     "weight": 8,
     "effect": {
       "INT": 1,
@@ -21704,7 +21706,7 @@
   {
     "id": 48310,
     "event": "你在实验室跑 PCR，等了两个小时跑胶，结果什么条带都没有。你盯着空白的凝胶图沉默了很久。",
-    "include": "(AGE>=20)&(MAJOR==BIO)",
+    "include": "(AGE>=20)&(MAJOR==BIO)&(AGE<=26)",
     "weight": 8,
     "effect": {
       "HAP": -1,
@@ -21736,7 +21738,7 @@
   {
     "id": 48313,
     "event": "实验室的离心机发出了诡异的噪音，你打开盖子发现有人没配平。你默默配好重新跑，在群里发了一条「请注意配平」。",
-    "include": "(AGE>=20)&(MAJOR==BIO)",
+    "include": "(AGE>=20)&(MAJOR==BIO)&(AGE<=26)",
     "weight": 8,
     "effect": {
       "PER": 1
@@ -21756,7 +21758,7 @@
   {
     "id": 48315,
     "event": "导师让你负责实验室的蛋白纯化工作，你优化了纯化流程，产量比之前提高了三倍。",
-    "include": "(AGE>=20)&(MAJOR==BIO)&(PER>6)",
+    "include": "(AGE>=20)&(MAJOR==BIO)&(PER>6)&(AGE<=26)",
     "weight": 6,
     "exclude": "EVT?[48315]",
     "effect": {
@@ -21767,7 +21769,7 @@
   {
     "id": 48316,
     "event": "你在超净台前坐了一整天做细胞转染，紫外灯烤得你脸发红。回宿舍后室友问你是不是去海边了。",
-    "include": "(AGE>=20)&(MAJOR==BIO)",
+    "include": "(AGE>=20)&(MAJOR==BIO)&(AGE<=24)",
     "weight": 7,
     "effect": {
       "PER": 1,
@@ -21787,7 +21789,7 @@
   {
     "id": 48318,
     "event": "你用生物信息学工具分析了一组测序数据，发现了一个之前没人报道过的突变位点。导师说这可能值一篇论文。",
-    "include": "(AGE>=20)&(MAJOR==BIO)&(INT>7)",
+    "include": "(AGE>=20)&(MAJOR==BIO)&(INT>7)&(AGE<=26)",
     "weight": 6,
     "effect": {
       "INT": 2,
@@ -21797,7 +21799,7 @@
   {
     "id": 48319,
     "event": "实验室搬家，你搬了一天的试剂瓶、培养箱和离心机。你觉得读生物不仅需要脑力，还需要体力。",
-    "include": "(AGE>=20)&(MAJOR==BIO)",
+    "include": "(AGE>=20)&(MAJOR==BIO)&(AGE<=26)",
     "weight": 7,
     "effect": {
       "HLT": -1,
@@ -21838,7 +21840,7 @@
   {
     "id": 48325,
     "event": "导师推荐你参加一个校企合作项目，帮一家药企做靶点筛选的实验。",
-    "include": "(AGE>=20)&(MAJOR==BIO)&(INT>8)&(PER>6)",
+    "include": "(AGE>=20)&(MAJOR==BIO)&(INT>8)&(PER>6)&(AGE<=26)",
     "weight": 6,
     "exclude": "EVT?[48325]",
     "branch": [
@@ -21887,7 +21889,7 @@
   {
     "id": 48332,
     "event": "你自费买了一套移液枪练手感，室友看你像看疯子。但你的加样精度确实从此突飞猛进。",
-    "include": "(AGE>=20)&(MAJOR==BIO)&(MNY>6)",
+    "include": "(AGE>=20)&(MAJOR==BIO)&(MNY>6)&(AGE<=24)",
     "weight": 6,
     "effect": {
       "MNY": -1,
@@ -21898,7 +21900,7 @@
   {
     "id": 48333,
     "event": "你帮同学从实验室带了一瓶分子级纯水回来泡茶。他喝了一口说：「这水怎么这么纯？」你说：「因为它确实很纯。」",
-    "include": "(AGE>=20)&(MAJOR==BIO)",
+    "include": "(AGE>=20)&(MAJOR==BIO)&(AGE<=26)",
     "weight": 7,
     "effect": {
       "SOC": 1,
@@ -21908,7 +21910,7 @@
   {
     "id": 48335,
     "event": "你的本科毕业论文被导师推荐到了一个 SCI 期刊，审稿人给了 minor revision。你离发表人生第一篇论文只差一步了。",
-    "include": "(AGE>=20)&(MAJOR==BIO)&(INT>9)",
+    "include": "(AGE>=20)&(MAJOR==BIO)&(INT>9)&(AGE<=26)",
     "weight": 5,
     "exclude": "EVT?[48335]",
     "effect": {
@@ -21920,7 +21922,7 @@
   {
     "id": 48336,
     "event": "你在实验室里发现了一种新型酶的催化机制，导师兴奋得当场打电话给合作教授。这个发现可能值一篇高影响因子论文。",
-    "include": "(AGE>=21)&(MAJOR==BIO)&(INT>8)&(PER>7)",
+    "include": "(AGE>=21)&(MAJOR==BIO)&(INT>8)&(PER>7)&(AGE<=26)",
     "weight": 5,
     "exclude": "EVT?[48336]",
     "effect": {
@@ -22290,7 +22292,7 @@
   {
     "id": 48402,
     "event": "你花了整整一周背人体 206 块骨骼的名字和位置。室友说你睡觉都在念「肱骨、尺骨、桡骨……」",
-    "include": "(AGE>=20)&(MAJOR==MED)",
+    "include": "(AGE>=20)&(MAJOR==MED)&(AGE<=24)",
     "weight": 8,
     "effect": {
       "INT": 1,
@@ -22341,7 +22343,7 @@
   {
     "id": 48407,
     "event": "期末考试月，你每天学习十四个小时。图书馆关门了就去自习室，自习室关了就回宿舍继续。你觉得自己的黑眼圈已经永久性了。",
-    "include": "(AGE>=20)&(MAJOR==MED)",
+    "include": "(AGE>=20)&(MAJOR==MED)&(AGE<=24)",
     "weight": 8,
     "effect": {
       "INT": 1,
@@ -22372,7 +22374,7 @@
   {
     "id": 48410,
     "event": "解剖实验室里的甲醛味让你头疼了一整天，但你发现自己已经能准确找到臂丛神经的五条根了。进步是实实在在的。",
-    "include": "(AGE>=20)&(MAJOR==MED)",
+    "include": "(AGE>=20)&(MAJOR==MED)&(AGE<=26)",
     "weight": 7,
     "effect": {
       "PER": 1,
@@ -23176,7 +23178,7 @@
   {
     "id": 48607,
     "event": "合同法期末作业，教授要求写一份30页的备忘录。你从周五写到周日，手指都是僵的。",
-    "include": "MAJOR==法学",
+    "include": "MAJOR==法学&(AGE<=24)",
     "weight": 9,
     "effect": {
       "INT": 1,
@@ -23235,7 +23237,7 @@
   {
     "id": 48613,
     "event": "期末考四小时写三道论述题，出来的时候天都黑了，右手完全没有知觉。",
-    "include": "MAJOR==法学",
+    "include": "MAJOR==法学&(AGE<=24)",
     "weight": 9,
     "effect": {
       "INT": 1,
@@ -24139,7 +24141,7 @@
   {
     "id": 48810,
     "event": "你的期末短片在学校放映时，有个情节让全场笑出声——这是你第一次感受到观众的能量。",
-    "include": "MAJOR==电影",
+    "include": "MAJOR==电影&(AGE<=24)",
     "weight": 7,
     "effect": {
       "PER": 1,
@@ -24217,7 +24219,7 @@
   {
     "id": 48818,
     "event": "期末拍摄遇到了最经典的问题：演员临时放鸽子。你现学现卖，十分钟内在校园里抓了个替补，愣是拍完了。",
-    "include": "MAJOR==电影",
+    "include": "MAJOR==电影&(AGE<=24)",
     "weight": 9,
     "effect": {
       "PER": 1,
@@ -25261,7 +25263,7 @@
   },
   {
     "id": 49004,
-    "include": "(AGE>=20)&(MAJOR==音乐)",
+    "include": "(AGE>=20)&(MAJOR==音乐)&(AGE<=24)",
     "weight": 5,
     "event": "学校音乐厅的期末汇报演出，你第一次站在聚光灯下面对两百人。手在抖，但唱完最后一个音时，掌声让你觉得一切值了。",
     "effect": {
@@ -25280,7 +25282,7 @@
   },
   {
     "id": 49006,
-    "include": "(AGE>=20)&(MAJOR==音乐)",
+    "include": "(AGE>=20)&(MAJOR==音乐)&(AGE<=24)",
     "weight": 5,
     "event": "凌晨三点在宿舍戴着耳机编曲，一个副歌旋律突然冒出来——你反复哼了十几遍，越听越觉得对。这就是你的声音。",
     "effect": {
@@ -25340,7 +25342,7 @@
   },
   {
     "id": 49012,
-    "include": "(AGE>=20)&(MAJOR==音乐)&(INT>=8)",
+    "include": "(AGE>=20)&(MAJOR==音乐)&(INT>=8)&(AGE<=26)",
     "weight": 5,
     "event": "作曲课期末作品被导师在全班播放：「这位同学的配器思路很成熟，大家可以参考。」你假装淡定，心里乐开了花。",
     "effect": {
@@ -25440,7 +25442,7 @@
   },
   {
     "id": 49022,
-    "include": "(AGE>=20)&(MAJOR==音乐)&(INT>=9)",
+    "include": "(AGE>=20)&(MAJOR==音乐)&(INT>=9)&(AGE<=26)",
     "weight": 4,
     "event": "导师推荐你参加伯克利暑期大师班。申请材料写到第三版才满意，录制的作品集更是改了不下十遍。",
     "effect": {
@@ -25460,7 +25462,7 @@
   },
   {
     "id": 49024,
-    "include": "(AGE>=20)&(MAJOR==音乐)",
+    "include": "(AGE>=20)&(MAJOR==音乐)&(AGE<=24)",
     "weight": 4,
     "event": "期末周赶四门课+一首作品。连续三天只睡四小时，视唱练耳考试时耳朵嗡嗡响，差点把大三度听成小三度。",
     "effect": {
@@ -25570,7 +25572,7 @@
   },
   {
     "id": 49043,
-    "include": "(AGE>=21)&(MAJOR==音乐)",
+    "include": "(AGE>=21)&(MAJOR==音乐)&(AGE<=24)",
     "weight": 3,
     "exclude": "EVT?[49043]",
     "event": "室友给你看了一个AI作曲工具：输入风格和情绪关键词，三十秒生成一段完整编曲。质量意外地不错。你的新歌正好缺一段bridge……",
@@ -26469,7 +26471,7 @@
   {
     "id": 49601,
     "event": "暑假收到了一封来自硅谷某独角兽的实习offer，面试时白板手撕了一道Hard。入职第一天发现mentor竟然是个华人学长。",
-    "include": "country==美国&major==CS&overseas==1",
+    "include": "country==美国&major==CS&overseas==1&(AGE<=24)",
     "weight": 1,
     "effect": {
       "INT": 2,
@@ -26500,7 +26502,7 @@
   {
     "id": 49604,
     "event": "你用课程作业拍的短片过了柏林短片节学生单元初审。导师说「技术粗糙但视角独特」——你激动得一晚没睡。",
-    "include": "country==欧洲&major==电影&overseas==1",
+    "include": "country==欧洲&major==电影&overseas==1&(AGE<=26)",
     "weight": 1,
     "effect": {
       "PER": 2,
@@ -26520,7 +26522,7 @@
   {
     "id": 49606,
     "event": "学长带你参观了金丝雀码头的trading floor。屏幕上的数字跳得比心脏还快。走出大楼时你攥紧了拳头。",
-    "include": "country==英国&major==商科&overseas==1",
+    "include": "country==英国&major==商科&overseas==1&(AGE<=24)",
     "weight": 1,
     "effect": {
       "MNY": 2,
@@ -26570,7 +26572,7 @@
   {
     "id": 49611,
     "event": "新加坡的医工交叉实验室招本科RA。你申请的AI影像诊断项目组刚好在做东南亚热带病数据集。",
-    "include": "country==新加坡&major==CS&overseas==1",
+    "include": "country==新加坡&major==CS&overseas==1&(AGE<=26)",
     "weight": 1,
     "effect": {
       "INT": 2,
@@ -26672,7 +26674,7 @@
   {
     "id": 49624,
     "event": "宿舍窗外的光线太美了，你借了室友的老相机，花一个下午拍了人生第一支短片。虽然只有三分钟，但你反复看了十遍。",
-    "include": "country==欧洲&hobby==film&overseas==1",
+    "include": "country==欧洲&hobby==film&overseas==1&(AGE<=24)",
     "weight": 1,
     "effect": {
       "PER": 1,
@@ -26838,7 +26840,7 @@
   {
     "id": 49643,
     "event": "你用电影系学到的镜头语言，拍了一支关于大堡礁珊瑚白化的科普短片。发布当天被BBC Earth的官方账号转发了。教授转发时配文：「我的学生做到了我们实验室科普十年没做到的事。」",
-    "include": "country==澳洲&hobby==science&major==电影&overseas==1",
+    "include": "country==澳洲&hobby==science&major==电影&overseas==1&(AGE<=26)",
     "logType": "easter",
     "weight": 1,
     "effect": {
@@ -26887,7 +26889,7 @@
   {
     "id": 49646,
     "event": "商法课期末moot court你代表原告。结辩时你脱稿陈述了五分钟，引用了三个真实判例。评委律师站起来鼓掌，说「这是我今年见过最好的本科生表现」。",
-    "include": "country==香港&hobby==law&major==商科&overseas==1",
+    "include": "country==香港&hobby==law&major==商科&overseas==1&(AGE<=24)",
     "logType": "easter",
     "weight": 1,
     "choices": [

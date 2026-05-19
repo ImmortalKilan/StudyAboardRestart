@@ -2733,6 +2733,279 @@ body.in-summary {
   to   { opacity: 1; transform: scale(1); }
 }
 
+/* ─── Reunion cinematic ──────── */
+.reunion-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background: rgba(0,0,0,0);
+  transition: background 300ms ease-out;
+}
+.reunion-overlay.active {
+  background: rgba(0,0,0,0.65);
+}
+.reunion-overlay.fade-out {
+  opacity: 0;
+  transition: opacity 350ms ease-in;
+}
+
+.reunion-title {
+  font-size: 36px;
+  font-weight: 800;
+  color: #ffd76b;
+  letter-spacing: 6px;
+  text-shadow: 0 0 20px rgba(255,215,107,0.5), 0 0 40px rgba(255,180,50,0.25);
+  opacity: 0;
+  transform: scale(0.7);
+  transition: opacity 300ms ease-out, transform 300ms cubic-bezier(.34,1.56,.64,1);
+}
+.reunion-title.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.reunion-cards {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-top: 18px;
+  height: 64px;
+}
+
+.reunion-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  backdrop-filter: blur(6px);
+  min-width: 100px;
+  opacity: 0;
+  transition: opacity 280ms ease-out, transform 350ms cubic-bezier(.34,1.56,.64,1);
+}
+.reunion-card.left {
+  transform: translateX(-50px);
+}
+.reunion-card.right {
+  transform: translateX(50px);
+}
+.reunion-card.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+.reunion-card-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+}
+.reunion-card-info {
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
+}
+
+.reunion-rel {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffd76b;
+  padding: 0 14px;
+  opacity: 0;
+  transform: scale(0);
+  transition: opacity 200ms ease-out, transform 250ms cubic-bezier(.34,1.56,.64,1);
+}
+.reunion-rel.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ─── Reunion dilemma overlay ──────── */
+.reunion-dilemma-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0);
+  transition: background 300ms ease-out;
+  padding: 16px;
+}
+.reunion-dilemma-overlay.active {
+  background: rgba(0,0,0,0.7);
+}
+
+.reunion-dilemma-box {
+  width: 100%;
+  max-width: 380px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border: 1px solid rgba(255,215,107,0.2);
+  border-radius: 16px;
+  padding: 28px 22px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 60px rgba(255,215,107,0.06);
+  animation: rdFadeIn 300ms ease-out both;
+}
+@keyframes rdFadeIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.reunion-dilemma-title {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffd76b;
+  letter-spacing: 3px;
+  margin-bottom: 4px;
+  text-shadow: 0 0 12px rgba(255,215,107,0.3);
+}
+.reunion-dilemma-prompt {
+  text-align: center;
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 20px;
+}
+
+.reunion-dilemma-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reunion-dilemma-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 200ms ease-out;
+  position: relative;
+}
+.reunion-dilemma-btn:hover:not(:disabled) {
+  background: rgba(255,215,107,0.1);
+  border-color: rgba(255,215,107,0.3);
+  transform: translateX(4px);
+}
+.reunion-dilemma-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.reunion-dilemma-btn.selected {
+  background: rgba(255,215,107,0.15);
+  border-color: rgba(255,215,107,0.5);
+  box-shadow: 0 0 16px rgba(255,215,107,0.15);
+}
+.reunion-dilemma-btn.dimmed {
+  opacity: 0.3;
+}
+.reunion-dilemma-btn:disabled {
+  cursor: default;
+}
+
+.rdb-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+  width: 36px;
+  text-align: center;
+}
+.reunion-dilemma-btn .rdb-content {
+  display: flex;
+  flex-direction: column;
+}
+.rdb-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.3;
+}
+.rdb-desc {
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+  margin-top: 2px;
+  line-height: 1.3;
+}
+
+/* Waiting spinner */
+.reunion-dilemma-waiting {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 18px;
+  color: rgba(255,255,255,0.6);
+  font-size: 14px;
+  animation: rdFadeIn 300ms ease-out both;
+}
+.rdw-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,215,107,0.3);
+  border-top-color: #ffd76b;
+  border-radius: 50%;
+  animation: rdSpin 800ms linear infinite;
+}
+@keyframes rdSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* Result display */
+.reunion-dilemma-result {
+  text-align: center;
+  animation: rdFadeIn 300ms ease-out both;
+}
+.rdr-opp-choice {
+  font-size: 14px;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 16px;
+}
+.rdr-text {
+  font-size: 15px;
+  color: #e6e9ef;
+  line-height: 1.7;
+  margin-bottom: 18px;
+}
+.rdr-effects {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.rde-tag {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.06);
+}
+.rde-tag.pos { color: #4ade80; }
+.rde-tag.neg { color: #f87171; }
+
+.rdr-close {
+  padding: 10px 36px;
+  background: linear-gradient(135deg, #ffd76b, #ffb347);
+  color: #1a1a2e;
+  font-weight: 700;
+  font-size: 15px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 150ms ease-out, box-shadow 150ms ease-out;
+}
+.rdr-close:hover {
+  transform: scale(1.04);
+  box-shadow: 0 4px 16px rgba(255,215,107,0.3);
+}
+
 /* ─── Action banner (idol debut / party CEO transition) ──────── */
 .action-banner {
   display: flex;

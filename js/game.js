@@ -8,6 +8,7 @@ let createRoom, joinRoom, mpSend, mpOn, mpDisconnect, resetMpState, REUNION_AGES
 // MP VS comparison data
 let _mpMyEndData = null;   // own final snapshot, set when game ends
 let _mpOppEndData = null;  // opponent's final snapshot, received via game_end
+let _allTalents = null;    // cached talents data for restart without reload
 
 const STAT_KEYS = ['SOC', 'INT', 'MNY', 'PER', 'HLT', 'APP'];
 const STAT_LABELS = {
@@ -4224,6 +4225,7 @@ requestAnimationFrame(_syncViewportHeight);
 async function main() {
   initAchievements();
   const talents = await loadData();
+  _allTalents = talents;
 
 
   $('sex-male').addEventListener('click', () => { state.sex = 0; $('sex-male').classList.add('active'); $('sex-female').classList.remove('active'); updateCreationAvatar(); });
@@ -4531,6 +4533,7 @@ async function main() {
   });
 
   $('btn-end-restart').addEventListener('click', () => {
+    if (mp.enabled && mp.connected) { _mpHandleRestart(); return; }
     location.reload();
   });
 
@@ -4540,6 +4543,7 @@ async function main() {
   });
 
   $('btn-summary-restart').addEventListener('click', () => {
+    if (mp.enabled && mp.connected) { _mpHandleRestart(); return; }
     location.reload();
   });
 
@@ -4884,7 +4888,306 @@ function _triggerReunion(age) {
   }
 }
 
-function _fireReunionEvent(age) {
+async function _playReunionCinematic(age, myName, oppName, oppProf, oppSchool, relLabel) {
+  const _w = ms => new Promise(r => setTimeout(r, ms));
+
+  const overlay = document.createElement('div');
+  overlay.className = 'reunion-overlay';
+
+  // Title
+  const title = document.createElement('div');
+  title.className = 'reunion-title';
+  title.textContent = `${age}岁 · 老友聚会`;
+  overlay.appendChild(title);
+
+  // Cards row: [me] [rel] [opp]
+  const row = document.createElement('div');
+  row.className = 'reunion-cards';
+
+  const myCard = document.createElement('div');
+  myCard.className = 'reunion-card left';
+  myCard.innerHTML = `<span class="reunion-card-name">${myName}</span>
+    <span class="reunion-card-info">${state.profession || '未知'}</span>`;
+
+  const relTag = document.createElement('div');
+  relTag.className = 'reunion-rel';
+  relTag.textContent = relLabel;
+
+  const oppCard = document.createElement('div');
+  oppCard.className = 'reunion-card right';
+  oppCard.innerHTML = `<span class="reunion-card-name">${oppName}</span>
+    <span class="reunion-card-info">${oppProf}${oppSchool ? ' · ' + oppSchool : ''}</span>`;
+
+  row.appendChild(myCard);
+  row.appendChild(relTag);
+  row.appendChild(oppCard);
+  overlay.appendChild(row);
+
+  document.body.appendChild(overlay);
+
+  // Timeline (~2s total)
+  // 0ms: overlay bg fade in + title pop
+  await _w(30);
+  overlay.classList.add('active');
+  title.classList.add('show');
+
+  // 350ms: cards slide in
+  await _w(350);
+  myCard.classList.add('show');
+  oppCard.classList.add('show');
+
+  // 650ms: relation label pops
+  await _w(300);
+  relTag.classList.add('show');
+
+  // Hold for reading
+  await _w(900);
+
+  // Fade out everything
+  overlay.classList.add('fade-out');
+  await _w(350);
+  overlay.remove();
+}
+
+// ── Reunion Dilemma Config ──
+const REUNION_DILEMMA = {
+  23: {
+    title: '毕业季',
+    intro: (opp, rel, oppProf, oppSchool, oppRel) =>
+      `毕业季的老同学聚餐，你见到了${rel}${opp}。TA现在是「${oppProf}」${oppSchool ? `，从${oppSchool}毕业` : ''}。大家点了一桌子菜，气氛正好。${oppRel === '单身' ? 'TA还是单身，你们开始起哄。' : `听说TA现在${oppRel}了。`}`,
+    choices: [
+      { key: 'coop', icon: '🍻', text: '一起痛饮到天亮', desc: '不管未来怎样，今晚不醉不归' },
+      { key: 'betray', icon: '📱', text: '好好发个朋友圈装一下', desc: '记录一下吧，难得的重逢嘛' },
+      { key: 'risky', icon: '🎓', text: '提议一起创业', desc: '我有个想法，要不要一起干？' },
+    ],
+    results: {
+      'coop_coop':     { my: { SOC: 2, HAP: 4 }, opp: { SOC: 2, HAP: 4 }, rel: 30, text: (o) => `你们聊了一晚上，从大学糗事到现在的迷茫，越聊越起劲。临走时勾肩搭背，约好下个月再聚。` },
+      'coop_betray':   { my: { HAP: -2, SOC: -2 }, opp: { MNY: 4 }, rel: -40, text: (o) => `你掏心掏肺讲了半天，${o}却一直在拍照修图发朋友圈。配文"和老同学叙旧❤️"，你成了TA精致生活的背景板。` },
+      'coop_risky':    { my: { SOC: 2, HAP: 4 }, opp: { HAP: -2, PER: 2 }, rel: 10, text: (o) => `你喝得正开心，${o}突然认真地说想一起创业。你笑了笑没接话。TA有些失落，但你们的关系倒没变差。` },
+      'betray_coop':   { my: { MNY: 4 }, opp: { HAP: -2, SOC: -2 }, rel: -40, text: (o) => `${o}真诚地分享着近况，你却忙着拍照选滤镜。"在大学同学聚会，感恩遇见🥂"，发出去点赞数不少。${o}看到后表情有点微妙。` },
+      'betray_betray': { my: { HAP: -2 }, opp: { HAP: -2 }, rel: -20, text: (o) => `你们都在忙着拍照发朋友圈，互相给对方点了个赞，然后各自沉默刷手机。散场时客气地说"下次再聚"，心里都知道不会有下次。` },
+      'betray_risky':  { my: { MNY: 4 }, opp: { HAP: -4 }, rel: -40, text: (o) => `${o}鼓起勇气提出一起创业，你却对着手机头也不抬地回了句"再说吧"。TA的表情像被泼了一盆冷水。` },
+      'risky_coop':    { my: { HAP: -2, PER: 2 }, opp: { SOC: 2, HAP: 4 }, rel: 10, text: (o) => `你提出一起创业的想法，${o}笑着说"先喝酒吧"。虽然没被接受，但TA的态度很温暖，你反而更坚定了自己的想法。` },
+      'risky_betray':  { my: { HAP: -4 }, opp: { MNY: 4 }, rel: -40, text: (o) => `你兴致勃勃地讲创业计划，${o}一边嗯嗯一边发朋友圈。你后来才发现TA配文写的是"有人毕业了还在做梦😂"。` },
+      'risky_risky':   { my: { MNY: 6, SOC: 4, PER: 2 }, opp: { MNY: 6, SOC: 4, PER: 2 }, rel: 40, text: (o) => `你们不约而同地提出创业，越聊越兴奋，当晚就在餐巾纸上画起了商业计划。也许这才是这顿饭最大的收获。` },
+    },
+  },
+  28: {
+    title: '职场江湖',
+    intro: (opp, rel, oppProf, oppSchool, oppRel) =>
+      `工作几年了，你和${rel}${opp}约了顿饭。TA现在是「${oppProf}」，看起来变了不少。你们点了壶茶，聊起各自的近况。`,
+    choices: [
+      { key: 'coop', icon: '🤝', text: '帮TA内推工作', desc: '把自己的人脉资源分享出去' },
+      { key: 'betray', icon: '💼', text: '套TA的商业情报', desc: '表面关心，其实在打探对方底细' },
+      { key: 'neutral', icon: '🍷', text: '什么都不聊，纯喝酒', desc: '不帮不坑，今晚只想放松' },
+    ],
+    results: {
+      'coop_coop':       { my: { SOC: 2, HAP: 4, MNY: 2 }, opp: { SOC: 2, HAP: 4, MNY: 2 }, rel: 30, text: (o) => `你帮${o}推了个好机会，TA也把自己的人脉介绍给你。这顿饭吃得值——老朋友就是最好的资源。` },
+      'coop_betray':     { my: { HAP: -2, SOC: -2 }, opp: { MNY: 4, SOC: 2 }, rel: -40, text: (o) => `你费心帮${o}牵线搭桥，后来才发现TA背地里在挖你的客户。一股寒意涌上心头。` },
+      'coop_neutral':    { my: { SOC: 2 }, opp: { HAP: 2 }, rel: 5, text: (o) => `你主动聊起工作机会想帮${o}，TA笑着说"今天不聊工作"，举起酒杯。也好，难得清闲。` },
+      'betray_coop':     { my: { MNY: 4, SOC: 2 }, opp: { HAP: -2, SOC: -2 }, rel: -40, text: (o) => `${o}热心地帮你介绍资源，你却悄悄记下了TA的客户联系方式。生意场上嘛……你安慰自己。` },
+      'betray_betray':   { my: { HAP: -2 }, opp: { HAP: -2 }, rel: -20, text: (o) => `你们表面和气地交换信息，暗地里都在套对方的底。最后谁也没占到便宜，饭钱倒花了不少。` },
+      'betray_neutral':  { my: { MNY: 2 }, opp: { HAP: -2 }, rel: -20, text: (o) => `你旁敲侧击地套话，${o}只顾喝酒不接茬。临走时TA说"感觉你今天怪怪的"。尴尬。` },
+      'neutral_coop':    { my: { HAP: 2 }, opp: { SOC: 2 }, rel: 5, text: (o) => `${o}想帮你推荐工作，你摆摆手说今天就是想放松。TA的好意你记在心里了。` },
+      'neutral_betray':  { my: { HAP: -2 }, opp: { MNY: 2 }, rel: -20, text: (o) => `你只想安静喝酒，${o}却一直在套你的工作情况。一顿饭吃得索然无味。` },
+      'neutral_neutral': { my: { HAP: 2, HLT: -2 }, opp: { HAP: 2, HLT: -2 }, rel: 0, text: (o) => `你们默契地不聊任何正事，一杯接一杯地喝。凌晨两点扶着墙回家，头疼得厉害。但心情不错。` },
+    },
+  },
+  33: {
+    title: '最后的交杯',
+    intro: (opp, rel, oppProf, oppSchool, oppRel) =>
+      `${rel}${opp}约你吃饭。TA现在是「${oppProf}」。能来的老朋友已经不多了。你们找了个安静的地方坐下，窗外是深秋的街景。`,
+    choices: [
+      { key: 'coop', icon: '🫂', text: '掏心窝子聊人生', desc: '聊遗憾、梦想、这些年的起落' },
+      { key: 'betray', icon: '🪞', text: '维持表面客气', desc: '笑着碰杯，心里想着自己的事' },
+      { key: 'risky', icon: '💰', text: '提议一起搞投资', desc: '中年了有点积蓄，合伙投点什么？' },
+    ],
+    results: {
+      'coop_coop':     { my: { SOC: 4, HAP: 6 }, opp: { SOC: 4, HAP: 6 }, rel: 40, text: (o) => `人到中年，能这么掏心窝子聊的朋友不多了。从事业聊到家庭、遗憾和梦想，你们聊到深夜。散场时都红了眼眶。` },
+      'coop_betray':   { my: { HAP: -4 }, opp: { SOC: 2 }, rel: -50, text: (o) => `你放下了所有防备想好好聊聊，${o}却全程在客套寒暄。你突然意识到，有些人注定走不进你的世界。` },
+      'coop_risky':    { my: { SOC: 4, HAP: 6 }, opp: { HAP: -2, PER: 2 }, rel: 20, text: (o) => `你想好好叙叙旧，${o}却急着聊投资。你耐心听完，说"钱的事不急，先把酒喝了"。${o}愣了一下，然后笑了。` },
+      'betray_coop':   { my: { SOC: 2 }, opp: { HAP: -4 }, rel: -50, text: (o) => `${o}想跟你好好聊聊这些年的心里话，你却笑着把话题带过。回家路上你有点后悔——这种机会可能不多了。` },
+      'betray_betray': { my: { HAP: -4 }, opp: { HAP: -4 }, rel: -30, text: (o) => `你们笑着碰杯，聊些无关痛痒的话题。临走时客气地说"保重"，转身各自消失在夜色里。这大概就是大人的交往方式吧。` },
+      'betray_risky':  { my: { SOC: 2 }, opp: { HAP: -4 }, rel: -30, text: (o) => `${o}认真地提出合伙投资，你敷衍地说"回去考虑考虑"。TA看出你没当回事，沉默了很久。` },
+      'risky_coop':    { my: { HAP: -2, PER: 2 }, opp: { SOC: 4, HAP: 6 }, rel: 20, text: (o) => `你聊起投资的想法，${o}不置可否，反而拉你聊起了当年的事。你被TA的真诚打动，决定今晚不谈钱了。` },
+      'risky_betray':  { my: { HAP: -4 }, opp: { SOC: 2 }, rel: -30, text: (o) => `你认真提出合伙计划，${o}客气地顾左右而言他。回家路上你觉得自己像个傻子。` },
+      'risky_risky':   { my: { MNY: 8, SOC: 4, PER: 4 }, opp: { MNY: 8, SOC: 4, PER: 4 }, rel: 50, text: (o) => `你们不约而同提出一起搞投资，越聊越认真，当场就开始研究项目。十年的信任，比任何商业计划书都值钱。` },
+    },
+  },
+};
+
+// Pending dilemma state
+let _reunionDilemmaAge = 0;
+let _reunionMyChoice = null;
+let _reunionOppChoice = null;
+
+function _showReunionDilemma(age, oppName) {
+  const cfg = REUNION_DILEMMA[age];
+  if (!cfg) return;
+  _reunionDilemmaAge = age;
+  _reunionMyChoice = null;
+  _reunionOppChoice = null;
+
+  // Build overlay
+  const overlay = document.createElement('div');
+  overlay.id = 'reunion-dilemma-overlay';
+  overlay.className = 'reunion-dilemma-overlay';
+  overlay.innerHTML = `
+    <div class="reunion-dilemma-box">
+      <div class="reunion-dilemma-title">${cfg.title}</div>
+      <div class="reunion-dilemma-prompt">你打算怎么做？</div>
+      <div class="reunion-dilemma-choices">
+        ${cfg.choices.map(c => `
+          <button class="reunion-dilemma-btn" data-key="${c.key}">
+            <span class="rdb-icon">${c.icon}</span>
+            <div class="rdb-content">
+              <span class="rdb-text">${c.text}</span>
+              <span class="rdb-desc">${c.desc}</span>
+            </div>
+          </button>
+        `).join('')}
+      </div>
+      <div class="reunion-dilemma-waiting" style="display:none;">
+        <div class="rdw-spinner"></div>
+        <span>等待${oppName}做出选择…</span>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('active'));
+
+  // Wire button clicks
+  overlay.querySelectorAll('.reunion-dilemma-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      _reunionMyChoice = btn.dataset.key;
+      mpSend('reunion_choice', { age, choice: _reunionMyChoice });
+      // Disable buttons, show waiting or resolve
+      overlay.querySelectorAll('.reunion-dilemma-btn').forEach(b => {
+        b.disabled = true;
+        if (b === btn) b.classList.add('selected');
+        else b.classList.add('dimmed');
+      });
+      if (_reunionOppChoice) {
+        _resolveReunionDilemma(age);
+      } else {
+        overlay.querySelector('.reunion-dilemma-waiting').style.display = 'flex';
+      }
+    });
+  });
+}
+
+function _resolveReunionDilemma(age) {
+  const cfg = REUNION_DILEMMA[age];
+  if (!cfg || !_reunionMyChoice || !_reunionOppChoice) return;
+  const key = `${_reunionMyChoice}_${_reunionOppChoice}`;
+  const result = cfg.results[key];
+  if (!result) return;
+
+  const oppName = mp.opponent.nickname || '对方';
+
+  // Apply my stat effects
+  if (result.my) {
+    for (const [k, v] of Object.entries(result.my)) {
+      if (k === 'HAP') state.HAP = Math.max(0, Math.min(10, (state.HAP || 0) + v));
+      else state[k] = Math.max(0, Math.min(10, (state[k] || 0) + v));
+    }
+  }
+  // Send opponent effects
+  if (result.opp) {
+    mpSend('reunion_effect', { age, effects: result.opp });
+  }
+  // Relation change
+  if (result.rel) {
+    _changeRelation(result.rel, `${age}岁聚会`);
+  }
+
+  // Result text
+  const resultText = result.text(oppName);
+  pushLog(resultText, 'mp-reunion');
+
+  // Effect summary log
+  if (result.my) {
+    const parts = Object.entries(result.my).map(([k, v]) =>
+      `${STAT_LABELS[k] || k}${v > 0 ? '+' : ''}${v}`
+    );
+    if (result.rel) parts.push(`好感度${result.rel > 0 ? '+' : ''}${result.rel}`);
+    pushLog(`（${parts.join('，')}）`, 'mp-reunion');
+  }
+
+  // Transition to result display
+  const overlay = document.getElementById('reunion-dilemma-overlay');
+  if (overlay) {
+    const box = overlay.querySelector('.reunion-dilemma-box');
+    box.innerHTML = `
+      <div class="reunion-dilemma-result">
+        <div class="rdr-opp-choice">
+          ${oppName}选择了：${_getChoiceLabel(age, _reunionOppChoice)}
+        </div>
+        <div class="rdr-text">${resultText}</div>
+        <div class="rdr-effects">${_formatDilemmaEffects(result.my, result.rel)}</div>
+        <button class="rdr-close">继续</button>
+      </div>
+    `;
+    box.querySelector('.rdr-close').addEventListener('click', () => {
+      overlay.classList.remove('active');
+      setTimeout(() => overlay.remove(), 300);
+      state.autoPlay = state._reunionSavedAuto || false;
+      if (state._reunionSavedAutoMode) startAuto(state._reunionSavedAutoMode);
+      render();
+    });
+  }
+
+  _reunionDilemmaAge = 0;
+  _reunionMyChoice = null;
+  _reunionOppChoice = null;
+}
+
+function _getChoiceLabel(age, key) {
+  const cfg = REUNION_DILEMMA[age];
+  if (!cfg) return key;
+  const c = cfg.choices.find(ch => ch.key === key);
+  return c ? `${c.icon} ${c.text}` : key;
+}
+
+function _formatDilemmaEffects(effects, rel) {
+  if (!effects) return '';
+  const parts = Object.entries(effects).map(([k, v]) => {
+    const cls = v > 0 ? 'pos' : 'neg';
+    return `<span class="rde-tag ${cls}">${STAT_LABELS[k] || k} ${v > 0 ? '+' : ''}${v}</span>`;
+  });
+  if (rel) {
+    const cls = rel > 0 ? 'pos' : 'neg';
+    parts.push(`<span class="rde-tag ${cls}">好感度 ${rel > 0 ? '+' : ''}${rel}</span>`);
+  }
+  return parts.join('');
+}
+
+function _cancelReunionDilemma(oppName) {
+  if (!_reunionDilemmaAge) return;
+  const overlay = document.getElementById('reunion-dilemma-overlay');
+  if (overlay) {
+    const box = overlay.querySelector('.reunion-dilemma-box');
+    box.innerHTML = `
+      <div class="reunion-dilemma-result">
+        <div class="rdr-text">${oppName}突然离开了……聚会不欢而散。</div>
+        <button class="rdr-close">继续</button>
+      </div>
+    `;
+    box.querySelector('.rdr-close').addEventListener('click', () => {
+      overlay.classList.remove('active');
+      setTimeout(() => overlay.remove(), 300);
+      state.autoPlay = state._reunionSavedAuto || false;
+      if (state._reunionSavedAutoMode) startAuto(state._reunionSavedAutoMode);
+      render();
+    });
+  }
+  pushLog(`（${oppName}突然离开了，聚会提前结束）`, 'mp-reunion');
+  _reunionDilemmaAge = 0;
+  _reunionMyChoice = null;
+  _reunionOppChoice = null;
+}
+
+async function _fireReunionEvent(age) {
   mp.isWaiting = false;
   if (mp._reunionTimeout) { clearTimeout(mp._reunionTimeout); mp._reunionTimeout = null; }
   _hideWaitingOverlay();
@@ -4893,18 +5196,26 @@ function _fireReunionEvent(age) {
   const oppSchool = mp.opponent.school || '';
   const oppRel = mp.opponent.relationship || '单身';
   const relLabel = mp.relation >= 50 ? '老铁' : mp.relation >= 0 ? '同学' : '冤家';
-  const reunionTexts = {
-    25: `${age}岁的老友聚会上，你见到了${relLabel}${oppName}。TA现在是「${oppProf}」${oppSchool ? `，从${oppSchool}毕业` : ''}。几杯酒下肚，大家聊起了当年的荒唐事，笑得前仰后合。${oppRel === '单身' ? 'TA还是单身，你们开始起哄。' : `听说TA现在${oppRel}了。`}`,
-    30: `${age}岁的老友聚会。${oppName}看起来变了不少，TA现在是「${oppProf}」。你们聊起各自的人生选择，感慨时间过得真快。${mp.relation >= 30 ? '临别时你们约好下次一定要再聚。' : '气氛有些微妙，毕竟这些年发生了不少事。'}`,
-    35: `${age}岁的老友聚会。能来的人已经不多了。${oppName}到了，TA现在是「${oppProf}」。你们不再像年轻时那样闹腾，而是安静地喝着茶，回忆那些年一起走过的路。`,
-  };
+  const myName = state.nickname || '你';
+
+  // Pause auto-play during reunion (both autoMode timer and state flag)
+  state._reunionSavedAutoMode = autoMode;
+  if (autoMode) stopAuto();
+  state._reunionSavedAuto = state.autoPlay;
+  state.autoPlay = false;
+
+  // 1. Cinematic animation
+  await _playReunionCinematic(age, myName, oppName, oppProf, oppSchool, relLabel);
+
+  // 2. Narrative intro + base effect
+  const cfg = REUNION_DILEMMA[age];
+  const introText = cfg ? cfg.intro(oppName, relLabel, oppProf, oppSchool, oppRel) : `${age}岁的老友聚会。`;
   const reunionEvent = {
     id: `mp_reunion_${age}`,
-    event: reunionTexts[age] || reunionTexts[25],
-    effect: { SOC: 1, HAP: age === 25 ? 2 : 1 },
+    event: introText,
+    effect: { SOC: 1, HAP: 1 },
     noRandom: true,
   };
-  // If no choice is pending, apply immediately; otherwise queue for next tick
   if (!state.pendingChoice) {
     applyEvent(reunionEvent);
   } else {
@@ -4912,6 +5223,9 @@ function _fireReunionEvent(age) {
   }
   pushLog(`🤝 ${age}岁老友聚会！`, 'mp-reunion');
   render();
+
+  // 3. Show dilemma choices (auto-play stays paused until player closes result)
+  _showReunionDilemma(age, oppName);
 }
 
 function _wireMpMessageHandlers() {
@@ -4950,6 +5264,30 @@ function _wireMpMessageHandlers() {
       mp.isWaiting = false;
       _hideWaitingOverlay();
       pushLog(`（${mp.opponent.nickname}正忙于自己的事业，没来参加${data.age}岁的同学聚会）`, 'mp-reunion');
+      render();
+    }
+  });
+
+  mpOn('reunion_choice', (data) => {
+    _reunionOppChoice = data.choice;
+    if (_reunionMyChoice) {
+      // Both chose — resolve
+      _resolveReunionDilemma(data.age);
+    }
+    // Otherwise we're still waiting for local player to pick
+  });
+
+  mpOn('reunion_effect', (data) => {
+    // Apply effects sent by opponent's dilemma result
+    if (data.effects) {
+      for (const [k, v] of Object.entries(data.effects)) {
+        if (k === 'HAP') state.HAP = Math.max(0, Math.min(10, (state.HAP || 0) + v));
+        else state[k] = Math.max(0, Math.min(10, (state[k] || 0) + v));
+      }
+      const parts = Object.entries(data.effects).map(([k, v]) =>
+        `${STAT_LABELS[k] || k}${v > 0 ? '+' : ''}${v}`
+      );
+      pushLog(`（聚会影响：${parts.join('，')}）`, 'mp-reunion');
       render();
     }
   });
@@ -4999,6 +5337,8 @@ function _wireMpMessageHandlers() {
       _showWaitingDismiss(`${data.nickname || mp.opponent.nickname} 好像已经消失了……同学聚会取消`);
       pushLog(`（${data.nickname || mp.opponent.nickname}已经结束了人生，同学聚会取消）`, 'mp-reunion');
     }
+    // 对方在聚会选择中消失 → 自动结算为对方"弃权"(neutral/betray depending on age)
+    _cancelReunionDilemma(data.nickname || mp.opponent.nickname);
     pushLog(`【${data.nickname || mp.opponent.nickname}】结束了人生：${data.age}岁，得分 ${data.score || '—'}`, 'mp-reunion');
     render();
     // If I already ended too, auto-refresh the VS button visibility
@@ -5015,12 +5355,24 @@ function _wireMpMessageHandlers() {
       if (mp._reunionTimeout) { clearTimeout(mp._reunionTimeout); mp._reunionTimeout = null; }
       _showWaitingDismiss(`${mp.opponent.nickname || '对方'} 好像已经断线了……同学聚会取消`);
     }
-    if (state.phase === 'playing') {
-      alert('对方已离开。本局联机结束，将转为单人模式继续。');
+    // 取消聚会选择
+    _cancelReunionDilemma(mp.opponent.nickname || '对方');
+    // 取消 restart 等待
+    if (_mpRestartPending) {
+      _mpRestartPending = false;
+      _hideWaitingOverlay();
+    }
+    if (state.phase === 'game') {
+      showConfirm({ title: '对方已离开', body: '本局联机结束，将转为单人模式继续。', okText: '好的' });
       mp.enabled = false;
       _hideOpponentBar();
     }
   });
+
+  // 再来一次同步
+  mpOn('restart_request', () => _mpOnRestartRequest());
+  mpOn('restart_ready', () => _mpOnRestartReady());
+  mpOn('restart_decline', () => _mpOnRestartDecline());
 }
 
 function _renderOpponentBar() {
@@ -5090,6 +5442,11 @@ function _renderCardsPanel() {
     `;
     if (!card.used) {
       div.addEventListener('click', async () => {
+        // 对方已结束游戏，不能再用卡
+        if (_mpOppEndData) {
+          await showConfirm({ title: '无法使用', body: `${mp.opponent.nickname} 已经不在了……`, okText: '好吧' });
+          return;
+        }
         const verb = cat === 'help' ? '帮助' : '对';
         const ok = await showConfirm({
           title: `使用「${card.name}」`,
@@ -5272,11 +5629,104 @@ function _wireMultiplayerUI() {
   });
 }
 
-function _enterMpCreation() {
-  mp.cards = []; // will be set by frenemy draft confirm
-  mp.relation = 0;
+// ── 完整重置游戏状态（不 reload 页面） ─────────────────────────────────────
+function _resetGameState() {
+  // 清空 state 到初始值
+  state.phase = 'talent';
+  for (const k of STAT_KEYS) { state.alloc[k] = 0; state.allocBase[k] = 0; state[k] = 0; }
+  state.HAP = 5;
+  state.talentsPool = [];
+  state.talentsPicked = [];
+  state.talentIds = new Set();
+  state.firedEvents = new Set();
+  state.yearlyPlan = new Map();
+  state.log = [];
+  state.logRenderedCount = 0;
+  state.sex = 0;
+  state.age = 15;
+  state.monthOfYear = 1;
+  state.monthTotal = 1;
+  state.school = '无';
+  state.hsType = '';
+  state.overseas = 0;
+  state.country = '';
+  state.countryIntent = '';
+  state.schoolTier = '';
+  state.major = '';
+  state.relationship = '单身';
+  state.relationshipHistory = [];
+  state.storyline = '';
+  state.storylineStart = 0;
+  state.storylineStartMonth = 0;
+  state.profession = '高中生';
+  state.gradEndAge = 0;
+  state.gradEndMonth = 0;
+  state.pendingEvent = null;
+  state.pendingChoice = null;
+  state.lastChoiceMonth = 0;
+  state._savedAutoMode = 0;
+  state.POP = 0; state.POK = 0; state.MMR = 0;
+  state.FIT = 0; state.CKL = 0; state.ATH = 0;
+  state.MAG = 0; state.hogwartsYear = 0; state.housePt = 0; state.house = ''; state.hasOwl = 0; state.hogwartsSeed = 0;
+  state.cul = 0; state.dao = 0; state.karma = 0; state.tribulation = 0;
+  state.xianxiaSeed = 0; state.yuanshen_book = 0; state.xingchen_book = 0;
+  state.statPeaks = {};
+  state.storylinesVisited = new Set();
+  state.choiceHistory = [];
+  state.milestones = [];
+  state.cardHistory = [];
+  state._frenemyDraftPool = null;
+  state._frenemyDraftPicked = [];
+  // 清除各种 flag
+  for (const flag of ['match_fixing', 'japan_path', 'jp_fluent', 'kohaku', 'scandal',
+    'party_clean', 'party_dirty', 'academic_dishonesty', 'late_dropout', 'hobby',
+    'idol_stage', 'debut_attempted', 'party_stage', 'esports_stage', 'poker_stage',
+    'fitness_stage', 'chef_stage', 'athlete_stage', 'pendingCinematic', '_cineSavedAuto']) {
+    delete state[flag];
+  }
+  // 停止自动播放
+  if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+  autoMode = 0;
+  // 清 MP end data
   _mpMyEndData = null;
   _mpOppEndData = null;
+  // 清 UI
+  const eventLog = $('event-log');
+  if (eventLog) eventLog.innerHTML = '';
+  const vsOverlay = $('mp-vs-overlay');
+  if (vsOverlay) vsOverlay.style.display = 'none';
+  const endOverlay = $('end-overlay');
+  if (endOverlay) endOverlay.classList.remove('active');
+  const vsBtn = $('btn-mp-vs');
+  if (vsBtn) vsBtn.style.display = 'none';
+  // 重置 step 显示状态
+  const stepTalents = $('step-talents');
+  const stepFrenemy = $('step-frenemy');
+  const stepAlloc = $('step-alloc');
+  if (stepTalents) stepTalents.style.display = '';
+  if (stepFrenemy) stepFrenemy.style.display = 'none';
+  if (stepAlloc) stepAlloc.style.display = '';
+}
+
+function _enterMpCreation() {
+  _resetGameState();
+  mp.cards = [];
+  mp.relation = 0;
+  mp.incomingCardEffect = null;
+  mp.pendingReunionAge = null;
+  mp.isWaiting = false;
+  mp.waitReason = '';
+  mp.pendingButterfly = [];
+  mp.coopInvitePending = null;
+  mp.opponent.age = 15;
+  mp.opponent.profession = '高中生';
+  mp.opponent.school = '';
+  mp.opponent.major = '';
+  mp.opponent.storyline = '';
+  mp.opponent.relationship = '单身';
+  mp.opponent.stats = { SOC: 0, INT: 0, MNY: 0, PER: 0, HLT: 0, APP: 0, HAP: 5 };
+  mp.opponent.endingId = null;
+  mp.opponent.endingScore = 0;
   $('mp-modal').style.display = 'none';
   state.faceVariant = Math.floor(Math.random() * 10);
   state.topVariant = Math.floor(Math.random() * 24);
@@ -5290,9 +5740,75 @@ function _enterMpCreation() {
   state.sex = 0;
   $('sex-male').classList.add('active');
   $('sex-female').classList.remove('active');
+  // 重新抽天赋
+  if (_allTalents) renderTalentSelect(_allTalents);
+  $('talent-confirm').disabled = true;
+  $('talent-confirm').textContent = '确认天赋（0/3）';
   showScreen('creation-screen');
   const scrollArea = $('creation-scroll-area');
   if (scrollArea) scrollArea.scrollTop = 0;
+}
+
+// ── 联机模式再来一次 ──────────────────────────────────────────────────────
+let _mpRestartPending = false; // 我已发出 restart 请求
+
+function _mpHandleRestart() {
+  // 联机模式：发送 restart 请求并等待对方
+  if (!mp.enabled || !mp.connected) {
+    // 非联机或已断线，直接 reload
+    location.reload();
+    return;
+  }
+  if (_mpRestartPending) return; // 已经在等了
+  // 如果对方还没结束，提示等待
+  if (!_mpOppEndData) {
+    showConfirm({ title: '对方还在游戏中', body: '等对方也结束后才能一起再来一次哦', okText: '好的' });
+    return;
+  }
+  _mpRestartPending = true;
+  mpSend('restart_request', {});
+  // 显示等待 UI
+  const ov = $('mp-waiting-overlay');
+  if (ov) {
+    const r = $('mp-waiting-reason');
+    ov.style.display = 'flex';
+    if (r) r.textContent = '等待对方确认再来一次...';
+  }
+}
+
+function _mpOnRestartRequest() {
+  // 对方想再来一次
+  showConfirm({
+    title: '再来一次？',
+    body: `${mp.opponent.nickname} 想再来一次，一起吗？`,
+    okText: '走起！', cancelText: '算了',
+  }).then(ok => {
+    if (ok) {
+      mpSend('restart_ready', {});
+      _mpDoRestart();
+    } else {
+      mpSend('restart_decline', {});
+    }
+  });
+}
+
+function _mpOnRestartReady() {
+  // 对方同意了
+  _mpRestartPending = false;
+  _hideWaitingOverlay();
+  _mpDoRestart();
+}
+
+function _mpOnRestartDecline() {
+  // 对方拒绝了
+  _mpRestartPending = false;
+  _hideWaitingOverlay();
+  showConfirm({ title: '对方拒绝了', body: `${mp.opponent.nickname} 不想再来一次了`, okText: '好吧' });
+}
+
+function _mpDoRestart() {
+  _enterMpCreation();
+  _renderOpponentBar();
 }
 
 main();
