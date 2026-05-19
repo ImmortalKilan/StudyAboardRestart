@@ -261,6 +261,16 @@ export async function createRoom(nickname) {
       resolve(mp.roomCode);
     });
     mp.peer.on('connection', (conn) => {
+      // 房间已满（已有一个连接）→ 拒绝第三人
+      if (mp.conn && mp.connected) {
+        try {
+          conn.on('open', () => {
+            conn.send(JSON.stringify({ type: 'room_full', data: {} }));
+            setTimeout(() => conn.close(), 500);
+          });
+        } catch (e) {}
+        return;
+      }
       mp.conn = conn;
       _wireConnection(conn);
     });
@@ -282,8 +292,38 @@ export async function joinRoom(code, nickname) {
       const conn = mp.peer.connect(ROOM_PREFIX + mp.roomCode, { reliable: true });
       mp.conn = conn;
       conn.on('open', () => {
-        _wireConnection(conn);
-        resolve();
+        // 先监听是否被拒绝（房间已满）
+        const earlyHandler = (raw) => {
+          try {
+            const msg = typeof raw === 'string' ? JSON.parse(raw) : raw;
+            if (msg && msg.type === 'room_full') {
+              conn.off('data', earlyHandler);
+              mp.conn = null;
+              try { mp.peer.destroy(); } catch (e) {}
+              mp.peer = null;
+              reject(new Error('房间已满（最多2人）'));
+              return;
+            }
+          } catch (e) {}
+          // 不是 room_full → 移除临时监听，正常建连
+          conn.off('data', earlyHandler);
+          _wireConnection(conn);
+          // 重放这条消息给正常 handler
+          try {
+            const msg = typeof raw === 'string' ? JSON.parse(raw) : raw;
+            if (msg && msg.type) _emit(msg.type, msg.data || {});
+          } catch (e) {}
+          resolve();
+        };
+        conn.on('data', earlyHandler);
+        // 如果 500ms 内没收到 room_full，也直接建连
+        setTimeout(() => {
+          conn.off('data', earlyHandler);
+          if (!mp.connected) {
+            _wireConnection(conn);
+            resolve();
+          }
+        }, 500);
       });
       conn.on('error', (e) => reject(e));
       setTimeout(() => {

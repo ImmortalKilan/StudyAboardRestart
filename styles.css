@@ -3972,6 +3972,60 @@ body.in-summary {
   color: #6ed999; font-weight: 600; text-align: center;
 }
 
+.mp-lobby {
+  text-align: left;
+}
+.mp-lobby-title {
+  font-size: 13px;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 10px;
+  text-align: center;
+  letter-spacing: 1px;
+}
+.mp-lobby-players {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mp-lobby-player {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 8px;
+  font-size: 14px;
+  color: #e6e9ef;
+}
+.mp-lobby-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.mp-lobby-dot.self {
+  background: #4ade80;
+  box-shadow: 0 0 6px rgba(74,222,128,0.5);
+}
+.mp-lobby-dot.opp {
+  background: #60a5fa;
+  box-shadow: 0 0 6px rgba(96,165,250,0.5);
+}
+.mp-lobby-tag {
+  margin-left: auto;
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.08);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.mp-lobby-cap {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+}
+
 /* Opponent Status Bar */
 .mp-opponent-bar {
   display: flex; align-items: center; gap: 18px;

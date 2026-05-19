@@ -74,7 +74,22 @@
         </div>
 
         <div id="mp-connected-banner" class="mp-connected" style="display:none;">
-          ✅ 已连接 — <span id="mp-opponent-nick">对手</span>
+          <div class="mp-lobby">
+            <div class="mp-lobby-title">房间大厅</div>
+            <div class="mp-lobby-players">
+              <div class="mp-lobby-player">
+                <span class="mp-lobby-dot self"></span>
+                <span id="mp-lobby-me">我</span>
+                <span id="mp-lobby-me-tag" class="mp-lobby-tag">房主</span>
+              </div>
+              <div class="mp-lobby-player">
+                <span class="mp-lobby-dot opp"></span>
+                <span id="mp-lobby-opp">等待加入...</span>
+                <span id="mp-lobby-opp-tag" class="mp-lobby-tag"></span>
+              </div>
+            </div>
+            <div class="mp-lobby-cap">👥 2/2</div>
+          </div>
           <button id="mp-start-game" class="mp-primary-btn" style="margin-top:12px;">开始游戏 →</button>
         </div>
 

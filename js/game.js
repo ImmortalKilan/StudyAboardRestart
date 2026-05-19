@@ -5584,10 +5584,14 @@ function _wireMultiplayerUI() {
 
   mpOn('connected', () => {
     $('mp-connected-banner').style.display = 'block';
-    $('mp-opponent-nick').textContent = '已连接';
+    // 填充大厅信息
+    if ($('mp-lobby-me')) $('mp-lobby-me').textContent = mp.myNickname || '我';
+    if ($('mp-lobby-me-tag')) $('mp-lobby-me-tag').textContent = mp.isHost ? '房主' : '加入者';
+    if ($('mp-lobby-opp')) $('mp-lobby-opp').textContent = '已连接';
+    if ($('mp-lobby-opp-tag')) $('mp-lobby-opp-tag').textContent = mp.isHost ? '加入者' : '房主';
   });
   mpOn('hello', () => {
-    $('mp-opponent-nick').textContent = mp.opponent.nickname;
+    if ($('mp-lobby-opp')) $('mp-lobby-opp').textContent = mp.opponent.nickname;
   });
 
   $('mp-start-game')?.addEventListener('click', () => {
@@ -5668,6 +5672,10 @@ function _resetGameState() {
   state.POP = 0; state.POK = 0; state.MMR = 0;
   state.FIT = 0; state.CKL = 0; state.ATH = 0;
   state.MAG = 0; state.hogwartsYear = 0; state.housePt = 0; state.house = ''; state.hasOwl = 0; state.hogwartsSeed = 0;
+  // 隐藏特殊属性面板
+  state.showPOP = false; state.showPOK = false; state.showMMR = false;
+  state.showFIT = false; state.showCKL = false; state.showATH = false;
+  state.showMAG = false;
   state.cul = 0; state.dao = 0; state.karma = 0; state.tribulation = 0;
   state.xianxiaSeed = 0; state.yuanshen_book = 0; state.xingchen_book = 0;
   state.statPeaks = {};
