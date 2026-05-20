@@ -42,6 +42,33 @@ body {
   background-attachment: fixed;
 }
 
+.mute-btn {
+  position: fixed;
+  bottom: 14px;
+  right: 14px;
+  z-index: 8000;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 150ms ease-out, transform 150ms ease-out;
+}
+.mute-btn:hover {
+  background: rgba(255,255,255,0.1);
+  transform: scale(1.08);
+}
+.mute-btn:active {
+  transform: scale(0.95);
+}
+
 body::before {
   content: '';
   position: fixed;
@@ -998,6 +1025,36 @@ body.in-game .left-panel {
   color: var(--ink);
   text-align: right;
   font-weight: 600;
+  position: relative;
+}
+.stat-delta {
+  font-size: 10px;
+  font-weight: 700;
+  margin-left: 3px;
+  animation: statDeltaPop 600ms ease-out forwards;
+}
+.stat-delta.pos { color: #4ade80; }
+.stat-delta.neg { color: #f87171; }
+@keyframes statDeltaPop {
+  0% { opacity: 0; transform: translateY(4px); }
+  20% { opacity: 1; transform: translateY(-2px); }
+  100% { opacity: 0; transform: translateY(-8px); }
+}
+.stat-row.stat-changed {
+  animation: statRowFlash 500ms ease-out;
+}
+.stat-row.stat-up .stat-fill {
+  transition: width 400ms ease-out;
+  box-shadow: 0 0 6px rgba(74,222,128,0.4);
+}
+.stat-row.stat-down .stat-fill {
+  transition: width 400ms ease-out;
+  box-shadow: 0 0 6px rgba(248,113,113,0.4);
+}
+@keyframes statRowFlash {
+  0% { background: transparent; }
+  20% { background: rgba(255,255,255,0.06); }
+  100% { background: transparent; }
 }
 .stat-special .stat-label,
 .stat-special .stat-val {
@@ -1278,6 +1335,7 @@ body.in-summary {
   color: var(--ink);
 }
 .summary-wrap {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 22px;
@@ -4019,11 +4077,29 @@ body.in-summary {
   padding: 2px 8px;
   border-radius: 4px;
 }
-.mp-lobby-cap {
+.mp-lobby-status {
+  margin-left: auto;
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+}
+.mp-lobby-status.ready {
+  color: #4ade80;
+}
+.mp-ready-hint {
   text-align: center;
-  margin-top: 10px;
-  font-size: 12px;
-  color: rgba(255,255,255,0.4);
+  font-size: 13px;
+  color: rgba(255,255,255,0.45);
+  margin-top: 8px;
+}
+.mp-primary-btn.cancel {
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.6);
+  border: 1px solid rgba(255,255,255,0.15);
+}
+.mp-primary-btn.cancel:hover {
+  background: rgba(255,100,100,0.15);
+  border-color: rgba(255,100,100,0.3);
+  color: #ff8a8a;
 }
 
 /* Opponent Status Bar */
@@ -4546,4 +4622,69 @@ body.in-summary {
   .mp-vs-awards-cols { grid-template-columns: 1fr; gap: 10px; }
   .mp-vs-awards-col.left { border-right: none; padding-right: 0; border-bottom: 1px solid #1a1f2e; padding-bottom: 10px; }
   .tl-item { font-size: 11px; }
+}
+
+/* ── Title / Badge (scattered on summary screen) ─────────────────────────── */
+.summary-titles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.title-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px 4px 6px;
+  background: rgba(30, 38, 52, 0.85);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  font-size: 12px;
+  color: var(--warm);
+  white-space: nowrap;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  animation: titlePop 0.5s ease-out forwards;
+  pointer-events: auto;
+  cursor: default;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.title-badge:hover {
+  transform: scale(1.12) rotate(var(--badge-rotate, 0deg)) !important;
+  box-shadow: 0 4px 16px rgba(201, 169, 120, 0.25);
+  z-index: 5;
+}
+
+.title-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.title-name {
+  font-family: var(--sans);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+@keyframes titlePop {
+  0% {
+    opacity: 0;
+    transform: scale(0.4) rotate(var(--badge-rotate, 0deg));
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.1) rotate(var(--badge-rotate, 0deg));
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(var(--badge-rotate, 0deg));
+  }
 }

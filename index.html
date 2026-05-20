@@ -8,6 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
+  <button id="btn-mute" class="mute-btn" title="开关音效">🔊</button>
   <main class="app">
 
     <section id="start-screen" class="screen active">
@@ -81,16 +82,18 @@
                 <span class="mp-lobby-dot self"></span>
                 <span id="mp-lobby-me">我</span>
                 <span id="mp-lobby-me-tag" class="mp-lobby-tag">房主</span>
+                <span id="mp-lobby-me-status" class="mp-lobby-status">未准备</span>
               </div>
               <div class="mp-lobby-player">
                 <span class="mp-lobby-dot opp"></span>
                 <span id="mp-lobby-opp">等待加入...</span>
                 <span id="mp-lobby-opp-tag" class="mp-lobby-tag"></span>
+                <span id="mp-lobby-opp-status" class="mp-lobby-status">未准备</span>
               </div>
             </div>
-            <div class="mp-lobby-cap">👥 2/2</div>
           </div>
-          <button id="mp-start-game" class="mp-primary-btn" style="margin-top:12px;">开始游戏 →</button>
+          <button id="mp-ready-btn" class="mp-primary-btn" style="margin-top:12px;">准备</button>
+          <div id="mp-ready-hint" class="mp-ready-hint" style="display:none;"></div>
         </div>
 
         <button id="mp-back-home" class="mp-ghost-btn" style="margin-top:16px; width:100%;">← 返回主页</button>
@@ -422,6 +425,8 @@
           </div>
           <div id="summary-score-rank" class="score-rank"></div>
         </div>
+
+        <div id="summary-titles" class="summary-titles"></div>
 
         <div class="summary-hero">
           <div class="hero-avatar-wrap">

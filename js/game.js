@@ -1,7 +1,8 @@
 import { evalCondition, pickBranch, pickWeightedBranch } from './dsl.js';
 import { renderAvatar, createStandaloneAvatar } from './avatar.js';
 import { playStorylineIntro, playStorylineExit } from './cinematic.js';
-import { initAchievements, unlockAchievement } from './achievements.js';
+import { initAchievements, unlockAchievement, setOnUnlock } from './achievements.js';
+import * as SFX from './audio.js';
 // Multiplayer — loaded dynamically so single-player works even if it fails
 let mp = { enabled: false, connected: false, cards: [], opponent: {} };
 let createRoom, joinRoom, mpSend, mpOn, mpDisconnect, resetMpState, REUNION_AGES, FATE_CARDS, initialFateCards, draftFrenemyCards, FRENEMY_CARD_POOL;
@@ -1315,7 +1316,8 @@ function applyEvent(ev) {
   // Storyline replay: only show text, skip all side effects
   if (ev._replay) {
     delete ev._replay;
-    const msg = ev.text || ev.event;
+    const _raw = ev.text || ev.event;
+    const msg = Array.isArray(_raw) ? _raw[Math.floor(Math.random() * _raw.length)] : _raw;
     if (msg) pushLog(msg);
     return;
   }
@@ -1383,7 +1385,8 @@ function applyEvent(ev) {
     state.milestones.push({ age: state.age, month: state.monthOfYear, type: 'ending', text: `结局：${endText}…` });
   }
 
-  const msg = ev.text || ev.event;
+  const _rawMsg = ev.text || ev.event;
+  const msg = Array.isArray(_rawMsg) ? _rawMsg[Math.floor(Math.random() * _rawMsg.length)] : _rawMsg;
   let evLogType = ev.logType
     || (ev.romance ? 'romance' : undefined)
     || (ev.include && (/MAJOR==/.test(ev.include) || /profession==/.test(ev.include)) ? 'major' : undefined);
@@ -1412,6 +1415,11 @@ function applyEvent(ev) {
   }
   if (msg) pushLog(msg, evLogType);
 
+  // Snapshot stats before applying effects (for change animation)
+  const _preFx = {};
+  for (const k of STAT_KEYS) _preFx[k] = state[k] || 0;
+  _preFx.HAP = state.HAP || 0;
+
   if (ev.effect) for (const [k, v] of Object.entries(ev.effect)) {
     if (EFFECT_KEYS.has(k)) state[k] = (state[k] || 0) + v;
   }
@@ -1419,15 +1427,27 @@ function applyEvent(ev) {
 
   clampStats();
 
+  // Track which stats changed for render animation
+  state._statChanges = {};
+  let _hasUp = false, _hasDown = false;
+  for (const k of [...STAT_KEYS, 'HAP']) {
+    const delta = (state[k] || 0) - (_preFx[k] || 0);
+    if (delta !== 0) { state._statChanges[k] = delta; if (delta > 0) _hasUp = true; else _hasDown = true; }
+  }
+  if (_hasUp && !_hasDown) SFX.sfxStatUp();
+  else if (_hasDown && !_hasUp) SFX.sfxStatDown();
+
   if (ev.end) {
     state.phase = 'ended';
     state.endingId = ev.id;
     state.endingAge = state.age;
+    SFX.sfxGameEnd();
   }
 
   // Cinematic intro when entering a special/hidden storyline
   if (ev.set && ev.set.storyline && ev.set.storyline !== prevStorylineForCinematic
       && (HIDDEN_STORYLINES.has(ev.set.storyline) || SPECIAL_STORYLINES.has(ev.set.storyline))) {
+    SFX.sfxKeyEvent();
     state.pendingCinematic = true;
     state._cineSavedAuto = autoMode;
     stopAuto();
@@ -1567,6 +1587,28 @@ function _checkEventAchievements(ev) {
   if (id === 49647) unlockAchievement('easter_nomad');
 }
 
+function _parseRequireHint(expr) {
+  // Parse simple stat conditions like (INT>=6)&(SOC>=4) into readable hints
+  const HINT_LABELS = { ...STAT_LABELS, IQ: '智力', STR: '毅力', HEA: '健康' };
+  const parts = [];
+  const re = /(\w+)\s*(>=|>|<=|<|==|!=)\s*(\d+)/g;
+  let m;
+  while ((m = re.exec(expr)) !== null) {
+    const [, key, op, val] = m;
+    const label = HINT_LABELS[key];
+    if (!label) continue;
+    const cur = state[key] || 0;
+    if (op === '>=' || op === '>') {
+      parts.push(`${label}≥${val}（当前${cur}）`);
+    } else if (op === '<=' || op === '<') {
+      parts.push(`${label}≤${val}（当前${cur}）`);
+    } else if (op === '==' || op === '!=') {
+      parts.push(`${label}=${val}`);
+    }
+  }
+  return parts.length > 0 ? '需要 ' + parts.join('，') : '条件不满足';
+}
+
 function pushLog(text, typeOverride) {
   const tag = `${state.age}岁${state.monthOfYear}月`;
   let logType = typeOverride || '';
@@ -1654,6 +1696,7 @@ function drawRandomEvent() {
  *   4. 恢复之前保存的自动播放模式
  */
 function resolveChoice(index) {
+  SFX.sfxChoice();
   const choice = state.pendingChoice[index];
   const allOptions = state.pendingChoice.map(c => c.title || c.text || '?');
   const chosenText = choice.title || choice.text || '?';
@@ -1769,6 +1812,7 @@ function resolveChoice(index) {
 function advanceMonth() {
   // 如果有待选择，阻塞推进
   if (state.pendingChoice || state.pendingCinematic) return;
+  SFX.sfxTick();
 
   // Fire pending event from previous branch before advancing
   if (state.pendingEvent) {
@@ -2507,13 +2551,18 @@ function render() {
         const val = state[k];
         const base = k === 'HAP' ? 10 : dynamicMax;
         const pct = Math.max(0, Math.min(100, (val / base) * 100));
+        const chg = state._statChanges && state._statChanges[k];
+        const chgHtml = chg ? `<span class="stat-delta ${chg > 0 ? 'pos' : 'neg'}">${chg > 0 ? '+' : ''}${chg}</span>` : '';
         row.innerHTML = `
           <span class="stat-label">${label}</span>
           <span class="stat-bar"><span class="stat-fill" style="width:${pct}%"></span></span>
-          <span class="stat-val">${val}</span>
+          <span class="stat-val">${val}${chgHtml}</span>
         `;
+        if (chg) row.classList.add('stat-changed', chg > 0 ? 'stat-up' : 'stat-down');
         statsEl.appendChild(row);
       }
+      // Clear after rendering so animation only plays once
+      if (state._statChanges) state._statChanges = null;
     }
 
     const HOUSE_NAMES = {
@@ -2944,10 +2993,11 @@ function render() {
             descEl.textContent = c.desc;
             btn.appendChild(descEl);
           }
-          if (c.requireText) {
+          if (c.requireText || (locked && c.requireExpr)) {
             const reqEl = document.createElement('div');
             reqEl.className = 'choice-req' + (locked ? ' locked' : ' met');
-            reqEl.textContent = (locked ? '🔒 ' : '✓ ') + c.requireText;
+            const hintText = c.requireText || _parseRequireHint(c.requireExpr);
+            reqEl.textContent = (locked ? '🔒 ' : '✓ ') + hintText;
             btn.appendChild(reqEl);
           }
         } else {
@@ -3255,6 +3305,84 @@ function animateScore(targetScore) {
     }
   }
   requestAnimationFrame(update);
+}
+
+// ── Title / Badge System ─────────────────────────────────────────────────────
+const TITLE_DEFS = [
+  // 属性类
+  { id: 'max_int', icon: '🧠', name: '学霸传奇', check: () => state.INT >= 10 },
+  { id: 'max_soc', icon: '🦋', name: '社交蝴蝶', check: () => state.SOC >= 10 },
+  { id: 'max_mny', icon: '💰', name: '富可敌国', check: () => state.MNY >= 10 },
+  { id: 'max_per', icon: '🔥', name: '钢铁意志', check: () => state.PER >= 10 },
+  { id: 'max_hlt', icon: '💪', name: '铁人体魄', check: () => state.HLT >= 10 },
+  { id: 'max_app', icon: '✨', name: '倾国倾城', check: () => state.APP >= 10 },
+  { id: 'all_high', icon: '👑', name: '人生赢家', check: () => ['SOC','INT','MNY','PER','HLT','APP'].every(k => state[k] >= 7) },
+  { id: 'all_max', icon: '🌟', name: '完美人类', check: () => ['SOC','INT','MNY','PER','HLT','APP'].every(k => state[k] >= 10) },
+  // 学校类
+  { id: 'top_school', icon: '🎓', name: '名校光环', check: () => state.schoolTier === 'top' },
+  { id: 'grad_school', icon: '📚', name: '学术深造', check: () => state.firedEvents && [...state.firedEvents].some(id => id >= 10700 && id <= 10799) },
+  // 恋爱类
+  { id: 'married', icon: '💍', name: '修成正果', check: () => state.relationship === '已婚' || state.relationship === '二婚' },
+  { id: 'sea_king', icon: '🌊', name: '渣王/渣后', check: () => state.relationship === '海王' || state.relationship === '海后' },
+  { id: 'forever_single', icon: '🐕', name: '单身贵族', check: () => state.relationship === '单身' && state.age >= 35 },
+  // 剧情类
+  { id: 'multi_storyline', icon: '📖', name: '剧情收集者', check: () => state.storylinesVisited && state.storylinesVisited.size >= 2 },
+  { id: 'hidden_explorer', icon: '🕵️', name: '暗面行者', check: () => state.storylinesVisited && [...state.storylinesVisited].some(s => HIDDEN_STORYLINES.has(s)) },
+  // 生存类
+  { id: 'long_life', icon: '🧓', name: '长命百岁', check: () => state.age >= 60 },
+  { id: 'young_death', icon: '💀', name: '英年早逝', check: () => state.age <= 25 && state.phase === 'ended' },
+  { id: 'happy_life', icon: '😊', name: '快乐至上', check: () => state.HAP >= 9 },
+  { id: 'sad_life', icon: '😢', name: '苦中作乐', check: () => state.HAP <= 2 && state.age >= 30 },
+  // 职业类
+  { id: 'ceo', icon: '🏢', name: '商界大佬', check: () => state.profession && (state.profession.includes('CEO') || state.profession.includes('合伙人') || state.profession.includes('创始人')) },
+  { id: 'doctor', icon: '⚕️', name: '悬壶济世', check: () => state.profession && (state.profession.includes('主治') || state.profession.includes('主任') || state.profession.includes('医生')) },
+  // 特殊
+  { id: 'broke_happy', icon: '🤡', name: '穷开心', check: () => state.MNY <= 2 && state.HAP >= 8 },
+  { id: 'rich_sad', icon: '😞', name: '富贵闲愁', check: () => state.MNY >= 8 && state.HAP <= 3 },
+];
+
+function _computeTitles() {
+  return TITLE_DEFS.filter(t => {
+    try { return t.check(); } catch (e) { return false; }
+  });
+}
+
+function _renderTitles(titles) {
+  const el = $('summary-titles');
+  if (!el) return;
+  if (titles.length === 0) { el.innerHTML = ''; return; }
+
+  // Pre-defined scattered positions (percentage-based, avoid center content)
+  const POSITIONS = [
+    { top: '2%', left: '3%', rotate: -12 },
+    { top: '5%', right: '4%', rotate: 8 },
+    { top: '15%', left: '1%', rotate: -5 },
+    { top: '18%', right: '2%', rotate: 15 },
+    { top: '30%', left: '2%', rotate: -18 },
+    { top: '28%', right: '3%', rotate: 6 },
+    { top: '42%', left: '1%', rotate: 10 },
+    { top: '45%', right: '1%', rotate: -8 },
+    { top: '55%', left: '3%', rotate: -14 },
+    { top: '58%', right: '4%', rotate: 12 },
+    { top: '68%', left: '2%', rotate: 7 },
+    { top: '72%', right: '2%', rotate: -10 },
+  ];
+
+  el.innerHTML = '';
+  titles.forEach((t, i) => {
+    const pos = POSITIONS[i % POSITIONS.length];
+    const badge = document.createElement('div');
+    badge.className = 'title-badge';
+    badge.innerHTML = `<span class="title-icon">${t.icon}</span><span class="title-name">${t.name}</span>`;
+    badge.style.position = 'absolute';
+    badge.style.top = pos.top || 'auto';
+    badge.style.bottom = pos.bottom || 'auto';
+    badge.style.left = pos.left || 'auto';
+    badge.style.right = pos.right || 'auto';
+    badge.style.setProperty('--badge-rotate', `${pos.rotate}deg`);
+    badge.style.animationDelay = `${0.5 + i * 0.2}s`;
+    el.appendChild(badge);
+  });
 }
 
 function renderSummary() {
@@ -4224,6 +4352,19 @@ requestAnimationFrame(_syncViewportHeight);
 
 async function main() {
   initAchievements();
+  setOnUnlock(() => SFX.sfxAchievement());
+  SFX.initMuteState();
+  // Mute button
+  const muteBtn = $('btn-mute');
+  if (muteBtn) {
+    muteBtn.textContent = SFX.isMuted() ? '🔇' : '🔊';
+    muteBtn.addEventListener('click', () => {
+      const next = !SFX.isMuted();
+      SFX.setMuted(next);
+      muteBtn.textContent = next ? '🔇' : '🔊';
+      SFX.sfxToggle();
+    });
+  }
   const talents = await loadData();
   _allTalents = talents;
 
@@ -4272,6 +4413,7 @@ async function main() {
   }
 
   $('talent-confirm').addEventListener('click', () => {
+    SFX.sfxConfirm();
     // In MP mode: show frenemy card draft as a separate step
     if (mp.enabled && draftFrenemyCards) {
       _renderFrenemyDraft();
@@ -4288,6 +4430,7 @@ async function main() {
 
   // Frenemy card draft confirm → proceed to alloc
   $('frenemy-confirm')?.addEventListener('click', () => {
+    SFX.sfxConfirm();
     const picked = state._frenemyDraftPicked || [];
     if (picked.length !== 3) return;
     mp.cards = picked.map(c => ({ ...c, used: false }));
@@ -4699,6 +4842,7 @@ async function main() {
   });
 
   $('btn-start').addEventListener('click', () => {
+    SFX.sfxConfirm();
     // Initialize random appearance before showing
     state.faceVariant = Math.floor(Math.random() * 10);
     state.topVariant = Math.floor(Math.random() * 24);
@@ -4889,6 +5033,7 @@ function _triggerReunion(age) {
 }
 
 async function _playReunionCinematic(age, myName, oppName, oppProf, oppSchool, relLabel) {
+  SFX.sfxReunion();
   const _w = ms => new Promise(r => setTimeout(r, ms));
 
   const overlay = document.createElement('div');
@@ -5469,6 +5614,7 @@ function _renderCardsPanel() {
             payload.mirrorVal = minV;
           }
         }
+        SFX.sfxCard();
         mpSend('card_played', payload);
         if (state.cardHistory) state.cardHistory.push({
           age: state.age, month: state.monthOfYear,
@@ -5582,22 +5728,75 @@ function _wireMultiplayerUI() {
     }
   });
 
+  let _mpMyReady = false;
+  let _mpOppReady = false;
+
+  function _updateLobbyStatus() {
+    const meStatus = $('mp-lobby-me-status');
+    const oppStatus = $('mp-lobby-opp-status');
+    if (meStatus) {
+      meStatus.textContent = _mpMyReady ? '✓ 已准备' : '未准备';
+      meStatus.className = 'mp-lobby-status' + (_mpMyReady ? ' ready' : '');
+    }
+    if (oppStatus) {
+      oppStatus.textContent = _mpOppReady ? '✓ 已准备' : '未准备';
+      oppStatus.className = 'mp-lobby-status' + (_mpOppReady ? ' ready' : '');
+    }
+    const hint = $('mp-ready-hint');
+    if (hint) {
+      if (_mpMyReady && !_mpOppReady) {
+        hint.style.display = 'block';
+        hint.textContent = '等待对方准备...';
+      } else {
+        hint.style.display = 'none';
+      }
+    }
+    const btn = $('mp-ready-btn');
+    if (btn) {
+      if (_mpMyReady) {
+        btn.textContent = '取消准备';
+        btn.classList.add('cancel');
+      } else {
+        btn.textContent = '准备';
+        btn.classList.remove('cancel');
+      }
+    }
+  }
+
   mpOn('connected', () => {
+    _mpMyReady = false;
+    _mpOppReady = false;
     $('mp-connected-banner').style.display = 'block';
-    // 填充大厅信息
     if ($('mp-lobby-me')) $('mp-lobby-me').textContent = mp.myNickname || '我';
     if ($('mp-lobby-me-tag')) $('mp-lobby-me-tag').textContent = mp.isHost ? '房主' : '加入者';
     if ($('mp-lobby-opp')) $('mp-lobby-opp').textContent = '已连接';
     if ($('mp-lobby-opp-tag')) $('mp-lobby-opp-tag').textContent = mp.isHost ? '加入者' : '房主';
+    _updateLobbyStatus();
   });
   mpOn('hello', () => {
     if ($('mp-lobby-opp')) $('mp-lobby-opp').textContent = mp.opponent.nickname;
   });
 
-  $('mp-start-game')?.addEventListener('click', () => {
-    mpSend('start_game', {});
-    _enterMpCreation();
+  $('mp-ready-btn')?.addEventListener('click', () => {
+    _mpMyReady = !_mpMyReady;
+    mpSend('ready_state', { ready: _mpMyReady });
+    _updateLobbyStatus();
+    if (_mpMyReady && _mpOppReady) {
+      // 双方都准备 → 开始游戏
+      mpSend('start_game', {});
+      _enterMpCreation();
+    }
   });
+
+  mpOn('ready_state', (data) => {
+    _mpOppReady = data.ready;
+    _updateLobbyStatus();
+    if (_mpMyReady && _mpOppReady) {
+      mpSend('start_game', {});
+      _enterMpCreation();
+    }
+  });
+
   mpOn('start_game', () => {
     _enterMpCreation();
   });

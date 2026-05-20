@@ -87,6 +87,9 @@ function _save() {
 }
 
 // ── Unlock ────────────────────────────────────────────────────────────────
+let _onUnlock = null;
+export function setOnUnlock(fn) { _onUnlock = fn; }
+
 export function unlockAchievement(id) {
   if (_unlocked.has(id)) return false;
   const def = ACHIEVEMENTS.find(a => a.id === id);
@@ -96,6 +99,7 @@ export function unlockAchievement(id) {
   _save();
   _showToast(def);
   _updateBadge();
+  if (_onUnlock) try { _onUnlock(def); } catch (e) {}
 
   // Combo: unlock "见过世面" when all four hidden storylines done
   if (id !== 'all_hidden' &&
