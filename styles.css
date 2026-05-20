@@ -995,6 +995,8 @@ body.in-game .left-panel {
   margin-top: 14px;
   display: grid;
   gap: 7px;
+  padding-right: 20px;
+  overflow: visible;
 }
 .stat-row {
   display: grid;
@@ -1002,6 +1004,7 @@ body.in-game .left-panel {
   align-items: center;
   gap: 8px;
   font-size: 12px;
+  overflow: visible;
 }
 .stat-label {
   color: var(--ink-soft);
@@ -1026,19 +1029,25 @@ body.in-game .left-panel {
   text-align: right;
   font-weight: 600;
   position: relative;
+  min-width: 30px;
 }
 .stat-delta {
+  position: absolute;
+  right: -22px;
+  top: 50%;
   font-size: 10px;
   font-weight: 700;
-  margin-left: 3px;
-  animation: statDeltaPop 600ms ease-out forwards;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: statDeltaPop 800ms ease-out forwards;
 }
 .stat-delta.pos { color: #4ade80; }
 .stat-delta.neg { color: #f87171; }
 @keyframes statDeltaPop {
-  0% { opacity: 0; transform: translateY(4px); }
-  20% { opacity: 1; transform: translateY(-2px); }
-  100% { opacity: 0; transform: translateY(-8px); }
+  0% { opacity: 0; transform: translateY(0); }
+  15% { opacity: 1; transform: translateY(-6px); }
+  70% { opacity: 1; transform: translateY(-10px); }
+  100% { opacity: 0; transform: translateY(-16px); }
 }
 .stat-row.stat-changed {
   animation: statRowFlash 500ms ease-out;
@@ -4137,11 +4146,18 @@ body.in-summary {
 .mp-relation-fill.neg { background: linear-gradient(90deg, #e74c3c, #c0392b); }
 .mp-relation-fill.pos { background: linear-gradient(90deg, #2ecc71, #27ae60); }
 .mp-cards-btn {
-  padding: 6px 12px; background: linear-gradient(135deg, #7b6cf6, #4a90e2);
-  border: none; border-radius: 6px; color: #fff;
-  font-size: 13px; font-weight: 600; cursor: pointer;
+  padding: 8px 16px; background: linear-gradient(135deg, #7b6cf6, #4a90e2);
+  border: none; border-radius: 8px; color: #fff;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  box-shadow: 0 2px 10px rgba(74,144,226,0.35);
+  animation: cardsBtnPulse 2.5s ease-in-out infinite;
+  letter-spacing: 0.5px;
 }
-.mp-cards-btn:hover { filter: brightness(1.15); }
+.mp-cards-btn:hover { filter: brightness(1.15); box-shadow: 0 4px 16px rgba(74,144,226,0.5); }
+@keyframes cardsBtnPulse {
+  0%, 100% { box-shadow: 0 2px 10px rgba(74,144,226,0.35); }
+  50% { box-shadow: 0 2px 18px rgba(123,108,246,0.55); }
+}
 
 /* Waiting overlay */
 .mp-waiting-overlay {
@@ -4165,36 +4181,48 @@ body.in-summary {
 
 /* Fate Cards Panel */
 .mp-cards-panel {
-  position: fixed; top: 80px; right: 20px; z-index: 6000;
-  width: 320px; background: #1a1f2e;
-  border: 1px solid #2a3142; border-radius: 12px;
-  box-shadow: 0 12px 36px rgba(0,0,0,0.6);
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 6000;
+  max-height: 70vh;
+  background: #1a1f2e;
+  border-top: 1px solid #3a4560;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.6);
   overflow: hidden;
+  display: flex; flex-direction: column;
+  animation: cardsPanelSlideUp 0.3s ease-out;
+}
+@keyframes cardsPanelSlideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
 }
 .mp-cards-head {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 16px; background: #0e1118; border-bottom: 1px solid #2a3142;
+  padding: 14px 20px; background: #0e1118; border-bottom: 1px solid #2a3142;
+  flex-shrink: 0;
 }
-.mp-cards-title { color: #e6e9ef; font-weight: 700; }
-.mp-cards-close { background: none; border: none; color: #888; cursor: pointer; font-size: 16px; }
-.mp-cards-list { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.mp-cards-title { color: #e6e9ef; font-weight: 700; font-size: 15px; }
+.mp-cards-close { background: none; border: none; color: #888; cursor: pointer; font-size: 20px; padding: 4px 8px; }
+.mp-cards-list { padding: 14px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; flex: 1; }
 .mp-card-item {
-  padding: 12px; background: #0e1118; border: 1px solid #2a3142;
-  border-radius: 8px; cursor: pointer; transition: all 0.18s;
+  padding: 14px 16px; background: #0e1118; border: 1px solid #2a3142;
+  border-radius: 10px; cursor: pointer; transition: all 0.18s;
+  display: flex; flex-direction: column; gap: 6px;
 }
-.mp-card-item:hover { border-color: #4a90e2; transform: translateY(-1px); }
-.mp-card-item.used { opacity: 0.4; cursor: not-allowed; filter: grayscale(0.8); }
-.mp-card-item.used:hover { transform: none; border-color: #2a3142; }
+.mp-card-item:hover { border-color: #4a90e2; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+.mp-card-item:active { transform: scale(0.98); }
+.mp-card-item.used { opacity: 0.35; cursor: not-allowed; filter: grayscale(0.8); }
+.mp-card-item.used:hover { transform: none; border-color: #2a3142; box-shadow: none; }
 .mp-card-item.big {
   background: linear-gradient(135deg, #1f1830 0%, #281a3c 100%);
   border-color: #7b6cf6;
 }
-.mp-card-name { color: #ffd76b; font-weight: 700; margin-bottom: 4px; font-size: 14px; }
+.mp-card-name { color: #ffd76b; font-weight: 700; font-size: 15px; }
 .mp-card-item.big .mp-card-name { color: #c0a0ff; }
-.mp-card-desc { color: #95a0b2; font-size: 12px; line-height: 1.5; }
+.mp-card-desc { color: #95a0b2; font-size: 13px; line-height: 1.6; }
 .mp-cards-hint {
-  padding: 10px 16px; color: #6a7589; font-size: 11px;
+  padding: 10px 20px; color: #6a7589; font-size: 12px;
   background: #0e1118; border-top: 1px solid #2a3142;
+  flex-shrink: 0;
 }
 
 /* Coop invite toast */
@@ -4234,7 +4262,7 @@ body.in-summary {
   .mp-bar-fields { gap: 8px; }
   .mp-bar-field label { display: none; }
   .mp-relation-bar { width: 50px; }
-  .mp-cards-panel { right: 10px; left: 10px; width: auto; }
+  .mp-cards-panel { max-height: 80vh; }
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -4497,9 +4525,10 @@ body.in-summary {
 .frenemy-card .fc-grade.g2 { background: rgba(255,215,107,0.2); color: #ffd76b; }
 
 /* In-game card panel: category colors */
-.mp-card-item.cat-harm { border-left: 3px solid #e74c3c; }
-.mp-card-item.cat-help { border-left: 3px solid #2ecc71; }
-.mp-card-item.cat-chaos { border-left: 3px solid #9b59b6; }
+.mp-card-item.cat-harm { border-left: 4px solid #e74c3c; background: linear-gradient(90deg, rgba(231,76,60,0.06), #0e1118 40%); }
+.mp-card-item.cat-help { border-left: 4px solid #2ecc71; background: linear-gradient(90deg, rgba(46,204,113,0.06), #0e1118 40%); }
+.mp-card-item.cat-chaos { border-left: 4px solid #9b59b6; background: linear-gradient(90deg, rgba(155,89,182,0.06), #0e1118 40%); }
+.mp-card-item.cat-harm .mp-card-name { color: #ff8a7a; }
 .mp-card-item.cat-help .mp-card-name { color: #7dffb3; }
 .mp-card-item.cat-chaos .mp-card-name { color: #c9a0ff; }
 

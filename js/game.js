@@ -1262,6 +1262,7 @@ function showConfirm({ title, body, stats, okText, cancelText }) {
     const okBtn = $('confirm-ok');
     const cancelBtn = $('confirm-cancel');
     if (!mask) { resolve(window.confirm(body || title || '')); return; }
+    SFX.sfxModalOpen();
     titleEl.textContent = title || '确认';
     bodyEl.textContent = body || '';
     statsEl.innerHTML = '';
@@ -1292,8 +1293,8 @@ function showConfirm({ title, body, stats, okText, cancelText }) {
       document.removeEventListener('keydown', onKey);
       resolve(result);
     };
-    const onOk = () => cleanup(true);
-    const onCancel = () => cleanup(false);
+    const onOk = () => { SFX.sfxConfirm(); cleanup(true); };
+    const onCancel = () => { SFX.sfxModalClose(); cleanup(false); };
     const onMaskClick = (e) => { if (e.target === mask) cleanup(false); };
     const onKey = (e) => {
       if (e.key === 'Escape') cleanup(false);
@@ -2376,9 +2377,11 @@ function _renderFrenemyDraft() {
       const picked = state._frenemyDraftPicked;
       const idx = picked.findIndex(c => c.id === card.id);
       if (idx >= 0) {
+        SFX.sfxCardDeselect();
         picked.splice(idx, 1);
         el.classList.remove('selected');
       } else if (picked.length < 3) {
+        SFX.sfxCardSelect();
         picked.push(card);
         el.classList.add('selected');
       }
@@ -2405,9 +2408,11 @@ function renderTalentSelect(talents) {
     el.addEventListener('click', () => {
       const idx = state.talentsPicked.findIndex(x => x.id === t.id);
       if (idx >= 0) {
+        SFX.sfxCardDeselect();
         state.talentsPicked.splice(idx, 1);
         el.classList.remove('picked');
       } else if (state.talentsPicked.length < 3) {
+        SFX.sfxTalentFlip();
         state.talentsPicked.push(t);
         el.classList.add('picked');
       }
@@ -4369,10 +4374,11 @@ async function main() {
   _allTalents = talents;
 
 
-  $('sex-male').addEventListener('click', () => { state.sex = 0; $('sex-male').classList.add('active'); $('sex-female').classList.remove('active'); updateCreationAvatar(); });
-  $('sex-female').addEventListener('click', () => { state.sex = 1; $('sex-female').classList.add('active'); $('sex-male').classList.remove('active'); updateCreationAvatar(); });
+  $('sex-male').addEventListener('click', () => { SFX.sfxToggleOption(); state.sex = 0; $('sex-male').classList.add('active'); $('sex-female').classList.remove('active'); updateCreationAvatar(); });
+  $('sex-female').addEventListener('click', () => { SFX.sfxToggleOption(); state.sex = 1; $('sex-female').classList.add('active'); $('sex-male').classList.remove('active'); updateCreationAvatar(); });
 
   $('btn-random-appearance').addEventListener('click', () => {
+    SFX.sfxShuffle();
     state.faceVariant = Math.floor(Math.random() * 10);
     state.topVariant = Math.floor(Math.random() * 24);
     state.bottomVariant = Math.floor(Math.random() * 8);
@@ -4385,6 +4391,7 @@ async function main() {
     const btn = $(`skin-${tone}`);
     if (!btn) continue;
     btn.addEventListener('click', () => {
+      SFX.sfxToggleOption();
       state.skinTone = tone;
       for (let t = 0; t < 3; t++) $(`skin-${t}`).classList.toggle('active', t === tone);
       updateCreationAvatar();
@@ -4446,21 +4453,24 @@ async function main() {
     $(`plus-${k}`).addEventListener('click', () => {
       const used = Object.values(state.alloc).reduce((a, b) => a + b, 0);
       if (used < ALLOC_TOTAL && state.alloc[k] < MAX_PER_STAT) {
+        SFX.sfxAllocTick();
         state.alloc[k] += 1;
         renderAlloc();
         updateCreationAvatar();
       }
     });
     $(`minus-${k}`).addEventListener('click', () => {
-      if (state.alloc[k] > 0) { 
-        state.alloc[k] -= 1; 
-        renderAlloc(); 
+      if (state.alloc[k] > 0) {
+        SFX.sfxAllocTick();
+        state.alloc[k] -= 1;
+        renderAlloc();
         updateCreationAvatar();
       }
     });
   }
 
   $('alloc-back-to-talent').addEventListener('click', () => {
+    SFX.sfxNav();
     const container = $('creation-scroll-area');
     const target = $('step-talents');
     if (container && target) {
@@ -4470,6 +4480,7 @@ async function main() {
   });
 
   $('alloc-random').addEventListener('click', () => {
+    SFX.sfxShuffle();
     for (const k of STAT_KEYS) state.alloc[k] = 0;
     let remaining = ALLOC_TOTAL;
     while (remaining > 0) {
@@ -4483,13 +4494,15 @@ async function main() {
     updateCreationAvatar();
   });
 
-  $('alloc-start').addEventListener('click', initGame);
+  $('alloc-start').addEventListener('click', () => { SFX.sfxConfirm(); initGame(); });
 
   $('btn-auto-1x').addEventListener('click', () => {
+    SFX.sfxAutoToggle();
     startAuto(1);
   });
 
   $('btn-auto-2x').addEventListener('click', () => {
+    SFX.sfxAutoToggle();
     startAuto(2);
   });
 
@@ -4503,6 +4516,7 @@ async function main() {
   });
 
   $('btn-restart').addEventListener('click', () => {
+    SFX.sfxRestart();
     showScreen('start-screen');
     location.reload();
   });
@@ -4664,44 +4678,53 @@ async function main() {
   }
 
   $('btn-summary').addEventListener('click', () => {
+    SFX.sfxNav();
     dismissEndOverlay();
     showScreen('summary-screen');
     renderSummary();
   });
 
   $('btn-end-summary').addEventListener('click', () => {
+    SFX.sfxNav();
     dismissEndOverlay();
     showScreen('summary-screen');
     renderSummary();
   });
 
   $('btn-end-restart').addEventListener('click', () => {
+    SFX.sfxRestart();
     if (mp.enabled && mp.connected) { _mpHandleRestart(); return; }
     location.reload();
   });
 
   $('btn-summary-back').addEventListener('click', () => {
+    SFX.sfxNav();
     showScreen('game-screen');
     render();
   });
 
   $('btn-summary-restart').addEventListener('click', () => {
+    SFX.sfxRestart();
     if (mp.enabled && mp.connected) { _mpHandleRestart(); return; }
     location.reload();
   });
 
   // MP VS comparison button
   $('btn-mp-vs')?.addEventListener('click', () => {
+    SFX.sfxNav();
     _mpShowVsComparison();
   });
   $('mp-vs-close')?.addEventListener('click', () => {
+    SFX.sfxModalClose();
     $('mp-vs-overlay').style.display = 'none';
   });
   $('mp-vs-back')?.addEventListener('click', () => {
+    SFX.sfxModalClose();
     $('mp-vs-overlay').style.display = 'none';
   });
 
   $('btn-summary-share').addEventListener('click', async () => {
+    SFX.sfxShare();
     try {
       const btn = $('btn-summary-share');
       const originalText = btn.innerHTML;
@@ -4838,6 +4861,7 @@ async function main() {
   });
 
   $('btn-close-poster').addEventListener('click', () => {
+    SFX.sfxModalClose();
     $('poster-modal').style.display = 'none';
   });
 
@@ -4979,6 +5003,28 @@ function _applyIncomingCard(eff) {
       const oldVal = state[srcKey] || 0;
       state[srcKey] = srcVal;
       pushLog(`【${cardName}】镜像！对方把自己最低的${STAT_LABELS[srcKey]}(${srcVal})复制给了你（原${oldVal}）`, logType);
+    } else if (eff.special === 'joker') {
+      // Reverse: intended harm becomes help — random +2 to two stats
+      const picks = [...base].sort(() => Math.random() - 0.5).slice(0, 2);
+      for (const k of picks) state[k] = (state[k] || 0) + 2;
+      state.HAP = (state.HAP || 0) + 1;
+      pushLog(`【${cardName}】小丑牌！对方本想害你，结果弄巧成拙——你的${picks.map(k => STAT_LABELS[k]).join('、')}各+2，HAP+1`, logType);
+    } else if (eff.special === 'drift') {
+      const k = base[Math.floor(Math.random() * base.length)];
+      const delta = Math.random() < 0.5 ? 3 : -3;
+      state[k] = (state[k] || 0) + delta;
+      pushLog(`【${cardName}】属性漂移！你的${STAT_LABELS[k]}${delta > 0 ? '+3' : '-3'}`, logType);
+    } else if (eff.special === 'steal_stat') {
+      // Steal 2 points from target's highest stat
+      let maxK = 'SOC', maxV = -99;
+      for (const k of base) { if ((state[k] || 0) > maxV) { maxV = state[k] || 0; maxK = k; } }
+      state[maxK] = (state[maxK] || 0) - 2;
+      pushLog(`【${cardName}】偷属性！对方偷走了你${STAT_LABELS[maxK]}的2点（${maxV}→${maxV - 2}）`, logType);
+    } else if (eff.special === 'nuke') {
+      const shuffled = [...base].sort(() => Math.random() - 0.5);
+      const targets = shuffled.slice(0, 2);
+      for (const k of targets) state[k] = (state[k] || 0) - 3;
+      pushLog(`【${cardName}】同归于尽！你的${targets.map(k => STAT_LABELS[k]).join('、')}各-3`, logType);
     }
     clampStats(); render(); return;
   }
@@ -5204,6 +5250,7 @@ function _showReunionDilemma(age, oppName) {
   // Wire button clicks
   overlay.querySelectorAll('.reunion-dilemma-btn').forEach(btn => {
     btn.addEventListener('click', () => {
+      SFX.sfxChoice();
       _reunionMyChoice = btn.dataset.key;
       mpSend('reunion_choice', { age, choice: _reunionMyChoice });
       // Disable buttons, show waiting or resolve
@@ -5612,6 +5659,19 @@ function _renderCardsPanel() {
             for (const k of base) { if ((state[k] || 0) < minV) { minV = state[k] || 0; minK = k; } }
             payload.mirrorKey = minK;
             payload.mirrorVal = minV;
+          }
+          // steal_stat: sender gains 2 to their lowest stat
+          if (card.effect.special === 'steal_stat') {
+            let minK = 'SOC', minV = 99;
+            for (const k of base) { if ((state[k] || 0) < minV) { minV = state[k] || 0; minK = k; } }
+            state[minK] = (state[minK] || 0) + 2;
+            clampStats();
+          }
+          // nuke: sender also takes -3 to two random stats
+          if (card.effect.special === 'nuke') {
+            const shuffled = [...base].sort(() => Math.random() - 0.5).slice(0, 2);
+            for (const k of shuffled) state[k] = (state[k] || 0) - 3;
+            clampStats();
           }
         }
         SFX.sfxCard();

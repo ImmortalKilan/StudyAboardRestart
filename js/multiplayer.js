@@ -72,19 +72,19 @@ export const mp = {
 export const FRENEMY_CARD_POOL = [
   // ─── 害人卡 (harm) ───
   {
-    id: 'trip', category: 'harm', grade: 0, icon: '🦶', name: '使绊子',
-    desc: '在食堂故意绊对方一脚。INT-2, HAP-1。好感-10',
-    effect: { stats: { INT: -2, HAP: -1 }, relationDelta: -10 },
-  },
-  {
-    id: 'rumor', category: 'harm', grade: 0, icon: '📣', name: '背后嚼舌根',
-    desc: '在同学群里说对方坏话。SOC-3, HAP-1。好感-10',
+    id: 'rumor', category: 'harm', grade: 0, icon: '📣', name: '嚼舌根',
+    desc: '在留学生群里说对方坏话。SOC-3, HAP-1。好感-10',
     effect: { stats: { SOC: -3, HAP: -1 }, relationDelta: -10 },
   },
   {
-    id: 'report', category: 'harm', grade: 1, icon: '📝', name: '举报学术不端',
-    desc: '向学校匿名举报对方作弊（不管有没有）。INT-3, SOC-2。好感-20',
-    effect: { stats: { INT: -3, SOC: -2 }, relationDelta: -20 },
+    id: 'midnight_call', category: 'harm', grade: 0, icon: '😈', name: '半夜夺命call',
+    desc: '算好时差在对方凌晨4点疯狂打电话。HLT-2, HAP-1。好感-10',
+    effect: { stats: { HLT: -2, HAP: -1 }, relationDelta: -10 },
+  },
+  {
+    id: 'screenshot', category: 'harm', grade: 0, icon: '🤡', name: '朋友圈挂人',
+    desc: '截对方聊天记录配上阴阳怪气的点评发出去。SOC-2, APP-1。好感-10',
+    effect: { stats: { SOC: -2, APP: -1 }, relationDelta: -10 },
   },
   {
     id: 'ugly_photo', category: 'harm', grade: 1, icon: '📸', name: '丑照轰炸',
@@ -92,63 +92,133 @@ export const FRENEMY_CARD_POOL = [
     effect: { stats: { APP: -3, HAP: -2 }, relationDelta: -20 },
   },
   {
+    id: 'report', category: 'harm', grade: 1, icon: '📝', name: '举报学术不端',
+    desc: '向对方学校匿名举报作弊（不管有没有）。INT-3, SOC-2。好感-20',
+    effect: { stats: { INT: -3, SOC: -2 }, relationDelta: -20 },
+  },
+  {
+    id: 'ex_like', category: 'harm', grade: 1, icon: '🐍', name: '给前任点赞',
+    desc: '疯狂给对方前任的社交媒体点赞评论。HAP-3, PER-1。好感-15',
+    effect: { stats: { HAP: -3, PER: -1 }, relationDelta: -15 },
+  },
+  {
+    id: 'ghost', category: 'harm', grade: 1, icon: '💬', name: '已读不回',
+    desc: '对方找你倾诉的时候永远已读不回。HAP-2, SOC-2。好感-15',
+    effect: { stats: { HAP: -2, SOC: -2 }, relationDelta: -15 },
+  },
+  {
+    id: 'bad_ramen', category: 'harm', grade: 0, icon: '🎁', name: '寄一箱泡面',
+    desc: '给对方寄了一箱家乡泡面……全是最难吃的口味。HAP-2。好感-5',
+    effect: { stats: { HAP: -2 }, relationDelta: -5 },
+  },
+  {
     id: 'erase', category: 'harm', grade: 2, icon: '🌑', name: '社会性死亡',
-    desc: '发动终极社死攻击，全属性-2, HAP-4。好感-30',
+    desc: '发动终极社死攻击。全属性-2, HAP-4。好感-30',
     effect: { stats: { SOC: -2, INT: -2, MNY: -2, PER: -2, HLT: -2, APP: -2, HAP: -4 }, relationDelta: -30 },
+  },
+  {
+    id: 'doxx', category: 'harm', grade: 2, icon: '🕵️', name: '开盒',
+    desc: '人肉搜索对方并把信息挂到网上。SOC-4, PER-3。好感-30',
+    effect: { stats: { SOC: -4, PER: -3 }, relationDelta: -30 },
   },
 
   // ─── 帮人卡 (help) ───
   {
-    id: 'treat', category: 'help', grade: 0, icon: '🍜', name: '请吃一顿',
-    desc: '难过的时候请对方搓一顿好的。对方HAP+2, HLT+1。好感+10',
-    effect: { stats: { HAP: 2, HLT: 1 }, relationDelta: 10 },
+    id: 'red_packet', category: 'help', grade: 0, icon: '🧧', name: '发个大红包',
+    desc: '在对方最难的时候转了一笔钱。MNY+2, HAP+1。好感+10',
+    effect: { stats: { MNY: 2, HAP: 1 }, relationDelta: 10 },
   },
   {
-    id: 'essay', category: 'help', grade: 0, icon: '✍️', name: '代写essay',
-    desc: '帮对方赶了一篇due。对方INT+2, PER+1。好感+15',
+    id: 'share_notes', category: 'help', grade: 0, icon: '📖', name: '共享网课笔记',
+    desc: '把自己整理的笔记和录屏全部共享。INT+2, PER+1。好感+15',
     effect: { stats: { INT: 2, PER: 1 }, relationDelta: 15 },
   },
   {
-    id: 'wingman', category: 'help', grade: 1, icon: '💘', name: '金牌僚机',
-    desc: '在派对上全力帮对方social。对方SOC+3, APP+1。好感+20',
-    effect: { stats: { SOC: 3, APP: 1 }, relationDelta: 20 },
+    id: 'delivery', category: 'help', grade: 0, icon: '🍕', name: '跨洋外卖',
+    desc: '点了一份对方城市的外卖送到门口。HAP+2, HLT+1。好感+10',
+    effect: { stats: { HAP: 2, HLT: 1 }, relationDelta: 10 },
+  },
+  {
+    id: 'late_chat', category: 'help', grade: 0, icon: '🌙', name: '跨时差陪聊',
+    desc: '凌晨3点爬起来陪对方聊到天亮。HAP+2, PER+1。好感+10',
+    effect: { stats: { HAP: 2, PER: 1 }, relationDelta: 10 },
+  },
+  {
+    id: 'essay', category: 'help', grade: 1, icon: '✍️', name: '远程代写essay',
+    desc: '熬夜帮对方赶了一篇due。INT+2, PER+1。好感+15',
+    effect: { stats: { INT: 2, PER: 1 }, relationDelta: 15 },
   },
   {
     id: 'lend_money', category: 'help', grade: 1, icon: '💸', name: '借钱不催',
-    desc: '在对方最难的时候借钱还不催还。对方MNY+3, HAP+1。好感+25',
+    desc: '在对方最难的时候借钱还不催还。MNY+3, HAP+1。好感+25',
     effect: { stats: { MNY: 3, HAP: 1 }, relationDelta: 25 },
   },
   {
+    id: 'care_package', category: 'help', grade: 1, icon: '📮', name: '寄家乡特产',
+    desc: '千里迢迢寄了一箱家乡零食和调料。HAP+3, HLT+1。好感+20',
+    effect: { stats: { HAP: 3, HLT: 1 }, relationDelta: 20 },
+  },
+  {
+    id: 'rec_letter', category: 'help', grade: 1, icon: '📋', name: '帮写推荐信',
+    desc: '帮对方润色了推荐信和简历。INT+2, SOC+1。好感+20',
+    effect: { stats: { INT: 2, SOC: 1 }, relationDelta: 20 },
+  },
+  {
     id: 'all_in_help', category: 'help', grade: 2, icon: '🌟', name: '两肋插刀',
-    desc: '在对方人生低谷全力相挺。对方全属性+1, HAP+3。好感+35',
+    desc: '在对方人生低谷全力相挺。全属性+1, HAP+3。好感+35',
     effect: { stats: { SOC: 1, INT: 1, MNY: 1, PER: 1, HLT: 1, APP: 1, HAP: 3 }, relationDelta: 35 },
+  },
+  {
+    id: 'referral', category: 'help', grade: 2, icon: '💼', name: '内推大厂',
+    desc: '用自己的人脉帮对方拿到面试机会。MNY+2, SOC+2, INT+1。好感+30',
+    effect: { stats: { MNY: 2, SOC: 2, INT: 1 }, relationDelta: 30 },
   },
 
   // ─── 骚操作卡 (chaos) ───
   {
+    id: 'double_or_nothing', category: 'chaos', grade: 0, icon: '🎲', name: '全押',
+    desc: '50%概率对方全属性+2，50%概率全属性-2。好感-5',
+    effect: { special: 'double_or_nothing', relationDelta: -5 },
+  },
+  {
+    id: 'mirror', category: 'chaos', grade: 0, icon: '🪞', name: '镜像',
+    desc: '把自己最低的属性复制给对方（替换同属性）。好感-10',
+    effect: { special: 'mirror_lowest', relationDelta: -10 },
+  },
+  {
+    id: 'joker', category: 'chaos', grade: 0, icon: '🃏', name: '小丑牌',
+    desc: '本来想害对方，结果帮了对方（效果反转）。好感+5',
+    effect: { special: 'joker', relationDelta: 5 },
+  },
+  {
+    id: 'drift', category: 'chaos', grade: 0, icon: '🌀', name: '属性漂移',
+    desc: '双方各随机一项属性±3，完全看运气。好感不变',
+    effect: { special: 'drift', relationDelta: 0 },
+  },
+  {
     id: 'swap_stat', category: 'chaos', grade: 1, icon: '🔀', name: '灵魂交换',
-    desc: '随机选一项属性，和对方互换数值。好感不变',
+    desc: '随机一项属性和对方互换数值。好感不变',
     effect: { special: 'swap_random_stat', relationDelta: 0 },
   },
   {
     id: 'roulette', category: 'chaos', grade: 1, icon: '🎰', name: '俄罗斯轮盘',
-    desc: '对方随机一项属性-4。但有40%概率反噬自己。好感-5',
+    desc: '对方随机一项属性-4，40%概率反噬自己。好感-5',
     effect: { special: 'roulette', relationDelta: -5 },
+  },
+  {
+    id: 'steal_stat', category: 'chaos', grade: 1, icon: '🧲', name: '偷属性',
+    desc: '偷对方最高属性的2点加到自己身上。好感-15',
+    effect: { special: 'steal_stat', relationDelta: -15 },
+  },
+  {
+    id: 'nuke', category: 'chaos', grade: 1, icon: '💣', name: '同归于尽',
+    desc: '双方随机两项属性各-3。好感-10',
+    effect: { special: 'nuke', relationDelta: -10 },
   },
   {
     id: 'identity_theft', category: 'chaos', grade: 2, icon: '🎭', name: '人生互换',
     desc: '和对方交换三项最高属性值。命运从此改写。好感-10',
     effect: { special: 'swap_top3', relationDelta: -10 },
-  },
-  {
-    id: 'double_or_nothing', category: 'chaos', grade: 0, icon: '🎲', name: '全押',
-    desc: '50%概率对方全属性+2，50%概率全属性-2。赌的就是心跳。好感-5',
-    effect: { special: 'double_or_nothing', relationDelta: -5 },
-  },
-  {
-    id: 'mirror', category: 'chaos', grade: 0, icon: '🪞', name: '镜像',
-    desc: '把自己当前最低的属性复制给对方（替换对方同属性）。好感-10',
-    effect: { special: 'mirror_lowest', relationDelta: -10 },
   },
 ];
 
@@ -167,11 +237,11 @@ export function draftFrenemyCards() {
       [arr[i], arr[j]] = [arr[j], arr[i]];
     }
   }
-  // pick ~3 harm, ~3 help, ~2 chaos (= 8)
+  // pick 3 harm, 3 help, 3 chaos (= 9), player picks 3
   const pool = [
     ...byCat.harm.slice(0, 3),
     ...byCat.help.slice(0, 3),
-    ...byCat.chaos.slice(0, 2),
+    ...byCat.chaos.slice(0, 3),
   ];
   // final shuffle
   for (let i = pool.length - 1; i > 0; i--) {
@@ -184,9 +254,9 @@ export function draftFrenemyCards() {
 export function initialFateCards() {
   // fallback: if draft wasn't used, give 3 defaults
   return [
-    { ...FATE_CARDS.trip,  used: false },
     { ...FATE_CARDS.rumor, used: false },
-    { ...FATE_CARDS.erase, used: false },
+    { ...FATE_CARDS.red_packet, used: false },
+    { ...FATE_CARDS.double_or_nothing, used: false },
   ];
 }
 
