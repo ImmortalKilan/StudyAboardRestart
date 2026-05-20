@@ -4717,3 +4717,387 @@ body.in-summary {
     transform: scale(1) rotate(var(--badge-rotate, 0deg));
   }
 }
+
+/* ── Tutorial Button on Start Screen ─────────────────────────────────────── */
+/* ── Step-by-step Guide (A层) ─────────────────────────────────────────────── */
+.guide-overlay {
+  position: fixed; inset: 0; z-index: 9800;
+  pointer-events: none;
+}
+.guide-spotlight {
+  position: absolute;
+  border-radius: 10px;
+  box-shadow: 0 0 0 9999px rgba(8, 10, 14, 0.78);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  z-index: 1;
+}
+.guide-spotlight::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 12px;
+  border: 2px solid var(--warm);
+  opacity: 0.7;
+  animation: guidePulse 1.5s ease-in-out infinite;
+}
+@keyframes guidePulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.01); }
+}
+.guide-tooltip {
+  position: absolute;
+  z-index: 2;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px 20px 14px;
+  max-width: 320px;
+  width: 90vw;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  pointer-events: auto;
+  animation: guideTooltipIn 0.35s ease-out;
+}
+@keyframes guideTooltipIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.guide-step-indicator {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.guide-step-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--line);
+  transition: background 0.25s;
+}
+.guide-step-dot.active {
+  background: var(--warm);
+}
+.guide-step-dot.done {
+  background: var(--accent);
+}
+.guide-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--warm);
+  margin-bottom: 6px;
+}
+.guide-body {
+  font-size: 13px;
+  color: var(--ink-soft);
+  line-height: 1.7;
+  margin-bottom: 14px;
+}
+.guide-body strong {
+  color: var(--ink);
+}
+.guide-btns {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.guide-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.1s;
+  pointer-events: auto;
+}
+.guide-btn:active { transform: scale(0.96); }
+.guide-btn.skip {
+  background: transparent;
+  color: var(--ink-faint);
+}
+.guide-btn.skip:hover { color: var(--ink-soft); }
+.guide-btn.next {
+  background: linear-gradient(135deg, var(--accent), var(--accent-soft));
+  color: #fff;
+}
+.guide-btn.next:hover { filter: brightness(1.1); }
+
+.guide-arrow {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  animation: guideArrowBounce 1s ease-in-out infinite;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+@keyframes guideArrowBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+
+.start-btn-tutorial {
+  background: transparent !important;
+  border: 1px solid var(--line) !important;
+  color: var(--ink-soft) !important;
+  font-size: 13px !important;
+  padding: 8px 20px !important;
+  opacity: 0.7;
+  transition: opacity 0.2s, border-color 0.2s;
+}
+.start-btn-tutorial:hover {
+  opacity: 1;
+  border-color: var(--accent) !important;
+  color: var(--ink) !important;
+}
+
+/* ── First-time Tutorial Prompt ──────────────────────────────────────────── */
+.tutorial-prompt-overlay {
+  position: fixed; inset: 0; z-index: 9500;
+  background: rgba(8, 10, 14, 0.80);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  animation: tutFadeIn 0.3s ease-out;
+}
+@keyframes tutFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.tutorial-prompt-card {
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 32px 28px 24px;
+  text-align: center;
+  max-width: 320px;
+  width: 90%;
+  animation: tutSlideUp 0.35s ease-out;
+}
+@keyframes tutSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.tutorial-prompt-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+.tutorial-prompt-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.tutorial-prompt-body {
+  font-size: 14px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+.tutorial-prompt-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.tutorial-prompt-btn {
+  border: none;
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.1s;
+}
+.tutorial-prompt-btn:active { transform: scale(0.97); }
+.tutorial-prompt-btn.yes {
+  background: linear-gradient(135deg, var(--accent), var(--accent-soft));
+  color: #fff;
+}
+.tutorial-prompt-btn.yes:hover { filter: brightness(1.1); }
+.tutorial-prompt-btn.no {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink-faint);
+}
+.tutorial-prompt-btn.no:hover { border-color: var(--ink-faint); color: var(--ink-soft); }
+
+/* ── Tutorial Modal (图文说明) ────────────────────────────────────────────── */
+.tutorial-modal-overlay {
+  position: fixed; inset: 0; z-index: 9600;
+  background: rgba(8, 10, 14, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  animation: tutFadeIn 0.3s ease-out;
+}
+.tutorial-modal {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  width: 94%;
+  max-width: 520px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: tutSlideUp 0.35s ease-out;
+}
+.tutorial-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+.tutorial-header-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.tutorial-close-btn {
+  background: none;
+  border: none;
+  color: var(--ink-faint);
+  font-size: 22px;
+  cursor: pointer;
+  padding: 2px 6px;
+  line-height: 1;
+  transition: color 0.15s;
+}
+.tutorial-close-btn:hover { color: var(--ink); }
+.tutorial-scroll {
+  overflow-y: auto;
+  padding: 20px;
+  flex: 1;
+}
+
+/* Tutorial content styles */
+.tut-section {
+  margin-bottom: 28px;
+}
+.tut-section:last-of-type {
+  margin-bottom: 20px;
+}
+.tut-heading {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--warm);
+  margin: 0 0 10px 0;
+}
+.tut-text {
+  font-size: 13px;
+  color: var(--ink-soft);
+  line-height: 1.7;
+  margin: 0 0 10px 0;
+}
+.tut-text strong {
+  color: var(--ink);
+}
+.tut-highlight {
+  background: rgba(111, 143, 188, 0.1);
+  border-left: 3px solid var(--accent);
+  padding: 10px 14px;
+  border-radius: 0 8px 8px 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+.tut-tip {
+  background: rgba(201, 169, 120, 0.08);
+  border-left: 3px solid var(--warm);
+  padding: 10px 14px;
+  border-radius: 0 8px 8px 0;
+  font-size: 12px;
+  color: var(--ink-faint);
+  line-height: 1.6;
+  margin-top: 8px;
+}
+
+/* Stat grid */
+.tut-stat-grid {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.tut-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 13px;
+}
+.tut-stat-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+}
+.tut-stat-item strong {
+  color: var(--ink);
+  min-width: 36px;
+}
+.tut-stat-desc {
+  color: var(--ink-faint);
+  font-size: 12px;
+}
+
+/* Grade badges */
+.tut-grade-row {
+  display: flex;
+  gap: 10px;
+  margin: 8px 0 12px;
+  flex-wrap: wrap;
+}
+.tut-grade {
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.tut-grade.g0 { background: rgba(176,184,196,0.15); color: var(--grade-0); }
+.tut-grade.g1 { background: rgba(74,157,229,0.15); color: var(--grade-1); }
+.tut-grade.g2 { background: rgba(168,85,247,0.15); color: var(--grade-2); }
+.tut-grade.g3 { background: rgba(245,182,66,0.15); color: var(--grade-3); }
+
+/* Feature list */
+.tut-feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tut-feature {
+  font-size: 13px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(43, 54, 72, 0.5);
+}
+.tut-feature:last-child {
+  border-bottom: none;
+}
+.tut-feature strong {
+  color: var(--ink);
+}
+
+/* Footer button */
+.tut-footer {
+  text-align: center;
+  padding: 10px 0 4px;
+}
+.tut-start-btn {
+  background: linear-gradient(135deg, var(--accent), var(--accent-soft));
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 32px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.1s;
+}
+.tut-start-btn:hover { filter: brightness(1.1); }
+.tut-start-btn:active { transform: scale(0.97); }

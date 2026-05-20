@@ -11357,7 +11357,8 @@
       },
       {
         "text": "学业优先，不去了",
-        "next": 90021
+        "next": 90021,
+        "butterflySend": "internship"
       }
     ],
     "include": "(AGE>=19)&(AGE<=21)",
@@ -11386,11 +11387,13 @@
     "choices": [
       {
         "text": "选择大厂，稳定至上",
-        "next": 90023
+        "next": 90023,
+        "butterflySend": "startup"
       },
       {
         "text": "加入创业公司，搏一搏",
-        "next": 90024
+        "next": 90024,
+        "butterflySend": "internship"
       }
     ],
     "include": "(AGE>=23)&(AGE<=28)",
@@ -11596,7 +11599,8 @@
       },
       {
         "text": "委婉拒绝，最近太忙了",
-        "next": 91009
+        "next": 91009,
+        "butterflySend": "network"
       }
     ],
     "include": "(AGE>=18)&(AGE<=21)&(SOC>=4)",
@@ -11728,7 +11732,8 @@
       },
       {
         "text": "没薪水的实习不做",
-        "next": 92012
+        "next": 92012,
+        "butterflySend": "internship"
       }
     ],
     "include": "(AGE>=20)&(AGE<=22)&(INT>=7)",
@@ -11925,7 +11930,8 @@
       },
       {
         "text": "委婉拒绝，现在不是恋爱的时候",
-        "next": 95003
+        "next": 95003,
+        "butterflySend": "romance"
       }
     ],
     "include": "(AGE>=16)&(AGE<=17)&(relationship==单身)",
@@ -12361,7 +12367,8 @@
       },
       {
         "text": "还不成熟，再等等",
-        "next": 97021
+        "next": 97021,
+        "butterflySend": "startup"
       }
     ],
     "include": "(AGE>=20)&(AGE<=24)&(INT>=6)&(SOC>=6)",
@@ -12460,7 +12467,8 @@
       },
       {
         "text": "不去了，在宿舍躺着",
-        "next": 97030
+        "next": 97030,
+        "butterflySend": "network"
       }
     ],
     "include": "(AGE>=18)&(AGE<=22)&(SOC>=8)",
@@ -12769,7 +12777,8 @@
       {
         "title": "礼貌拒绝，提前回家",
         "desc": "守住底线，回去陪 TA。",
-        "next": 14311
+        "next": 14311,
+        "butterflySend": "romance"
       },
       {
         "title": "保留联系方式，私下聊聊",

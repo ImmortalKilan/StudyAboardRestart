@@ -1011,7 +1011,10 @@
     "id": 10349001,
     "text": "你决定留在日本再拼一年。白天上语言学校，晚上刷留考真题，周末去图书馆背N1词汇。便利店的饭团成了你最好的朋友。",
     "noRandom": true,
-    "effect": { "INT": 1, "PER": 2 },
+    "effect": {
+      "INT": 1,
+      "PER": 2
+    },
     "happyDelta": -1,
     "branch": [
       "INT>=5?10349011",
@@ -1664,11 +1667,13 @@
     "choices": [
       {
         "text": "申请研究生，继续深造",
-        "next": 10706
+        "next": 10706,
+        "butterflySend": "internship"
       },
       {
         "text": "直接找工作，进入社会",
-        "next": 10707
+        "next": 10707,
+        "butterflySend": "overseas_advanced"
       }
     ]
   },

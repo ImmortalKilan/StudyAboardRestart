@@ -1443,6 +1443,10 @@ function applyEvent(ev) {
     state.endingId = ev.id;
     state.endingAge = state.age;
     SFX.sfxGameEnd();
+    // Clean up any pending MP reunion state
+    if (mp._reunionTimeout) { clearTimeout(mp._reunionTimeout); mp._reunionTimeout = null; }
+    mp.isWaiting = false;
+    _hideWaitingOverlay();
   }
 
   // Cinematic intro when entering a special/hidden storyline
@@ -1802,6 +1806,18 @@ function resolveChoice(index) {
     if (line) pushLog(line, logType);
   }
 
+  // ── Butterfly effect: event-bound send ──
+  // If the chosen option has a butterflySend key AND we're in MP, send to opponent
+  if (choice.butterflySend && mp.enabled && mp.connected && mpSend) {
+    const bfKey = choice.butterflySend;
+    if (!mp.butterflySent) mp.butterflySent = new Set();
+    if (!mp.butterflySent.has(bfKey)) {
+      mp.butterflySent.add(bfKey);
+      mpSend('butterfly', { payload: { key: bfKey, srcAge: state.age } });
+      pushLog('（你的选择在远方激起了一只蝴蝶……）', 'mp-butterfly');
+    }
+  }
+
   render();
 
   // 恢复选择前的自动播放状态
@@ -1926,11 +1942,15 @@ function advanceMonth() {
       pushLog('「结局：油尽灯枯」长期的忽视和透支终于压垮了你的身体。你在一个深夜倒下，再也没有醒来。人生就此画上句号。', 'ending');
       state.phase = 'ended';
       unlockAchievement('end_health');
+      if (mp._reunionTimeout) { clearTimeout(mp._reunionTimeout); mp._reunionTimeout = null; }
+      mp.isWaiting = false;
     }
     if (state.age >= 60) {
       pushLog('你退休了。回首这一生，百感交集。', 'ending');
       state.phase = 'ended';
       unlockAchievement('end_retire');
+      if (mp._reunionTimeout) { clearTimeout(mp._reunionTimeout); mp._reunionTimeout = null; }
+      mp.isWaiting = false;
     }
   }
 
@@ -1951,6 +1971,27 @@ function advanceMonth() {
       const bf = mp.pendingButterfly.shift();
       const bfEv = _findButterflyReceive(bf.key);
       if (bfEv) applyEvent(bfEv);
+    }
+
+    // ── Butterfly effect: stat-based auto-trigger ──
+    // Every 6 months, check stat conditions and probabilistically send butterflies
+    if (state.monthTotal % 6 === 0 && state.age >= 18) {
+      if (!mp.butterflySent) mp.butterflySent = new Set();
+      const _bfAutoRules = [
+        { key: 'internship',        cond: () => state.INT >= 12 && state.MNY <= 3 && state.age >= 20, prob: 0.15 },
+        { key: 'network',           cond: () => state.SOC <= 2 && state.age >= 19, prob: 0.12 },
+        { key: 'startup',           cond: () => state.INT >= 10 && state.MNY >= 8 && state.age >= 22 && !state.storyline, prob: 0.10 },
+        { key: 'overseas_advanced', cond: () => state.INT >= 12 && state.overseas && state.age >= 22, prob: 0.10 },
+        { key: 'romance',           cond: () => state.APP >= 10 && state.relationship === '单身' && state.age >= 19, prob: 0.12 },
+      ];
+      for (const rule of _bfAutoRules) {
+        if (mp.butterflySent.has(rule.key)) continue;
+        if (rule.cond() && Math.random() < rule.prob) {
+          mp.butterflySent.add(rule.key);
+          mpSend('butterfly', { payload: { key: rule.key, srcAge: state.age } });
+          break; // max 1 auto-butterfly per check
+        }
+      }
     }
   }
 
@@ -4398,7 +4439,7 @@ async function main() {
     });
   }
 
-  function _scrollToAlloc() {
+  let _scrollToAlloc = function() {
     for (const k of STAT_KEYS) {
       state.alloc[k] = 0;
     }
@@ -4417,7 +4458,7 @@ async function main() {
         allocList.parentNode.insertBefore(banner, allocList);
       }
     }
-  }
+  };
 
   $('talent-confirm').addEventListener('click', () => {
     SFX.sfxConfirm();
@@ -4892,6 +4933,287 @@ async function main() {
   renderTalentSelect(talents);
   updateCreationAvatar();
   showScreen('start-screen');
+
+  // ── Tutorial system ──────────────────────────────────────────────
+  const _tutSeen = (() => { try { return localStorage.getItem('sasr_tutorial_seen'); } catch(e) { return null; } })();
+
+  function _openTutorial() {
+    SFX.sfxNav();
+    $('tutorial-modal').style.display = '';
+  }
+  function _closeTutorial() {
+    SFX.sfxModalClose();
+    $('tutorial-modal').style.display = 'none';
+  }
+
+  // First-time prompt
+  if (!_tutSeen) {
+    $('tutorial-prompt').style.display = '';
+    $('tutorial-prompt-yes').addEventListener('click', () => {
+      SFX.sfxConfirm();
+      $('tutorial-prompt').style.display = 'none';
+      try { localStorage.setItem('sasr_tutorial_seen', '1'); } catch(e) {}
+      _openTutorial();
+    });
+    $('tutorial-prompt-no').addEventListener('click', () => {
+      SFX.sfxClick();
+      $('tutorial-prompt').style.display = 'none';
+      try { localStorage.setItem('sasr_tutorial_seen', '1'); } catch(e) {}
+      try { localStorage.setItem('sasr_guide_done', '1'); } catch(e) {}
+    });
+  }
+
+  // Tutorial button on start screen
+  $('btn-tutorial').addEventListener('click', () => _openTutorial());
+  $('tutorial-close').addEventListener('click', () => _closeTutorial());
+  $('tutorial-start-game').addEventListener('click', () => {
+    _closeTutorial();
+    $('btn-start').click();
+  });
+
+  // ── Step-by-step Guide (A层) ────────────────────────────────────
+  const _guideDone = (() => { try { return localStorage.getItem('sasr_guide_done'); } catch(e) { return null; } })();
+  let _guideActive = false;
+  let _guideStep = 0;
+
+  // Steps are grouped by phase: 'creation' steps first, then 'game' steps
+  const GUIDE_STEPS = [
+    // ── Creation Screen Steps ──
+    {
+      phase: 'creation',
+      target: '#talent-list',
+      title: '🎲 抽取天赋',
+      body: '这是你的天赋卡池，共 10 张随机天赋。<strong>点击选择 3 张</strong>带入本局游戏。\n颜色越亮越稀有，橙色最强。',
+      arrow: 'bottom',
+    },
+    {
+      phase: 'creation',
+      target: '#talent-confirm',
+      title: '✅ 确认选择',
+      body: '选好 3 张天赋后，这个按钮会亮起。点击确认进入<strong>属性分配</strong>阶段。',
+      arrow: 'top',
+    },
+    // Note: alloc steps will fire after user confirms talents and scrolls
+    {
+      phase: 'alloc',
+      target: '.alloc-list',
+      title: '📊 分配属性点',
+      body: '用 <strong>＋</strong> 和 <strong>−</strong> 分配 25 个点数到六大属性。\n每项上限 10，天赋加成会额外叠加。点「随机分配」可以一键随机。',
+      arrow: 'left',
+    },
+    {
+      phase: 'alloc',
+      target: '#alloc-start',
+      title: '🚀 开始人生',
+      body: '属性分配好后，点击这个按钮正式开始你的留学人生！',
+      arrow: 'top',
+    },
+    // ── Game Screen Steps ──
+    {
+      phase: 'game',
+      target: '.left-panel',
+      title: '👤 你的状态',
+      body: '左侧面板显示你的<strong>头像、属性、学校、专业、恋爱</strong>等状态。\n属性条会随事件实时变化。',
+      arrow: 'right',
+    },
+    {
+      phase: 'game',
+      target: '.right-panel',
+      title: '📜 事件面板',
+      body: '<strong>点击这里推进一个月</strong>，触发新事件。\n遇到选择时，选项按钮会出现在这里——有些选项需要属性达标才能选。',
+      arrow: 'left',
+    },
+    {
+      phase: 'game',
+      target: '#btn-auto-1x',
+      title: '⏩ 自动播放',
+      body: '懒得一直点？按「自动播放」让游戏自动跑。\n遇到选择时会<strong>自动暂停</strong>等你操作。',
+      arrow: 'bottom',
+    },
+  ];
+
+  function _guideShow(stepIdx) {
+    const overlay = $('guide-overlay');
+    const spotlight = $('guide-spotlight');
+    const tooltip = $('guide-tooltip');
+    const arrow = $('guide-arrow');
+    const titleEl = $('guide-title');
+    const bodyEl = $('guide-body');
+    const indicator = $('guide-step-indicator');
+    const nextBtn = $('guide-next');
+
+    const step = GUIDE_STEPS[stepIdx];
+    if (!step) { _guideEnd(); return; }
+
+    const targetEl = document.querySelector(step.target);
+    if (!targetEl || targetEl.offsetHeight === 0) {
+      // Target not visible, skip
+      _guideStep++;
+      setTimeout(() => _guideShow(_guideStep), 100);
+      return;
+    }
+
+    overlay.style.display = '';
+    _guideActive = true;
+
+    // Spotlight
+    const rect = targetEl.getBoundingClientRect();
+    const pad = 8;
+    spotlight.style.top = (rect.top - pad) + 'px';
+    spotlight.style.left = (rect.left - pad) + 'px';
+    spotlight.style.width = (rect.width + pad * 2) + 'px';
+    spotlight.style.height = (rect.height + pad * 2) + 'px';
+
+    // Step dots
+    indicator.innerHTML = GUIDE_STEPS.map((_, i) =>
+      `<span class="guide-step-dot ${i < stepIdx ? 'done' : i === stepIdx ? 'active' : ''}"></span>`
+    ).join('');
+
+    // Content
+    titleEl.textContent = step.title;
+    bodyEl.innerHTML = step.body.replace(/\n/g, '<br>');
+    nextBtn.textContent = stepIdx === GUIDE_STEPS.length - 1 ? '开始游戏！' : '下一步';
+
+    // Position tooltip
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    tooltip.style.removeProperty('top');
+    tooltip.style.removeProperty('bottom');
+    tooltip.style.removeProperty('left');
+    tooltip.style.removeProperty('right');
+
+    // For tall elements (> 60% viewport), use center-of-viewport vertical positioning
+    const isTall = rect.height > vh * 0.6;
+    const centerY = isTall ? vh / 2 : rect.top + rect.height / 2;
+
+    if (step.arrow === 'right' || step.arrow === 'left') {
+      // Place tooltip beside the target, vertically centered
+      let tooltipTop = centerY - 80;
+      tooltipTop = Math.max(20, Math.min(tooltipTop, vh - 220));
+      tooltip.style.top = tooltipTop + 'px';
+      if (step.arrow === 'right') {
+        tooltip.style.left = Math.min(rect.right + 60, vw - 340) + 'px';
+      } else {
+        tooltip.style.left = Math.max(10, rect.left - 340) + 'px';
+      }
+    } else {
+      // Place tooltip above or below
+      const spaceBelow = vh - rect.bottom;
+      const spaceAbove = rect.top;
+      if (spaceBelow > 180 || spaceBelow > spaceAbove) {
+        tooltip.style.top = Math.min(rect.bottom + 20, vh - 200) + 'px';
+      } else {
+        tooltip.style.top = Math.max(20, rect.top - 200) + 'px';
+      }
+      let tooltipLeft = rect.left + rect.width / 2 - 160;
+      tooltipLeft = Math.max(10, Math.min(tooltipLeft, vw - 330));
+      tooltip.style.left = tooltipLeft + 'px';
+    }
+
+    // Re-trigger animation
+    tooltip.style.animation = 'none';
+    tooltip.offsetHeight; // reflow
+    tooltip.style.animation = '';
+
+    // Arrow pointing at target — use clamped center for tall elements
+    const arrowY = isTall ? (vh / 2 - 24) : (rect.top + rect.height / 2 - 24);
+    const arrowYClamped = Math.max(20, Math.min(arrowY, vh - 60));
+
+    if (step.arrow === 'bottom') {
+      arrow.style.display = '';
+      arrow.style.top = Math.min(rect.bottom + 2, vh - 60) + 'px';
+      arrow.style.left = (rect.left + rect.width / 2 - 24) + 'px';
+      arrow.style.transform = 'rotate(0deg)';
+    } else if (step.arrow === 'top') {
+      arrow.style.display = '';
+      arrow.style.top = Math.max(rect.top - 52, 4) + 'px';
+      arrow.style.left = (rect.left + rect.width / 2 - 24) + 'px';
+      arrow.style.transform = 'rotate(180deg)';
+    } else if (step.arrow === 'right') {
+      arrow.style.display = '';
+      arrow.style.top = arrowYClamped + 'px';
+      arrow.style.left = (rect.right + 4) + 'px';
+      arrow.style.transform = 'rotate(-90deg)';
+    } else if (step.arrow === 'left') {
+      arrow.style.display = '';
+      arrow.style.top = arrowYClamped + 'px';
+      arrow.style.left = (rect.left - 52) + 'px';
+      arrow.style.transform = 'rotate(90deg)';
+    } else {
+      arrow.style.display = 'none';
+    }
+  }
+
+  function _guideEnd() {
+    $('guide-overlay').style.display = 'none';
+    _guideActive = false;
+    try { localStorage.setItem('sasr_guide_done', '1'); } catch(e) {}
+  }
+
+  function _guideNext() {
+    SFX.sfxClick();
+    _guideStep++;
+    const nextStep = GUIDE_STEPS[_guideStep];
+    if (!nextStep) {
+      _guideEnd();
+      return;
+    }
+    // If the next step is in a different phase, pause — will be resumed by hooks
+    const curStep = GUIDE_STEPS[_guideStep - 1];
+    if (nextStep.phase !== curStep.phase) {
+      $('guide-overlay').style.display = 'none';
+      _guideActive = false;
+      return;
+    }
+    _guideShow(_guideStep);
+  }
+
+  // Called by various hooks when the right phase becomes visible
+  function _guideResumeForPhase(phase) {
+    if (_guideStep >= GUIDE_STEPS.length) return;
+    if (_guideActive) return; // already showing
+    const nextStep = GUIDE_STEPS[_guideStep];
+    if (nextStep && nextStep.phase === phase) {
+      setTimeout(() => {
+        _guideActive = true;
+        _guideShow(_guideStep);
+      }, 500);
+    }
+  }
+
+  $('guide-next').addEventListener('click', _guideNext);
+  $('guide-skip').addEventListener('click', () => { SFX.sfxClick(); _guideEnd(); });
+
+  // Hook showScreen for game-screen phase resume
+  const _origShowScreen = showScreen;
+  showScreen = function(id) {
+    _origShowScreen(id);
+    if (id === 'game-screen') _guideResumeForPhase('game');
+  };
+
+  // Hook _scrollToAlloc for alloc phase resume
+  const _origScrollToAlloc = _scrollToAlloc;
+  _scrollToAlloc = function() {
+    _origScrollToAlloc();
+    _guideResumeForPhase('alloc');
+  };
+
+  // Hook: start guide when entering creation screen for the first time
+  if (!_guideDone) {
+    let _guideStarted = false;
+    const _creationObserver = new MutationObserver(() => {
+      if (!_guideStarted && $('creation-screen').classList.contains('active')) {
+        _guideStarted = true;
+        _creationObserver.disconnect();
+        setTimeout(() => {
+          _guideStep = 0;
+          _guideActive = true;
+          _guideShow(0);
+        }, 500);
+      }
+    });
+    _creationObserver.observe($('creation-screen'), { attributes: true, attributeFilter: ['class'] });
+  }
 
   // ── Multiplayer (optional) ──────────────────────────────────────
   try {
@@ -5558,6 +5880,10 @@ function _wireMpMessageHandlers() {
       showConfirm({ title: '对方已离开', body: '本局联机结束，将转为单人模式继续。', okText: '好的' });
       mp.enabled = false;
       _hideOpponentBar();
+    } else if (state.phase === 'ended') {
+      // Game already over — silently clean up, no disruptive modal
+      mp.connected = false;
+      _hideOpponentBar();
     }
   });
 
@@ -5984,6 +6310,7 @@ function _enterMpCreation() {
   mp.isWaiting = false;
   mp.waitReason = '';
   mp.pendingButterfly = [];
+  mp.butterflySent = new Set();
   mp.coopInvitePending = null;
   mp.opponent.age = 15;
   mp.opponent.profession = '高中生';
