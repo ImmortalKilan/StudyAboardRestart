@@ -1,9 +1,11 @@
 // ── Audio System ─────────────────────────────────────────────────────────────
-// 8-bit pixel core + wooden/natural resonance warmth.
-// All sounds synthesized via Web Audio API — no external files needed.
+// Hybrid: Kenney ogg files for UI interactions + Web Audio synthesis for stat effects.
+// Kenney assets: CC0 licensed from kenney.nl
 
 let _ctx = null;
 let _muted = false;
+const _audioCache = {};  // path → AudioBuffer
+const SFX_BASE = 'assets/sfx/';
 
 function _ensureCtx() {
   if (!_ctx) {
@@ -26,9 +28,52 @@ export function initMuteState() {
   } catch (e) {}
 }
 
-// ── Synth primitives ─────────────────────────────────────────────────────────
+// ── File-based playback ─────────────────────────────────────────────────────
+async function _loadBuffer(filename) {
+  if (_audioCache[filename]) return _audioCache[filename];
+  try {
+    const ctx = _ensureCtx();
+    const resp = await fetch(SFX_BASE + filename);
+    const arr = await resp.arrayBuffer();
+    const buf = await ctx.decodeAudioData(arr);
+    _audioCache[filename] = buf;
+    return buf;
+  } catch (e) {
+    return null;
+  }
+}
 
-// 8-bit tone — square wave with optional pitch slide for retro feel
+function _playFile(filename, vol = 0.5) {
+  if (_muted) return;
+  _loadBuffer(filename).then(buf => {
+    if (!buf) return;
+    try {
+      const ctx = _ensureCtx();
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      const gain = ctx.createGain();
+      gain.gain.value = vol;
+      src.connect(gain);
+      gain.connect(ctx.destination);
+      src.start();
+    } catch (e) {}
+  });
+}
+
+// Preload critical sounds on first user interaction
+let _preloaded = false;
+export function preloadSounds() {
+  if (_preloaded) return;
+  _preloaded = true;
+  const critical = [
+    'click_002.ogg', 'rollover1.ogg', 'click3.ogg', 'click4.ogg',
+    'glitch_004.ogg', 'switch3.ogg', 'click1.ogg'
+  ];
+  critical.forEach(f => _loadBuffer(f));
+}
+
+// ── Synth primitives (kept for stat effects) ────────────────────────────────
+
 function _bit(freq, duration, vol = 0.08, slide = 0) {
   if (_muted) return;
   try {
@@ -47,7 +92,6 @@ function _bit(freq, duration, vol = 0.08, slide = 0) {
   } catch (e) {}
 }
 
-// Wooden / marimba tone — sine with fast attack + bandpass resonance
 function _wood(freq, duration, vol = 0.10) {
   if (_muted) return;
   try {
@@ -56,31 +100,22 @@ function _wood(freq, duration, vol = 0.10) {
     const osc2 = ctx.createOscillator();
     const gain = ctx.createGain();
     const filter = ctx.createBiquadFilter();
-
-    // Primary tone
     osc.type = 'sine';
     osc.frequency.value = freq;
-    // Harmonic overtone for body
     osc2.type = 'sine';
-    osc2.frequency.value = freq * 2.76; // inharmonic partial, wood-like
-
+    osc2.frequency.value = freq * 2.76;
     filter.type = 'bandpass';
     filter.frequency.value = freq * 1.5;
     filter.Q.value = 2.5;
-
-    // Sharp attack, fast decay (wood percussion envelope)
     const t = ctx.currentTime;
     gain.gain.setValueAtTime(0, t);
-    gain.gain.linearRampToValueAtTime(vol, t + 0.003); // 3ms attack
-    gain.gain.exponentialRampToValueAtTime(vol * 0.3, t + 0.04); // fast initial decay
-    gain.gain.exponentialRampToValueAtTime(0.001, t + duration); // tail
-
+    gain.gain.linearRampToValueAtTime(vol, t + 0.003);
+    gain.gain.exponentialRampToValueAtTime(vol * 0.3, t + 0.04);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
     osc.connect(filter);
     osc2.connect(gain);
-    gain.gain.setValueAtTime !== undefined; // just referencing
     filter.connect(gain);
     gain.connect(ctx.destination);
-
     osc.start(t);
     osc2.start(t);
     osc.stop(t + duration + 0.01);
@@ -88,61 +123,29 @@ function _wood(freq, duration, vol = 0.10) {
   } catch (e) {}
 }
 
-// Noise burst (filtered) — for texture hits
-function _noiseHit(duration, freq = 2000, vol = 0.04) {
-  if (_muted) return;
-  try {
-    const ctx = _ensureCtx();
-    const buf = ctx.createBuffer(1, ctx.sampleRate * duration, ctx.sampleRate);
-    const data = buf.getChannelData(0);
-    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1);
-    const fadeLen = Math.floor(data.length * 0.6);
-    for (let i = 0; i < fadeLen; i++) data[data.length - 1 - i] *= i / fadeLen;
-
-    const src = ctx.createBufferSource();
-    src.buffer = buf;
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'bandpass';
-    filter.frequency.value = freq;
-    filter.Q.value = 1.5;
-    const gain = ctx.createGain();
-    gain.gain.setValueAtTime(vol, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-
-    src.connect(filter);
-    filter.connect(gain);
-    gain.connect(ctx.destination);
-    src.start();
-  } catch (e) {}
-}
-
 // ── Sound library ────────────────────────────────────────────────────────────
 
-// Generic UI tap — light wood knock
+// 1,2,3: Generic UI tap / toggle (sex, skin, random appearance)
 export function sfxClick() {
-  _wood(880, 0.08, 0.06);
+  _playFile('click_002.ogg', 0.5);
 }
 
-// Primary confirm (start game, confirm talent, etc.) — 8-bit ascending + wood body
+// 9: Primary confirm (start game)
 export function sfxConfirm() {
-  _bit(440, 0.05, 0.06);
-  setTimeout(() => _bit(660, 0.05, 0.06), 40);
-  setTimeout(() => _wood(880, 0.12, 0.08), 80);
+  _playFile('click4.ogg', 0.55);
 }
 
-// Choice button — wood tap with slight pitch
+// 12: Choice button (event options)
 export function sfxChoice() {
-  _wood(660, 0.09, 0.07);
-  _bit(660, 0.04, 0.03);
+  _playFile('click3.ogg', 0.5);
 }
 
-// Month tick — soft noise + faint wood
+// 10: Month tick
 export function sfxTick() {
-  _noiseHit(0.04, 3000, 0.02);
-  _wood(1200, 0.03, 0.02);
+  _playFile('rollover1.ogg', 0.35);
 }
 
-// Stat up — 8-bit ascending two-note + wood resonance
+// 13: Stat up — kept as synth (ascending pitch conveys "up")
 export function sfxStatUp() {
   _bit(523, 0.06, 0.06);
   setTimeout(() => {
@@ -151,43 +154,36 @@ export function sfxStatUp() {
   }, 50);
 }
 
-// Stat down — descending 8-bit
+// 14: Stat down — kept as synth (descending pitch conveys "down")
 export function sfxStatDown() {
   _bit(523, 0.06, 0.06);
   setTimeout(() => _bit(330, 0.1, 0.06), 50);
 }
 
-// Storyline enter — warm wood chord arpeggio
+// 15: Storyline enter — kept as synth for now
 export function sfxKeyEvent() {
   _wood(523, 0.25, 0.07);
   setTimeout(() => _wood(659, 0.25, 0.06), 80);
   setTimeout(() => _wood(784, 0.3, 0.06), 160);
 }
 
-// Negative event — low 8-bit rumble
+// 16: Negative event — kept as synth for now
 export function sfxBad() {
   _bit(120, 0.25, 0.06, -40);
   _bit(150, 0.3, 0.04);
 }
 
-// Achievement unlock — 8-bit fanfare arpeggio
+// 17: Achievement unlock
 export function sfxAchievement() {
-  _bit(523, 0.08, 0.06);
-  setTimeout(() => _bit(659, 0.08, 0.06), 70);
-  setTimeout(() => _bit(784, 0.08, 0.06), 140);
-  setTimeout(() => {
-    _bit(1047, 0.15, 0.07);
-    _wood(1047, 0.2, 0.06);
-  }, 210);
+  _playFile('confirmation_002.ogg', 0.6);
 }
 
-// Frenemy card played — noise whoosh + 8-bit impact
+// 18: Frenemy card played
 export function sfxCard() {
-  _noiseHit(0.1, 1500, 0.06);
-  setTimeout(() => _bit(250, 0.1, 0.07, 80), 60);
+  _playFile('switch9.ogg', 0.5);
 }
 
-// Game end — slow descending 8-bit with wood resonance tail
+// 25: Game end — kept as synth for now
 export function sfxGameEnd() {
   _bit(784, 0.1, 0.06);
   setTimeout(() => _bit(659, 0.1, 0.06), 120);
@@ -198,7 +194,7 @@ export function sfxGameEnd() {
   }, 360);
 }
 
-// Reunion — warm wood chime cascade
+// 29: Reunion — kept as synth for now
 export function sfxReunion() {
   _wood(659, 0.2, 0.07);
   setTimeout(() => _wood(784, 0.2, 0.06), 90);
@@ -206,90 +202,99 @@ export function sfxReunion() {
   setTimeout(() => _bit(1047, 0.06, 0.03), 180);
 }
 
-// Toggle sound — always plays (bypass mute) for unmute feedback
+// 24: Toggle sound — always plays (bypass mute) for unmute feedback
 export function sfxToggle() {
   const wasMuted = _muted;
   _muted = false;
-  _wood(wasMuted ? 880 : 440, 0.08, 0.08);
+  _playFile('click_005.ogg', 0.5);
   _muted = wasMuted;
 }
 
-// ── NEW: additional granular sounds ──────────────────────────────────────────
+// ── Granular sounds ─────────────────────────────────────────────────────────
 
-// Stat point +/- buttons in allocation screen — tiny wood tick
+// 6: Stat point +/- buttons in allocation screen
 export function sfxAllocTick() {
-  _wood(1100, 0.04, 0.05);
+  _playFile('glitch_004.ogg', 0.4);
 }
 
-// Talent card flip / selection — 8-bit flip
+// 4: Talent card flip / selection
 export function sfxTalentFlip() {
-  _bit(600, 0.03, 0.05, 200);
-  setTimeout(() => _noiseHit(0.03, 4000, 0.02), 20);
+  _playFile('switch3.ogg', 0.5);
 }
 
-// Random allocation / shuffle — rapid wood rattle
+// 7: Random allocation / shuffle
 export function sfxShuffle() {
-  for (let i = 0; i < 5; i++) {
-    setTimeout(() => _wood(800 + i * 80, 0.03, 0.04), i * 30);
-  }
+  _playFile('click5.ogg', 0.5);
 }
 
-// Navigation / screen switch — soft whoosh
+// 26: Navigation / screen switch / summary page flip
 export function sfxNav() {
-  _noiseHit(0.06, 2500, 0.03);
-  _wood(600, 0.05, 0.03);
+  _playFile('rollover2.ogg', 0.45);
 }
 
-// Sex / option toggle — light 8-bit blip
+// 1,2,3: Sex / option toggle (same as sfxClick)
 export function sfxToggleOption() {
-  _bit(880, 0.04, 0.05);
+  _playFile('click_002.ogg', 0.5);
 }
 
-// Auto-play speed switch
+// 11: Auto-play speed switch
 export function sfxAutoToggle() {
-  _bit(700, 0.03, 0.04);
-  setTimeout(() => _bit(900, 0.03, 0.04), 30);
+  _playFile('switch5.ogg', 0.45);
 }
 
-// Attempt action (debut, fitness, chef, etc.) — tension build
+// Attempt action (debut, fitness, chef, etc.) — kept as synth
 export function sfxAttempt() {
   _bit(330, 0.06, 0.05);
   setTimeout(() => _bit(440, 0.06, 0.05), 60);
   setTimeout(() => _bit(550, 0.06, 0.05), 120);
 }
 
-// Modal open
+// 21: Modal open
 export function sfxModalOpen() {
-  _wood(500, 0.08, 0.04);
-  _bit(500, 0.04, 0.03);
+  _playFile('switch2.ogg', 0.45);
 }
 
-// Modal close / cancel
+// 23: Modal close / cancel
 export function sfxModalClose() {
-  _bit(400, 0.05, 0.04, -100);
+  _playFile('switch6.ogg', 0.45);
 }
 
-// Frenemy card select (during draft)
+// 22: Modal confirm (OK)
+export function sfxModalConfirm() {
+  _playFile('click1.ogg', 0.5);
+}
+
+// 19: Frenemy card select (during draft)
 export function sfxCardSelect() {
-  _wood(900, 0.06, 0.06);
-  _bit(900, 0.03, 0.03);
+  _playFile('switch4.ogg', 0.5);
 }
 
-// Frenemy card deselect
+// 20: Frenemy card deselect
 export function sfxCardDeselect() {
-  _bit(600, 0.04, 0.04, -100);
+  _playFile('switch8.ogg', 0.45);
 }
 
-// Restart game
+// 28: Restart game
 export function sfxRestart() {
-  _bit(600, 0.06, 0.05);
-  setTimeout(() => _bit(400, 0.06, 0.05), 50);
-  setTimeout(() => _bit(600, 0.08, 0.06), 100);
+  _playFile('switch11.ogg', 0.5);
 }
 
-// Summary / poster share
+// 27: Summary / poster share
 export function sfxShare() {
-  _wood(700, 0.08, 0.05);
-  setTimeout(() => _wood(900, 0.08, 0.05), 60);
-  setTimeout(() => _wood(1100, 0.12, 0.06), 120);
+  _playFile('click2.ogg', 0.5);
+}
+
+// 5: Talent card deselect
+export function sfxTalentDeselect() {
+  _playFile('switch7.ogg', 0.45);
+}
+
+// 8: Back button (alloc → talent)
+export function sfxBack() {
+  _playFile('switch1.ogg', 0.45);
+}
+
+// NEW: Error / locked option
+export function sfxError() {
+  _playFile('error_005.ogg', 0.5);
 }

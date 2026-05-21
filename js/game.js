@@ -1293,7 +1293,7 @@ function showConfirm({ title, body, stats, okText, cancelText }) {
       document.removeEventListener('keydown', onKey);
       resolve(result);
     };
-    const onOk = () => { SFX.sfxConfirm(); cleanup(true); };
+    const onOk = () => { SFX.sfxModalConfirm(); cleanup(true); };
     const onCancel = () => { SFX.sfxModalClose(); cleanup(false); };
     const onMaskClick = (e) => { if (e.target === mask) cleanup(false); };
     const onKey = (e) => {
@@ -1814,7 +1814,7 @@ function resolveChoice(index) {
     if (!mp.butterflySent.has(bfKey)) {
       mp.butterflySent.add(bfKey);
       mpSend('butterfly', { payload: { key: bfKey, srcAge: state.age } });
-      pushLog('（你的选择在远方激起了一只蝴蝶……）', 'mp-butterfly');
+      pushLog('（你放下的东西，也许会落到别人手里……）', 'mp-butterfly');
     }
   }
 
@@ -2449,7 +2449,7 @@ function renderTalentSelect(talents) {
     el.addEventListener('click', () => {
       const idx = state.talentsPicked.findIndex(x => x.id === t.id);
       if (idx >= 0) {
-        SFX.sfxCardDeselect();
+        SFX.sfxTalentDeselect();
         state.talentsPicked.splice(idx, 1);
         el.classList.remove('picked');
       } else if (state.talentsPicked.length < 3) {
@@ -4511,7 +4511,7 @@ async function main() {
   }
 
   $('alloc-back-to-talent').addEventListener('click', () => {
-    SFX.sfxNav();
+    SFX.sfxBack();
     const container = $('creation-scroll-area');
     const target = $('step-talents');
     if (container && target) {
@@ -4907,6 +4907,7 @@ async function main() {
   });
 
   $('btn-start').addEventListener('click', () => {
+    SFX.preloadSounds();
     SFX.sfxConfirm();
     // Initialize random appearance before showing
     state.faceVariant = Math.floor(Math.random() * 10);
