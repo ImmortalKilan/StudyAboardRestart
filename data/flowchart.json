@@ -1,0 +1,929 @@
+{
+  "regions": [
+    {
+      "id": "origin",
+      "label": "起点",
+      "x": 0,
+      "y": 0,
+      "nodes": [
+        {
+          "id": "n_start",
+          "label": "人生重来",
+          "achId": "first_play",
+          "x": 0,
+          "y": 240
+        }
+      ]
+    },
+    {
+      "id": "highschool",
+      "label": "高中",
+      "x": 288,
+      "y": 0,
+      "nodes": [
+        {
+          "id": "n_hs_intl",
+          "label": "国际部",
+          "achId": null,
+          "trigger": {
+            "key": "hsType",
+            "val": "国际"
+          },
+          "x": 288,
+          "y": 160
+        },
+        {
+          "id": "n_hs_normal",
+          "label": "体制内",
+          "achId": null,
+          "trigger": {
+            "key": "hsType",
+            "val": "体制内"
+          },
+          "x": 288,
+          "y": 320
+        }
+      ]
+    },
+    {
+      "id": "country",
+      "label": "留学目的地",
+      "x": 608,
+      "y": 0,
+      "nodes": [
+        {
+          "id": "n_us",
+          "label": "美国",
+          "achId": null,
+          "trigger": {
+            "key": "country",
+            "val": "美国"
+          },
+          "x": 608,
+          "y": 64
+        },
+        {
+          "id": "n_uk",
+          "label": "英国",
+          "achId": null,
+          "trigger": {
+            "key": "country",
+            "val": "英国"
+          },
+          "x": 608,
+          "y": 160
+        },
+        {
+          "id": "n_au",
+          "label": "澳洲",
+          "achId": null,
+          "trigger": {
+            "key": "country",
+            "val": "澳洲"
+          },
+          "x": 608,
+          "y": 248
+        },
+        {
+          "id": "n_eu",
+          "label": "欧洲",
+          "achId": null,
+          "trigger": {
+            "key": "country",
+            "val": "欧洲"
+          },
+          "x": 608,
+          "y": 336
+        },
+        {
+          "id": "n_hk",
+          "label": "香港",
+          "achId": null,
+          "trigger": {
+            "key": "country",
+            "val": "香港"
+          },
+          "x": 608,
+          "y": 424
+        },
+        {
+          "id": "n_jp",
+          "label": "日本",
+          "achId": null,
+          "trigger": {
+            "key": "country",
+            "val": "日本"
+          },
+          "x": 608,
+          "y": 512
+        },
+        {
+          "id": "n_sg",
+          "label": "新加坡",
+          "achId": null,
+          "trigger": {
+            "key": "country",
+            "val": "新加坡"
+          },
+          "x": 608,
+          "y": 600
+        }
+      ]
+    },
+    {
+      "id": "school",
+      "label": "大学",
+      "x": 928,
+      "y": 0,
+      "nodes": [
+        {
+          "id": "n_top",
+          "label": "顶尖名校",
+          "achId": "school_t20",
+          "x": 928,
+          "y": 128
+        },
+        {
+          "id": "n_mid",
+          "label": "中等学校",
+          "achId": null,
+          "trigger": {
+            "key": "schoolTier",
+            "val": "mid"
+          },
+          "x": 928,
+          "y": 272
+        },
+        {
+          "id": "n_low",
+          "label": "普通学校",
+          "achId": null,
+          "trigger": {
+            "key": "schoolTier",
+            "val": "low"
+          },
+          "x": 928,
+          "y": 416
+        },
+        {
+          "id": "n_expelled",
+          "label": "遣返/退学",
+          "achId": "school_expelled",
+          "x": 928,
+          "y": 560
+        }
+      ]
+    },
+    {
+      "id": "romance",
+      "label": "感情",
+      "x": 1264,
+      "y": 480,
+      "nodes": [
+        {
+          "id": "n_love",
+          "label": "初坠爱河",
+          "achId": "romance_first",
+          "x": 1264,
+          "y": 480
+        },
+        {
+          "id": "n_married",
+          "label": "步入婚姻",
+          "achId": "romance_married",
+          "x": 1488,
+          "y": 432
+        },
+        {
+          "id": "n_seaking",
+          "label": "海王/海后",
+          "achId": "romance_sea_king",
+          "x": 1488,
+          "y": 528
+        },
+        {
+          "id": "n_divorced",
+          "label": "此情成追忆",
+          "achId": "romance_divorced",
+          "x": 1712,
+          "y": 480
+        }
+      ]
+    },
+    {
+      "id": "career_visible",
+      "label": "职业剧情线",
+      "x": 1264,
+      "y": 0,
+      "nodes": [
+        {
+          "id": "n_sl_idol",
+          "label": "偶像练习生",
+          "achId": "sl_idol",
+          "x": 1264,
+          "y": 32
+        },
+        {
+          "id": "n_sl_esports",
+          "label": "电竞新星",
+          "achId": "sl_esports",
+          "x": 1264,
+          "y": 104
+        },
+        {
+          "id": "n_sl_fitness",
+          "label": "健美之路",
+          "achId": "sl_fitness",
+          "x": 1264,
+          "y": 176
+        },
+        {
+          "id": "n_sl_chef",
+          "label": "厨神之路",
+          "achId": "sl_chef",
+          "x": 1264,
+          "y": 248
+        },
+        {
+          "id": "n_sl_athlete",
+          "label": "运动生涯",
+          "achId": "sl_athlete",
+          "x": 1264,
+          "y": 320
+        },
+        {
+          "id": "n_sl_party",
+          "label": "派对狂魔",
+          "achId": "sl_party",
+          "x": 1264,
+          "y": 392
+        }
+      ]
+    },
+    {
+      "id": "career_hidden",
+      "label": "隐藏剧情线",
+      "x": 1264,
+      "y": 640,
+      "nodes": [
+        {
+          "id": "n_sl_spy",
+          "label": "国际特工",
+          "achId": "sl_spy",
+          "x": 1264,
+          "y": 672
+        },
+        {
+          "id": "n_sl_xianxia",
+          "label": "修真之路",
+          "achId": "sl_xianxia",
+          "x": 1264,
+          "y": 744
+        },
+        {
+          "id": "n_sl_abyss",
+          "label": "深渊科技",
+          "achId": "sl_abyss",
+          "x": 1264,
+          "y": 816
+        },
+        {
+          "id": "n_sl_meta",
+          "label": "第四面墙",
+          "achId": "sl_meta",
+          "x": 1264,
+          "y": 888
+        },
+        {
+          "id": "n_sl_thief",
+          "label": "影子协会",
+          "achId": "sl_thief",
+          "x": 1264,
+          "y": 960
+        },
+        {
+          "id": "n_sl_hogwarts",
+          "label": "霍格沃茨",
+          "achId": "sl_hogwarts",
+          "x": 1264,
+          "y": 1032
+        }
+      ]
+    },
+    {
+      "id": "career_other",
+      "label": "其他剧情线",
+      "x": 1520,
+      "y": 0,
+      "nodes": [
+        {
+          "id": "n_sl_superstar",
+          "label": "巨星崛起",
+          "achId": "sl_superstar",
+          "x": 1520,
+          "y": 32
+        },
+        {
+          "id": "n_sl_streamer",
+          "label": "网红主播",
+          "achId": "sl_streamer",
+          "x": 1520,
+          "y": 104
+        },
+        {
+          "id": "n_sl_poker",
+          "label": "地下牌局",
+          "achId": "sl_poker",
+          "x": 1520,
+          "y": 176
+        },
+        {
+          "id": "n_sl_worlds",
+          "label": "电竞世界赛",
+          "achId": "sl_worlds",
+          "x": 1520,
+          "y": 248
+        },
+        {
+          "id": "n_sl_wasted",
+          "label": "南柯梦境",
+          "achId": "sl_wasted",
+          "x": 1520,
+          "y": 320
+        }
+      ]
+    },
+    {
+      "id": "endings",
+      "label": "终局",
+      "x": 1920,
+      "y": 0,
+      "nodes": [
+        {
+          "id": "n_end_idol",
+          "label": "闪耀出道",
+          "achId": "end_idol",
+          "x": 1920,
+          "y": 16
+        },
+        {
+          "id": "n_end_idol_fail",
+          "label": "遗憾落幕",
+          "achId": "debut_fail",
+          "x": 1920,
+          "y": 80
+        },
+        {
+          "id": "n_end_worlds",
+          "label": "全球冠军",
+          "achId": "end_worlds",
+          "x": 1920,
+          "y": 144
+        },
+        {
+          "id": "n_end_fitness",
+          "label": "健美传奇",
+          "achId": "end_fitness",
+          "x": 1920,
+          "y": 208
+        },
+        {
+          "id": "n_end_chef",
+          "label": "三星主厨",
+          "achId": "end_chef",
+          "x": 1920,
+          "y": 272
+        },
+        {
+          "id": "n_end_athlete",
+          "label": "体坛之巅",
+          "achId": "end_athlete",
+          "x": 1920,
+          "y": 336
+        },
+        {
+          "id": "n_end_ceo",
+          "label": "商界传奇",
+          "achId": "end_ceo",
+          "x": 1920,
+          "y": 400
+        },
+        {
+          "id": "n_end_spy",
+          "label": "特工荣耀",
+          "achId": "end_spy",
+          "x": 1920,
+          "y": 544
+        },
+        {
+          "id": "n_end_xianxia",
+          "label": "羽化登仙",
+          "achId": "end_xianxia",
+          "x": 1920,
+          "y": 608
+        },
+        {
+          "id": "n_end_abyss",
+          "label": "深渊彼岸",
+          "achId": "end_abyss",
+          "x": 1920,
+          "y": 672
+        },
+        {
+          "id": "n_end_meta",
+          "label": "出戏了",
+          "achId": "end_meta",
+          "x": 1920,
+          "y": 736
+        },
+        {
+          "id": "n_end_thief",
+          "label": "幽灵评级",
+          "achId": "end_thief",
+          "x": 1920,
+          "y": 800
+        },
+        {
+          "id": "n_end_hogwarts",
+          "label": "救世之星",
+          "achId": "end_hogwarts",
+          "x": 1920,
+          "y": 864
+        },
+        {
+          "id": "n_end_health",
+          "label": "油尽灯枯",
+          "achId": "end_health",
+          "x": 1920,
+          "y": 976
+        },
+        {
+          "id": "n_end_retire",
+          "label": "安然退休",
+          "achId": "end_retire",
+          "x": 1920,
+          "y": 1056
+        },
+        {
+          "id": "n_all_hidden",
+          "label": "见过世面",
+          "achId": "all_hidden",
+          "x": 1920,
+          "y": 1136
+        }
+      ]
+    },
+    {
+      "id": "milestones",
+      "label": "里程碑",
+      "x": 928,
+      "y": 672,
+      "nodes": [
+        {
+          "id": "n_stat_max",
+          "label": "天赋异禀",
+          "achId": "stat_max",
+          "x": 928,
+          "y": 704
+        },
+        {
+          "id": "n_stat_neg",
+          "label": "人生低谷",
+          "achId": "stat_negative",
+          "x": 928,
+          "y": 800
+        }
+      ]
+    },
+    {
+      "id": "easter",
+      "label": "跨界彩蛋",
+      "x": 1920,
+      "y": 1248,
+      "nodes": [
+        {
+          "id": "n_easter_rhythm",
+          "label": "节奏大师",
+          "achId": "easter_rhythm",
+          "x": 1920,
+          "y": 1248
+        },
+        {
+          "id": "n_easter_viral",
+          "label": "病毒传播",
+          "achId": "easter_viral",
+          "x": 1920,
+          "y": 1312
+        },
+        {
+          "id": "n_easter_novelist",
+          "label": "跨界作家",
+          "achId": "easter_novelist",
+          "x": 1920,
+          "y": 1376
+        },
+        {
+          "id": "n_easter_coral",
+          "label": "科学影像师",
+          "achId": "easter_coral",
+          "x": 2128,
+          "y": 1248
+        },
+        {
+          "id": "n_easter_synth",
+          "label": "声音炼金",
+          "achId": "easter_synth",
+          "x": 2128,
+          "y": 1312
+        },
+        {
+          "id": "n_easter_medtech",
+          "label": "赛博华佗",
+          "achId": "easter_medtech",
+          "x": 2128,
+          "y": 1376
+        },
+        {
+          "id": "n_easter_courtroom",
+          "label": "模拟大律师",
+          "achId": "easter_courtroom",
+          "x": 2336,
+          "y": 1248
+        },
+        {
+          "id": "n_easter_nomad",
+          "label": "数字游牧",
+          "achId": "easter_nomad",
+          "x": 2336,
+          "y": 1312
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "n_start",
+      "to": "n_hs_intl"
+    },
+    {
+      "from": "n_start",
+      "to": "n_hs_normal"
+    },
+    {
+      "from": "n_hs_intl",
+      "to": "n_us"
+    },
+    {
+      "from": "n_hs_intl",
+      "to": "n_uk"
+    },
+    {
+      "from": "n_hs_intl",
+      "to": "n_au"
+    },
+    {
+      "from": "n_hs_intl",
+      "to": "n_eu"
+    },
+    {
+      "from": "n_hs_intl",
+      "to": "n_hk"
+    },
+    {
+      "from": "n_hs_intl",
+      "to": "n_jp"
+    },
+    {
+      "from": "n_hs_intl",
+      "to": "n_sg"
+    },
+    {
+      "from": "n_hs_normal",
+      "to": "n_us"
+    },
+    {
+      "from": "n_hs_normal",
+      "to": "n_uk"
+    },
+    {
+      "from": "n_us",
+      "to": "n_top"
+    },
+    {
+      "from": "n_us",
+      "to": "n_mid"
+    },
+    {
+      "from": "n_us",
+      "to": "n_low"
+    },
+    {
+      "from": "n_us",
+      "to": "n_expelled"
+    },
+    {
+      "from": "n_uk",
+      "to": "n_top"
+    },
+    {
+      "from": "n_uk",
+      "to": "n_mid"
+    },
+    {
+      "from": "n_uk",
+      "to": "n_low"
+    },
+    {
+      "from": "n_au",
+      "to": "n_top"
+    },
+    {
+      "from": "n_au",
+      "to": "n_mid"
+    },
+    {
+      "from": "n_au",
+      "to": "n_low"
+    },
+    {
+      "from": "n_eu",
+      "to": "n_top"
+    },
+    {
+      "from": "n_eu",
+      "to": "n_mid"
+    },
+    {
+      "from": "n_hk",
+      "to": "n_top"
+    },
+    {
+      "from": "n_hk",
+      "to": "n_mid"
+    },
+    {
+      "from": "n_jp",
+      "to": "n_top"
+    },
+    {
+      "from": "n_jp",
+      "to": "n_mid"
+    },
+    {
+      "from": "n_sg",
+      "to": "n_top"
+    },
+    {
+      "from": "n_sg",
+      "to": "n_mid"
+    },
+    {
+      "from": "n_top",
+      "to": "n_sl_idol"
+    },
+    {
+      "from": "n_top",
+      "to": "n_sl_esports"
+    },
+    {
+      "from": "n_top",
+      "to": "n_sl_fitness"
+    },
+    {
+      "from": "n_top",
+      "to": "n_sl_chef"
+    },
+    {
+      "from": "n_top",
+      "to": "n_sl_athlete"
+    },
+    {
+      "from": "n_top",
+      "to": "n_sl_party"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_sl_idol"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_sl_esports"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_sl_fitness"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_sl_chef"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_sl_athlete"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_sl_party"
+    },
+    {
+      "from": "n_low",
+      "to": "n_sl_party"
+    },
+    {
+      "from": "n_low",
+      "to": "n_sl_fitness"
+    },
+    {
+      "from": "n_top",
+      "to": "n_love"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_love"
+    },
+    {
+      "from": "n_low",
+      "to": "n_love"
+    },
+    {
+      "from": "n_love",
+      "to": "n_married"
+    },
+    {
+      "from": "n_love",
+      "to": "n_seaking"
+    },
+    {
+      "from": "n_married",
+      "to": "n_divorced"
+    },
+    {
+      "from": "n_top",
+      "to": "n_sl_spy"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_sl_spy"
+    },
+    {
+      "from": "n_top",
+      "to": "n_sl_xianxia"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_sl_xianxia"
+    },
+    {
+      "from": "n_top",
+      "to": "n_sl_abyss"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_sl_abyss"
+    },
+    {
+      "from": "n_top",
+      "to": "n_sl_meta"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_sl_meta"
+    },
+    {
+      "from": "n_top",
+      "to": "n_sl_thief"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_sl_thief"
+    },
+    {
+      "from": "n_top",
+      "to": "n_sl_hogwarts"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_sl_hogwarts"
+    },
+    {
+      "from": "n_sl_idol",
+      "to": "n_sl_superstar"
+    },
+    {
+      "from": "n_sl_idol",
+      "to": "n_end_idol"
+    },
+    {
+      "from": "n_sl_idol",
+      "to": "n_end_idol_fail"
+    },
+    {
+      "from": "n_sl_esports",
+      "to": "n_sl_worlds"
+    },
+    {
+      "from": "n_sl_esports",
+      "to": "n_end_worlds"
+    },
+    {
+      "from": "n_sl_party",
+      "to": "n_sl_wasted"
+    },
+    {
+      "from": "n_sl_party",
+      "to": "n_sl_poker"
+    },
+    {
+      "from": "n_sl_worlds",
+      "to": "n_end_worlds"
+    },
+    {
+      "from": "n_sl_fitness",
+      "to": "n_end_fitness"
+    },
+    {
+      "from": "n_sl_chef",
+      "to": "n_end_chef"
+    },
+    {
+      "from": "n_sl_athlete",
+      "to": "n_end_athlete"
+    },
+    {
+      "from": "n_sl_superstar",
+      "to": "n_end_ceo"
+    },
+    {
+      "from": "n_sl_spy",
+      "to": "n_end_spy"
+    },
+    {
+      "from": "n_sl_xianxia",
+      "to": "n_end_xianxia"
+    },
+    {
+      "from": "n_sl_abyss",
+      "to": "n_end_abyss"
+    },
+    {
+      "from": "n_sl_meta",
+      "to": "n_end_meta"
+    },
+    {
+      "from": "n_sl_thief",
+      "to": "n_end_thief"
+    },
+    {
+      "from": "n_sl_hogwarts",
+      "to": "n_end_hogwarts"
+    },
+    {
+      "from": "n_top",
+      "to": "n_end_retire"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_end_retire"
+    },
+    {
+      "from": "n_low",
+      "to": "n_end_retire"
+    },
+    {
+      "from": "n_top",
+      "to": "n_end_health"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_end_health"
+    },
+    {
+      "from": "n_low",
+      "to": "n_end_health"
+    },
+    {
+      "from": "n_expelled",
+      "to": "n_end_health"
+    },
+    {
+      "from": "n_expelled",
+      "to": "n_end_retire"
+    },
+    {
+      "from": "n_end_spy",
+      "to": "n_all_hidden"
+    },
+    {
+      "from": "n_end_xianxia",
+      "to": "n_all_hidden"
+    },
+    {
+      "from": "n_end_abyss",
+      "to": "n_all_hidden"
+    },
+    {
+      "from": "n_end_meta",
+      "to": "n_all_hidden"
+    }
+  ]
+}

@@ -24,9 +24,14 @@
         </div>
       </div>
 
-      <button id="ach-trophy-start-btn" class="ghost" title="成就墙" style="position: absolute; top: 20px; right: 24px; z-index: 100; display:flex; align-items:center; gap:6px;">
-        🏆 <span id="ach-trophy-start-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/50</span>
-      </button>
+      <div style="position: absolute; top: 20px; right: 24px; z-index: 100; display:flex; align-items:center; gap:12px;">
+        <button id="fc-open-start-btn" class="ghost" title="命运图谱" style="display:flex; align-items:center; gap:4px; font-size:15px;">
+          🗺️ <span style="font-size:13px;">命运图谱</span>
+        </button>
+        <button id="ach-trophy-start-btn" class="ghost" title="成就墙" style="display:flex; align-items:center; gap:6px;">
+          🏆 <span id="ach-trophy-start-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/50</span>
+        </button>
+      </div>
       <div class="start-center">
         <h1 class="start-title">留学重开模拟器</h1>
         <p class="start-sub">这垃圾留学，一秒也不想学了！</p>
@@ -722,6 +727,18 @@
 
   <!-- Toast container: bottom-right, stacks upward -->
   <div id="ach-toast-container" class="ach-toast-container" aria-live="polite"></div>
+
+  <!-- ── Story Flowchart ──────────────────────────────────────── -->
+  <div id="fc-overlay" class="fc-overlay" aria-modal="true" role="dialog" aria-label="命运图谱">
+    <div class="fc-panel">
+      <div class="fc-head">
+        <div class="fc-title">命运图谱</div>
+        <span id="fc-stats" class="fc-stats">已探索 0/0 个节点（0%）</span>
+        <button id="fc-close" class="fc-close-btn" aria-label="关闭命运图谱">✕</button>
+      </div>
+      <div id="fc-canvas" class="fc-canvas"></div>
+    </div>
+  </div>
 
   <script type="module" src="js/game.js"></script>
 </body>

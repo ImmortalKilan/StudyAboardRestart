@@ -2,6 +2,7 @@ import { evalCondition, pickBranch, pickWeightedBranch } from './dsl.js';
 import { renderAvatar, createStandaloneAvatar } from './avatar.js';
 import { playStorylineIntro, playStorylineExit } from './cinematic.js';
 import { initAchievements, unlockAchievement, setOnUnlock } from './achievements.js';
+import { initFlowchart, openFlowchart, unlockFlowchartNode, setFlowchartSfx, resetSessionUnlocks, getSessionUnlocks } from './flowchart.js';
 import * as SFX from './audio.js';
 // Multiplayer — loaded dynamically so single-player works even if it fails
 let mp = { enabled: false, connected: false, cards: [], opponent: {} };
@@ -1558,6 +1559,18 @@ function _checkEventAchievements(ev) {
     const tier = ev.set.schoolTier;
     if (tier === 'top' || school === 'T20') unlockAchievement('school_t20');
     if (school === '遣返' || school === '退学') unlockAchievement('school_expelled');
+
+    // ── Flowchart node unlocks (non-achievement triggers) ──
+    const hsType = ev.set.hsType;
+    if (hsType === '国际') unlockFlowchartNode('n_hs_intl');
+    if (hsType === '体制内') unlockFlowchartNode('n_hs_normal');
+
+    const country = ev.set.country;
+    const COUNTRY_NODE = { '美国': 'n_us', '英国': 'n_uk', '澳洲': 'n_au', '欧洲': 'n_eu', '香港': 'n_hk', '日本': 'n_jp', '新加坡': 'n_sg' };
+    if (country && COUNTRY_NODE[country]) unlockFlowchartNode(COUNTRY_NODE[country]);
+
+    if (tier === 'mid') unlockFlowchartNode('n_mid');
+    if (tier === 'low') unlockFlowchartNode('n_low');
   }
 
   // Specific event IDs for outcomes
@@ -3574,6 +3587,21 @@ function renderSummary() {
     <div class="meta-row"><span class="meta-k">死因</span><span class="meta-v">${ageDeath ? '健康崩溃' : (state.age >= 60 ? '善终退休' : '剧情结局')}</span></div>
   `;
 
+  // ── Flowchart nudge: show if new nodes unlocked this session ──
+  const fcNewCount = getSessionUnlocks();
+  const existingNudge = document.getElementById('fc-nudge');
+  if (existingNudge) existingNudge.remove();
+  if (fcNewCount > 0) {
+    const nudge = document.createElement('div');
+    nudge.id = 'fc-nudge';
+    nudge.className = 'fc-nudge';
+    nudge.innerHTML = `<span class="fc-nudge-icon">🗺️</span> 本局解锁了 <strong>${fcNewCount}</strong> 个新命运节点 <button class="fc-nudge-btn" id="fc-nudge-go">去看看 →</button>`;
+    const wrap = document.querySelector('.summary-wrap');
+    if (wrap) wrap.insertBefore(nudge, wrap.querySelector('.summary-grid'));
+    const goBtn = $('fc-nudge-go');
+    if (goBtn) goBtn.addEventListener('click', () => { openFlowchart(); });
+  }
+
   // ── MP: broadcast end data & show VS button ──
   if (mp.enabled) {
     _mpBroadcastEndData();
@@ -4396,10 +4424,29 @@ if (window.visualViewport) {
 // 首帧后再同步一次
 requestAnimationFrame(_syncViewportHeight);
 
+// ── Performance: pause all CSS animations when tab is hidden ──
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    document.body.classList.add('tab-hidden');
+  } else {
+    document.body.classList.remove('tab-hidden');
+  }
+});
+
 async function main() {
   initAchievements();
+  initFlowchart();
+  setFlowchartSfx({
+    onOpen: () => SFX.sfxModalOpen(),
+    onClose: () => SFX.sfxModalClose(),
+    onHover: () => SFX.sfxTick(),
+  });
   setOnUnlock(() => SFX.sfxAchievement());
   SFX.initMuteState();
+
+  // Flowchart open buttons
+  const fcStartBtn = $('fc-open-start-btn');
+  if (fcStartBtn) fcStartBtn.addEventListener('click', () => { openFlowchart(); });
   // Mute button
   const muteBtn = $('btn-mute');
   if (muteBtn) {
@@ -4909,6 +4956,7 @@ async function main() {
   $('btn-start').addEventListener('click', () => {
     SFX.preloadSounds();
     SFX.sfxConfirm();
+    resetSessionUnlocks();
     // Initialize random appearance before showing
     state.faceVariant = Math.floor(Math.random() * 10);
     state.topVariant = Math.floor(Math.random() * 24);

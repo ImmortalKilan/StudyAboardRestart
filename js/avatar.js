@@ -1954,32 +1954,16 @@ function paint(ctx, state) {
   drawAccessory(ctx, state);
 }
 
-// ─── Idle bobbing animation ───────────────────────────────────
-let _animId = null;
-let _animCanvas = null;
-function _stopAnim() {
-  if (_animId) { cancelAnimationFrame(_animId); _animId = null; }
-  if (_animCanvas) { _animCanvas.style.transform = ''; _animCanvas = null; }
-}
-
 // ─── Public API ───────────────────────────────────────────────
 export function renderAvatar(canvas, state) {
-  _stopAnim();
   canvas.width = W;
   canvas.height = H;
   canvas.style.imageRendering = 'pixelated';
   const ctx = canvas.getContext('2d');
   ctx.imageSmoothingEnabled = false;
   paint(ctx, state);
-  _animCanvas = canvas;
-  let t = 0;
-  function tick() {
-    t++;
-    const dy = Math.sin(t * 0.04) * 1.5;
-    canvas.style.transform = `translateY(${dy.toFixed(2)}px)`;
-    _animId = requestAnimationFrame(tick);
-  }
-  tick();
+  // Idle bobbing via CSS animation (no JS rAF loop needed)
+  canvas.style.animation = 'avatarBob 2.6s ease-in-out infinite';
 }
 
 export function createStandaloneAvatar(state) {
