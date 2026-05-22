@@ -8,6 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
+  <button id="btn-mute" class="mute-btn" title="开关音效">🔊</button>
   <main class="app">
 
     <section id="start-screen" class="screen active">
@@ -23,35 +24,213 @@
         </div>
       </div>
 
-      <button id="ach-trophy-start-btn" class="ghost" title="成就墙" style="position: absolute; top: 20px; right: 24px; z-index: 100; display:flex; align-items:center; gap:6px;">
-        🏆 <span id="ach-trophy-start-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/31</span>
-      </button>
+      <div style="position: absolute; top: 20px; right: 24px; z-index: 100; display:flex; align-items:center; gap:12px;">
+        <button id="fc-open-start-btn" class="ghost" title="命运图谱" style="display:flex; align-items:center; gap:4px; font-size:15px;">
+          🗺️ <span style="font-size:13px;">命运图谱</span>
+        </button>
+        <button id="ach-trophy-start-btn" class="ghost" title="成就墙" style="display:flex; align-items:center; gap:6px;">
+          🏆 <span id="ach-trophy-start-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/61</span>
+        </button>
+      </div>
       <div class="start-center">
         <h1 class="start-title">留学重开模拟器</h1>
         <p class="start-sub">这垃圾留学，一秒也不想学了！</p>
         <button id="btn-start" class="start-btn">&#x21BB; 立即重开</button>
+        <button id="btn-mp-start" class="start-btn start-btn-mp" style="margin-top:14px;">🤝 联机重开</button>
+        <button id="btn-tutorial" class="start-btn start-btn-tutorial" style="margin-top:10px;">📖 新手教程</button>
       </div>
     </section>
 
+    <!-- ── Step-by-step Guide Overlay (A层) ─────────────────────────── -->
+    <div id="guide-overlay" class="guide-overlay" style="display:none;">
+      <div id="guide-spotlight" class="guide-spotlight"></div>
+      <div id="guide-tooltip" class="guide-tooltip">
+        <div id="guide-step-indicator" class="guide-step-indicator"></div>
+        <div id="guide-title" class="guide-title"></div>
+        <div id="guide-body" class="guide-body"></div>
+        <div class="guide-btns">
+          <button id="guide-skip" class="guide-btn skip">跳过引导</button>
+          <button id="guide-next" class="guide-btn next">下一步</button>
+        </div>
+      </div>
+      <svg id="guide-arrow" class="guide-arrow" viewBox="0 0 60 60" width="48" height="48">
+        <path d="M30 5 L30 45 M15 32 L30 47 L45 32" fill="none" stroke="#c9a978" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <!-- ── First-time Tutorial Prompt ─────────────────────────────────── -->
+    <div id="tutorial-prompt" class="tutorial-prompt-overlay" style="display:none;">
+      <div class="tutorial-prompt-card">
+        <div class="tutorial-prompt-icon">📖</div>
+        <div class="tutorial-prompt-title">第一次来？</div>
+        <div class="tutorial-prompt-body">需要看一下新手教程吗？<br>了解游戏玩法和属性含义</div>
+        <div class="tutorial-prompt-btns">
+          <button id="tutorial-prompt-yes" class="tutorial-prompt-btn yes">好的，看一下</button>
+          <button id="tutorial-prompt-no" class="tutorial-prompt-btn no">不用了，直接玩</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Tutorial Guide (图文说明) ──────────────────────────────────── -->
+    <div id="tutorial-modal" class="tutorial-modal-overlay" style="display:none;">
+      <div class="tutorial-modal">
+        <header class="tutorial-header">
+          <span class="tutorial-header-title">📖 新手教程</span>
+          <button id="tutorial-close" class="tutorial-close-btn">&times;</button>
+        </header>
+        <div class="tutorial-scroll">
+
+          <!-- Section 1: 游戏简介 -->
+          <section class="tut-section">
+            <h2 class="tut-heading">🎮 这是什么游戏？</h2>
+            <p class="tut-text">这是一个<strong>数据驱动的人生模拟器</strong>。你将从高中开始，经历留学申请、大学生活、职场打拼，直到人生终局。每一局都是不同的故事。</p>
+            <div class="tut-highlight">每个月自动推进一个事件，你需要在关键节点做出选择，这些选择会影响你的属性和命运走向。</div>
+          </section>
+
+          <!-- Section 2: 属性系统 -->
+          <section class="tut-section">
+            <h2 class="tut-heading">📊 七大基础属性</h2>
+            <div class="tut-stat-grid">
+              <div class="tut-stat-item"><span class="tut-stat-icon">🗣️</span><strong>社交</strong><span class="tut-stat-desc">人脉和社交能力，影响关系和机会</span></div>
+              <div class="tut-stat-item"><span class="tut-stat-icon">🧠</span><strong>智力</strong><span class="tut-stat-desc">学习和思维能力，影响学业和职场</span></div>
+              <div class="tut-stat-item"><span class="tut-stat-icon">💰</span><strong>家境</strong><span class="tut-stat-desc">经济状况，影响生活质量和选择</span></div>
+              <div class="tut-stat-item"><span class="tut-stat-icon">😊</span><strong>快乐</strong><span class="tut-stat-desc">心理健康，过低可能导致不好的结局</span></div>
+              <div class="tut-stat-item"><span class="tut-stat-icon">❤️</span><strong>健康</strong><span class="tut-stat-desc">身体状况，降到极低会直接死亡</span></div>
+              <div class="tut-stat-item"><span class="tut-stat-icon">💪</span><strong>毅力</strong><span class="tut-stat-desc">坚持和自律，影响困难事件的结果</span></div>
+              <div class="tut-stat-item"><span class="tut-stat-icon">✨</span><strong>颜值</strong><span class="tut-stat-desc">外貌魅力，影响社交和恋爱</span></div>
+            </div>
+            <div class="tut-tip">💡 属性范围 0-10。开局时你有有限的点数分配到各属性，天赋也会加成。</div>
+          </section>
+
+          <!-- Section 3: 天赋 -->
+          <section class="tut-section">
+            <h2 class="tut-heading">🎲 天赋系统</h2>
+            <p class="tut-text">开局随机抽取10个天赋，你选3个。天赋分四个等级：</p>
+            <div class="tut-grade-row">
+              <span class="tut-grade g0">普通</span>
+              <span class="tut-grade g1">稀有</span>
+              <span class="tut-grade g2">史诗</span>
+              <span class="tut-grade g3">传说</span>
+            </div>
+            <p class="tut-text">高等级天赋加成更强，但也可能带来意想不到的副作用。每次抽卡保底至少一个紫色或橙色天赋。</p>
+          </section>
+
+          <!-- Section 4: 事件与选择 -->
+          <section class="tut-section">
+            <h2 class="tut-heading">📜 事件与选择</h2>
+            <p class="tut-text">游戏按月推进，每月触发一个事件。有些事件会给你<strong>选择</strong>——不同的选项可能需要满足属性条件。</p>
+            <div class="tut-highlight">灰色选项 = 属性不够，会显示缺什么条件。选择会影响属性变化和后续剧情走向。</div>
+            <p class="tut-text">你可以点击右边的事件面板手动推进，也可以点「自动播放」让游戏自动跑。</p>
+          </section>
+
+          <!-- Section 5: 隐藏剧情线 -->
+          <section class="tut-section">
+            <h2 class="tut-heading">🔮 特殊剧情线</h2>
+            <p class="tut-text">游戏中有十几条隐藏剧情线（偶像、电竞、修仙、间谍……），触发后会进入完全不同的故事分支。</p>
+            <div class="tut-tip">💡 剧情线入口通常隐藏在随机事件的选项中，多玩几局会有不同发现。进入剧情线后还会解锁专属隐藏属性。</div>
+          </section>
+
+          <!-- Section 6: 联机模式 -->
+          <section class="tut-section">
+            <h2 class="tut-heading">🤝 联机模式</h2>
+            <p class="tut-text">和朋友一起玩！创建房间后分享房间号，两人同时经历各自的人生。</p>
+            <div class="tut-feature-list">
+              <div class="tut-feature">🎴 <strong>损友卡</strong> — 开局选3张卡，可以帮助或坑害对方</div>
+              <div class="tut-feature">🍻 <strong>老友聚会</strong> — 在特定年龄触发，双方做出选择产生博弈</div>
+              <div class="tut-feature">⚔️ <strong>结局对比</strong> — 游戏结束后对比双方人生数据</div>
+            </div>
+          </section>
+
+          <!-- Section 7: 小技巧 -->
+          <section class="tut-section">
+            <h2 class="tut-heading">💡 小技巧</h2>
+            <div class="tut-feature-list">
+              <div class="tut-feature">🏥 健康降到极低会<strong>猝死</strong>，注意保持</div>
+              <div class="tut-feature">😢 快乐过低也有危险，别让自己太惨</div>
+              <div class="tut-feature">📖 每局结束可以查看「命运抉择」回顾你做过的选择</div>
+              <div class="tut-feature">🏆 收集成就解锁更多挑战</div>
+              <div class="tut-feature">🔁 每一局都不一样，多玩几次探索不同结局</div>
+            </div>
+          </section>
+
+          <div class="tut-footer">
+            <button id="tutorial-start-game" class="tut-start-btn">明白了，开始游戏！</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Multiplayer Setup Modal ─────────────────────────────────────── -->
+    <div id="mp-modal" class="overlay" style="position:fixed; inset:0; display:none; z-index:9000; align-items:center; justify-content:center; background:rgba(0,0,0,0.92);">
+      <div class="mp-modal-panel">
+        <h2 class="mp-modal-title">🤝 联机重开</h2>
+
+        <div class="mp-tab-bar">
+          <button id="mp-tab-create" class="mp-tab active">创建房间</button>
+          <button id="mp-tab-join" class="mp-tab">加入房间</button>
+        </div>
+
+        <div id="mp-pane-create" class="mp-pane">
+          <p class="mp-pane-hint">创建一个房间，把房间码发给你的朋友。</p>
+          <label class="mp-label">你的昵称
+            <input id="mp-create-name" class="mp-input" maxlength="10" placeholder="留个名字"/>
+          </label>
+          <button id="mp-btn-create" class="mp-primary-btn">创建房间</button>
+          <div id="mp-create-result" class="mp-result" style="display:none;">
+            <div class="mp-roomcode-label">房间码</div>
+            <div class="mp-roomcode-row">
+              <div id="mp-roomcode" class="mp-roomcode">------</div>
+              <button id="mp-copy-code" class="mp-copy-btn" title="复制房间码">📋</button>
+            </div>
+            <div id="mp-copy-toast" class="mp-copy-toast">已复制！</div>
+            <div class="mp-waiting-text">等待朋友加入......</div>
+          </div>
+        </div>
+
+        <div id="mp-pane-join" class="mp-pane" style="display:none;">
+          <p class="mp-pane-hint">输入朋友给你的6位房间码。</p>
+          <label class="mp-label">你的昵称
+            <input id="mp-join-name" class="mp-input" maxlength="10" placeholder="留个名字"/>
+          </label>
+          <label class="mp-label">房间码
+            <input id="mp-join-code" class="mp-input mp-input-code" maxlength="6" placeholder="ABC123"/>
+          </label>
+          <button id="mp-btn-join" class="mp-primary-btn">加入房间</button>
+          <div id="mp-join-status" class="mp-result" style="display:none;"></div>
+        </div>
+
+        <div id="mp-connected-banner" class="mp-connected" style="display:none;">
+          <div class="mp-lobby">
+            <div class="mp-lobby-title">房间大厅</div>
+            <div class="mp-lobby-players">
+              <div class="mp-lobby-player">
+                <span class="mp-lobby-dot self"></span>
+                <span id="mp-lobby-me">我</span>
+                <span id="mp-lobby-me-tag" class="mp-lobby-tag">房主</span>
+                <span id="mp-lobby-me-status" class="mp-lobby-status">未准备</span>
+              </div>
+              <div class="mp-lobby-player">
+                <span class="mp-lobby-dot opp"></span>
+                <span id="mp-lobby-opp">等待加入...</span>
+                <span id="mp-lobby-opp-tag" class="mp-lobby-tag"></span>
+                <span id="mp-lobby-opp-status" class="mp-lobby-status">未准备</span>
+              </div>
+            </div>
+          </div>
+          <button id="mp-ready-btn" class="mp-primary-btn" style="margin-top:12px;">准备</button>
+          <div id="mp-ready-hint" class="mp-ready-hint" style="display:none;"></div>
+        </div>
+
+        <button id="mp-back-home" class="mp-ghost-btn" style="margin-top:16px; width:100%;">← 返回主页</button>
+      </div>
+    </div>
+
     <section id="creation-screen" class="screen">
       <div class="creation-layout">
-        <!-- Left: Avatar Preview -->
-        <aside class="creation-left">
-          <div class="creation-avatar-wrap">
-            <canvas id="creation-avatar-canvas"></canvas>
-          </div>
-          <div class="creation-controls">
-            <div class="sex-row">
-              <button id="sex-male" class="chip active">男</button>
-              <button id="sex-female" class="chip">女</button>
-            </div>
-            <button id="btn-random-appearance" class="ghost small-btn">🎲 Fit Check</button>
-          </div>
-        </aside>
-
-        <!-- Right: Scrollable Steps -->
+        <!-- Scrollable Steps (talents → alloc → appearance) -->
         <div class="creation-right" id="creation-scroll-area">
-          <!-- Step 1: Talents -->
+
+          <!-- Step 0: Talents -->
           <div class="creation-step" id="step-talents">
             <header class="screen-head">
               <h1>重开中......</h1>
@@ -62,11 +241,23 @@
             <div id="talent-list" class="talent-grid"></div>
 
             <div class="footer-actions">
-              <button id="talent-confirm" class="primary" disabled>确认天赋</button>
+              <button id="talent-confirm" class="primary" disabled>确认天赋（0/3）</button>
             </div>
           </div>
 
-          <!-- Step 2: Stats Allocation -->
+          <!-- Step 0.5: Frenemy Card Draft (MP only) -->
+          <div class="creation-step" id="step-frenemy" style="display:none;">
+            <header class="screen-head">
+              <h1>选择损友卡</h1>
+              <p class="sub">选 3 张带入游戏，用来坑朋友或帮朋友</p>
+            </header>
+            <div id="frenemy-draft-grid" class="frenemy-draft-grid"></div>
+            <div class="footer-actions">
+              <button id="frenemy-confirm" class="primary" disabled>确认损友卡（0/3）</button>
+            </div>
+          </div>
+
+          <!-- Step 1: Stats Allocation -->
           <div class="creation-step" id="step-alloc">
             <header class="screen-head">
               <h1>分配属性</h1>
@@ -77,22 +268,44 @@
 
             <div id="talent-bonus-banner" class="talent-bonus-banner" style="display:none;"></div>
 
-            <div class="alloc-list">
+            <div class="alloc-layout">
+              <div class="alloc-avatar-wrap">
+                <canvas id="alloc-avatar-canvas"></canvas>
+                <p class="alloc-avatar-hint">属性会实时影响外貌</p>
+                <div class="appearance-section">
+                  <div class="appearance-label">性别</div>
+                  <div class="sex-row">
+                    <button id="sex-male" class="chip active">♂ 男</button>
+                    <button id="sex-female" class="chip">♀ 女</button>
+                  </div>
+                </div>
+                <div class="appearance-section">
+                  <div class="appearance-label">肤色</div>
+                  <div class="skin-row">
+                    <button id="skin-0" class="chip skin-chip skin-chip-dark" title="小麦色"></button>
+                    <button id="skin-1" class="chip skin-chip skin-chip-mid active" title="自然色"></button>
+                    <button id="skin-2" class="chip skin-chip skin-chip-light" title="白皙"></button>
+                  </div>
+                </div>
+                <button id="btn-random-appearance" class="ghost appearance-random-btn">🎲 随机发型/服装</button>
+              </div>
+              <div class="alloc-list">
               <div class="alloc-row"><span>社交</span><button class="step" id="minus-SOC">−</button><span class="alloc-val" id="alloc-SOC">0</span><button class="step" id="plus-SOC">＋</button><span class="alloc-bonus" id="bonus-SOC"></span></div>
               <div class="alloc-row"><span>智力</span><button class="step" id="minus-INT">−</button><span class="alloc-val" id="alloc-INT">0</span><button class="step" id="plus-INT">＋</button><span class="alloc-bonus" id="bonus-INT"></span></div>
               <div class="alloc-row"><span>家境</span><button class="step" id="minus-MNY">−</button><span class="alloc-val" id="alloc-MNY">0</span><button class="step" id="plus-MNY">＋</button><span class="alloc-bonus" id="bonus-MNY"></span></div>
               <div class="alloc-row"><span>健康</span><button class="step" id="minus-HLT">−</button><span class="alloc-val" id="alloc-HLT">0</span><button class="step" id="plus-HLT">＋</button><span class="alloc-bonus" id="bonus-HLT"></span></div>
               <div class="alloc-row"><span>毅力</span><button class="step" id="minus-PER">−</button><span class="alloc-val" id="alloc-PER">0</span><button class="step" id="plus-PER">＋</button><span class="alloc-bonus" id="bonus-PER"></span></div>
               <div class="alloc-row"><span>颜值</span><button class="step" id="minus-APP">−</button><span class="alloc-val" id="alloc-APP">0</span><button class="step" id="plus-APP">＋</button><span class="alloc-bonus" id="bonus-APP"></span></div>
+              </div>
             </div>
 
             <div class="footer-actions">
-              <button id="alloc-back-to-talent" class="ghost">返回修改天赋</button>
+              <button id="alloc-back-to-talent" class="ghost">← 返回天赋</button>
               <button id="alloc-random" class="ghost">随机分配</button>
-              <button id="alloc-start" class="primary" disabled>开始留学人生</button>
+              <button id="alloc-start" class="primary" disabled>↻ 立即重开</button>
             </div>
           </div>
-        </div>
+        </div><!-- end creation-right -->
       </div>
     </section>
 
@@ -112,7 +325,11 @@
             <span class="major-label">学校</span>
             <span id="school-display" class="major-val"></span>
           </div>
-          <div class="major-box">
+          <div id="house-box" class="major-box" style="display:none;">
+            <span class="major-label">学院</span>
+            <span id="house-display" class="hogwarts-house-label major-val"></span>
+          </div>
+          <div id="major-box" class="major-box">
             <span class="major-label">专业</span>
             <span id="major-display" class="major-val">未定</span>
           </div>
@@ -132,6 +349,29 @@
         </aside>
 
         <section class="right-panel">
+          <!-- ── Multiplayer: Opponent Status Bar ──────────────────────── -->
+          <div id="mp-opponent-bar" class="mp-opponent-bar" style="display:none;">
+            <div class="mp-bar-left">
+              <span class="mp-bar-icon">👥</span>
+              <span id="mp-bar-nick" class="mp-bar-nick">对手</span>
+            </div>
+            <div class="mp-bar-fields">
+              <span class="mp-bar-field"><label>年龄</label><span id="mp-bar-age">15</span></span>
+              <span class="mp-bar-field"><label>学校</label><span id="mp-bar-school">—</span></span>
+              <span class="mp-bar-field"><label>专业</label><span id="mp-bar-major">未定</span></span>
+              <span class="mp-bar-field"><label>职业</label><span id="mp-bar-prof">高中生</span></span>
+              <span class="mp-bar-field"><label>恋爱</label><span id="mp-bar-rel">单身</span></span>
+            </div>
+            <div class="mp-bar-right">
+              <span class="mp-bar-relation">
+                <label>关系</label>
+                <span id="mp-bar-relation-val" class="mp-relation-val">0</span>
+                <span class="mp-relation-bar"><span id="mp-relation-fill" class="mp-relation-fill"></span></span>
+              </span>
+              <button id="mp-cards-btn" class="mp-cards-btn" title="损友卡">🎴 <span id="mp-cards-count">3</span></button>
+            </div>
+          </div>
+
           <div class="right-head">
             <h2>事件流</h2>
             <div class="right-actions">
@@ -140,7 +380,7 @@
               <button id="btn-summary" class="ghost" style="display:none;">查看总结</button>
               <button id="btn-restart" class="ghost">重开</button>
               <button id="ach-trophy-btn" class="ghost" title="成就墙" style="display:flex; align-items:center; gap:6px;">
-                🏆 <span id="ach-trophy-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/31</span>
+                🏆 <span id="ach-trophy-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/61</span>
               </button>
             </div>
           </div>
@@ -240,6 +480,36 @@
         </section>
 
       </div>
+
+      <!-- ── Multiplayer: Waiting Overlay ─────────────────────────── -->
+      <div id="mp-waiting-overlay" class="mp-waiting-overlay" style="display:none;">
+        <div class="mp-waiting-card">
+          <div class="mp-waiting-spinner"></div>
+          <div class="mp-waiting-title">等待对方到达...</div>
+          <div id="mp-waiting-reason" class="mp-waiting-reason"></div>
+        </div>
+      </div>
+
+      <!-- ── Multiplayer: Fate Cards Panel ────────────────────────── -->
+      <div id="mp-cards-panel" class="mp-cards-panel" style="display:none;">
+        <div class="mp-cards-head">
+          <span class="mp-cards-title">🎴 损友卡</span>
+          <button id="mp-cards-close" class="mp-cards-close">✕</button>
+        </div>
+        <div id="mp-cards-list" class="mp-cards-list"></div>
+        <div class="mp-cards-hint">每张卡只能用一次。用完对方会知道。绿卡加好感，红卡减好感，紫卡看命。</div>
+      </div>
+
+      <!-- ── Multiplayer: Coop Invite Toast ───────────────────────── -->
+      <div id="mp-coop-toast" class="mp-coop-toast" style="display:none;">
+        <div class="mp-coop-title">🤝 合作邀请</div>
+        <div id="mp-coop-text" class="mp-coop-text">对方邀请你一起进入「合伙创业」剧情</div>
+        <div class="mp-coop-actions">
+          <button id="mp-coop-accept" class="mp-primary-btn">接受</button>
+          <button id="mp-coop-decline" class="mp-ghost-btn">拒绝</button>
+        </div>
+      </div>
+
     </section>
 
     <div id="confirm-modal" class="modal-mask" style="display:none;">
@@ -265,6 +535,7 @@
           </div>
           <div class="summary-actions">
             <button id="btn-summary-share" class="primary share-btn" style="background: linear-gradient(135deg, #f1c40f, #e67e22); border: none; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5);"><span class="icon">📸</span> 生成人生档案</button>
+            <button id="btn-mp-vs" class="primary mp-vs-btn" style="display:none;">⚔️ 查看双人对比</button>
             <button id="btn-summary-back" class="ghost">返回事件流</button>
             <button id="btn-summary-restart" class="primary">再来一次</button>
           </div>
@@ -279,6 +550,8 @@
           </div>
           <div id="summary-score-rank" class="score-rank"></div>
         </div>
+
+        <div id="summary-titles" class="summary-titles"></div>
 
         <div class="summary-hero">
           <div class="hero-avatar-wrap">
@@ -332,6 +605,45 @@
         <div class="end-card-actions">
           <button id="btn-end-restart" class="ghost">再来一次</button>
           <button id="btn-end-summary" class="primary">查看人生总结</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Multiplayer VS Comparison Overlay ─────────────────────── -->
+    <div id="mp-vs-overlay" class="mp-vs-overlay" style="display:none;">
+      <div class="mp-vs-container">
+        <button id="mp-vs-close" class="mp-vs-close">✕</button>
+        <div class="mp-vs-header">
+          <h1 class="mp-vs-title">⚔️ 人生对决 ⚔️</h1>
+          <div id="mp-vs-subtitle" class="mp-vs-subtitle"></div>
+        </div>
+
+        <div class="mp-vs-avatars">
+          <div class="mp-vs-player mp-vs-left">
+            <canvas id="mp-vs-avatar-me" class="mp-vs-avatar" width="128" height="192"></canvas>
+            <div id="mp-vs-name-me" class="mp-vs-name">我</div>
+            <div id="mp-vs-age-me" class="mp-vs-age"></div>
+            <div id="mp-vs-score-me" class="mp-vs-score"></div>
+          </div>
+          <div class="mp-vs-badge-col">
+            <div class="mp-vs-spark">VS</div>
+            <div id="mp-vs-relation-badge" class="mp-vs-relation-badge"></div>
+          </div>
+          <div class="mp-vs-player mp-vs-right">
+            <canvas id="mp-vs-avatar-opp" class="mp-vs-avatar" width="128" height="192"></canvas>
+            <div id="mp-vs-name-opp" class="mp-vs-name">对手</div>
+            <div id="mp-vs-age-opp" class="mp-vs-age"></div>
+            <div id="mp-vs-score-opp" class="mp-vs-score"></div>
+          </div>
+        </div>
+
+        <div id="mp-vs-stats" class="mp-vs-stats"></div>
+        <div id="mp-vs-life" class="mp-vs-life"></div>
+        <div id="mp-vs-commentary" class="mp-vs-commentary"></div>
+        <div id="mp-vs-relation-story" class="mp-vs-relation-story"></div>
+
+        <div class="mp-vs-footer">
+          <button id="mp-vs-back" class="primary">返回我的总结</button>
         </div>
       </div>
     </div>
@@ -406,7 +718,7 @@
     <div class="ach-wall-panel">
       <div class="ach-wall-head">
         <div class="ach-wall-title">🏆&nbsp;&nbsp;成就</div>
-        <span id="ach-wall-count" class="ach-wall-count">0/31</span>
+        <span id="ach-wall-count" class="ach-wall-count">0/61</span>
         <button id="ach-wall-close" class="ach-wall-close" aria-label="关闭成就墙">✕</button>
       </div>
       <div id="ach-wall-grid" class="ach-wall-grid"></div>
@@ -415,6 +727,18 @@
 
   <!-- Toast container: bottom-right, stacks upward -->
   <div id="ach-toast-container" class="ach-toast-container" aria-live="polite"></div>
+
+  <!-- ── Story Flowchart ──────────────────────────────────────── -->
+  <div id="fc-overlay" class="fc-overlay" aria-modal="true" role="dialog" aria-label="命运图谱">
+    <div class="fc-panel">
+      <div class="fc-head">
+        <div class="fc-title">命运图谱</div>
+        <span id="fc-stats" class="fc-stats">已探索 0/0 个节点（0%）</span>
+        <button id="fc-close" class="fc-close-btn" aria-label="关闭命运图谱">✕</button>
+      </div>
+      <div id="fc-canvas" class="fc-canvas"></div>
+    </div>
+  </div>
 
   <script type="module" src="js/game.js"></script>
 </body>

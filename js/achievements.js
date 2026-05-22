@@ -7,7 +7,7 @@ const STORAGE_KEY = 'studyAbroad_ach_v1';
 export const ACHIEVEMENTS = [
   // ── 里程碑 ──────────────────────────────────────────────────────────────
   { id: 'first_play',       name: '人生重来',     icon: '🔄', rarity: 'normal',    cat: '里程碑', desc: '开始了第一次留学重开' },
-  { id: 'school_t20',       name: '名校之路',     icon: '🎓', rarity: 'rare',      cat: '里程碑', desc: '成功进入 T20 大学' },
+  { id: 'school_t20',       name: '名校之路',     icon: '🎓', rarity: 'rare',      cat: '里程碑', desc: '成功进入顶尖大学（T20 / G5 / 港三 / 帝大 等）' },
   { id: 'school_expelled',  name: '学业未竟',     icon: '📋', rarity: 'normal',    cat: '里程碑', desc: '被学校开除或遣返回国' },
   { id: 'stat_max',         name: '天赋异禀',     icon: '💪', rarity: 'rare',      cat: '里程碑', desc: '某项基础属性达到了 10 点' },
   { id: 'stat_negative',    name: '人生低谷',     icon: '📉', rarity: 'normal',    cat: '里程碑', desc: '某项基础属性跌入了负数' },
@@ -32,6 +32,11 @@ export const ACHIEVEMENTS = [
   { id: 'sl_esports',       name: '电竞新星',     icon: '🎮', rarity: 'normal',    cat: '剧情',   desc: '踏入了职业电竞赛场' },
   { id: 'sl_wasted',        name: '南柯梦境',     icon: '🌙', rarity: 'normal',    cat: '剧情',   desc: '陷入了颓废的南柯梦' },
   { id: 'sl_worlds',        name: '赛场巅峰',     icon: '🏆', rarity: 'rare',      cat: '剧情',   desc: '踏上了电竞世界赛之路' },
+  { id: 'sl_fitness',       name: '铁血健将',     icon: '💪', rarity: 'normal',    cat: '剧情',   desc: '踏上了健美之路' },
+  { id: 'sl_chef',          name: '围裙新星',     icon: '👨‍🍳', rarity: 'normal',    cat: '剧情',   desc: '踏入了校园厨神的世界' },
+  { id: 'sl_athlete',       name: '运动少年',     icon: '⚽', rarity: 'normal',    cat: '剧情',   desc: '加入了校队，开启运动生涯' },
+  { id: 'sl_thief',         name: '影子协会',     icon: '🦊', rarity: 'rare',      cat: '剧情',   desc: '收到了影子协会的邀请' },
+  { id: 'sl_hogwarts',      name: '魔法学徒',     icon: '🪄', rarity: 'rare',      cat: '剧情',   desc: '收到了霍格沃茨的入学通知书' },
 
   // ── 终局 ─────────────────────────────────────────────────────────────────
   { id: 'end_health',       name: '油尽灯枯',     icon: '💀', rarity: 'normal',    cat: '终局',   desc: '因健康耗尽而离开了人世' },
@@ -44,6 +49,34 @@ export const ACHIEVEMENTS = [
   { id: 'end_ceo',          name: '商界传奇',     icon: '💼', rarity: 'epic',      cat: '终局',   desc: '成功转型，成为了 CEO' },
   { id: 'end_worlds',       name: '全球冠军',     icon: '🥇', rarity: 'epic',      cat: '终局',   desc: '赢得了电竞世界赛冠军' },
   { id: 'end_xianxia',      name: '羽化登仙',     icon: '✨', rarity: 'legendary', cat: '终局',   desc: '踏入修真之路，最终成仙' },
+  { id: 'end_fitness',      name: '健美传奇',     icon: '🏋️', rarity: 'epic',      cat: '终局',   desc: '站上了健美巅峰的舞台' },
+  { id: 'end_chef',         name: '三星主厨',     icon: '⭐', rarity: 'epic',      cat: '终局',   desc: '获得了米其林三星评级' },
+  { id: 'end_athlete',      name: '体坛之巅',     icon: '🏆', rarity: 'epic',      cat: '终局',   desc: '成为了职业体育的传奇' },
+  { id: 'end_thief',        name: '幽灵评级',     icon: '👻', rarity: 'epic',      cat: '终局',   desc: '达到了影子协会最高评级' },
+  { id: 'end_hogwarts',     name: '救世之星',     icon: '⚡', rarity: 'legendary', cat: '终局',   desc: '用老魔杖击败了伏地魔' },
+
+  // ── 专业传奇终局 ──────────────────────────────────────────────────────────
+  { id: 'end_ee',           name: '半导体教父',   icon: '🔬', rarity: 'legendary', cat: '终局',   desc: '在芯片领域封神，重塑了半导体产业格局' },
+  { id: 'end_me',           name: '智造先驱',     icon: '🏭', rarity: 'legendary', cat: '终局',   desc: '成为总工程师或智造独角兽创始人' },
+  { id: 'end_bio',          name: '新药教父',     icon: '🧬', rarity: 'legendary', cat: '终局',   desc: '研发出重磅新药，改变了医药行业' },
+  { id: 'end_med',          name: '杏林圣手',     icon: '🩺', rarity: 'legendary', cat: '终局',   desc: '成为科室主任或以自己命名了新术式' },
+  { id: 'end_law',          name: '法界泰斗',     icon: '⚖️', rarity: 'legendary', cat: '终局',   desc: '成为管理合伙人或首席大检察官' },
+  { id: 'end_film',         name: '金棕榈之夜',   icon: '🎬', rarity: 'legendary', cat: '终局',   desc: '作为导演斩获国际顶级电影奖' },
+  { id: 'end_cs',           name: '硅谷传奇',     icon: '💻', rarity: 'legendary', cat: '终局',   desc: '成为大厂核心或连续创业传奇' },
+  { id: 'end_biz',          name: '金融之王',     icon: '💹', rarity: 'legendary', cat: '终局',   desc: '登顶投行或风投界的巅峰' },
+  { id: 'end_sci',          name: '学术巨擘',     icon: '🔭', rarity: 'legendary', cat: '终局',   desc: '以全奖直博身份成为学界泰斗' },
+  { id: 'end_art',          name: '传世大家',     icon: '🖋️', rarity: 'legendary', cat: '终局',   desc: '作品跨越时代，成为文学/艺术大师' },
+  { id: 'end_music',        name: '乐坛传奇',     icon: '🎵', rarity: 'legendary', cat: '终局',   desc: '在音乐领域达到传奇地位' },
+
+  // ── 跨界彩蛋 ──────────────────────────────────────────────────────────────
+  { id: 'easter_rhythm',     name: '节奏大师',     icon: '🎹', rarity: 'epic',      cat: '彩蛋',   desc: '音乐爱好者×CS×日本：做出了上架的音游' },
+  { id: 'easter_viral',      name: '病毒式传播',   icon: '📹', rarity: 'epic',      cat: '彩蛋',   desc: '电影爱好者×商科×美国：校园纪录片爆红' },
+  { id: 'easter_novelist',   name: '跨界作家',     icon: '📖', rarity: 'epic',      cat: '彩蛋',   desc: '法律爱好者×文艺×英国：法律小说出版' },
+  { id: 'easter_coral',      name: '科学影像师',   icon: '🪸', rarity: 'epic',      cat: '彩蛋',   desc: '科学爱好者×电影×澳洲：珊瑚纪录片被BBC转发' },
+  { id: 'easter_synth',      name: '声音炼金师',   icon: '🔊', rarity: 'epic',      cat: '彩蛋',   desc: '音乐爱好者×理科×欧洲：物理建模合成器走红' },
+  { id: 'easter_medtech',    name: '赛博华佗',     icon: '🧬', rarity: 'epic',      cat: '彩蛋',   desc: '医学爱好者×CS×新加坡：AI辅助诊断获奖' },
+  { id: 'easter_courtroom',  name: '模拟大律师',   icon: '⚖️', rarity: 'epic',      cat: '彩蛋',   desc: '法律爱好者×商科×香港：模拟庭审全场最佳' },
+  { id: 'easter_nomad',      name: '数字游牧',     icon: '🌍', rarity: 'epic',      cat: '彩蛋',   desc: '科技爱好者×商科×欧洲：远程创业走遍三国' },
 ];
 
 let _unlocked = new Set();
@@ -67,6 +100,9 @@ function _save() {
 }
 
 // ── Unlock ────────────────────────────────────────────────────────────────
+let _onUnlock = null;
+export function setOnUnlock(fn) { _onUnlock = fn; }
+
 export function unlockAchievement(id) {
   if (_unlocked.has(id)) return false;
   const def = ACHIEVEMENTS.find(a => a.id === id);
@@ -76,6 +112,7 @@ export function unlockAchievement(id) {
   _save();
   _showToast(def);
   _updateBadge();
+  if (_onUnlock) try { _onUnlock(def); } catch (e) {}
 
   // Combo: unlock "见过世面" when all four hidden storylines done
   if (id !== 'all_hidden' &&
@@ -170,7 +207,7 @@ function _renderWall() {
   const countEl = document.getElementById('ach-wall-count');
   if (countEl) countEl.textContent = `${_unlocked.size} / ${ACHIEVEMENTS.length}`;
 
-  const cats = ['里程碑', '感情', '剧情', '终局'];
+  const cats = ['里程碑', '感情', '剧情', '终局', '彩蛋'];
   for (const cat of cats) {
     const items = ACHIEVEMENTS.filter(a => a.cat === cat);
     if (!items.length) continue;

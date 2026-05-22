@@ -1,16 +1,25 @@
 import { evalCondition, pickBranch, pickWeightedBranch } from './dsl.js';
 import { renderAvatar, createStandaloneAvatar } from './avatar.js';
 import { playStorylineIntro, playStorylineExit } from './cinematic.js';
-import { initAchievements, unlockAchievement } from './achievements.js';
+import { initAchievements, unlockAchievement, setOnUnlock } from './achievements.js';
+import { initFlowchart, openFlowchart, unlockFlowchartNode, setFlowchartSfx, resetSessionUnlocks, getSessionUnlocks } from './flowchart.js';
+import * as SFX from './audio.js';
+// Multiplayer — loaded dynamically so single-player works even if it fails
+let mp = { enabled: false, connected: false, cards: [], opponent: {} };
+let createRoom, joinRoom, mpSend, mpOn, mpDisconnect, resetMpState, REUNION_AGES, FATE_CARDS, initialFateCards, draftFrenemyCards, FRENEMY_CARD_POOL;
+// MP VS comparison data
+let _mpMyEndData = null;   // own final snapshot, set when game ends
+let _mpOppEndData = null;  // opponent's final snapshot, received via game_end
+let _allTalents = null;    // cached talents data for restart without reload
 
 const STAT_KEYS = ['SOC', 'INT', 'MNY', 'PER', 'HLT', 'APP'];
 const STAT_LABELS = {
   SOC: '社交', INT: '智力', MNY: '家境',
   HAP: '快乐', HLT: '健康', PER: '毅力', APP: '颜值',
-  POP: '人气', POK: '牌技', MMR: '天梯分', FIT: '体能', CKL: '厨艺', ATH: '运动',
+  POP: '人气', POK: '牌技', MMR: '天梯分', FIT: '体能', CKL: '厨艺', ATH: '运动', MAG: '魔力',
   cul: '修为', dao: '大道', karma: '机缘', tribulation: '渡劫', realm: '境界'
 };
-const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'HEAT', 'cul', 'dao', 'karma', 'tribulation']);
+const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG', 'HEAT', 'cul', 'dao', 'karma', 'tribulation', 'darkOmen', 'courage', 'alliance', 'knowledge']);
 const XIANXIA_KEYS = ['realm', 'cul', 'dao', 'karma', 'tribulation'];
 
 // ── Special Scoring Endings ──
@@ -24,7 +33,19 @@ const LEGENDARY_ENDINGS = new Set([
   85061, // Chef 3-Star
   81090, // Poker God
   86105, 86120, 86136, // Athlete Top Tier (NBA状元, World Cup Champion, Frisbee Worlds Champion)
-  87190 // Thief Ghost Rating
+  87190, // Thief Ghost Rating
+  61611, // Hogwarts: defeated Voldemort with Elder Wand
+  48190, 48191, // EE: 半导体教父, 芯片独角兽
+  48290, 48291, // ME: 总工程师, 智造独角兽
+  48390, 48391, // BIO: 新药教父, 生物医药独角兽
+  48590, 48591, // MED: 科室主任, 新术式命名
+  48790, 48791, // LAW: 管理合伙人, 首席大检察官
+  48990, 48991, // Film: 金棕榈独立导演, 百亿票房商业导演
+  42190, 42191, // CS: 大厂核心, 连续创业者
+  43190,        // 商科: 投行精英/风投巨鳄
+  44190,        // 理科: 全奖直博巅峰
+  45191,        // 文科/文艺: 传世大家
+  49990, 49991, 49992  // 音乐: 独立音乐人, 流行歌手, 作曲家
 ]);
 
 const GOOD_ENDINGS = new Set([
@@ -32,7 +53,14 @@ const GOOD_ENDINGS = new Set([
   82096, // Corporate Elite
   84091, // Fitness Influencer
   85091, 85092, // Chef 2-Star / 1-Star
-  90050, 90052, 90054, 90056 // Late dropout good endings
+  90050, 90052, 90054, 90056, // Late dropout good endings
+  61612, 61613, // Hogwarts: defeated Voldemort (patronus / resurrection)
+  48192, // EE: 转码逆袭
+  48292, // ME: 转码逆袭
+  48392, // BIO: 生信逆袭
+  48592, // MED: 受人尊敬的主治
+  48792, // LAW: 知名人权律师
+  48992  // Film: 奥斯卡编剧
 ]);
 
 function deriveRealm(cul) {
@@ -114,8 +142,8 @@ const STORYLINE_CFG = {
     gracePeriod: 12,
     eventRate: 0.8,
     deathChecks: [
-      { cond: s => (s.HLT || 0) <= 2, event: 85080 },
-      { cond: s => (s.HAP || 0) <= 2, event: 85081 },
+      { cond: s => (s.HLT || 0) <= 0, event: 85080 },
+      { cond: s => (s.HAP || 0) <= 0, event: 85081 },
       { cond: s => (s.SOC || 0) <= 0, event: 85095 },
     ],
     progressChecks: [],
@@ -124,8 +152,8 @@ const STORYLINE_CFG = {
     gracePeriod: 12,
     eventRate: 0.8,
     deathChecks: [
-      { cond: s => (s.HLT || 0) <= 2, event: 86151 },
-      { cond: s => (s.HAP || 0) <= 2, event: 86152 },
+      { cond: s => (s.HLT || 0) <= 0, event: 86151 },
+      { cond: s => (s.HAP || 0) <= 0, event: 86152 },
       { cond: s => (s.SOC || 0) <= 0, event: 86153 },
     ],
     progressChecks: [],
@@ -145,10 +173,24 @@ const STORYLINE_CFG = {
       idol: {    gracePeriod: 12,
     eventRate: 0.7,
     deathChecks: [
-      { cond: s => s.INT < 0, event: 82020 },
       { cond: s => s.HLT <= -2, event: 82021 },
     ],
     progressChecks: [],
+  },
+  party: {
+    gracePeriod: 6,
+    eventRate: 0.8,
+    deathChecks: [
+      { cond: s => s.HLT < 2 && Math.random() < 0.25, event: 82022 },
+      { cond: s => s.HLT <= -3, event: 82021 },
+      { cond: s => s.SOC <= -3, event: 82020 },
+      { cond: s => s.MNY <= -3, event: 82091 },
+    ],
+    progressChecks: [],
+    flavor: () => {
+      const lines = ['你在组织下一场派对的细节。', '手机响个不停，全是派对邀请。', '你和朋友们在策划一个大活动。'];
+      return lines[Math.floor(Math.random() * lines.length)];
+    },
   },
   ceo: {
     gracePeriod: 12,
@@ -157,8 +199,8 @@ const STORYLINE_CFG = {
       { cond: s => s.MNY <= -2, event: 82095 },
     ],
     progressChecks: [
-      { cond: s => s.SOC >= 23 && s.MNY >= 18, event: 82090 },
-      { cond: s => s.age >= 30, event: 82096 },
+      { cond: s => (s.age - s.storylineStart) >= 2 && s.SOC >= 30 && s.MNY >= 10, event: 82090 },
+      { cond: s => (s.age - s.storylineStart) >= 2, event: 82096 },
     ],
   },
   poker: {
@@ -269,7 +311,31 @@ const STORYLINE_CFG = {
     deathChecks: [],
     flavor: () => xianxiaFlavor(),
   },
+  hogwarts: {
+    gracePeriod: 24,
+    eventRate: 0.6,
+    progressChecks: [
+      { cond: s => (s.hogwartsYear || 1) >= 7 && !s.firedEvents.has(61600) && (s.darkForces || 0) === 0, event: 61500 },
+    ],
+    deathChecks: [],
+    flavor: () => hogwartsFlavor(),
+  },
 };
+
+// ── Hogwarts flavor lines ──────────────────────────────────────
+function hogwartsFlavor() {
+  const lines = [
+    '你在公共休息室里做着魔药学的论文，壁炉里的火焰跳跃不停。',
+    '猫头鹰送来了家里的包裹，里面是一大盒自制曲奇。',
+    '你在图书馆翻阅《高级魔药制作》，差点打翻旁边的墨水瓶。',
+    '移动楼梯又变了方向，你在城堡里多走了二十分钟的冤枉路。',
+    '差点被打人柳的枝条抽中，你及时跳开了。',
+    '晚饭时南瓜汁喝了三杯，幽灵们在头顶飘来飘去。',
+    '你在天文塔顶看星星，辨认着猎户座和天狼星的位置。',
+    '草药学课上，你成功让曼德拉草安静下来了。',
+  ];
+  return lines[Math.floor(Math.random() * lines.length)];
+}
 
 // ── Idol stage clock (System D) ─────────────────────────────────
 // Stages: 'training' (0-12 mo) → 'debut_window' (12-60 mo) → 'debuted'
@@ -633,6 +699,15 @@ function updateAthleteStage() {
   }
 }
 
+function updateHogwartsYear() {
+  if (state.storyline !== 'hogwarts') return;
+  const monthsIn = (state.monthTotal || 0) - (state.storylineStartMonth || 0);
+  const year = Math.min(7, Math.floor(monthsIn / 12) + 1);
+  if (year > (state.hogwartsYear || 1)) {
+    state.hogwartsYear = year;
+  }
+}
+
 function computeAthleteProb(s) {
   if (s.storyline !== 'athlete') return 0;
   let p = -15;
@@ -894,8 +969,9 @@ const STORYLINE_NAMES = {
   chef: '校园厨神',
   athlete: '校队之星',
   thief: '影子协会',
+  hogwarts: '霍格沃茨',
 };
-const HIDDEN_STORYLINES = new Set(['spy', 'abyss', 'meta', 'xianxia', 'thief']);
+const HIDDEN_STORYLINES = new Set(['spy', 'abyss', 'meta', 'xianxia', 'thief', 'hogwarts']);
 const SPECIAL_STORYLINES = new Set(['idol', 'superstar', 'streamer', 'poker', 'triton', 'local_shark', 'party', 'ceo', 'wasted', 'esports', 'worlds', 'minor_league', 'fitness', 'chef', 'athlete']);
 const STORYLINE_UNLOCK_STAT = {
   idol: 'POP', superstar: 'POP', streamer: 'POP',
@@ -904,6 +980,7 @@ const STORYLINE_UNLOCK_STAT = {
   fitness: 'FIT',
   chef: 'CKL',
   athlete: 'ATH',
+  hogwarts: 'MAG',
 };
 const STUDENT_PHASES = new Set([
   '高中生', '本科生', '理工生', '商科生', '文科生',
@@ -932,6 +1009,9 @@ const state = {
   school: '无',
   hsType: '',
   overseas: 0,
+  country: '',
+  countryIntent: '',
+  schoolTier: '',
   major: '',
   relationship: '单身',
   relationshipHistory: [],
@@ -958,6 +1038,7 @@ const state = {
   POP: 0, POK: 0, MMR: 0,
   cul: 0, dao: 0, karma: 0, tribulation: 0,
   xianxiaSeed: 0, yuanshen_book: 0, xingchen_book: 0,
+  MAG: 0, hogwartsYear: 0, housePt: 0, house: '', hasOwl: 0, hogwartsSeed: 0,
 
   // Summary tracking
   statPeaks: {},
@@ -970,18 +1051,23 @@ let autoMode = 0;
 let sessionPlayCount = 0;
 
 async function loadData() {
-  const [talents, events, ages, randomEvents, xianxiaEvents] = await Promise.all([
+  const [talents, events, ages, randomEvents, xianxiaEvents, hogwartsEvents, mpEvents] = await Promise.all([
     fetch('data/talents.json').then(r => r.json()),
     fetch('data/events.json').then(r => r.json()),
     fetch('data/ages.json').then(r => r.json()),
     fetch('data/random_events.json').then(r => r.json()),
-    fetch('data/xianxia_events.json').then(r => r.json()).catch(() => [])
+    fetch('data/xianxia_events.json').then(r => r.json()).catch(() => []),
+    fetch('data/hogwarts_events.json').then(r => r.json()).catch(() => []),
+    fetch('data/multiplayer_events.json').then(r => r.json()).catch(() => [])
   ]);
   state.eventsMap = new Map(events.map(e => [e.id, e]));
   state.agesMap = ages;
-  state.randomEvents = randomEvents.concat(xianxiaEvents);
+  state.randomEvents = randomEvents.concat(xianxiaEvents).concat(hogwartsEvents);
   // Also index random events into eventsMap for branch lookups
   for (const re of state.randomEvents) state.eventsMap.set(re.id, re);
+  // Index mp events but DON'T put them in random pool (they're triggered explicitly)
+  const realMpEvents = mpEvents.filter(e => typeof e.id === 'number');
+  for (const re of realMpEvents) state.eventsMap.set(re.id, re);
   return talents;
 }
 
@@ -1114,14 +1200,21 @@ function maybeGraduateFromSchool() {
 function assignFallbackMajor() {
   if (state.major) return;
   const options = state.hsType === '体制内'
-    ? [['理科', 55], ['文科', 45]]
-    : [['CS', 40], ['商科', 35], ['文艺', 25]];
+    ? [['理科', 30], ['文科', 30], ['MED', 20], ['法学', 20]]
+    : [['CS', 10], ['商科', 10], ['文艺', 10], ['EE', 10], ['ME', 10], ['BIO', 10], ['MED', 10], ['法学', 10], ['电影', 10], ['音乐', 10]];
   for (const opt of options) {
-    if (opt[0] === 'CS' && state.INT >= 6) opt[1] += 20;
-    if (opt[0] === '商科' && state.MNY >= 6) opt[1] += 20;
-    if (opt[0] === '文艺' && (state.APP >= 5 || state.SOC >= 6)) opt[1] += 15;
-    if (opt[0] === '理科' && state.INT >= 6) opt[1] += 20;
-    if (opt[0] === '文科' && state.SOC >= 6) opt[1] += 15;
+    if (opt[0] === 'CS' && state.INT >= 6) opt[1] += 15;
+    if (opt[0] === '商科' && state.MNY >= 6) opt[1] += 15;
+    if (opt[0] === '文艺' && (state.APP >= 5 || state.SOC >= 6)) opt[1] += 10;
+    if (opt[0] === '理科' && state.INT >= 6) opt[1] += 15;
+    if (opt[0] === '文科' && state.SOC >= 6) opt[1] += 10;
+    if (opt[0] === 'EE' && state.INT >= 6) opt[1] += 15;
+    if (opt[0] === 'ME' && state.INT >= 5 && state.PER >= 5) opt[1] += 15;
+    if (opt[0] === 'BIO' && state.INT >= 6) opt[1] += 15;
+    if (opt[0] === 'MED' && state.INT >= 7 && state.PER >= 6) opt[1] += 15;
+    if (opt[0] === '法学' && state.INT >= 6 && state.SOC >= 5) opt[1] += 15;
+    if (opt[0] === '电影' && state.APP >= 5) opt[1] += 10;
+    if (opt[0] === '音乐' && (state.APP >= 5 || state.PER >= 6)) opt[1] += 10;
   }
   const total = options.reduce((s, o) => s + o[1], 0);
   let r = Math.random() * total;
@@ -1175,6 +1268,7 @@ function showConfirm({ title, body, stats, okText, cancelText }) {
     const okBtn = $('confirm-ok');
     const cancelBtn = $('confirm-cancel');
     if (!mask) { resolve(window.confirm(body || title || '')); return; }
+    SFX.sfxModalOpen();
     titleEl.textContent = title || '确认';
     bodyEl.textContent = body || '';
     statsEl.innerHTML = '';
@@ -1205,8 +1299,8 @@ function showConfirm({ title, body, stats, okText, cancelText }) {
       document.removeEventListener('keydown', onKey);
       resolve(result);
     };
-    const onOk = () => cleanup(true);
-    const onCancel = () => cleanup(false);
+    const onOk = () => { SFX.sfxModalConfirm(); cleanup(true); };
+    const onCancel = () => { SFX.sfxModalClose(); cleanup(false); };
     const onMaskClick = (e) => { if (e.target === mask) cleanup(false); };
     const onKey = (e) => {
       if (e.key === 'Escape') cleanup(false);
@@ -1229,7 +1323,8 @@ function applyEvent(ev) {
   // Storyline replay: only show text, skip all side effects
   if (ev._replay) {
     delete ev._replay;
-    const msg = ev.text || ev.event;
+    const _raw = ev.text || ev.event;
+    const msg = Array.isArray(_raw) ? _raw[Math.floor(Math.random() * _raw.length)] : _raw;
     if (msg) pushLog(msg);
     return;
   }
@@ -1268,9 +1363,37 @@ function applyEvent(ev) {
     if (ev.set.profession && GRAD_SCHOOL_PHASES.has(ev.set.profession)) {
       scheduleGraduateCompletion();
     }
+
+    // ── Milestone tracking (for MP VS timeline) ──
+    if (state.milestones) {
+      const ms = { age: state.age, month: state.monthOfYear };
+      if (ev.set.school && ev.set.school !== '无' && ev.set.school !== prevRel) {
+        state.milestones.push({ ...ms, type: 'school', text: `考入${ev.set.school}` });
+      }
+      if (ev.set.overseas === 1) {
+        state.milestones.push({ ...ms, type: 'overseas', text: `出国留学（${ev.set.country || state.country || ''}）` });
+      }
+      if (ev.set.major && ev.set.major !== state.major) {
+        state.milestones.push({ ...ms, type: 'major', text: `选择${ev.set.major}专业` });
+      }
+      if (ev.set.storyline && ev.set.storyline !== prevStoryline && ev.set.storyline !== '') {
+        const slName = STORYLINE_NAMES[ev.set.storyline] || ev.set.storyline;
+        state.milestones.push({ ...ms, type: 'storyline', text: `进入【${slName}】剧情` });
+      }
+      if (ev.set.relationship !== undefined && ev.set.relationship !== prevRel) {
+        state.milestones.push({ ...ms, type: 'relationship', text: `恋爱状态→${ev.set.relationship}` });
+      }
+    }
   }
 
-  const msg = ev.text || ev.event;
+  // Ending milestone
+  if (ev.end && state.milestones) {
+    const endText = (ev.text || ev.event || '').slice(0, 20);
+    state.milestones.push({ age: state.age, month: state.monthOfYear, type: 'ending', text: `结局：${endText}…` });
+  }
+
+  const _rawMsg = ev.text || ev.event;
+  const msg = Array.isArray(_rawMsg) ? _rawMsg[Math.floor(Math.random() * _rawMsg.length)] : _rawMsg;
   let evLogType = ev.logType
     || (ev.romance ? 'romance' : undefined)
     || (ev.include && (/MAJOR==/.test(ev.include) || /profession==/.test(ev.include)) ? 'major' : undefined);
@@ -1299,6 +1422,11 @@ function applyEvent(ev) {
   }
   if (msg) pushLog(msg, evLogType);
 
+  // Snapshot stats before applying effects (for change animation)
+  const _preFx = {};
+  for (const k of STAT_KEYS) _preFx[k] = state[k] || 0;
+  _preFx.HAP = state.HAP || 0;
+
   if (ev.effect) for (const [k, v] of Object.entries(ev.effect)) {
     if (EFFECT_KEYS.has(k)) state[k] = (state[k] || 0) + v;
   }
@@ -1306,15 +1434,31 @@ function applyEvent(ev) {
 
   clampStats();
 
+  // Track which stats changed for render animation
+  state._statChanges = {};
+  let _hasUp = false, _hasDown = false;
+  for (const k of [...STAT_KEYS, 'HAP']) {
+    const delta = (state[k] || 0) - (_preFx[k] || 0);
+    if (delta !== 0) { state._statChanges[k] = delta; if (delta > 0) _hasUp = true; else _hasDown = true; }
+  }
+  if (_hasUp && !_hasDown) SFX.sfxStatUp();
+  else if (_hasDown && !_hasUp) SFX.sfxStatDown();
+
   if (ev.end) {
     state.phase = 'ended';
     state.endingId = ev.id;
     state.endingAge = state.age;
+    SFX.sfxGameEnd();
+    // Clean up any pending MP reunion state
+    if (mp._reunionTimeout) { clearTimeout(mp._reunionTimeout); mp._reunionTimeout = null; }
+    mp.isWaiting = false;
+    _hideWaitingOverlay();
   }
 
   // Cinematic intro when entering a special/hidden storyline
   if (ev.set && ev.set.storyline && ev.set.storyline !== prevStorylineForCinematic
       && (HIDDEN_STORYLINES.has(ev.set.storyline) || SPECIAL_STORYLINES.has(ev.set.storyline))) {
+    SFX.sfxKeyEvent();
     state.pendingCinematic = true;
     state._cineSavedAuto = autoMode;
     stopAuto();
@@ -1324,7 +1468,7 @@ function applyEvent(ev) {
     const prevStat = STORYLINE_UNLOCK_STAT[prevStorylineForCinematic];
     playStorylineIntro({
       name: STORYLINE_NAMES[state.storyline] || state.storyline,
-      color: isHidden ? '#ff5252' : '#d4af37',
+      color: state.storyline === 'hogwarts' ? '#9B59B6' : (isHidden ? '#ff5252' : '#d4af37'),
       unlockStat: (newStat && newStat !== prevStat) ? newStat : null,
       statLabels: STAT_LABELS,
       onDone: () => {
@@ -1409,14 +1553,29 @@ function _checkEventAchievements(ev) {
         idol: 'sl_idol', superstar: 'sl_superstar', streamer: 'sl_streamer',
         party: 'sl_party', wasted: 'sl_wasted', poker: 'sl_poker',
         esports: 'sl_esports', worlds: 'sl_worlds',
+        fitness: 'sl_fitness', chef: 'sl_chef', athlete: 'sl_athlete',
+        thief: 'sl_thief', hogwarts: 'sl_hogwarts',
       };
       if (SL_MAP[sl]) unlockAchievement(SL_MAP[sl]);
     }
 
     // School milestones
     const school = ev.set.school;
-    if (school === 'T20') unlockAchievement('school_t20');
+    const tier = ev.set.schoolTier;
+    if (tier === 'top' || school === 'T20') unlockAchievement('school_t20');
     if (school === '遣返' || school === '退学') unlockAchievement('school_expelled');
+
+    // ── Flowchart node unlocks (non-achievement triggers) ──
+    const hsType = ev.set.hsType;
+    if (hsType === '国际') unlockFlowchartNode('n_hs_intl');
+    if (hsType === '体制内') unlockFlowchartNode('n_hs_normal');
+
+    const country = ev.set.country;
+    const COUNTRY_NODE = { '美国': 'n_us', '英国': 'n_uk', '澳洲': 'n_au', '欧洲': 'n_eu', '香港': 'n_hk', '日本': 'n_jp', '新加坡': 'n_sg' };
+    if (country && COUNTRY_NODE[country]) unlockFlowchartNode(COUNTRY_NODE[country]);
+
+    if (tier === 'mid') unlockFlowchartNode('n_mid');
+    if (tier === 'low') unlockFlowchartNode('n_low');
   }
 
   // Specific event IDs for outcomes
@@ -1429,17 +1588,69 @@ function _checkEventAchievements(ev) {
   if (id === 82041 || id === 82090) unlockAchievement('end_ceo');   // CEO success
   if (id === 83090 || id === 83094) unlockAchievement('end_worlds'); // worlds win
 
+  if (id === 84061) unlockAchievement('end_fitness');        // fitness legend
+  if (id === 85061) unlockAchievement('end_chef');           // chef 3-star
+  if (id === 86105 || id === 86120 || id === 86136) unlockAchievement('end_athlete'); // athlete top tier
+  if (id === 87190) unlockAchievement('end_thief');          // thief ghost rating
+  if (id === 61611) unlockAchievement('end_hogwarts');       // defeated Voldemort with Elder Wand
+
+  // Major career legendary endings
+  if (id === 48190 || id === 48191) unlockAchievement('end_ee');    // EE: 半导体教父 / 芯片独角兽
+  if (id === 48290 || id === 48291) unlockAchievement('end_me');    // ME: 总工程师 / 智造独角兽
+  if (id === 48390 || id === 48391) unlockAchievement('end_bio');   // BIO: 新药教父 / 生物医药独角兽
+  if (id === 48590 || id === 48591) unlockAchievement('end_med');   // MED: 科室主任 / 新术式命名
+  if (id === 48790 || id === 48791) unlockAchievement('end_law');   // LAW: 管理合伙人 / 首席大检察官
+  if (id === 48990 || id === 48991) unlockAchievement('end_film');  // Film: 金棕榈 / 百亿票房
+  if (id === 42190 || id === 42191) unlockAchievement('end_cs');    // CS: 大厂核心 / 连续创业者
+  if (id === 43190) unlockAchievement('end_biz');                   // 商科: 投行精英/风投巨鳄
+  if (id === 44190) unlockAchievement('end_sci');                   // 理科: 全奖直博巅峰
+  if (id === 45191) unlockAchievement('end_art');                   // 文科/文艺: 传世大家
+  if (id === 49990 || id === 49991 || id === 49992) unlockAchievement('end_music'); // 音乐: 传奇
+
   // Xianxia immortal ending: any game-end while in xianxia with high cul
   if (ev.end && state.storyline === 'xianxia' && (state.cul || 0) >= 1000) {
     unlockAchievement('end_xianxia');
   }
+
+  // Easter egg combo achievements
+  if (id === 49640) unlockAchievement('easter_rhythm');
+  if (id === 49641) unlockAchievement('easter_viral');
+  if (id === 49642) unlockAchievement('easter_novelist');
+  if (id === 49643) unlockAchievement('easter_coral');
+  if (id === 49644) unlockAchievement('easter_synth');
+  if (id === 49645) unlockAchievement('easter_medtech');
+  if (id === 49646) unlockAchievement('easter_courtroom');
+  if (id === 49647) unlockAchievement('easter_nomad');
+}
+
+function _parseRequireHint(expr) {
+  // Parse simple stat conditions like (INT>=6)&(SOC>=4) into readable hints
+  const HINT_LABELS = { ...STAT_LABELS, IQ: '智力', STR: '毅力', HEA: '健康' };
+  const parts = [];
+  const re = /(\w+)\s*(>=|>|<=|<|==|!=)\s*(\d+)/g;
+  let m;
+  while ((m = re.exec(expr)) !== null) {
+    const [, key, op, val] = m;
+    const label = HINT_LABELS[key];
+    if (!label) continue;
+    const cur = state[key] || 0;
+    if (op === '>=' || op === '>') {
+      parts.push(`${label}≥${val}（当前${cur}）`);
+    } else if (op === '<=' || op === '<') {
+      parts.push(`${label}≤${val}（当前${cur}）`);
+    } else if (op === '==' || op === '!=') {
+      parts.push(`${label}=${val}`);
+    }
+  }
+  return parts.length > 0 ? '需要 ' + parts.join('，') : '条件不满足';
 }
 
 function pushLog(text, typeOverride) {
   const tag = `${state.age}岁${state.monthOfYear}月`;
   let logType = typeOverride || '';
   if (!logType && state.storyline) {
-    logType = HIDDEN_STORYLINES.has(state.storyline) ? 'hidden' : 'special';
+    if (state.storyline === 'hogwarts') logType = 'hogwarts';
+    else logType = HIDDEN_STORYLINES.has(state.storyline) ? 'hidden' : 'special';
   }
   state.log.push({ tag, text, logType });
   if (state.log.length > 200) {
@@ -1474,7 +1685,13 @@ function drawRandomEvent() {
         .filter(matchStoryline)
         .filter(ev => !ev.choices)
         .filter(ev => !ev.include || evalCondition(state, ev.include))
-        .filter(ev => !ev.exclude || !evalCondition(state, ev.exclude));
+        .filter(ev => !ev.exclude || !evalCondition(state, ev.exclude))
+        .filter(ev => {
+          if (!ev.stage || ev.stage === '*') return true;
+          if (state.storyline === 'idol') return ev.stage === state.idol_stage;
+          if (state.storyline === 'party') return ev.stage === state.party_stage;
+          return true;
+        });
       pool.forEach(ev => { ev._replay = true; });
     }
   } else {
@@ -1487,11 +1704,13 @@ function drawRandomEvent() {
   }
   if (!pool.length) return null;
   const majorKey = state.major ? 'MAJOR==' + state.major : null;
+  const romanceImmune = state.talentIds && state.talentIds.has(3036);
   const weights = pool.map(ev => {
     let w = ev.weight ?? 1;
     if (majorKey && ev.include && ev.include.includes(majorKey)) w *= 2;
     // System A: damp choice events so flavor dominates
     if (ev.choices && ev.choices.length > 0) w *= 0.5;
+    if (romanceImmune && ev.romance) w *= 0.5;
     return w;
   });
   const total = weights.reduce((a, b) => a + b, 0);
@@ -1513,6 +1732,7 @@ function drawRandomEvent() {
  *   4. 恢复之前保存的自动播放模式
  */
 function resolveChoice(index) {
+  SFX.sfxChoice();
   const choice = state.pendingChoice[index];
   const allOptions = state.pendingChoice.map(c => c.title || c.text || '?');
   const chosenText = choice.title || choice.text || '?';
@@ -1533,6 +1753,15 @@ function resolveChoice(index) {
       if (ev) applyEvent(ev);
     }
   } else if (choice.next) {
+    if (choice.set) {
+      for (const [k, v] of Object.entries(choice.set)) state[k] = v;
+    }
+    if (choice.effect) {
+      for (const [k, v] of Object.entries(choice.effect)) {
+        if (EFFECT_KEYS.has(k)) state[k] = (state[k] || 0) + v;
+      }
+      clampStats();
+    }
     const ev = state.eventsMap.get(choice.next);
     if (ev) applyEvent(ev);
   } else if (choice.effect || choice.set || choice.resultText || choice.text) {
@@ -1608,6 +1837,18 @@ function resolveChoice(index) {
     if (line) pushLog(line, logType);
   }
 
+  // ── Butterfly effect: event-bound send ──
+  // If the chosen option has a butterflySend key AND we're in MP, send to opponent
+  if (choice.butterflySend && mp.enabled && mp.connected && mpSend) {
+    const bfKey = choice.butterflySend;
+    if (!mp.butterflySent) mp.butterflySent = new Set();
+    if (!mp.butterflySent.has(bfKey)) {
+      mp.butterflySent.add(bfKey);
+      mpSend('butterfly', { payload: { key: bfKey, srcAge: state.age } });
+      pushLog('（你放下的东西，也许会落到别人手里……）', 'mp-butterfly');
+    }
+  }
+
   render();
 
   // 恢复选择前的自动播放状态
@@ -1619,6 +1860,7 @@ function resolveChoice(index) {
 function advanceMonth() {
   // 如果有待选择，阻塞推进
   if (state.pendingChoice || state.pendingCinematic) return;
+  SFX.sfxTick();
 
   // Fire pending event from previous branch before advancing
   if (state.pendingEvent) {
@@ -1652,6 +1894,7 @@ function advanceMonth() {
     updateFitnessStage();
     updateChefStage();
     updateAthleteStage();
+    updateHogwartsYear();
     if (state.phase === 'ended' || state.pendingChoice) { render(); return; }
     // === Storyline mode: skip normal events, only draw storyline events ===
     const cfg = STORYLINE_CFG[state.storyline];
@@ -1709,15 +1952,77 @@ function advanceMonth() {
   }
 
   if (!state.storyline) {
+    const _statComboDeaths = [
+      { cond: s => s.INT <= 0 && s.overseas, event: 99931 },
+      { cond: s => s.SOC <= 0 && s.HAP <= 0 && s.overseas, event: 99932 },
+      { cond: s => s.MNY <= 0 && s.HLT <= 0 && s.overseas, event: 99933 },
+      { cond: s => s.PER <= 0 && s.MNY <= 0 && s.overseas, event: 99934 },
+      { cond: s => s.APP <= 0 && s.SOC <= 0 && s.overseas, event: 99935 },
+      { cond: s => s.INT <= 0 && s.PER <= 0 && s.overseas, event: 99936 },
+      { cond: s => s.HLT <= 0 && s.HAP <= 0 && s.overseas, event: 99937 },
+      { cond: s => s.SOC <= 0 && s.PER <= 0 && s.overseas, event: 99938 },
+    ];
+    const eligible = _statComboDeaths.filter(dc => dc.cond(state) && !state.firedEvents.has(dc.event));
+    if (eligible.length && Math.random() < 0.2) {
+      const pick = eligible[Math.floor(Math.random() * eligible.length)];
+      const ev = state.eventsMap.get(pick.event);
+      if (ev) applyEvent(ev);
+    }
+
     if (state.HLT <= -5) {
       pushLog('「结局：油尽灯枯」长期的忽视和透支终于压垮了你的身体。你在一个深夜倒下，再也没有醒来。人生就此画上句号。', 'ending');
       state.phase = 'ended';
       unlockAchievement('end_health');
+      if (mp._reunionTimeout) { clearTimeout(mp._reunionTimeout); mp._reunionTimeout = null; }
+      mp.isWaiting = false;
     }
     if (state.age >= 60) {
       pushLog('你退休了。回首这一生，百感交集。', 'ending');
       state.phase = 'ended';
       unlockAchievement('end_retire');
+      if (mp._reunionTimeout) { clearTimeout(mp._reunionTimeout); mp._reunionTimeout = null; }
+      mp.isWaiting = false;
+    }
+  }
+
+  // ── Multiplayer per-tick hooks ──
+  if (mp.enabled && mp.connected && state.phase !== 'ended') {
+    _broadcastState();
+    // Apply incoming fate card effects
+    if (mp.incomingCardEffect) {
+      _applyIncomingCard(mp.incomingCardEffect);
+      mp.incomingCardEffect = null;
+    }
+    // Check reunion ages (fire on month 1 of the reunion year)
+    if (REUNION_AGES && state.monthOfYear === 1 && REUNION_AGES.includes(state.age)) {
+      _triggerReunion(state.age);
+    }
+    // Process incoming butterfly effects
+    if (mp.pendingButterfly && mp.pendingButterfly.length > 0) {
+      const bf = mp.pendingButterfly.shift();
+      const bfEv = _findButterflyReceive(bf.key);
+      if (bfEv) applyEvent(bfEv);
+    }
+
+    // ── Butterfly effect: stat-based auto-trigger ──
+    // Every 6 months, check stat conditions and probabilistically send butterflies
+    if (state.monthTotal % 6 === 0 && state.age >= 18) {
+      if (!mp.butterflySent) mp.butterflySent = new Set();
+      const _bfAutoRules = [
+        { key: 'internship',        cond: () => state.INT >= 12 && state.MNY <= 3 && state.age >= 20, prob: 0.15 },
+        { key: 'network',           cond: () => state.SOC <= 2 && state.age >= 19, prob: 0.12 },
+        { key: 'startup',           cond: () => state.INT >= 10 && state.MNY >= 8 && state.age >= 22 && !state.storyline, prob: 0.10 },
+        { key: 'overseas_advanced', cond: () => state.INT >= 12 && state.overseas && state.age >= 22, prob: 0.10 },
+        { key: 'romance',           cond: () => state.APP >= 10 && state.relationship === '单身' && state.age >= 19, prob: 0.12 },
+      ];
+      for (const rule of _bfAutoRules) {
+        if (mp.butterflySent.has(rule.key)) continue;
+        if (rule.cond() && Math.random() < rule.prob) {
+          mp.butterflySent.add(rule.key);
+          mpSend('butterfly', { payload: { key: rule.key, srcAge: state.age } });
+          break; // max 1 auto-butterfly per check
+        }
+      }
     }
   }
 
@@ -2124,6 +2429,45 @@ function xianxiaFlavor() {
 
 function $(id) { return document.getElementById(id); }
 
+function _renderFrenemyDraft() {
+  if (!draftFrenemyCards) return;
+  const pool = draftFrenemyCards();
+  state._frenemyDraftPool = pool;
+  state._frenemyDraftPicked = [];
+  const grid = $('frenemy-draft-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  const gradeLabels = ['普通', '稀有', '史诗'];
+  for (const card of pool) {
+    const el = document.createElement('div');
+    el.className = `frenemy-card ${card.category}`;
+    el.innerHTML = `
+      <div class="fc-name">${card.icon} ${card.name}<span class="fc-grade g${card.grade}">${gradeLabels[card.grade]}</span></div>
+      <div class="fc-desc">${card.desc}</div>
+    `;
+    el.addEventListener('click', () => {
+      const picked = state._frenemyDraftPicked;
+      const idx = picked.findIndex(c => c.id === card.id);
+      if (idx >= 0) {
+        SFX.sfxCardDeselect();
+        picked.splice(idx, 1);
+        el.classList.remove('selected');
+      } else if (picked.length < 3) {
+        SFX.sfxCardSelect();
+        picked.push(card);
+        el.classList.add('selected');
+      }
+      const cnt = picked.length;
+      const btn = $('frenemy-confirm');
+      btn.disabled = cnt !== 3;
+      btn.textContent = cnt === 3 ? '确认损友卡 →' : `确认损友卡（${cnt}/3）`;
+    });
+    grid.appendChild(el);
+  }
+  const btn = $('frenemy-confirm');
+  if (btn) { btn.disabled = true; btn.textContent = '确认损友卡（0/3）'; }
+}
+
 function renderTalentSelect(talents) {
   const pool = gachaDraw(talents, 10);
   state.talentsPool = pool;
@@ -2136,13 +2480,17 @@ function renderTalentSelect(talents) {
     el.addEventListener('click', () => {
       const idx = state.talentsPicked.findIndex(x => x.id === t.id);
       if (idx >= 0) {
+        SFX.sfxTalentDeselect();
         state.talentsPicked.splice(idx, 1);
         el.classList.remove('picked');
       } else if (state.talentsPicked.length < 3) {
+        SFX.sfxTalentFlip();
         state.talentsPicked.push(t);
         el.classList.add('picked');
       }
-      $('talent-confirm').disabled = state.talentsPicked.length !== 3;
+      const cnt = state.talentsPicked.length;
+      $('talent-confirm').disabled = cnt !== 3;
+      $('talent-confirm').textContent = cnt === 3 ? '确认天赋 →' : `确认天赋（${cnt}/3）`;
       if (typeof updateCreationAvatar === 'function') updateCreationAvatar();
     });
     list.appendChild(el);
@@ -2268,57 +2616,113 @@ function render() {
       if (state.showFIT) shown.push('FIT');
       if (state.showCKL) shown.push('CKL');
       if (state.showATH) shown.push('ATH');
+      if (state.showMAG) shown.push('MAG');
       const dynamicMax = Math.max(1, ...shown.filter(k => k !== 'HAP').map(k => state[k]));
-      const SPECIAL_STATS = new Set(['POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH']);
+      const SPECIAL_STATS = new Set(['POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG']);
       for (const k of shown) {
         const row = document.createElement('div');
         const isSpecial = SPECIAL_STATS.has(k);
-        row.className = 'stat-row' + (isSpecial ? ' stat-special' : '');
+        row.className = 'stat-row' + (isSpecial ? (k === 'MAG' ? ' stat-special stat-hogwarts' : ' stat-special') : '');
         row.dataset.stat = k;
         const label = STAT_LABELS[k];
         const val = state[k];
         const base = k === 'HAP' ? 10 : dynamicMax;
         const pct = Math.max(0, Math.min(100, (val / base) * 100));
+        const chg = state._statChanges && state._statChanges[k];
+        const chgHtml = chg ? `<span class="stat-delta ${chg > 0 ? 'pos' : 'neg'}">${chg > 0 ? '+' : ''}${chg}</span>` : '';
         row.innerHTML = `
           <span class="stat-label">${label}</span>
           <span class="stat-bar"><span class="stat-fill" style="width:${pct}%"></span></span>
-          <span class="stat-val">${val}</span>
+          <span class="stat-val">${val}${chgHtml}</span>
         `;
+        if (chg) row.classList.add('stat-changed', chg > 0 ? 'stat-up' : 'stat-down');
         statsEl.appendChild(row);
+      }
+      // Clear after rendering so animation only plays once
+      if (state._statChanges) state._statChanges = null;
+    }
+
+    const HOUSE_NAMES = {
+      gryffindor: '格兰芬多', ravenclaw: '拉文克劳',
+      hufflepuff: '赫奇帕奇', slytherin: '斯莱特林'
+    };
+    const HOUSE_COLORS = {
+      gryffindor: { primary: '#740001', secondary: '#EEBA30', text: '#c0392b' },
+      slytherin:  { primary: '#1A472A', secondary: '#AAAAAA', text: '#27ae60' },
+      ravenclaw:  { primary: '#222F5B', secondary: '#BEBEBE', text: '#5b8abf' },
+      hufflepuff: { primary: '#FFDB00', secondary: '#000000', text: '#d4a017' }
+    };
+    const isHogwarts = state.storyline === 'hogwarts';
+
+    const schoolBox = $('school-box');
+
+
+    const majorBox = $('major-box');
+    const profBox = $('profession-box');
+    const houseBox = $('house-box');
+
+    if (isHogwarts) {
+      schoolBox.classList.add('hogwarts-fade-out');
+      majorBox.classList.add('hogwarts-fade-out');
+      profBox.classList.add('hogwarts-fade-out');
+      schoolBox.style.display = 'none';
+      majorBox.style.display = 'none';
+      profBox.style.display = 'none';
+
+      if (state.house) {
+        houseBox.style.display = '';
+        houseBox.classList.add('hogwarts-fade-in');
+        const hc = HOUSE_COLORS[state.house] || { primary: '#9B59B6', secondary: '#9B59B6', text: '#9B59B6' };
+        houseBox.style.setProperty('--house-gradient', `linear-gradient(to right, ${hc.primary}, ${hc.secondary})`);
+        houseBox.style.background = `linear-gradient(135deg, ${hc.primary}18 0%, var(--card-2) 60%)`;
+        $('house-display').textContent = HOUSE_NAMES[state.house] || state.house;
+        $('house-display').style.color = hc.text;
+        const houseLabel = houseBox.querySelector('.hogwarts-house-label');
+        if (houseLabel) houseLabel.style.color = hc.primary;
+      } else {
+        houseBox.style.display = 'none';
+      }
+    } else {
+      schoolBox.classList.remove('hogwarts-fade-out');
+      majorBox.classList.remove('hogwarts-fade-out');
+      profBox.classList.remove('hogwarts-fade-out');
+      houseBox.classList.remove('hogwarts-fade-in');
+      houseBox.style.display = 'none';
+
+      if (state.school && state.school !== '无') {
+        schoolBox.style.display = '';
+        $('school-display').textContent = state.school;
+      } else {
+        schoolBox.style.display = 'none';
+      }
+
+      majorBox.style.display = '';
+      $('major-display').textContent = state.major || '未定';
+
+      if (state.profession && !STUDENT_PHASES.has(state.profession)) {
+        profBox.style.display = '';
+        $('profession-display').textContent = state.profession;
+      } else {
+        profBox.style.display = 'none';
       }
     }
 
-    const schoolBox = $('school-box');
-    if (state.school && state.school !== '无') {
-      schoolBox.style.display = '';
-      $('school-display').textContent = state.school;
-    } else {
-      schoolBox.style.display = 'none';
-    }
-
-    $('major-display').textContent = state.major || '未定';
     $('relationship-display').textContent = (state.talentIds.has(3036) && state.relationship === '暧昧')
       ? '？？？'
       : (state.relationship || '单身');
-
-    const profBox = $('profession-box');
-    if (state.profession && !STUDENT_PHASES.has(state.profession)) {
-      profBox.style.display = '';
-      $('profession-display').textContent = state.profession;
-    } else {
-      profBox.style.display = 'none';
-    }
 
     const slBox = $('storyline-box');
     if (state.storyline) {
       slBox.style.display = '';
       const isHidden = HIDDEN_STORYLINES.has(state.storyline);
-      slBox.classList.toggle('hidden-storyline', isHidden);
+      slBox.classList.toggle('hidden-storyline', isHidden && !isHogwarts);
       slBox.classList.toggle('special-storyline', !isHidden);
-      slBox.querySelector('.storyline-label').textContent = isHidden ? '隐藏剧情' : '特殊剧情';
+      slBox.classList.toggle('hogwarts-storyline', isHogwarts);
+      slBox.querySelector('.storyline-label').textContent = isHogwarts ? '魔法世界' : (isHidden ? '隐藏剧情' : '特殊剧情');
       $('storyline-display').textContent = STORYLINE_NAMES[state.storyline] || state.storyline;
     } else {
       slBox.style.display = 'none';
+      slBox.classList.remove('hogwarts-storyline');
     }
 
     const debutBox = $('debut-box');
@@ -2666,10 +3070,11 @@ function render() {
             descEl.textContent = c.desc;
             btn.appendChild(descEl);
           }
-          if (c.requireText) {
+          if (c.requireText || (locked && c.requireExpr)) {
             const reqEl = document.createElement('div');
             reqEl.className = 'choice-req' + (locked ? ' locked' : ' met');
-            reqEl.textContent = (locked ? '🔒 ' : '✓ ') + c.requireText;
+            const hintText = c.requireText || _parseRequireHint(c.requireExpr);
+            reqEl.textContent = (locked ? '🔒 ' : '✓ ') + hintText;
             btn.appendChild(reqEl);
           }
         } else {
@@ -2705,6 +3110,7 @@ function render() {
 
   updateAutoButtons();
   if (_mobileStatsStripUpdate) _mobileStatsStripUpdate();
+  if (_mobileStatsGridUpdate) _mobileStatsGridUpdate();
 }
 
 function updateAutoButtons() {
@@ -2760,6 +3166,8 @@ function initGame() {
   state.statPeaks = {};
   state.storylinesVisited = new Set();
   state.choiceHistory = [];
+  state.milestones = [];
+  state.cardHistory = [];
   _endCinematicShown = false;
   applyTalentEffects();
   clampStats();
@@ -2787,6 +3195,12 @@ function initGame() {
 
   showScreen('game-screen');
   render();
+
+  // Multiplayer: show opponent bar & broadcast initial state
+  if (mp.enabled && mp.connected) {
+    _broadcastState();
+    _renderOpponentBar();
+  }
 }
 
 let _endCinematicShown = false;
@@ -2869,8 +3283,8 @@ function calculateScore() {
   if (peaks.cul) score += peaks.cul * 20;
 
   // Education bonus
-  if (state.school === 'T20') score += 1000;
-  else if (state.school === 'T50') score += 500;
+  if (state.schoolTier === 'top' || state.school === 'T20') score += 1000;
+  else if (state.schoolTier === 'mid' || state.school === 'T50') score += 500;
   else if (state.school === '遣返' || state.school === '退学') score -= 1000;
 
   // Storyline / Hidden Paths
@@ -2968,6 +3382,84 @@ function animateScore(targetScore) {
     }
   }
   requestAnimationFrame(update);
+}
+
+// ── Title / Badge System ─────────────────────────────────────────────────────
+const TITLE_DEFS = [
+  // 属性类
+  { id: 'max_int', icon: '🧠', name: '学霸传奇', check: () => state.INT >= 10 },
+  { id: 'max_soc', icon: '🦋', name: '社交蝴蝶', check: () => state.SOC >= 10 },
+  { id: 'max_mny', icon: '💰', name: '富可敌国', check: () => state.MNY >= 10 },
+  { id: 'max_per', icon: '🔥', name: '钢铁意志', check: () => state.PER >= 10 },
+  { id: 'max_hlt', icon: '💪', name: '铁人体魄', check: () => state.HLT >= 10 },
+  { id: 'max_app', icon: '✨', name: '倾国倾城', check: () => state.APP >= 10 },
+  { id: 'all_high', icon: '👑', name: '人生赢家', check: () => ['SOC','INT','MNY','PER','HLT','APP'].every(k => state[k] >= 7) },
+  { id: 'all_max', icon: '🌟', name: '完美人类', check: () => ['SOC','INT','MNY','PER','HLT','APP'].every(k => state[k] >= 10) },
+  // 学校类
+  { id: 'top_school', icon: '🎓', name: '名校光环', check: () => state.schoolTier === 'top' },
+  { id: 'grad_school', icon: '📚', name: '学术深造', check: () => state.firedEvents && [...state.firedEvents].some(id => id >= 10700 && id <= 10799) },
+  // 恋爱类
+  { id: 'married', icon: '💍', name: '修成正果', check: () => state.relationship === '已婚' || state.relationship === '二婚' },
+  { id: 'sea_king', icon: '🌊', name: '渣王/渣后', check: () => state.relationship === '海王' || state.relationship === '海后' },
+  { id: 'forever_single', icon: '🐕', name: '单身贵族', check: () => state.relationship === '单身' && state.age >= 35 },
+  // 剧情类
+  { id: 'multi_storyline', icon: '📖', name: '剧情收集者', check: () => state.storylinesVisited && state.storylinesVisited.size >= 2 },
+  { id: 'hidden_explorer', icon: '🕵️', name: '暗面行者', check: () => state.storylinesVisited && [...state.storylinesVisited].some(s => HIDDEN_STORYLINES.has(s)) },
+  // 生存类
+  { id: 'long_life', icon: '🧓', name: '长命百岁', check: () => state.age >= 60 },
+  { id: 'young_death', icon: '💀', name: '英年早逝', check: () => state.age <= 25 && state.phase === 'ended' },
+  { id: 'happy_life', icon: '😊', name: '快乐至上', check: () => state.HAP >= 9 },
+  { id: 'sad_life', icon: '😢', name: '苦中作乐', check: () => state.HAP <= 2 && state.age >= 30 },
+  // 职业类
+  { id: 'ceo', icon: '🏢', name: '商界大佬', check: () => state.profession && (state.profession.includes('CEO') || state.profession.includes('合伙人') || state.profession.includes('创始人')) },
+  { id: 'doctor', icon: '⚕️', name: '悬壶济世', check: () => state.profession && (state.profession.includes('主治') || state.profession.includes('主任') || state.profession.includes('医生')) },
+  // 特殊
+  { id: 'broke_happy', icon: '🤡', name: '穷开心', check: () => state.MNY <= 2 && state.HAP >= 8 },
+  { id: 'rich_sad', icon: '😞', name: '富贵闲愁', check: () => state.MNY >= 8 && state.HAP <= 3 },
+];
+
+function _computeTitles() {
+  return TITLE_DEFS.filter(t => {
+    try { return t.check(); } catch (e) { return false; }
+  });
+}
+
+function _renderTitles(titles) {
+  const el = $('summary-titles');
+  if (!el) return;
+  if (titles.length === 0) { el.innerHTML = ''; return; }
+
+  // Pre-defined scattered positions (percentage-based, avoid center content)
+  const POSITIONS = [
+    { top: '2%', left: '3%', rotate: -12 },
+    { top: '5%', right: '4%', rotate: 8 },
+    { top: '15%', left: '1%', rotate: -5 },
+    { top: '18%', right: '2%', rotate: 15 },
+    { top: '30%', left: '2%', rotate: -18 },
+    { top: '28%', right: '3%', rotate: 6 },
+    { top: '42%', left: '1%', rotate: 10 },
+    { top: '45%', right: '1%', rotate: -8 },
+    { top: '55%', left: '3%', rotate: -14 },
+    { top: '58%', right: '4%', rotate: 12 },
+    { top: '68%', left: '2%', rotate: 7 },
+    { top: '72%', right: '2%', rotate: -10 },
+  ];
+
+  el.innerHTML = '';
+  titles.forEach((t, i) => {
+    const pos = POSITIONS[i % POSITIONS.length];
+    const badge = document.createElement('div');
+    badge.className = 'title-badge';
+    badge.innerHTML = `<span class="title-icon">${t.icon}</span><span class="title-name">${t.name}</span>`;
+    badge.style.position = 'absolute';
+    badge.style.top = pos.top || 'auto';
+    badge.style.bottom = pos.bottom || 'auto';
+    badge.style.left = pos.left || 'auto';
+    badge.style.right = pos.right || 'auto';
+    badge.style.setProperty('--badge-rotate', `${pos.rotate}deg`);
+    badge.style.animationDelay = `${0.5 + i * 0.2}s`;
+    el.appendChild(badge);
+  });
 }
 
 function renderSummary() {
@@ -3112,6 +3604,622 @@ function renderSummary() {
     <div class="meta-row"><span class="meta-k">触发剧情</span><span class="meta-v">${visited.length} 条</span></div>
     <div class="meta-row"><span class="meta-k">死因</span><span class="meta-v">${ageDeath ? '健康崩溃' : (state.age >= 60 ? '善终退休' : '剧情结局')}</span></div>
   `;
+
+  // ── Flowchart nudge: show if new nodes unlocked this session ──
+  const fcNewCount = getSessionUnlocks();
+  const existingNudge = document.getElementById('fc-nudge');
+  if (existingNudge) existingNudge.remove();
+  if (fcNewCount > 0) {
+    const nudge = document.createElement('div');
+    nudge.id = 'fc-nudge';
+    nudge.className = 'fc-nudge';
+    nudge.innerHTML = `<span class="fc-nudge-icon">🗺️</span> 本局解锁了 <strong>${fcNewCount}</strong> 个新命运节点 <button class="fc-nudge-btn" id="fc-nudge-go">去看看 →</button>`;
+    const wrap = document.querySelector('.summary-wrap');
+    if (wrap) wrap.insertBefore(nudge, wrap.querySelector('.summary-grid'));
+    const goBtn = $('fc-nudge-go');
+    if (goBtn) goBtn.addEventListener('click', () => { openFlowchart(); });
+  }
+
+  // ── MP: broadcast end data & show VS button ──
+  if (mp.enabled) {
+    _mpBroadcastEndData();
+    const vsBtn = $('btn-mp-vs');
+    if (vsBtn) vsBtn.style.display = '';
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Multiplayer VS Comparison
+   ═══════════════════════════════════════════════════════════════ */
+
+// ── 趣味称号定义 ──
+// condition(me, opp) → 'me' | 'opp' | 'both' | null
+const MP_AWARDS = [
+  {
+    id: 'early_death', icon: '💀', name: '英年早逝奖',
+    desc: '更早告别人世',
+    condition: (me, opp) => {
+      if (me.age === opp.age) return null;
+      return me.age < opp.age ? 'me' : 'opp';
+    },
+  },
+  {
+    id: 'longevity', icon: '🐢', name: '长寿之星',
+    desc: '活得最久的那个',
+    condition: (me, opp) => {
+      if (me.age >= 55 && opp.age >= 55) return 'both';
+      if (me.age >= 55) return 'me';
+      if (opp.age >= 55) return 'opp';
+      return null;
+    },
+  },
+  {
+    id: 'solo_king', icon: '🐕', name: '母胎solo奖',
+    desc: '至死没脱单',
+    condition: (me, opp) => {
+      const meS = me.relationship === '单身';
+      const oppS = opp.relationship === '单身';
+      if (meS && oppS) return 'both';
+      if (meS) return 'me';
+      if (oppS) return 'opp';
+      return null;
+    },
+  },
+  {
+    id: 'sea_king', icon: '🌊', name: '海王/海后',
+    desc: '感情里的多面手',
+    condition: (me, opp) => {
+      const meH = me.relationship === '海王' || me.relationship === '海后';
+      const oppH = opp.relationship === '海王' || opp.relationship === '海后';
+      if (meH && oppH) return 'both';
+      if (meH) return 'me';
+      if (oppH) return 'opp';
+      return null;
+    },
+  },
+  {
+    id: 'brain', icon: '🧠', name: '学霸担当',
+    desc: '智力值最高',
+    condition: (me, opp) => {
+      if (me.stats.INT === opp.stats.INT) return null;
+      return me.stats.INT > opp.stats.INT ? 'me' : 'opp';
+    },
+  },
+  {
+    id: 'rich', icon: '💰', name: '人生赢家',
+    desc: '最有钱的那个',
+    condition: (me, opp) => {
+      if (me.stats.MNY === opp.stats.MNY) return null;
+      return me.stats.MNY > opp.stats.MNY ? 'me' : 'opp';
+    },
+  },
+  {
+    id: 'broke', icon: '📉', name: '最惨打工人',
+    desc: '家境垫底',
+    condition: (me, opp) => {
+      if (me.stats.MNY <= 1 && opp.stats.MNY <= 1) return 'both';
+      if (me.stats.MNY <= 1) return 'me';
+      if (opp.stats.MNY <= 1) return 'opp';
+      return null;
+    },
+  },
+  {
+    id: 'pretty', icon: '✨', name: '颜值巅峰',
+    desc: '最好看的那位',
+    condition: (me, opp) => {
+      if (me.stats.APP === opp.stats.APP) return null;
+      return me.stats.APP > opp.stats.APP ? 'me' : 'opp';
+    },
+  },
+  {
+    id: 'social_butterfly', icon: '🦋', name: '社交达人',
+    desc: '社交能力碾压',
+    condition: (me, opp) => {
+      if (me.stats.SOC >= 8 && me.stats.SOC > opp.stats.SOC + 3) return 'me';
+      if (opp.stats.SOC >= 8 && opp.stats.SOC > me.stats.SOC + 3) return 'opp';
+      return null;
+    },
+  },
+  {
+    id: 'drama_king', icon: '🎭', name: '戏精本精',
+    desc: '经历剧情线最多',
+    condition: (me, opp) => {
+      const meC = (me.storylinesVisited || []).length;
+      const oppC = (opp.storylinesVisited || []).length;
+      if (meC === oppC) return null;
+      return meC > oppC ? 'me' : 'opp';
+    },
+  },
+  {
+    id: 'happy', icon: '😁', name: '快乐肥宅',
+    desc: '快乐值爆表',
+    condition: (me, opp) => {
+      if (me.stats.HAP >= 9 && opp.stats.HAP >= 9) return 'both';
+      if (me.stats.HAP >= 9) return 'me';
+      if (opp.stats.HAP >= 9) return 'opp';
+      return null;
+    },
+  },
+  {
+    id: 'miserable', icon: '😭', name: '人间不值得',
+    desc: '快乐值见底',
+    condition: (me, opp) => {
+      if (me.stats.HAP <= 1 && opp.stats.HAP <= 1) return 'both';
+      if (me.stats.HAP <= 1) return 'me';
+      if (opp.stats.HAP <= 1) return 'opp';
+      return null;
+    },
+  },
+  {
+    id: 'tough', icon: '💪', name: '钢铁意志',
+    desc: '毅力值最高',
+    condition: (me, opp) => {
+      if (me.stats.PER >= 9 && me.stats.PER > opp.stats.PER) return 'me';
+      if (opp.stats.PER >= 9 && opp.stats.PER > me.stats.PER) return 'opp';
+      return null;
+    },
+  },
+  {
+    id: 'glass', icon: '🫙', name: '玻璃心体质',
+    desc: '健康值见底',
+    condition: (me, opp) => {
+      if (me.stats.HLT <= 0 && opp.stats.HLT <= 0) return 'both';
+      if (me.stats.HLT <= 0) return 'me';
+      if (opp.stats.HLT <= 0) return 'opp';
+      return null;
+    },
+  },
+  {
+    id: 'allrounder', icon: '🌟', name: '六边形战士',
+    desc: '六维均衡且全部≥6',
+    condition: (me, opp) => {
+      const base = ['SOC','INT','MNY','PER','HLT','APP'];
+      const meOk = base.every(k => (me.stats[k] || 0) >= 6);
+      const oppOk = base.every(k => (opp.stats[k] || 0) >= 6);
+      if (meOk && oppOk) return 'both';
+      if (meOk) return 'me';
+      if (oppOk) return 'opp';
+      return null;
+    },
+  },
+  {
+    id: 'top_school', icon: '🎓', name: '名校光环',
+    desc: '学校tier最高',
+    condition: (me, opp) => {
+      const tierRank = { top: 3, mid: 2, low: 1, '': 0 };
+      const meR = tierRank[me.schoolTier] || 0;
+      const oppR = tierRank[opp.schoolTier] || 0;
+      if (meR === oppR) return null;
+      return meR > oppR ? 'me' : 'opp';
+    },
+  },
+  {
+    id: 'score_king', icon: '🏆', name: '总分之王',
+    desc: '人生综合评分最高',
+    condition: (me, opp) => {
+      if (Math.abs(me.score - opp.score) < 200) return null;
+      return me.score > opp.score ? 'me' : 'opp';
+    },
+  },
+];
+
+function _mpCollectAwards(me, opp) {
+  const myAwards = [];
+  const oppAwards = [];
+  for (const a of MP_AWARDS) {
+    const winner = a.condition(me, opp);
+    if (winner === 'me' || winner === 'both') myAwards.push(a);
+    if (winner === 'opp' || winner === 'both') oppAwards.push(a);
+  }
+  return { myAwards, oppAwards };
+}
+
+function _mpRenderAwards(me, opp) {
+  const { myAwards, oppAwards } = _mpCollectAwards(me, opp);
+  // Cap at 4 each
+  const myShow = myAwards.slice(0, 4);
+  const oppShow = oppAwards.slice(0, 4);
+  const renderList = (list) => list.length === 0
+    ? '<div class="award-empty">无称号</div>'
+    : list.map(a => `
+        <div class="award-chip">
+          <span class="award-icon">${a.icon}</span>
+          <div class="award-text">
+            <span class="award-name">${a.name}</span>
+            <span class="award-desc">${a.desc}</span>
+          </div>
+        </div>
+      `).join('');
+
+  return `
+    <div class="mp-vs-awards-title">🏅 颁奖典礼</div>
+    <div class="mp-vs-awards-cols">
+      <div class="mp-vs-awards-col left">
+        <div class="awards-col-name">${me.nickname}</div>
+        ${renderList(myShow)}
+      </div>
+      <div class="mp-vs-awards-col right">
+        <div class="awards-col-name">${opp.nickname}</div>
+        ${renderList(oppShow)}
+      </div>
+    </div>
+  `;
+}
+
+function _mpBuildMySnapshot() {
+  const score = calculateScore();
+  const ageDeath = state.HLT <= -5;
+  return {
+    nickname: mp.myNickname || '我',
+    age: state.age, month: state.monthOfYear,
+    score,
+    sex: state.sex,
+    school: state.school || '无',
+    schoolTier: state.schoolTier || '',
+    major: state.major || '未定',
+    profession: state.profession || '未定',
+    relationship: state.relationship || '单身',
+    country: state.country || '',
+    storylinesVisited: [...(state.storylinesVisited || [])],
+    endingId: state.endingId || null,
+    deathCause: ageDeath ? '健康崩溃' : (state.age >= 60 ? '善终退休' : '剧情结局'),
+    stats: {
+      SOC: state.SOC || 0, INT: state.INT || 0, MNY: state.MNY || 0,
+      PER: state.PER || 0, HLT: state.HLT || 0, APP: state.APP || 0, HAP: state.HAP || 0,
+    },
+    peaks: { ...(state.statPeaks || {}) },
+    talentNames: (state.talentsPicked || []).map(t => t.name),
+    milestones: [...(state.milestones || [])],
+    cardHistory: [...(state.cardHistory || [])],
+    // Avatar state for rendering
+    avatarState: {
+      sex: state.sex, skinTone: state.skinTone,
+      faceVariant: state.faceVariant, topVariant: state.topVariant,
+      bottomVariant: state.bottomVariant, outfitColorId: state.outfitColorId,
+      SOC: state.SOC, INT: state.INT, MNY: state.MNY,
+      PER: state.PER, HLT: state.HLT, APP: state.APP, HAP: state.HAP,
+      school: state.school, profession: state.profession, storyline: state.storyline,
+    },
+  };
+}
+
+function _mpBroadcastEndData() {
+  _mpMyEndData = _mpBuildMySnapshot();
+  if (mp.connected && mpSend) {
+    mpSend('game_end', _mpMyEndData);
+  }
+}
+
+function _mpShowVsComparison() {
+  const me = _mpMyEndData;
+  const opp = _mpOppEndData;
+  if (!me) return;
+
+  const ov = $('mp-vs-overlay');
+  if (!ov) return;
+  ov.style.display = '';
+
+  // Subtitle
+  const sub = $('mp-vs-subtitle');
+  if (opp) {
+    sub.textContent = `${me.nickname} vs ${opp.nickname} — 谁的人生更精彩？`;
+  } else {
+    sub.textContent = `对方还在奋斗中…对比数据使用最后同步的状态`;
+  }
+
+  // ── Avatars ──
+  $('mp-vs-name-me').textContent = me.nickname;
+  $('mp-vs-age-me').textContent = `${me.age}岁${me.month}个月`;
+  $('mp-vs-score-me').textContent = me.score + '分';
+
+  // Render my avatar
+  const myCanvas = $('mp-vs-avatar-me');
+  if (myCanvas) renderAvatar(myCanvas, me.avatarState);
+
+  if (opp) {
+    $('mp-vs-name-opp').textContent = opp.nickname;
+    $('mp-vs-age-opp').textContent = `${opp.age}岁${opp.month || 1}个月`;
+    $('mp-vs-score-opp').textContent = (opp.score || 0) + '分';
+    // Render opponent avatar
+    const oppCanvas = $('mp-vs-avatar-opp');
+    if (oppCanvas && opp.avatarState) renderAvatar(oppCanvas, opp.avatarState);
+  } else {
+    // Use last synced opponent data
+    $('mp-vs-name-opp').textContent = mp.opponent.nickname || '对手';
+    $('mp-vs-age-opp').textContent = `${mp.opponent.age || '?'}岁`;
+    $('mp-vs-score-opp').textContent = '进行中…';
+  }
+
+  // ── Relation badge ──
+  const rel = mp.relation || 0;
+  const relBadge = $('mp-vs-relation-badge');
+  const relCls = rel > 20 ? 'pos' : rel < -20 ? 'neg' : 'neutral';
+  relBadge.className = 'mp-vs-relation-badge ' + relCls;
+  relBadge.textContent = `好感度 ${rel > 0 ? '+' : ''}${rel}`;
+
+  // ── Stats bars ──
+  const statsKeys = ['SOC', 'INT', 'MNY', 'PER', 'HLT', 'APP', 'HAP'];
+  const oppStats = opp ? opp.stats : (mp.opponent.stats || {});
+  const statsEl = $('mp-vs-stats');
+  const maxStat = 15; // for bar width scaling
+  statsEl.innerHTML = statsKeys.map(k => {
+    const myVal = me.stats[k] || 0;
+    const oppVal = oppStats[k] || 0;
+    // Treat negative values: bar shows absolute magnitude, minimum 5% so there's something visible
+    const myPct = Math.min(100, Math.max(5, (Math.abs(myVal) / maxStat) * 100));
+    const oppPct = Math.min(100, Math.max(5, (Math.abs(oppVal) / maxStat) * 100));
+    const myWin = myVal > oppVal;
+    const oppWin = oppVal > myVal;
+    const myNeg = myVal < 0;
+    const oppNeg = oppVal < 0;
+    return `<div class="mp-vs-stat-row">
+      <div class="mp-vs-bar-cell left">
+        <span class="mp-vs-val-label${myNeg ? ' neg' : ''}">${myWin ? '👑 ' : ''}${myVal}</span>
+        <div class="mp-vs-bar-track">
+          <div class="mp-vs-bar${myNeg ? ' neg' : ''}" style="width:${myPct}%"></div>
+        </div>
+      </div>
+      <div class="mp-vs-stat-label">${STAT_LABELS[k]}</div>
+      <div class="mp-vs-bar-cell right">
+        <div class="mp-vs-bar-track">
+          <div class="mp-vs-bar${oppNeg ? ' neg' : ''}" style="width:${oppPct}%"></div>
+        </div>
+        <span class="mp-vs-val-label${oppNeg ? ' neg' : ''}">${oppVal}${oppWin ? ' 👑' : ''}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // ── Life comparison ──
+  const oppData = opp || {};
+  const lifeEl = $('mp-vs-life');
+  const rows = [
+    ['学校', me.school, oppData.school || mp.opponent.school || '—'],
+    ['专业', me.major, oppData.major || mp.opponent.major || '未定'],
+    ['职业', me.profession, oppData.profession || mp.opponent.profession || '—'],
+    ['恋爱', me.relationship, oppData.relationship || mp.opponent.relationship || '单身'],
+    ['活到', `${me.age}岁`, opp ? `${opp.age}岁` : '进行中'],
+    ['死因', me.deathCause, oppData.deathCause || '—'],
+  ];
+  lifeEl.innerHTML = `
+    <div class="mp-vs-life-card">
+      <div class="lc-label">人生轨迹</div>
+      ${rows.map(([label, myV, oppV]) => `
+        <div class="lc-row">
+          <span class="lc-val-me">${myV}</span>
+          <span class="lc-vs">${label}</span>
+          <span class="lc-val-opp">${oppV}</span>
+        </div>
+      `).join('')}
+    </div>
+    <div class="mp-vs-life-card">
+      <div class="lc-label">天赋对比</div>
+      ${(() => {
+        const myT = me.talentNames || [];
+        const oppT = oppData.talentNames || [];
+        const maxLen = Math.max(myT.length, oppT.length, 1);
+        let html = '';
+        for (let i = 0; i < maxLen; i++) {
+          html += `<div class="lc-row">
+            <span class="lc-val-me">${myT[i] || '—'}</span>
+            <span class="lc-vs">天赋${i+1}</span>
+            <span class="lc-val-opp">${oppT[i] || '—'}</span>
+          </div>`;
+        }
+        return html;
+      })()}
+    </div>
+  `;
+
+  // ── Awards ──
+  let awardsEl = document.getElementById('mp-vs-awards');
+  if (!awardsEl) {
+    awardsEl = document.createElement('div');
+    awardsEl.id = 'mp-vs-awards';
+    awardsEl.className = 'mp-vs-awards';
+    // Insert before commentary
+    const comEl = $('mp-vs-commentary');
+    comEl.parentNode.insertBefore(awardsEl, comEl);
+  }
+  if (opp) {
+    awardsEl.innerHTML = _mpRenderAwards(me, opp);
+    awardsEl.style.display = '';
+  } else {
+    awardsEl.style.display = 'none';
+  }
+
+  // ── Timeline ──
+  let tlEl = document.getElementById('mp-vs-timeline');
+  if (!tlEl) {
+    tlEl = document.createElement('div');
+    tlEl.id = 'mp-vs-timeline';
+    tlEl.className = 'mp-vs-timeline';
+    awardsEl.parentNode.insertBefore(tlEl, awardsEl.nextSibling);
+  }
+  if (opp && me.milestones && opp.milestones) {
+    tlEl.innerHTML = _mpRenderTimeline(me, opp);
+    tlEl.style.display = '';
+  } else {
+    tlEl.style.display = 'none';
+  }
+
+  // ── Card recap ──
+  let cardEl = document.getElementById('mp-vs-cardrecap');
+  if (!cardEl) {
+    cardEl = document.createElement('div');
+    cardEl.id = 'mp-vs-cardrecap';
+    cardEl.className = 'mp-vs-cardrecap';
+    tlEl.parentNode.insertBefore(cardEl, tlEl.nextSibling);
+  }
+  if (me.cardHistory && me.cardHistory.length > 0 || opp && opp.cardHistory && opp.cardHistory.length > 0) {
+    cardEl.innerHTML = _mpRenderCardRecap(me, opp);
+    cardEl.style.display = '';
+  } else {
+    cardEl.style.display = 'none';
+  }
+
+  // ── Commentary ──
+  const comEl = $('mp-vs-commentary');
+  comEl.innerHTML = _mpGenerateCommentary(me, opp || null);
+
+  // ── Relation story ──
+  const rsEl = $('mp-vs-relation-story');
+  rsEl.innerHTML = _mpGenerateRelationStory(rel, me, opp || null);
+}
+
+function _mpGenerateCommentary(me, opp) {
+  const lines = [];
+  let winnerName = '';
+  let loserName = '';
+
+  if (opp) {
+    // Score comparison
+    const scoreDiff = me.score - opp.score;
+    if (Math.abs(scoreDiff) < 500) {
+      winnerName = '🤝 不分伯仲';
+      lines.push('两人的人生精彩程度旗鼓相当，这辈子算是势均力敌。');
+    } else if (scoreDiff > 0) {
+      winnerName = `🏆 ${me.nickname} 胜出！`;
+      if (scoreDiff > 10000) lines.push(`碾压级别的差距。${opp.nickname}，你下辈子加油吧。`);
+      else if (scoreDiff > 5000) lines.push(`${me.nickname}的人生明显更精彩，${opp.nickname}只能仰望。`);
+      else lines.push(`${me.nickname}险胜一筹，但${opp.nickname}也不差。`);
+    } else {
+      winnerName = `🏆 ${opp.nickname} 胜出！`;
+      if (-scoreDiff > 10000) lines.push(`${opp.nickname}把${me.nickname}按在地上摩擦。差距太大了。`);
+      else if (-scoreDiff > 5000) lines.push(`${opp.nickname}的人生更胜一筹，${me.nickname}要反思一下了。`);
+      else lines.push(`${opp.nickname}小幅领先，两人其实很接近。`);
+    }
+
+    // Age comparison
+    const ageDiff = me.age - opp.age;
+    if (ageDiff > 10) lines.push(`${me.nickname}比${opp.nickname}多活了${ageDiff}年，光是活着就已经赢了。`);
+    else if (ageDiff < -10) lines.push(`${opp.nickname}比${me.nickname}多活了${-ageDiff}年。寿命也是一种实力。`);
+    else if (me.age >= 60 && opp.age < 30) lines.push(`${me.nickname}安享晚年，${opp.nickname}英年早逝，令人唏嘘。`);
+    else if (opp.age >= 60 && me.age < 30) lines.push(`${opp.nickname}安享晚年，${me.nickname}英年早逝。活着才是硬道理啊。`);
+
+    // Fun stat comparisons
+    const myTotal = Object.values(me.stats).reduce((a, b) => a + b, 0);
+    const oppTotal = Object.values(opp.stats).reduce((a, b) => a + b, 0);
+    if (myTotal > oppTotal + 15) lines.push(`${me.nickname}在六维属性上全面碾压，这不是重开，这是开挂。`);
+    else if (oppTotal > myTotal + 15) lines.push(`${opp.nickname}属性总和遥遥领先，该不会是转世大佬吧？`);
+
+    if (me.stats.HAP <= 1 && opp.stats.HAP >= 8) lines.push(`${me.nickname}活得痛苦不堪，${opp.nickname}却幸福满满。人生真是不公平。`);
+    else if (opp.stats.HAP <= 1 && me.stats.HAP >= 8) lines.push(`${opp.nickname}一辈子在受苦，${me.nickname}笑到了最后。`);
+
+    if (me.stats.MNY >= 10 && opp.stats.MNY <= 2) lines.push(`${me.nickname}富甲一方，${opp.nickname}穷困潦倒。贫富差距就是这么来的。`);
+    else if (opp.stats.MNY >= 10 && me.stats.MNY <= 2) lines.push(`${opp.nickname}财务自由，${me.nickname}还在吃土。钱不是万能的，但没钱是万万不能的。`);
+
+    // Relationship
+    if (me.relationship === '单身' && opp.relationship === '已婚') lines.push(`${opp.nickname}人生圆满步入婚姻，${me.nickname}至死母胎solo。`);
+    else if (opp.relationship === '单身' && me.relationship === '已婚') lines.push(`${me.nickname}成家立业了，${opp.nickname}一辈子没脱单，建议下辈子刷颜值。`);
+    else if (me.relationship === '海王' && opp.relationship === '海王') lines.push('两人都是海王/海后，这场聚会怕不是大型修罗场。');
+    else if (me.relationship === '单身' && opp.relationship === '单身') lines.push('两个人都是单身狗，至少你们还有彼此（并没有）。');
+  } else {
+    winnerName = '⏳ 对方还在奋斗…';
+    lines.push(`${me.nickname}已经结束了人生，但对方还在继续。耐心等待最终对比吧。`);
+  }
+
+  // Pick 2-3 random lines (keep first, shuffle rest)
+  const picked = [lines[0]];
+  const rest = lines.slice(1).sort(() => Math.random() - 0.5).slice(0, 2);
+  picked.push(...rest);
+
+  return `
+    <div class="vc-title">最终裁决</div>
+    <div class="vc-winner">${winnerName}</div>
+    ${picked.map(l => `<div class="vc-line">${l}</div>`).join('')}
+  `;
+}
+
+function _mpGenerateRelationStory(relation, me, opp) {
+  let title, desc, cls;
+  if (relation >= 80) {
+    title = '💕 挚友·灵魂伴侣'; cls = 'pos';
+    desc = '两人惺惺相惜，即使人生道路不同，心始终在一起。这是跨越时空的友谊。';
+  } else if (relation >= 50) {
+    title = '🤝 铁哥们/闺蜜'; cls = 'pos';
+    desc = '虽然偶有摩擦，但在关键时刻总是互相扶持。这份友情经得起考验。';
+  } else if (relation >= 20) {
+    title = '😊 不错的朋友'; cls = 'pos';
+    desc = '说不上多亲密，但绝对是靠谱的朋友。毕业多年后还会偶尔联系。';
+  } else if (relation >= -20) {
+    title = '😐 点头之交'; cls = 'neutral';
+    desc = '见面打个招呼，但也仅此而已。同学群里潜水的那种关系。';
+  } else if (relation >= -50) {
+    title = '😤 互看不爽'; cls = 'neg';
+    desc = '暗地里互相较劲，谁过得更好就在朋友圈炫耀。标准的塑料同学情。';
+  } else if (relation >= -80) {
+    title = '🔥 宿敌'; cls = 'neg';
+    desc = '见面就掐，不见面也要在背后嘀咕。这辈子的冤家，下辈子最好别再碰到。';
+  } else {
+    title = '💀 不共戴天'; cls = 'neg';
+    desc = '关系已经恶化到无法修复。如果有来生，请投胎到不同星球。';
+  }
+
+  return `
+    <div class="rs-title">你们的关系</div>
+    <div class="rs-val ${cls}">${relation > 0 ? '+' : ''}${relation}</div>
+    <div class="rs-label">${title}</div>
+    <div class="rs-desc">${desc}</div>
+  `;
+}
+
+// ── Timeline render ──
+function _mpRenderTimeline(me, opp) {
+  const myMs = me.milestones || [];
+  const oppMs = opp.milestones || [];
+  if (myMs.length === 0 && oppMs.length === 0) return '';
+
+  // Merge all ages and sort
+  const allAges = new Set([...myMs.map(m => m.age), ...oppMs.map(m => m.age)]);
+  const sorted = [...allAges].sort((a, b) => a - b);
+
+  const myByAge = {};
+  for (const m of myMs) { if (!myByAge[m.age]) myByAge[m.age] = []; myByAge[m.age].push(m); }
+  const oppByAge = {};
+  for (const m of oppMs) { if (!oppByAge[m.age]) oppByAge[m.age] = []; oppByAge[m.age].push(m); }
+
+  const typeIcons = {
+    school: '🎓', overseas: '✈️', major: '📚', storyline: '🎭',
+    relationship: '💕', ending: '🏁',
+  };
+
+  let html = `<div class="tl-title">📜 人生时间线</div><div class="tl-body">`;
+  for (const age of sorted) {
+    const myItems = myByAge[age] || [];
+    const oppItems = oppByAge[age] || [];
+    html += `<div class="tl-row">`;
+    html += `<div class="tl-left">${myItems.map(m => `<span class="tl-item me">${typeIcons[m.type] || '•'} ${m.text}</span>`).join('')}</div>`;
+    html += `<div class="tl-center"><span class="tl-dot"></span><span class="tl-age">${age}岁</span></div>`;
+    html += `<div class="tl-right">${oppItems.map(m => `<span class="tl-item opp">${typeIcons[m.type] || '•'} ${m.text}</span>`).join('')}</div>`;
+    html += `</div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+// ── Card recap render ──
+// Only use MY cardHistory (it already has both sent & received from my perspective).
+// Don't merge opponent's — it would duplicate every event with swapped directions.
+function _mpRenderCardRecap(me, opp) {
+  const cards = (me.cardHistory || []).slice().sort((a, b) => a.age - b.age || (a.month || 0) - (b.month || 0));
+  if (cards.length === 0) return '';
+
+  const oppName = (opp && opp.nickname) || '对手';
+  let html = `<div class="cr-title">🎴 损友卡战报</div><div class="cr-list">`;
+  for (const c of cards) {
+    const isSent = c.direction === 'sent';
+    const fromName = isSent ? me.nickname : oppName;
+    const toName = isSent ? oppName : me.nickname;
+    html += `<div class="cr-item ${c.direction}">
+      <span class="cr-age">${c.age}岁</span>
+      <span class="cr-who">${fromName}</span>
+      <span class="cr-dir">${isSent ? '→' : '←'}</span>
+      <span class="cr-target">${toName}</span>
+      <span class="cr-card">${c.cardName || c.cardId}</span>
+    </div>`;
+  }
+  html += `</div>`;
+  return html;
 }
 
 function showScreen(id) {
@@ -3125,6 +4233,17 @@ function showScreen(id) {
 }
 
 let _mobileStatsStripUpdate = null;
+let _mobileStatsGridUpdate = null;
+
+// Re-run mobile layout when window resizes (e.g. browser DevTools toggle)
+let _resizeTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(_resizeTimer);
+  _resizeTimer = setTimeout(() => {
+    const inGame = document.body.classList.contains('in-game');
+    if (inGame) rearrangeMobileLayout(true);
+  }, 200);
+});
 
 function initStripDrag(el) {
   let isDown = false, startX, scrollLeft;
@@ -3154,12 +4273,25 @@ function rearrangeMobileLayout(entering) {
   if (!leftPanel || !rightHead || !gameLayout) return;
 
   if (entering && isMobile) {
-    leftPanel.insertBefore(rightHead, leftPanel.children[1]);
+    // 创建属性 grid（替代原来的按钮区，放在头像右侧）
+    if (!leftPanel.querySelector('.mobile-stats-grid')) {
+      const grid = document.createElement('div');
+      grid.className = 'mobile-stats-grid';
+      leftPanel.appendChild(grid);
+      _mobileStatsGridUpdate = () => updateMobileStatsGrid(grid);
+      _mobileStatsGridUpdate();
+    }
 
+    // 创建底部条，并把按钮区(right-head)移进来
     if (!gameLayout.querySelector('.mobile-stats-strip')) {
       const strip = document.createElement('div');
       strip.className = 'mobile-stats-strip';
       gameLayout.insertBefore(strip, rightPanel);
+      // 时间 chip 在最左侧
+      const timeChip = document.createElement('div');
+      timeChip.className = 'mp-strip-time';
+      strip.appendChild(timeChip);
+      strip.appendChild(rightHead);   // 按钮区在时间右边
       initStripDrag(strip);
       _mobileStatsStripUpdate = () => updateMobileStatsStrip(strip);
       _mobileStatsStripUpdate();
@@ -3168,153 +4300,293 @@ function rearrangeMobileLayout(entering) {
     if (!gameLayout.querySelector('.mobile-fs-toggle')) {
       const toggle = document.createElement('div');
       toggle.className = 'mobile-fs-toggle';
-      toggle.innerHTML = '<svg class="fs-arrow" viewBox="0 0 28 14"><polyline points="6,12 14,4 22,12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      toggle.innerHTML = '<svg class="fs-arrow" viewBox="0 0 42 14"><polyline points="10,12 21,4 32,12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
       toggle.addEventListener('click', () => {
         gameLayout.classList.toggle('mobile-fs');
       });
       rightPanel.insertBefore(toggle, rightPanel.firstChild);
     }
   } else if (!entering) {
-    if (rightPanel && rightHead.parentElement === leftPanel) {
+    // 还原：把 right-head 放回 right-panel
+    const strip = gameLayout.querySelector('.mobile-stats-strip');
+    if (rightPanel && strip && rightHead.parentElement === strip) {
       rightPanel.insertBefore(rightHead, rightPanel.querySelector('.mobile-fs-toggle') || rightPanel.firstChild);
     }
-    const strip = gameLayout.querySelector('.mobile-stats-strip');
     if (strip) strip.remove();
+    const grid = leftPanel.querySelector('.mobile-stats-grid');
+    if (grid) grid.remove();
     const toggle = rightPanel?.querySelector('.mobile-fs-toggle');
     if (toggle) toggle.remove();
     gameLayout.classList.remove('mobile-fs');
     _mobileStatsStripUpdate = null;
+    _mobileStatsGridUpdate = null;
   }
 }
 
+// Strip 只放时间 chip + 按钮区（right-head 已移入 DOM）
 function updateMobileStatsStrip(strip) {
   if (!strip) return;
+  // 清空除时间chip和right-head外的其他残留
+  Array.from(strip.children).forEach(ch => {
+    if (!ch.classList.contains('right-head') && !ch.classList.contains('mp-strip-time')) ch.remove();
+  });
+  // 更新时间文本
+  const timeChip = strip.querySelector('.mp-strip-time');
+  const timeEl = document.getElementById('time-display');
+  if (timeChip && timeEl) timeChip.textContent = timeEl.textContent;
+}
+
+// 头像右侧的属性 grid：时间 + 2x4 stat 单元格 + 信息 chip 列表
+function updateMobileStatsGrid(grid) {
+  if (!grid) return;
   const s = state;
-  let html = '';
 
   const timeEl = document.getElementById('time-display');
   const timeText = timeEl ? timeEl.textContent : `${s.age}岁`;
-  html += `<div class="ms-chip ms-chip-time"><span class="ms-val">${timeText}</span></div>`;
 
-  const allKeys = [...STAT_KEYS, 'HAP'];
-  for (const k of allKeys) {
+  // 基础 7 项：社/智/家/乐 + 健/毅/颜（HAP 放在第4格）
+  // 触发剧情后追加 career stat 凑成 2x4（用 show* 标志判断）
+  const baseKeys = ['SOC', 'INT', 'MNY', 'HAP', 'HLT', 'PER', 'APP'];
+  const careerKeys = ['POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG'];
+
+  let cellsHtml = '';
+  for (const k of baseKeys) {
     const v = s[k] ?? 0;
     const label = STAT_LABELS[k] || k;
     const pct = Math.max(0, Math.min(100, (v / 30) * 100));
-    html += `<div class="ms-chip"><span class="ms-label">${label}</span><div class="ms-bar"><div class="ms-bar-fill" style="width:${pct}%"></div></div><span class="ms-val">${v}</span></div>`;
+    cellsHtml += `<div class="msg-cell"><span class="msg-label">${label}</span><div class="msg-bar"><div class="msg-bar-fill" style="width:${pct}%"></div></div><span class="msg-val">${v}</span></div>`;
+  }
+  for (const k of careerKeys) {
+    if (s['show' + k]) {
+      const v = s[k] || 0;
+      const label = STAT_LABELS[k] || k;
+      const cap = (k === 'MMR') ? 4000 : 100;
+      const pct = Math.max(0, Math.min(100, (v / cap) * 100));
+      cellsHtml += `<div class="msg-cell career"><span class="msg-label">${label}</span><div class="msg-bar"><div class="msg-bar-fill" style="width:${pct}%"></div></div><span class="msg-val">${v}</span></div>`;
+    }
   }
 
-  if (s.POP != null) html += `<div class="ms-chip"><span class="ms-label">${STAT_LABELS.POP}</span><span class="ms-val">${s.POP}</span></div>`;
-  if (s.POK != null) html += `<div class="ms-chip"><span class="ms-label">${STAT_LABELS.POK}</span><span class="ms-val">${s.POK}</span></div>`;
-  if (s.FIT != null) html += `<div class="ms-chip"><span class="ms-label">${STAT_LABELS.FIT}</span><span class="ms-val">${s.FIT}</span></div>`;
-  if (s.CKL != null) html += `<div class="ms-chip"><span class="ms-label">${STAT_LABELS.CKL}</span><span class="ms-val">${s.CKL}</span></div>`;
-  if (s.ATH != null) html += `<div class="ms-chip"><span class="ms-label">${STAT_LABELS.ATH}</span><span class="ms-val">${s.ATH}</span></div>`;
-  if (s.MMR != null) html += `<div class="ms-chip"><span class="ms-label">${STAT_LABELS.MMR}</span><span class="ms-val">${s.MMR}</span></div>`;
-
+  // 信息 chip 区：专业 / 学校 / 恋爱 / 职业 / 剧情
+  let infoHtml = '';
   const majorEl = document.getElementById('major-display');
-  if (majorEl) html += `<div class="ms-chip ms-chip-info"><span class="ms-label">专业</span><span class="ms-val">${majorEl.textContent}</span></div>`;
-
-  const relEl = document.getElementById('relationship-display');
-  if (relEl) html += `<div class="ms-chip ms-chip-info"><span class="ms-label">恋爱</span><span class="ms-val">${relEl.textContent}</span></div>`;
-
+  if (majorEl) infoHtml += `<div class="msg-info-chip"><span class="msg-info-label">专业</span><span class="msg-info-val">${majorEl.textContent}</span></div>`;
+  // 学校/职业 始终显示，没数据时给占位文案，保证右上区域不留白
   const schoolEl = document.getElementById('school-display');
-  if (schoolEl && schoolEl.parentElement.style.display !== 'none') {
-    html += `<div class="ms-chip ms-chip-info"><span class="ms-label">学校</span><span class="ms-val">${schoolEl.textContent}</span></div>`;
-  }
-
+  const schoolText = schoolEl && schoolEl.parentElement && schoolEl.parentElement.style.display !== 'none'
+    ? schoolEl.textContent : (s.school && s.school !== '无' ? s.school : '在读');
+  infoHtml += `<div class="msg-info-chip"><span class="msg-info-label">学校</span><span class="msg-info-val">${schoolText}</span></div>`;
+  const relEl = document.getElementById('relationship-display');
+  if (relEl) infoHtml += `<div class="msg-info-chip"><span class="msg-info-label">恋爱</span><span class="msg-info-val">${relEl.textContent}</span></div>`;
   const profEl = document.getElementById('profession-display');
-  if (profEl && profEl.parentElement.style.display !== 'none') {
-    html += `<div class="ms-chip ms-chip-info"><span class="ms-label">职业</span><span class="ms-val">${profEl.textContent}</span></div>`;
-  }
-
+  const profText = profEl && profEl.parentElement && profEl.parentElement.style.display !== 'none'
+    ? profEl.textContent : (s.profession || '高中生');
+  infoHtml += `<div class="msg-info-chip"><span class="msg-info-label">职业</span><span class="msg-info-val">${profText}</span></div>`;
   const storyEl = document.getElementById('storyline-display');
-  if (storyEl && storyEl.parentElement.style.display !== 'none') {
-    html += `<div class="ms-chip ms-chip-storyline"><span class="ms-label">剧情</span><span class="ms-val">${storyEl.textContent}</span></div>`;
+  if (storyEl && storyEl.parentElement && storyEl.parentElement.style.display !== 'none') {
+    infoHtml += `<div class="msg-info-chip msg-info-storyline"><span class="msg-info-label">剧情</span><span class="msg-info-val">${storyEl.textContent}</span></div>`;
   }
 
-  strip.innerHTML = html;
+  grid.innerHTML = `
+    <div class="msg-cells">${cellsHtml}</div>
+    ${infoHtml ? `<div class="msg-info">${infoHtml}</div>` : ''}
+  `;
 }
 
 function updateCreationAvatar() {
-  const canvas = $('creation-avatar-canvas');
-  if (canvas) {
-    // Temporarily sync stats for preview
-    for (const k of STAT_KEYS) {
-      state[k] = (state.alloc[k] || 0);
-    }
-    // Also apply talent bonuses to the preview
-    for (const t of state.talentsPicked || []) {
-      if (t.effect) {
-        for (const [k, v] of Object.entries(t.effect)) {
-          if (STAT_KEYS.includes(k)) state[k] = (state[k] || 0) + v;
-        }
+  // Temporarily sync stats for preview
+  for (const k of STAT_KEYS) {
+    state[k] = (state.alloc[k] || 0);
+  }
+  // Also apply talent bonuses to the preview
+  for (const t of state.talentsPicked || []) {
+    if (t.effect) {
+      for (const [k, v] of Object.entries(t.effect)) {
+        if (STAT_KEYS.includes(k)) state[k] = (state[k] || 0) + v;
       }
     }
-    renderAvatar(canvas, state);
+  }
+  for (const id of ['creation-avatar-canvas', 'alloc-avatar-canvas']) {
+    const canvas = $(id);
+    if (canvas) renderAvatar(canvas, state);
   }
 }
 
+// ── 修复 iOS Safari viewport 高度问题 ──────────────────────────────────────
+// iOS Safari 上 URL 栏会让 100vh / 100dvh 计算异常，导致 .app 高度不对，
+// 进游戏一开始下方留白，需要手动滑动一下才会重排。
+// 解决方案：用 visualViewport API（iOS 13+ 支持）实时获取真实可见高度，
+// 直接给 .app 设置 px 高度，比纯 CSS 单位可靠得多。
+function _syncViewportHeight() {
+  // 优先 visualViewport（监听 URL 栏变化最准），fallback innerHeight
+  const h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+  document.documentElement.style.setProperty('--vh', `${h * 0.01}px`);
+  document.documentElement.style.setProperty('--app-height', `${h}px`);
+  // 直接给 .app / .screen 强制高度，绕过浏览器的 vh 计算 bug
+  const app = document.querySelector('.app');
+  if (app) app.style.height = `${h}px`;
+  document.querySelectorAll('.screen').forEach(el => {
+    el.style.height = `${h}px`;
+  });
+}
+
+// 监听各种触发点
+_syncViewportHeight();
+window.addEventListener('resize', _syncViewportHeight);
+window.addEventListener('orientationchange', () => setTimeout(_syncViewportHeight, 100));
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', _syncViewportHeight);
+  window.visualViewport.addEventListener('scroll', _syncViewportHeight);
+}
+// iOS 加载后 URL 栏可能继续动，多次延迟同步保险
+[100, 300, 600, 1200].forEach(ms => setTimeout(_syncViewportHeight, ms));
+// 首帧后再同步一次
+requestAnimationFrame(_syncViewportHeight);
+
+// ── Performance: pause all CSS animations when tab is hidden ──
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    document.body.classList.add('tab-hidden');
+  } else {
+    document.body.classList.remove('tab-hidden');
+  }
+});
+
 async function main() {
   initAchievements();
+  initFlowchart();
+  setFlowchartSfx({
+    onOpen: () => SFX.sfxModalOpen(),
+    onClose: () => SFX.sfxModalClose(),
+    onHover: () => SFX.sfxTick(),
+  });
+  setOnUnlock(() => SFX.sfxAchievement());
+  SFX.initMuteState();
+
+  // Flowchart open buttons
+  const fcStartBtn = $('fc-open-start-btn');
+  if (fcStartBtn) fcStartBtn.addEventListener('click', () => { openFlowchart(); });
+  // Mute button
+  const muteBtn = $('btn-mute');
+  if (muteBtn) {
+    muteBtn.textContent = SFX.isMuted() ? '🔇' : '🔊';
+    muteBtn.addEventListener('click', () => {
+      const next = !SFX.isMuted();
+      SFX.setMuted(next);
+      muteBtn.textContent = next ? '🔇' : '🔊';
+      SFX.sfxToggle();
+    });
+  }
   const talents = await loadData();
+  _allTalents = talents;
 
 
-  $('sex-male').addEventListener('click', () => { state.sex = 0; $('sex-male').classList.add('active'); $('sex-female').classList.remove('active'); updateCreationAvatar(); });
-  $('sex-female').addEventListener('click', () => { state.sex = 1; $('sex-female').classList.add('active'); $('sex-male').classList.remove('active'); updateCreationAvatar(); });
+  $('sex-male').addEventListener('click', () => { SFX.sfxToggleOption(); state.sex = 0; $('sex-male').classList.add('active'); $('sex-female').classList.remove('active'); updateCreationAvatar(); });
+  $('sex-female').addEventListener('click', () => { SFX.sfxToggleOption(); state.sex = 1; $('sex-female').classList.add('active'); $('sex-male').classList.remove('active'); updateCreationAvatar(); });
 
   $('btn-random-appearance').addEventListener('click', () => {
-    state.faceVariant = Math.floor(Math.random() * 3);
-    state.topVariant = Math.floor(Math.random() * 6);
-    state.bottomVariant = Math.floor(Math.random() * 6);
-    state.outfitColorId = Math.floor(Math.random() * 5);
+    SFX.sfxShuffle();
+    state.faceVariant = Math.floor(Math.random() * 10);
+    state.topVariant = Math.floor(Math.random() * 24);
+    state.bottomVariant = Math.floor(Math.random() * 8);
+    state.outfitColorId = Math.floor(Math.random() * 16);
     updateCreationAvatar();
   });
 
-  $('talent-confirm').addEventListener('click', () => {
+  // Skin tone picker (0=dark, 1=mid, 2=light)
+  for (let tone = 0; tone < 3; tone++) {
+    const btn = $(`skin-${tone}`);
+    if (!btn) continue;
+    btn.addEventListener('click', () => {
+      SFX.sfxToggleOption();
+      state.skinTone = tone;
+      for (let t = 0; t < 3; t++) $(`skin-${t}`).classList.toggle('active', t === tone);
+      updateCreationAvatar();
+    });
+  }
+
+  let _scrollToAlloc = function() {
     for (const k of STAT_KEYS) {
       state.alloc[k] = 0;
     }
     renderAlloc();
-    
-    // Programmatic Scroll to Step 2
+    updateCreationAvatar();
     const container = $('creation-scroll-area');
     const target = $('step-alloc');
     if (container && target) {
       container.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
     }
-    // Reset the internal scroll of the new step for mobile
     setTimeout(() => { target.scrollTop = 0; }, 300);
+    if (window.matchMedia('(max-width: 760px)').matches) {
+      const banner = target.querySelector('.alloc-banner');
+      const allocList = target.querySelector('.alloc-list');
+      if (banner && allocList && banner.nextElementSibling !== allocList) {
+        allocList.parentNode.insertBefore(banner, allocList);
+      }
+    }
+  };
+
+  $('talent-confirm').addEventListener('click', () => {
+    SFX.sfxConfirm();
+    // In MP mode: show frenemy card draft as a separate step
+    if (mp.enabled && draftFrenemyCards) {
+      _renderFrenemyDraft();
+      const container = $('creation-scroll-area');
+      const talentStep = $('step-talents');
+      const frenemyStep = $('step-frenemy');
+      if (talentStep) talentStep.style.display = 'none';
+      if (frenemyStep) frenemyStep.style.display = '';
+      if (container) container.scrollTo({ top: 0, behavior: 'auto' });
+    } else {
+      _scrollToAlloc();
+    }
+  });
+
+  // Frenemy card draft confirm → proceed to alloc
+  $('frenemy-confirm')?.addEventListener('click', () => {
+    SFX.sfxConfirm();
+    const picked = state._frenemyDraftPicked || [];
+    if (picked.length !== 3) return;
+    mp.cards = picked.map(c => ({ ...c, used: false }));
+    const frenemyStep = $('step-frenemy');
+    if (frenemyStep) frenemyStep.style.display = 'none';
+    // Show talents step again (for consistency) and alloc
+    const talentStep = $('step-talents');
+    if (talentStep) talentStep.style.display = '';
+    _scrollToAlloc();
   });
 
   for (const k of STAT_KEYS) {
     $(`plus-${k}`).addEventListener('click', () => {
       const used = Object.values(state.alloc).reduce((a, b) => a + b, 0);
       if (used < ALLOC_TOTAL && state.alloc[k] < MAX_PER_STAT) {
+        SFX.sfxAllocTick();
         state.alloc[k] += 1;
         renderAlloc();
         updateCreationAvatar();
       }
     });
     $(`minus-${k}`).addEventListener('click', () => {
-      if (state.alloc[k] > 0) { 
-        state.alloc[k] -= 1; 
-        renderAlloc(); 
+      if (state.alloc[k] > 0) {
+        SFX.sfxAllocTick();
+        state.alloc[k] -= 1;
+        renderAlloc();
         updateCreationAvatar();
       }
     });
   }
 
   $('alloc-back-to-talent').addEventListener('click', () => {
+    SFX.sfxBack();
     const container = $('creation-scroll-area');
     const target = $('step-talents');
     if (container && target) {
       container.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
     }
-    // Reset internal scroll for step 1
     setTimeout(() => { target.scrollTop = 0; }, 300);
   });
 
   $('alloc-random').addEventListener('click', () => {
+    SFX.sfxShuffle();
     for (const k of STAT_KEYS) state.alloc[k] = 0;
     let remaining = ALLOC_TOTAL;
     while (remaining > 0) {
@@ -3328,13 +4600,15 @@ async function main() {
     updateCreationAvatar();
   });
 
-  $('alloc-start').addEventListener('click', initGame);
+  $('alloc-start').addEventListener('click', () => { SFX.sfxConfirm(); initGame(); });
 
   $('btn-auto-1x').addEventListener('click', () => {
+    SFX.sfxAutoToggle();
     startAuto(1);
   });
 
   $('btn-auto-2x').addEventListener('click', () => {
+    SFX.sfxAutoToggle();
     startAuto(2);
   });
 
@@ -3348,6 +4622,7 @@ async function main() {
   });
 
   $('btn-restart').addEventListener('click', () => {
+    SFX.sfxRestart();
     showScreen('start-screen');
     location.reload();
   });
@@ -3509,31 +4784,53 @@ async function main() {
   }
 
   $('btn-summary').addEventListener('click', () => {
+    SFX.sfxNav();
     dismissEndOverlay();
     showScreen('summary-screen');
     renderSummary();
   });
 
   $('btn-end-summary').addEventListener('click', () => {
+    SFX.sfxNav();
     dismissEndOverlay();
     showScreen('summary-screen');
     renderSummary();
   });
 
   $('btn-end-restart').addEventListener('click', () => {
+    SFX.sfxRestart();
+    if (mp.enabled && mp.connected) { _mpHandleRestart(); return; }
     location.reload();
   });
 
   $('btn-summary-back').addEventListener('click', () => {
+    SFX.sfxNav();
     showScreen('game-screen');
     render();
   });
 
   $('btn-summary-restart').addEventListener('click', () => {
+    SFX.sfxRestart();
+    if (mp.enabled && mp.connected) { _mpHandleRestart(); return; }
     location.reload();
   });
 
+  // MP VS comparison button
+  $('btn-mp-vs')?.addEventListener('click', () => {
+    SFX.sfxNav();
+    _mpShowVsComparison();
+  });
+  $('mp-vs-close')?.addEventListener('click', () => {
+    SFX.sfxModalClose();
+    $('mp-vs-overlay').style.display = 'none';
+  });
+  $('mp-vs-back')?.addEventListener('click', () => {
+    SFX.sfxModalClose();
+    $('mp-vs-overlay').style.display = 'none';
+  });
+
   $('btn-summary-share').addEventListener('click', async () => {
+    SFX.sfxShare();
     try {
       const btn = $('btn-summary-share');
       const originalText = btn.innerHTML;
@@ -3670,122 +4967,1509 @@ async function main() {
   });
 
   $('btn-close-poster').addEventListener('click', () => {
+    SFX.sfxModalClose();
     $('poster-modal').style.display = 'none';
   });
 
   $('btn-start').addEventListener('click', () => {
+    SFX.preloadSounds();
+    SFX.sfxConfirm();
+    resetSessionUnlocks();
     // Initialize random appearance before showing
-    state.faceVariant = Math.floor(Math.random() * 3);
-    state.topVariant = Math.floor(Math.random() * 6);
-    state.bottomVariant = Math.floor(Math.random() * 6);
-    state.outfitColorId = Math.floor(Math.random() * 5);
-    
+    state.faceVariant = Math.floor(Math.random() * 10);
+    state.topVariant = Math.floor(Math.random() * 24);
+    state.bottomVariant = Math.floor(Math.random() * 8);
+    state.outfitColorId = Math.floor(Math.random() * 16);
+    if (typeof state.skinTone !== 'number') state.skinTone = 1;
+    for (let t = 0; t < 3; t++) {
+      const el = $(`skin-${t}`);
+      if (el) el.classList.toggle('active', t === state.skinTone);
+    }
+    state.sex = 0;
+    $('sex-male').classList.add('active');
+    $('sex-female').classList.remove('active');
+
     showScreen('creation-screen');
-    
-    // Reset scroll and render
+
+    // Always start at step-talents (first step)
     const scrollArea = $('creation-scroll-area');
     if (scrollArea) scrollArea.scrollTop = 0;
-    
-    // Wait a tick for DOM to be visible so canvas can render properly
-    setTimeout(updateCreationAvatar, 50);
+    // Avatar is in the last step — no need to render on start-screen click
   });
 
   renderTalentSelect(talents);
+  updateCreationAvatar();
   showScreen('start-screen');
-  startSoulsAnimation();
-}
 
-function startSoulsAnimation() {
-  const container = document.getElementById('souls-container');
-  if (!container) return;
+  // ── Tutorial system ──────────────────────────────────────────────
+  const _tutSeen = (() => { try { return localStorage.getItem('sasr_tutorial_seen'); } catch(e) { return null; } })();
 
-  const MAX_ON_SCREEN = 3;
-  let currentOnScreen = 0;
+  function _openTutorial() {
+    SFX.sfxNav();
+    $('tutorial-modal').style.display = '';
+  }
+  function _closeTutorial() {
+    SFX.sfxModalClose();
+    $('tutorial-modal').style.display = 'none';
+  }
 
-  function spawnSoul() {
-    if (currentOnScreen >= MAX_ON_SCREEN) return;
-    
-    if (document.getElementById('start-screen').classList.contains('active')) {
-      const soulState = {
-        APP: Math.floor(Math.random() * 11),
-        INT: Math.floor(Math.random() * 11),
-        MNY: Math.floor(Math.random() * 11),
-        HLT: Math.floor(Math.random() * 11),
-        HAP: Math.floor(Math.random() * 11),
-        PER: Math.floor(Math.random() * 11),
-        sex: Math.floor(Math.random() * 2),
-        faceVariant: Math.floor(Math.random() * 3),
-        topVariant: Math.floor(Math.random() * 4),
-        bottomVariant: Math.floor(Math.random() * 3),
-        outfitColorId: Math.floor(Math.random() * 5),
-        storyline: ['spy', 'ceo', 'xianxia', 'abyss', 'meta', 'idol', ''][Math.floor(Math.random() * 7)],
-        major: ['CS', '商科', '理科', '文科', ''][Math.floor(Math.random() * 5)]
-      };
+  // First-time prompt
+  if (!_tutSeen) {
+    $('tutorial-prompt').style.display = '';
+    $('tutorial-prompt-yes').addEventListener('click', () => {
+      SFX.sfxConfirm();
+      $('tutorial-prompt').style.display = 'none';
+      try { localStorage.setItem('sasr_tutorial_seen', '1'); } catch(e) {}
+      _openTutorial();
+    });
+    $('tutorial-prompt-no').addEventListener('click', () => {
+      SFX.sfxClick();
+      $('tutorial-prompt').style.display = 'none';
+      try { localStorage.setItem('sasr_tutorial_seen', '1'); } catch(e) {}
+      try { localStorage.setItem('sasr_guide_done', '1'); } catch(e) {}
+    });
+  }
 
-      const canvas = createStandaloneAvatar(soulState);
-      canvas.className = 'walker-canvas';
-      
-      const wrap = document.createElement('div');
-      wrap.className = 'walker-wrap';
-      
-      const scaleWrap = document.createElement('div');
-      scaleWrap.className = 'walker-scale';
+  // Tutorial button on start screen
+  $('btn-tutorial').addEventListener('click', () => _openTutorial());
+  $('tutorial-close').addEventListener('click', () => _closeTutorial());
+  $('tutorial-start-game').addEventListener('click', () => {
+    _closeTutorial();
+    $('btn-start').click();
+  });
 
-      const scale = 0.4 + Math.random() * 0.6; // 0.4 to 1.0
-      const duration = 15 + Math.random() * 15; 
-      
-      // Determine random start and end edges
-      // 0: left, 1: right, 2: bottom
-      const startEdge = Math.floor(Math.random() * 3);
-      let startX, startY, endX, endY;
+  // ── Step-by-step Guide (A层) ────────────────────────────────────
+  const _guideDone = (() => { try { return localStorage.getItem('sasr_guide_done'); } catch(e) { return null; } })();
+  let _guideActive = false;
+  let _guideStep = 0;
 
-      if (startEdge === 0) { // start left
-        startX = -20; startY = 30 + Math.random() * 60;
-        endX = 120; endY = 30 + Math.random() * 60;
-      } else if (startEdge === 1) { // start right
-        startX = 120; startY = 30 + Math.random() * 60;
-        endX = -20; endY = 30 + Math.random() * 60;
-      } else { // start bottom
-        startX = 10 + Math.random() * 80; startY = 120;
-        endX = startX > 50 ? -20 : 120; // go opposite side
-        endY = 30 + Math.random() * 50;
+  // Steps are grouped by phase: 'creation' steps first, then 'game' steps
+  const GUIDE_STEPS = [
+    // ── Creation Screen Steps ──
+    {
+      phase: 'creation',
+      target: '#talent-list',
+      title: '🎲 抽取天赋',
+      body: '这是你的天赋卡池，共 10 张随机天赋。<strong>点击选择 3 张</strong>带入本局游戏。\n颜色越亮越稀有，橙色最强。',
+      arrow: 'bottom',
+    },
+    {
+      phase: 'creation',
+      target: '#talent-confirm',
+      title: '✅ 确认选择',
+      body: '选好 3 张天赋后，这个按钮会亮起。点击确认进入<strong>属性分配</strong>阶段。',
+      arrow: 'top',
+    },
+    // Note: alloc steps will fire after user confirms talents and scrolls
+    {
+      phase: 'alloc',
+      target: '.alloc-list',
+      title: '📊 分配属性点',
+      body: '用 <strong>＋</strong> 和 <strong>−</strong> 分配 25 个点数到六大属性。\n每项上限 10，天赋加成会额外叠加。点「随机分配」可以一键随机。',
+      arrow: 'left',
+    },
+    {
+      phase: 'alloc',
+      target: '#alloc-start',
+      title: '🚀 开始人生',
+      body: '属性分配好后，点击这个按钮正式开始你的留学人生！',
+      arrow: 'top',
+    },
+    // ── Game Screen Steps ──
+    {
+      phase: 'game',
+      target: '.left-panel',
+      title: '👤 你的状态',
+      body: '左侧面板显示你的<strong>头像、属性、学校、专业、恋爱</strong>等状态。\n属性条会随事件实时变化。',
+      arrow: 'right',
+    },
+    {
+      phase: 'game',
+      target: '.right-panel',
+      title: '📜 事件面板',
+      body: '<strong>点击这里推进一个月</strong>，触发新事件。\n遇到选择时，选项按钮会出现在这里——有些选项需要属性达标才能选。',
+      arrow: 'left',
+    },
+    {
+      phase: 'game',
+      target: '#btn-auto-1x',
+      title: '⏩ 自动播放',
+      body: '懒得一直点？按「自动播放」让游戏自动跑。\n遇到选择时会<strong>自动暂停</strong>等你操作。',
+      arrow: 'bottom',
+    },
+  ];
+
+  function _guideShow(stepIdx) {
+    const overlay = $('guide-overlay');
+    const spotlight = $('guide-spotlight');
+    const tooltip = $('guide-tooltip');
+    const arrow = $('guide-arrow');
+    const titleEl = $('guide-title');
+    const bodyEl = $('guide-body');
+    const indicator = $('guide-step-indicator');
+    const nextBtn = $('guide-next');
+
+    const step = GUIDE_STEPS[stepIdx];
+    if (!step) { _guideEnd(); return; }
+
+    const targetEl = document.querySelector(step.target);
+    if (!targetEl || targetEl.offsetHeight === 0) {
+      // Target not visible, skip
+      _guideStep++;
+      setTimeout(() => _guideShow(_guideStep), 100);
+      return;
+    }
+
+    overlay.style.display = '';
+    _guideActive = true;
+
+    // Spotlight
+    const rect = targetEl.getBoundingClientRect();
+    const pad = 8;
+    spotlight.style.top = (rect.top - pad) + 'px';
+    spotlight.style.left = (rect.left - pad) + 'px';
+    spotlight.style.width = (rect.width + pad * 2) + 'px';
+    spotlight.style.height = (rect.height + pad * 2) + 'px';
+
+    // Step dots
+    indicator.innerHTML = GUIDE_STEPS.map((_, i) =>
+      `<span class="guide-step-dot ${i < stepIdx ? 'done' : i === stepIdx ? 'active' : ''}"></span>`
+    ).join('');
+
+    // Content
+    titleEl.textContent = step.title;
+    bodyEl.innerHTML = step.body.replace(/\n/g, '<br>');
+    nextBtn.textContent = stepIdx === GUIDE_STEPS.length - 1 ? '开始游戏！' : '下一步';
+
+    // Position tooltip
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    tooltip.style.removeProperty('top');
+    tooltip.style.removeProperty('bottom');
+    tooltip.style.removeProperty('left');
+    tooltip.style.removeProperty('right');
+
+    // For tall elements (> 60% viewport), use center-of-viewport vertical positioning
+    const isTall = rect.height > vh * 0.6;
+    const centerY = isTall ? vh / 2 : rect.top + rect.height / 2;
+
+    if (step.arrow === 'right' || step.arrow === 'left') {
+      // Place tooltip beside the target, vertically centered
+      let tooltipTop = centerY - 80;
+      tooltipTop = Math.max(20, Math.min(tooltipTop, vh - 220));
+      tooltip.style.top = tooltipTop + 'px';
+      if (step.arrow === 'right') {
+        tooltip.style.left = Math.min(rect.right + 60, vw - 340) + 'px';
+      } else {
+        tooltip.style.left = Math.max(10, rect.left - 340) + 'px';
       }
+    } else {
+      // Place tooltip above or below
+      const spaceBelow = vh - rect.bottom;
+      const spaceAbove = rect.top;
+      if (spaceBelow > 180 || spaceBelow > spaceAbove) {
+        tooltip.style.top = Math.min(rect.bottom + 20, vh - 200) + 'px';
+      } else {
+        tooltip.style.top = Math.max(20, rect.top - 200) + 'px';
+      }
+      let tooltipLeft = rect.left + rect.width / 2 - 160;
+      tooltipLeft = Math.max(10, Math.min(tooltipLeft, vw - 330));
+      tooltip.style.left = tooltipLeft + 'px';
+    }
 
-      wrap.style.left = `${startX}%`;
-      wrap.style.top = `${startY}%`;
-      wrap.style.transition = `left ${duration}s linear, top ${duration}s linear`;
-      wrap.style.zIndex = Math.floor(startY / 10);
-      
-      // Flip horizontally if going left
-      const isGoingLeft = endX < startX;
-      scaleWrap.style.transform = `scale(${scale}) ${isGoingLeft ? 'scaleX(-1)' : ''}`;
-      canvas.style.animationDelay = `-${Math.random()}s`;
+    // Re-trigger animation
+    tooltip.style.animation = 'none';
+    tooltip.offsetHeight; // reflow
+    tooltip.style.animation = '';
 
-      scaleWrap.appendChild(canvas);
-      wrap.appendChild(scaleWrap);
-      container.appendChild(wrap);
-      currentOnScreen++;
+    // Arrow pointing at target — use clamped center for tall elements
+    const arrowY = isTall ? (vh / 2 - 24) : (rect.top + rect.height / 2 - 24);
+    const arrowYClamped = Math.max(20, Math.min(arrowY, vh - 60));
 
-      // Trigger animation on next frame
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          wrap.style.left = `${endX}%`;
-          wrap.style.top = `${endY}%`;
-        });
-      });
-
-      setTimeout(() => {
-        if (container.contains(wrap)) {
-          container.removeChild(wrap);
-          currentOnScreen--;
-        }
-      }, duration * 1000);
+    if (step.arrow === 'bottom') {
+      arrow.style.display = '';
+      arrow.style.top = Math.min(rect.bottom + 2, vh - 60) + 'px';
+      arrow.style.left = (rect.left + rect.width / 2 - 24) + 'px';
+      arrow.style.transform = 'rotate(0deg)';
+    } else if (step.arrow === 'top') {
+      arrow.style.display = '';
+      arrow.style.top = Math.max(rect.top - 52, 4) + 'px';
+      arrow.style.left = (rect.left + rect.width / 2 - 24) + 'px';
+      arrow.style.transform = 'rotate(180deg)';
+    } else if (step.arrow === 'right') {
+      arrow.style.display = '';
+      arrow.style.top = arrowYClamped + 'px';
+      arrow.style.left = (rect.right + 4) + 'px';
+      arrow.style.transform = 'rotate(-90deg)';
+    } else if (step.arrow === 'left') {
+      arrow.style.display = '';
+      arrow.style.top = arrowYClamped + 'px';
+      arrow.style.left = (rect.left - 52) + 'px';
+      arrow.style.transform = 'rotate(90deg)';
+    } else {
+      arrow.style.display = 'none';
     }
   }
 
-  // Check frequently but spawn max 3
-  setInterval(spawnSoul, 2000);
-  spawnSoul(); // Spawn one immediately
+  function _guideEnd() {
+    $('guide-overlay').style.display = 'none';
+    _guideActive = false;
+    try { localStorage.setItem('sasr_guide_done', '1'); } catch(e) {}
+  }
+
+  function _guideNext() {
+    SFX.sfxClick();
+    _guideStep++;
+    const nextStep = GUIDE_STEPS[_guideStep];
+    if (!nextStep) {
+      _guideEnd();
+      return;
+    }
+    // If the next step is in a different phase, pause — will be resumed by hooks
+    const curStep = GUIDE_STEPS[_guideStep - 1];
+    if (nextStep.phase !== curStep.phase) {
+      $('guide-overlay').style.display = 'none';
+      _guideActive = false;
+      return;
+    }
+    _guideShow(_guideStep);
+  }
+
+  // Called by various hooks when the right phase becomes visible
+  function _guideResumeForPhase(phase) {
+    if (_guideStep >= GUIDE_STEPS.length) return;
+    if (_guideActive) return; // already showing
+    const nextStep = GUIDE_STEPS[_guideStep];
+    if (nextStep && nextStep.phase === phase) {
+      setTimeout(() => {
+        _guideActive = true;
+        _guideShow(_guideStep);
+      }, 500);
+    }
+  }
+
+  $('guide-next').addEventListener('click', _guideNext);
+  $('guide-skip').addEventListener('click', () => { SFX.sfxClick(); _guideEnd(); });
+
+  // Hook showScreen for game-screen phase resume
+  const _origShowScreen = showScreen;
+  showScreen = function(id) {
+    _origShowScreen(id);
+    if (id === 'game-screen') _guideResumeForPhase('game');
+  };
+
+  // Hook _scrollToAlloc for alloc phase resume
+  const _origScrollToAlloc = _scrollToAlloc;
+  _scrollToAlloc = function() {
+    _origScrollToAlloc();
+    _guideResumeForPhase('alloc');
+  };
+
+  // Hook: start guide when entering creation screen for the first time
+  if (!_guideDone) {
+    let _guideStarted = false;
+    const _creationObserver = new MutationObserver(() => {
+      if (!_guideStarted && $('creation-screen').classList.contains('active')) {
+        _guideStarted = true;
+        _creationObserver.disconnect();
+        setTimeout(() => {
+          _guideStep = 0;
+          _guideActive = true;
+          _guideShow(0);
+        }, 500);
+      }
+    });
+    _creationObserver.observe($('creation-screen'), { attributes: true, attributeFilter: ['class'] });
+  }
+
+  // ── Multiplayer (optional) ──────────────────────────────────────
+  try {
+    const _mp = await import('./multiplayer.js');
+    mp = _mp.mp;
+    createRoom = _mp.createRoom;
+    joinRoom = _mp.joinRoom;
+    mpSend = _mp.send;
+    mpOn = _mp.on;
+    mpDisconnect = _mp.disconnect;
+    resetMpState = _mp.resetMpState;
+    REUNION_AGES = _mp.REUNION_AGES;
+    FATE_CARDS = _mp.FATE_CARDS;
+    initialFateCards = _mp.initialFateCards;
+    draftFrenemyCards = _mp.draftFrenemyCards;
+    FRENEMY_CARD_POOL = _mp.FRENEMY_CARD_POOL;
+    _wireMultiplayerUI();
+  } catch (e) {
+    console.warn('[mp] multiplayer.js 加载失败，联机功能不可用:', e);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MULTIPLAYER INTEGRATION
+// ═══════════════════════════════════════════════════════════════════════════
+
+function _broadcastState() {
+  if (!mp.enabled || !mp.connected) return;
+  mpSend('state_sync', {
+    age: state.age,
+    month: state.monthOfYear,
+    school: state.school,
+    profession: state.profession,
+    major: state.major || '未定',
+    country: state.country,
+    storyline: state.storyline,
+    relationship: state.relationship,
+    stats: {
+      SOC: state.SOC, INT: state.INT, MNY: state.MNY,
+      PER: state.PER, HLT: state.HLT, APP: state.APP, HAP: state.HAP,
+    },
+  });
+}
+
+function _changeRelation(delta, reason) {
+  mp.relation = Math.max(-100, Math.min(100, mp.relation + delta));
+  mpSend('relation_delta', { delta, reason: reason || '' });
+  _renderOpponentBar();
+}
+
+function _findButterflyReceive(key) {
+  for (const ev of state.eventsMap.values()) {
+    if (ev.butterflyReceive === key) return ev;
+  }
+  return null;
+}
+
+function _isDeclineChoice(choice, ev) {
+  const txt = (choice.title || choice.text || '').trim();
+  if (!txt) return false;
+  return /拒绝|婉拒|放弃|不去|不接|留下|算了|不感兴趣|跳过/.test(txt);
+}
+
+function _applyIncomingCard(eff) {
+  if (!eff) return;
+  const cardName = eff.cardName || '损友卡';
+  const isHelp = eff.category === 'help';
+  const logType = isHelp ? 'mp-reunion' : 'mp-pvp';
+
+  // ── Special chaos effects ──
+  if (eff.special) {
+    const base = ['SOC', 'INT', 'MNY', 'PER', 'HLT', 'APP'];
+    if (eff.special === 'swap_random_stat') {
+      const k = base[Math.floor(Math.random() * base.length)];
+      const oppVal = eff._oppStats ? eff._oppStats[k] : 5;
+      const myVal = state[k] || 0;
+      state[k] = oppVal;
+      pushLog(`【${cardName}】对方发动了灵魂交换！你的${STAT_LABELS[k]}从${myVal}变成了${oppVal}`, logType);
+    } else if (eff.special === 'roulette') {
+      if (Math.random() < 0.4) {
+        // backfire — sender gets the penalty (we're the target, so we're safe)
+        pushLog(`【${cardName}】对方对你发动了俄罗斯轮盘……但反噬了自己！你安然无恙`, logType);
+      } else {
+        const k = base[Math.floor(Math.random() * base.length)];
+        state[k] = (state[k] || 0) - 4;
+        pushLog(`【${cardName}】对方对你发动了俄罗斯轮盘！你的${STAT_LABELS[k]}-4`, logType);
+      }
+    } else if (eff.special === 'swap_top3') {
+      const myStats = base.map(k => [k, state[k] || 0]).sort((a, b) => b[1] - a[1]);
+      const oppStats = eff._oppStats || {};
+      const top3Keys = myStats.slice(0, 3).map(x => x[0]);
+      const changes = [];
+      for (const k of top3Keys) {
+        const myV = state[k] || 0;
+        const oppV = oppStats[k] || 0;
+        state[k] = oppV;
+        changes.push(`${STAT_LABELS[k]}:${myV}→${oppV}`);
+      }
+      pushLog(`【${cardName}】人生互换！你的三项最高属性被替换：${changes.join('、')}`, logType);
+    } else if (eff.special === 'double_or_nothing') {
+      const lucky = Math.random() < 0.5;
+      const delta = lucky ? 2 : -2;
+      for (const k of base) state[k] = (state[k] || 0) + delta;
+      state.HAP = (state.HAP || 0) + delta;
+      pushLog(`【${cardName}】全押！${lucky ? '运气爆棚，全属性+2！' : '手气不佳，全属性-2…'}`, logType);
+    } else if (eff.special === 'mirror_lowest') {
+      const srcVal = eff._mirrorVal ?? 0;
+      const srcKey = eff._mirrorKey || 'HLT';
+      const oldVal = state[srcKey] || 0;
+      state[srcKey] = srcVal;
+      pushLog(`【${cardName}】镜像！对方把自己最低的${STAT_LABELS[srcKey]}(${srcVal})复制给了你（原${oldVal}）`, logType);
+    } else if (eff.special === 'joker') {
+      // Reverse: intended harm becomes help — random +2 to two stats
+      const picks = [...base].sort(() => Math.random() - 0.5).slice(0, 2);
+      for (const k of picks) state[k] = (state[k] || 0) + 2;
+      state.HAP = (state.HAP || 0) + 1;
+      pushLog(`【${cardName}】小丑牌！对方本想害你，结果弄巧成拙——你的${picks.map(k => STAT_LABELS[k]).join('、')}各+2，HAP+1`, logType);
+    } else if (eff.special === 'drift') {
+      const k = base[Math.floor(Math.random() * base.length)];
+      const delta = Math.random() < 0.5 ? 3 : -3;
+      state[k] = (state[k] || 0) + delta;
+      pushLog(`【${cardName}】属性漂移！你的${STAT_LABELS[k]}${delta > 0 ? '+3' : '-3'}`, logType);
+    } else if (eff.special === 'steal_stat') {
+      // Steal 2 points from target's highest stat
+      let maxK = 'SOC', maxV = -99;
+      for (const k of base) { if ((state[k] || 0) > maxV) { maxV = state[k] || 0; maxK = k; } }
+      state[maxK] = (state[maxK] || 0) - 2;
+      pushLog(`【${cardName}】偷属性！对方偷走了你${STAT_LABELS[maxK]}的2点（${maxV}→${maxV - 2}）`, logType);
+    } else if (eff.special === 'nuke') {
+      const shuffled = [...base].sort(() => Math.random() - 0.5);
+      const targets = shuffled.slice(0, 2);
+      for (const k of targets) state[k] = (state[k] || 0) - 3;
+      pushLog(`【${cardName}】同归于尽！你的${targets.map(k => STAT_LABELS[k]).join('、')}各-3`, logType);
+    }
+    clampStats(); render(); return;
+  }
+
+  // ── Normal stat effects ──
+  if (eff.stats) {
+    for (const [k, v] of Object.entries(eff.stats)) {
+      if (EFFECT_KEYS.has(k)) state[k] = (state[k] || 0) + v;
+    }
+    clampStats();
+    const verb = isHelp ? '帮了你一把' : '对你出手了';
+    pushLog(`【${cardName}】对方${verb}——${_formatCardEffect(eff.stats)}`, logType);
+  }
+  render();
+}
+
+function _formatCardEffect(stats) {
+  const labels = { SOC: '社交', INT: '智力', MNY: '家境', PER: '毅力', HLT: '健康', APP: '颜值', HAP: '快乐' };
+  return Object.entries(stats).map(([k, v]) => `${labels[k] || k}${v > 0 ? '+' : ''}${v}`).join('、');
+}
+
+function _triggerReunion(age) {
+  // 如果自己在特殊/隐藏剧情中，跳过同学聚会
+  if (state.storyline && (SPECIAL_STORYLINES.has(state.storyline) || HIDDEN_STORYLINES.has(state.storyline))) {
+    mpSend('reunion_skip', { age, reason: 'in_storyline' });
+    pushLog(`（你正忙于自己的事业，错过了${age}岁的同学聚会）`, 'mp-reunion');
+    render();
+    return;
+  }
+  // 对方已经结束游戏或断线，无法参加聚会
+  if (_mpOppEndData || !mp.connected) {
+    pushLog(`（${mp.opponent.nickname || '对方'}已经结束了人生，${age}岁的同学聚会无法举行）`, 'mp-reunion');
+    render();
+    return;
+  }
+  mpSend('reunion_arrived', { age });
+  if (mp.opponent.age >= age) {
+    _fireReunionEvent(age);
+  } else {
+    mp.isWaiting = true;
+    mp.waitReason = `等待对方到达 ${age} 岁参加同学聚会...`;
+    _renderWaitingOverlay();
+    // 超时保护：30秒后自动取消等待
+    mp._reunionTimeout = setTimeout(() => {
+      if (mp.isWaiting && mp.waitReason.includes(`${age}`)) {
+        mp.isWaiting = false;
+        _showWaitingDismiss(`等了好久，${mp.opponent.nickname || '对方'} 好像迷路了……`);
+        pushLog(`（等了很久，${mp.opponent.nickname || '对方'}没能赶到${age}岁的同学聚会）`, 'mp-reunion');
+      }
+    }, 30000);
+  }
+}
+
+async function _playReunionCinematic(age, myName, oppName, oppProf, oppSchool, relLabel) {
+  SFX.sfxReunion();
+  const _w = ms => new Promise(r => setTimeout(r, ms));
+
+  const overlay = document.createElement('div');
+  overlay.className = 'reunion-overlay';
+
+  // Title
+  const title = document.createElement('div');
+  title.className = 'reunion-title';
+  title.textContent = `${age}岁 · 老友聚会`;
+  overlay.appendChild(title);
+
+  // Cards row: [me] [rel] [opp]
+  const row = document.createElement('div');
+  row.className = 'reunion-cards';
+
+  const myCard = document.createElement('div');
+  myCard.className = 'reunion-card left';
+  myCard.innerHTML = `<span class="reunion-card-name">${myName}</span>
+    <span class="reunion-card-info">${state.profession || '未知'}</span>`;
+
+  const relTag = document.createElement('div');
+  relTag.className = 'reunion-rel';
+  relTag.textContent = relLabel;
+
+  const oppCard = document.createElement('div');
+  oppCard.className = 'reunion-card right';
+  oppCard.innerHTML = `<span class="reunion-card-name">${oppName}</span>
+    <span class="reunion-card-info">${oppProf}${oppSchool ? ' · ' + oppSchool : ''}</span>`;
+
+  row.appendChild(myCard);
+  row.appendChild(relTag);
+  row.appendChild(oppCard);
+  overlay.appendChild(row);
+
+  document.body.appendChild(overlay);
+
+  // Timeline (~2s total)
+  // 0ms: overlay bg fade in + title pop
+  await _w(30);
+  overlay.classList.add('active');
+  title.classList.add('show');
+
+  // 350ms: cards slide in
+  await _w(350);
+  myCard.classList.add('show');
+  oppCard.classList.add('show');
+
+  // 650ms: relation label pops
+  await _w(300);
+  relTag.classList.add('show');
+
+  // Hold for reading
+  await _w(900);
+
+  // Fade out everything
+  overlay.classList.add('fade-out');
+  await _w(350);
+  overlay.remove();
+}
+
+// ── Reunion Dilemma Config ──
+const REUNION_DILEMMA = {
+  23: {
+    title: '毕业季',
+    intro: (opp, rel, oppProf, oppSchool, oppRel) =>
+      `毕业季的老同学聚餐，你见到了${rel}${opp}。TA现在是「${oppProf}」${oppSchool ? `，从${oppSchool}毕业` : ''}。大家点了一桌子菜，气氛正好。${oppRel === '单身' ? 'TA还是单身，你们开始起哄。' : `听说TA现在${oppRel}了。`}`,
+    choices: [
+      { key: 'coop', icon: '🍻', text: '一起痛饮到天亮', desc: '不管未来怎样，今晚不醉不归' },
+      { key: 'betray', icon: '📱', text: '好好发个朋友圈装一下', desc: '记录一下吧，难得的重逢嘛' },
+      { key: 'risky', icon: '🎓', text: '提议一起创业', desc: '我有个想法，要不要一起干？' },
+    ],
+    results: {
+      'coop_coop':     { my: { SOC: 2, HAP: 4 }, opp: { SOC: 2, HAP: 4 }, rel: 30, text: (o) => `你们聊了一晚上，从大学糗事到现在的迷茫，越聊越起劲。临走时勾肩搭背，约好下个月再聚。` },
+      'coop_betray':   { my: { HAP: -2, SOC: -2 }, opp: { MNY: 4 }, rel: -40, text: (o) => `你掏心掏肺讲了半天，${o}却一直在拍照修图发朋友圈。配文"和老同学叙旧❤️"，你成了TA精致生活的背景板。` },
+      'coop_risky':    { my: { SOC: 2, HAP: 4 }, opp: { HAP: -2, PER: 2 }, rel: 10, text: (o) => `你喝得正开心，${o}突然认真地说想一起创业。你笑了笑没接话。TA有些失落，但你们的关系倒没变差。` },
+      'betray_coop':   { my: { MNY: 4 }, opp: { HAP: -2, SOC: -2 }, rel: -40, text: (o) => `${o}真诚地分享着近况，你却忙着拍照选滤镜。"在大学同学聚会，感恩遇见🥂"，发出去点赞数不少。${o}看到后表情有点微妙。` },
+      'betray_betray': { my: { HAP: -2 }, opp: { HAP: -2 }, rel: -20, text: (o) => `你们都在忙着拍照发朋友圈，互相给对方点了个赞，然后各自沉默刷手机。散场时客气地说"下次再聚"，心里都知道不会有下次。` },
+      'betray_risky':  { my: { MNY: 4 }, opp: { HAP: -4 }, rel: -40, text: (o) => `${o}鼓起勇气提出一起创业，你却对着手机头也不抬地回了句"再说吧"。TA的表情像被泼了一盆冷水。` },
+      'risky_coop':    { my: { HAP: -2, PER: 2 }, opp: { SOC: 2, HAP: 4 }, rel: 10, text: (o) => `你提出一起创业的想法，${o}笑着说"先喝酒吧"。虽然没被接受，但TA的态度很温暖，你反而更坚定了自己的想法。` },
+      'risky_betray':  { my: { HAP: -4 }, opp: { MNY: 4 }, rel: -40, text: (o) => `你兴致勃勃地讲创业计划，${o}一边嗯嗯一边发朋友圈。你后来才发现TA配文写的是"有人毕业了还在做梦😂"。` },
+      'risky_risky':   { my: { MNY: 6, SOC: 4, PER: 2 }, opp: { MNY: 6, SOC: 4, PER: 2 }, rel: 40, text: (o) => `你们不约而同地提出创业，越聊越兴奋，当晚就在餐巾纸上画起了商业计划。也许这才是这顿饭最大的收获。` },
+    },
+  },
+  28: {
+    title: '职场江湖',
+    intro: (opp, rel, oppProf, oppSchool, oppRel) =>
+      `工作几年了，你和${rel}${opp}约了顿饭。TA现在是「${oppProf}」，看起来变了不少。你们点了壶茶，聊起各自的近况。`,
+    choices: [
+      { key: 'coop', icon: '🤝', text: '帮TA内推工作', desc: '把自己的人脉资源分享出去' },
+      { key: 'betray', icon: '💼', text: '套TA的商业情报', desc: '表面关心，其实在打探对方底细' },
+      { key: 'neutral', icon: '🍷', text: '什么都不聊，纯喝酒', desc: '不帮不坑，今晚只想放松' },
+    ],
+    results: {
+      'coop_coop':       { my: { SOC: 2, HAP: 4, MNY: 2 }, opp: { SOC: 2, HAP: 4, MNY: 2 }, rel: 30, text: (o) => `你帮${o}推了个好机会，TA也把自己的人脉介绍给你。这顿饭吃得值——老朋友就是最好的资源。` },
+      'coop_betray':     { my: { HAP: -2, SOC: -2 }, opp: { MNY: 4, SOC: 2 }, rel: -40, text: (o) => `你费心帮${o}牵线搭桥，后来才发现TA背地里在挖你的客户。一股寒意涌上心头。` },
+      'coop_neutral':    { my: { SOC: 2 }, opp: { HAP: 2 }, rel: 5, text: (o) => `你主动聊起工作机会想帮${o}，TA笑着说"今天不聊工作"，举起酒杯。也好，难得清闲。` },
+      'betray_coop':     { my: { MNY: 4, SOC: 2 }, opp: { HAP: -2, SOC: -2 }, rel: -40, text: (o) => `${o}热心地帮你介绍资源，你却悄悄记下了TA的客户联系方式。生意场上嘛……你安慰自己。` },
+      'betray_betray':   { my: { HAP: -2 }, opp: { HAP: -2 }, rel: -20, text: (o) => `你们表面和气地交换信息，暗地里都在套对方的底。最后谁也没占到便宜，饭钱倒花了不少。` },
+      'betray_neutral':  { my: { MNY: 2 }, opp: { HAP: -2 }, rel: -20, text: (o) => `你旁敲侧击地套话，${o}只顾喝酒不接茬。临走时TA说"感觉你今天怪怪的"。尴尬。` },
+      'neutral_coop':    { my: { HAP: 2 }, opp: { SOC: 2 }, rel: 5, text: (o) => `${o}想帮你推荐工作，你摆摆手说今天就是想放松。TA的好意你记在心里了。` },
+      'neutral_betray':  { my: { HAP: -2 }, opp: { MNY: 2 }, rel: -20, text: (o) => `你只想安静喝酒，${o}却一直在套你的工作情况。一顿饭吃得索然无味。` },
+      'neutral_neutral': { my: { HAP: 2, HLT: -2 }, opp: { HAP: 2, HLT: -2 }, rel: 0, text: (o) => `你们默契地不聊任何正事，一杯接一杯地喝。凌晨两点扶着墙回家，头疼得厉害。但心情不错。` },
+    },
+  },
+  33: {
+    title: '最后的交杯',
+    intro: (opp, rel, oppProf, oppSchool, oppRel) =>
+      `${rel}${opp}约你吃饭。TA现在是「${oppProf}」。能来的老朋友已经不多了。你们找了个安静的地方坐下，窗外是深秋的街景。`,
+    choices: [
+      { key: 'coop', icon: '🫂', text: '掏心窝子聊人生', desc: '聊遗憾、梦想、这些年的起落' },
+      { key: 'betray', icon: '🪞', text: '维持表面客气', desc: '笑着碰杯，心里想着自己的事' },
+      { key: 'risky', icon: '💰', text: '提议一起搞投资', desc: '中年了有点积蓄，合伙投点什么？' },
+    ],
+    results: {
+      'coop_coop':     { my: { SOC: 4, HAP: 6 }, opp: { SOC: 4, HAP: 6 }, rel: 40, text: (o) => `人到中年，能这么掏心窝子聊的朋友不多了。从事业聊到家庭、遗憾和梦想，你们聊到深夜。散场时都红了眼眶。` },
+      'coop_betray':   { my: { HAP: -4 }, opp: { SOC: 2 }, rel: -50, text: (o) => `你放下了所有防备想好好聊聊，${o}却全程在客套寒暄。你突然意识到，有些人注定走不进你的世界。` },
+      'coop_risky':    { my: { SOC: 4, HAP: 6 }, opp: { HAP: -2, PER: 2 }, rel: 20, text: (o) => `你想好好叙叙旧，${o}却急着聊投资。你耐心听完，说"钱的事不急，先把酒喝了"。${o}愣了一下，然后笑了。` },
+      'betray_coop':   { my: { SOC: 2 }, opp: { HAP: -4 }, rel: -50, text: (o) => `${o}想跟你好好聊聊这些年的心里话，你却笑着把话题带过。回家路上你有点后悔——这种机会可能不多了。` },
+      'betray_betray': { my: { HAP: -4 }, opp: { HAP: -4 }, rel: -30, text: (o) => `你们笑着碰杯，聊些无关痛痒的话题。临走时客气地说"保重"，转身各自消失在夜色里。这大概就是大人的交往方式吧。` },
+      'betray_risky':  { my: { SOC: 2 }, opp: { HAP: -4 }, rel: -30, text: (o) => `${o}认真地提出合伙投资，你敷衍地说"回去考虑考虑"。TA看出你没当回事，沉默了很久。` },
+      'risky_coop':    { my: { HAP: -2, PER: 2 }, opp: { SOC: 4, HAP: 6 }, rel: 20, text: (o) => `你聊起投资的想法，${o}不置可否，反而拉你聊起了当年的事。你被TA的真诚打动，决定今晚不谈钱了。` },
+      'risky_betray':  { my: { HAP: -4 }, opp: { SOC: 2 }, rel: -30, text: (o) => `你认真提出合伙计划，${o}客气地顾左右而言他。回家路上你觉得自己像个傻子。` },
+      'risky_risky':   { my: { MNY: 8, SOC: 4, PER: 4 }, opp: { MNY: 8, SOC: 4, PER: 4 }, rel: 50, text: (o) => `你们不约而同提出一起搞投资，越聊越认真，当场就开始研究项目。十年的信任，比任何商业计划书都值钱。` },
+    },
+  },
+};
+
+// Pending dilemma state
+let _reunionDilemmaAge = 0;
+let _reunionMyChoice = null;
+let _reunionOppChoice = null;
+
+function _showReunionDilemma(age, oppName) {
+  const cfg = REUNION_DILEMMA[age];
+  if (!cfg) return;
+  _reunionDilemmaAge = age;
+  _reunionMyChoice = null;
+  _reunionOppChoice = null;
+
+  // Build overlay
+  const overlay = document.createElement('div');
+  overlay.id = 'reunion-dilemma-overlay';
+  overlay.className = 'reunion-dilemma-overlay';
+  overlay.innerHTML = `
+    <div class="reunion-dilemma-box">
+      <div class="reunion-dilemma-title">${cfg.title}</div>
+      <div class="reunion-dilemma-prompt">你打算怎么做？</div>
+      <div class="reunion-dilemma-choices">
+        ${cfg.choices.map(c => `
+          <button class="reunion-dilemma-btn" data-key="${c.key}">
+            <span class="rdb-icon">${c.icon}</span>
+            <div class="rdb-content">
+              <span class="rdb-text">${c.text}</span>
+              <span class="rdb-desc">${c.desc}</span>
+            </div>
+          </button>
+        `).join('')}
+      </div>
+      <div class="reunion-dilemma-waiting" style="display:none;">
+        <div class="rdw-spinner"></div>
+        <span>等待${oppName}做出选择…</span>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('active'));
+
+  // Wire button clicks
+  overlay.querySelectorAll('.reunion-dilemma-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      SFX.sfxChoice();
+      _reunionMyChoice = btn.dataset.key;
+      mpSend('reunion_choice', { age, choice: _reunionMyChoice });
+      // Disable buttons, show waiting or resolve
+      overlay.querySelectorAll('.reunion-dilemma-btn').forEach(b => {
+        b.disabled = true;
+        if (b === btn) b.classList.add('selected');
+        else b.classList.add('dimmed');
+      });
+      if (_reunionOppChoice) {
+        _resolveReunionDilemma(age);
+      } else {
+        overlay.querySelector('.reunion-dilemma-waiting').style.display = 'flex';
+      }
+    });
+  });
+}
+
+function _resolveReunionDilemma(age) {
+  const cfg = REUNION_DILEMMA[age];
+  if (!cfg || !_reunionMyChoice || !_reunionOppChoice) return;
+  const key = `${_reunionMyChoice}_${_reunionOppChoice}`;
+  const result = cfg.results[key];
+  if (!result) return;
+
+  const oppName = mp.opponent.nickname || '对方';
+
+  // Apply my stat effects
+  if (result.my) {
+    for (const [k, v] of Object.entries(result.my)) {
+      if (k === 'HAP') state.HAP = Math.max(0, Math.min(10, (state.HAP || 0) + v));
+      else state[k] = Math.max(0, Math.min(10, (state[k] || 0) + v));
+    }
+  }
+  // Send opponent effects
+  if (result.opp) {
+    mpSend('reunion_effect', { age, effects: result.opp });
+  }
+  // Relation change
+  if (result.rel) {
+    _changeRelation(result.rel, `${age}岁聚会`);
+  }
+
+  // Result text
+  const resultText = result.text(oppName);
+  pushLog(resultText, 'mp-reunion');
+
+  // Effect summary log
+  if (result.my) {
+    const parts = Object.entries(result.my).map(([k, v]) =>
+      `${STAT_LABELS[k] || k}${v > 0 ? '+' : ''}${v}`
+    );
+    if (result.rel) parts.push(`好感度${result.rel > 0 ? '+' : ''}${result.rel}`);
+    pushLog(`（${parts.join('，')}）`, 'mp-reunion');
+  }
+
+  // Transition to result display
+  const overlay = document.getElementById('reunion-dilemma-overlay');
+  if (overlay) {
+    const box = overlay.querySelector('.reunion-dilemma-box');
+    box.innerHTML = `
+      <div class="reunion-dilemma-result">
+        <div class="rdr-opp-choice">
+          ${oppName}选择了：${_getChoiceLabel(age, _reunionOppChoice)}
+        </div>
+        <div class="rdr-text">${resultText}</div>
+        <div class="rdr-effects">${_formatDilemmaEffects(result.my, result.rel)}</div>
+        <button class="rdr-close">继续</button>
+      </div>
+    `;
+    box.querySelector('.rdr-close').addEventListener('click', () => {
+      overlay.classList.remove('active');
+      setTimeout(() => overlay.remove(), 300);
+      state.autoPlay = state._reunionSavedAuto || false;
+      if (state._reunionSavedAutoMode) startAuto(state._reunionSavedAutoMode);
+      render();
+    });
+  }
+
+  _reunionDilemmaAge = 0;
+  _reunionMyChoice = null;
+  _reunionOppChoice = null;
+}
+
+function _getChoiceLabel(age, key) {
+  const cfg = REUNION_DILEMMA[age];
+  if (!cfg) return key;
+  const c = cfg.choices.find(ch => ch.key === key);
+  return c ? `${c.icon} ${c.text}` : key;
+}
+
+function _formatDilemmaEffects(effects, rel) {
+  if (!effects) return '';
+  const parts = Object.entries(effects).map(([k, v]) => {
+    const cls = v > 0 ? 'pos' : 'neg';
+    return `<span class="rde-tag ${cls}">${STAT_LABELS[k] || k} ${v > 0 ? '+' : ''}${v}</span>`;
+  });
+  if (rel) {
+    const cls = rel > 0 ? 'pos' : 'neg';
+    parts.push(`<span class="rde-tag ${cls}">好感度 ${rel > 0 ? '+' : ''}${rel}</span>`);
+  }
+  return parts.join('');
+}
+
+function _cancelReunionDilemma(oppName) {
+  if (!_reunionDilemmaAge) return;
+  const overlay = document.getElementById('reunion-dilemma-overlay');
+  if (overlay) {
+    const box = overlay.querySelector('.reunion-dilemma-box');
+    box.innerHTML = `
+      <div class="reunion-dilemma-result">
+        <div class="rdr-text">${oppName}突然离开了……聚会不欢而散。</div>
+        <button class="rdr-close">继续</button>
+      </div>
+    `;
+    box.querySelector('.rdr-close').addEventListener('click', () => {
+      overlay.classList.remove('active');
+      setTimeout(() => overlay.remove(), 300);
+      state.autoPlay = state._reunionSavedAuto || false;
+      if (state._reunionSavedAutoMode) startAuto(state._reunionSavedAutoMode);
+      render();
+    });
+  }
+  pushLog(`（${oppName}突然离开了，聚会提前结束）`, 'mp-reunion');
+  _reunionDilemmaAge = 0;
+  _reunionMyChoice = null;
+  _reunionOppChoice = null;
+}
+
+async function _fireReunionEvent(age) {
+  mp.isWaiting = false;
+  if (mp._reunionTimeout) { clearTimeout(mp._reunionTimeout); mp._reunionTimeout = null; }
+  _hideWaitingOverlay();
+  const oppName = mp.opponent.nickname || '对方';
+  const oppProf = mp.opponent.profession || '未知';
+  const oppSchool = mp.opponent.school || '';
+  const oppRel = mp.opponent.relationship || '单身';
+  const relLabel = mp.relation >= 50 ? '老铁' : mp.relation >= 0 ? '同学' : '冤家';
+  const myName = state.nickname || '你';
+
+  // Pause auto-play during reunion (both autoMode timer and state flag)
+  state._reunionSavedAutoMode = autoMode;
+  if (autoMode) stopAuto();
+  state._reunionSavedAuto = state.autoPlay;
+  state.autoPlay = false;
+
+  // 1. Cinematic animation
+  await _playReunionCinematic(age, myName, oppName, oppProf, oppSchool, relLabel);
+
+  // 2. Narrative intro + base effect
+  const cfg = REUNION_DILEMMA[age];
+  const introText = cfg ? cfg.intro(oppName, relLabel, oppProf, oppSchool, oppRel) : `${age}岁的老友聚会。`;
+  const reunionEvent = {
+    id: `mp_reunion_${age}`,
+    event: introText,
+    effect: { SOC: 1, HAP: 1 },
+    noRandom: true,
+  };
+  if (!state.pendingChoice) {
+    applyEvent(reunionEvent);
+  } else {
+    state.pendingEvent = reunionEvent;
+  }
+  pushLog(`🤝 ${age}岁老友聚会！`, 'mp-reunion');
+  render();
+
+  // 3. Show dilemma choices (auto-play stays paused until player closes result)
+  _showReunionDilemma(age, oppName);
+}
+
+function _wireMpMessageHandlers() {
+  mpOn('hello', (data) => {
+    mp.opponent.nickname = data.nickname || '对手';
+    _renderOpponentBar();
+  });
+
+  mpOn('state_sync', (data) => {
+    Object.assign(mp.opponent, data);
+    _renderOpponentBar();
+  });
+
+  mpOn('butterfly', (data) => {
+    if (data.payload) mp.pendingButterfly.push(data.payload);
+  });
+
+  mpOn('reunion_arrived', (data) => {
+    // 如果自己也在特殊剧情中，跳过
+    if (state.storyline && (SPECIAL_STORYLINES.has(state.storyline) || HIDDEN_STORYLINES.has(state.storyline))) {
+      mpSend('reunion_skip', { age: data.age, reason: 'in_storyline' });
+      pushLog(`（你正忙于自己的事业，错过了${data.age}岁的同学聚会）`, 'mp-reunion');
+      render();
+      return;
+    }
+    if (state.age >= data.age && mp.isWaiting && mp.waitReason.includes(`${data.age}`)) {
+      _fireReunionEvent(data.age);
+    } else if (state.age >= data.age) {
+      _fireReunionEvent(data.age);
+    }
+  });
+
+  mpOn('reunion_skip', (data) => {
+    // 对方跳过了同学聚会
+    if (mp.isWaiting && mp.waitReason.includes(`${data.age}`)) {
+      mp.isWaiting = false;
+      _hideWaitingOverlay();
+      pushLog(`（${mp.opponent.nickname}正忙于自己的事业，没来参加${data.age}岁的同学聚会）`, 'mp-reunion');
+      render();
+    }
+  });
+
+  mpOn('reunion_choice', (data) => {
+    _reunionOppChoice = data.choice;
+    if (_reunionMyChoice) {
+      // Both chose — resolve
+      _resolveReunionDilemma(data.age);
+    }
+    // Otherwise we're still waiting for local player to pick
+  });
+
+  mpOn('reunion_effect', (data) => {
+    // Apply effects sent by opponent's dilemma result
+    if (data.effects) {
+      for (const [k, v] of Object.entries(data.effects)) {
+        if (k === 'HAP') state.HAP = Math.max(0, Math.min(10, (state.HAP || 0) + v));
+        else state[k] = Math.max(0, Math.min(10, (state[k] || 0) + v));
+      }
+      const parts = Object.entries(data.effects).map(([k, v]) =>
+        `${STAT_LABELS[k] || k}${v > 0 ? '+' : ''}${v}`
+      );
+      pushLog(`（聚会影响：${parts.join('，')}）`, 'mp-reunion');
+      render();
+    }
+  });
+
+  mpOn('card_played', (data) => {
+    const def = FATE_CARDS[data.card];
+    if (def) {
+      const incoming = { ...def.effect, cardName: def.name, category: def.category };
+      // Chaos cards: attach sender stats
+      if (data.senderStats) incoming._oppStats = data.senderStats;
+      if (data.mirrorKey) { incoming._mirrorKey = data.mirrorKey; incoming._mirrorVal = data.mirrorVal; }
+      mp.incomingCardEffect = incoming;
+      if (state.cardHistory) state.cardHistory.push({
+        age: state.age, month: state.monthOfYear,
+        cardId: data.card, cardName: def.name, direction: 'received',
+      });
+    }
+  });
+
+  mpOn('relation_delta', (data) => {
+    mp.relation = Math.max(-100, Math.min(100, mp.relation + data.delta));
+    _renderOpponentBar();
+  });
+
+  mpOn('coop_invite', (data) => {
+    mp.coopInvitePending = { from: 'them', storyline: data.storyline };
+    _showCoopInviteToast();
+  });
+
+  mpOn('coop_response', (data) => {
+    if (data.accept && data.storyline === 'partners') {
+      const ev = state.eventsMap.get(95020);
+      if (ev) applyEvent(ev);
+      _hideCoopInviteToast();
+    } else {
+      pushLog('（对方婉拒了合作邀请）', 'mp-coop-intro');
+      render();
+    }
+  });
+
+  mpOn('game_end', (data) => {
+    _mpOppEndData = data;
+    // 对方结束了 → 如果我在等待同学聚会，显示提示后关闭
+    if (mp.isWaiting) {
+      mp.isWaiting = false;
+      if (mp._reunionTimeout) { clearTimeout(mp._reunionTimeout); mp._reunionTimeout = null; }
+      _showWaitingDismiss(`${data.nickname || mp.opponent.nickname} 好像已经消失了……同学聚会取消`);
+      pushLog(`（${data.nickname || mp.opponent.nickname}已经结束了人生，同学聚会取消）`, 'mp-reunion');
+    }
+    // 对方在聚会选择中消失 → 自动结算为对方"弃权"(neutral/betray depending on age)
+    _cancelReunionDilemma(data.nickname || mp.opponent.nickname);
+    pushLog(`【${data.nickname || mp.opponent.nickname}】结束了人生：${data.age}岁，得分 ${data.score || '—'}`, 'mp-reunion');
+    render();
+    // If I already ended too, auto-refresh the VS button visibility
+    if (state.phase === 'ended') {
+      const vsBtn = $('btn-mp-vs');
+      if (vsBtn) vsBtn.style.display = '';
+    }
+  });
+
+  mpOn('peer_left', () => {
+    // 取消同学聚会等待
+    if (mp.isWaiting) {
+      mp.isWaiting = false;
+      if (mp._reunionTimeout) { clearTimeout(mp._reunionTimeout); mp._reunionTimeout = null; }
+      _showWaitingDismiss(`${mp.opponent.nickname || '对方'} 好像已经断线了……同学聚会取消`);
+    }
+    // 取消聚会选择
+    _cancelReunionDilemma(mp.opponent.nickname || '对方');
+    // 取消 restart 等待
+    if (_mpRestartPending) {
+      _mpRestartPending = false;
+      _hideWaitingOverlay();
+    }
+    if (state.phase === 'game') {
+      showConfirm({ title: '对方已离开', body: '本局联机结束，将转为单人模式继续。', okText: '好的' });
+      mp.enabled = false;
+      _hideOpponentBar();
+    } else if (state.phase === 'ended') {
+      // Game already over — silently clean up, no disruptive modal
+      mp.connected = false;
+      _hideOpponentBar();
+    }
+  });
+
+  // 再来一次同步
+  mpOn('restart_request', () => _mpOnRestartRequest());
+  mpOn('restart_ready', () => _mpOnRestartReady());
+  mpOn('restart_decline', () => _mpOnRestartDecline());
+}
+
+function _renderOpponentBar() {
+  if (!mp.enabled) { _hideOpponentBar(); return; }
+  const bar = $('mp-opponent-bar');
+  if (!bar) return;
+  bar.style.display = 'flex';
+  $('mp-bar-nick').textContent = mp.opponent.nickname || '对手';
+  $('mp-bar-age').textContent = mp.opponent.age || '—';
+  $('mp-bar-school').textContent = mp.opponent.school || '—';
+  $('mp-bar-major').textContent = mp.opponent.major || '未定';
+  $('mp-bar-prof').textContent = mp.opponent.profession || '—';
+  $('mp-bar-rel').textContent = mp.opponent.relationship || '单身';
+  $('mp-bar-relation-val').textContent = mp.relation;
+  const fill = $('mp-relation-fill');
+  const pct = (mp.relation + 100) / 2;
+  fill.style.width = pct + '%';
+  fill.className = 'mp-relation-fill ' + (mp.relation > 20 ? 'pos' : mp.relation < -20 ? 'neg' : '');
+  const remaining = mp.cards.filter(c => !c.used).length;
+  const cc = $('mp-cards-count');
+  if (cc) cc.textContent = remaining;
+}
+
+function _hideOpponentBar() {
+  const bar = $('mp-opponent-bar');
+  if (bar) bar.style.display = 'none';
+}
+
+function _renderWaitingOverlay() {
+  const ov = $('mp-waiting-overlay');
+  if (!ov) return;
+  ov.style.display = mp.isWaiting ? 'flex' : 'none';
+  const r = $('mp-waiting-reason');
+  if (r) r.textContent = mp.waitReason || '';
+}
+
+function _hideWaitingOverlay() {
+  const ov = $('mp-waiting-overlay');
+  if (ov) ov.style.display = 'none';
+}
+
+// 对方死亡/断线时，把等待覆盖层切换成提示文案，2秒后自动关闭
+function _showWaitingDismiss(msg) {
+  const ov = $('mp-waiting-overlay');
+  if (!ov) return;
+  ov.innerHTML = `
+    <div class="mp-wait-box">
+      <div style="font-size:36px;margin-bottom:12px;">💀</div>
+      <h3 style="color:#ff8a8a;">${msg}</h3>
+    </div>`;
+  ov.style.display = 'flex';
+  setTimeout(() => { ov.style.display = 'none'; render(); }, 2500);
+}
+
+function _renderCardsPanel() {
+  const list = $('mp-cards-list');
+  if (!list) return;
+  list.innerHTML = '';
+  const gradeStars = ['', ' ★', ' ★★'];
+  for (const card of mp.cards) {
+    const cat = card.category || 'harm';
+    const div = document.createElement('div');
+    div.className = 'mp-card-item cat-' + cat + (card.grade === 2 ? ' big' : '') + (card.used ? ' used' : '');
+    div.innerHTML = `
+      <div class="mp-card-name">${card.icon} ${card.name}${gradeStars[card.grade] || ''}</div>
+      <div class="mp-card-desc">${card.desc}</div>
+    `;
+    if (!card.used) {
+      div.addEventListener('click', async () => {
+        // 对方已结束游戏，不能再用卡
+        if (_mpOppEndData) {
+          await showConfirm({ title: '无法使用', body: `${mp.opponent.nickname} 已经不在了……`, okText: '好吧' });
+          return;
+        }
+        const verb = cat === 'help' ? '帮助' : '对';
+        const ok = await showConfirm({
+          title: `使用「${card.name}」`,
+          body: `确定${verb} ${mp.opponent.nickname} 使用「${card.name}」吗？`,
+          okText: '使用', cancelText: '取消',
+        });
+        if (!ok) return;
+        card.used = true;
+        // Build payload — chaos cards need sender's stats
+        const payload = { card: card.id };
+        if (card.effect && card.effect.special) {
+          const base = ['SOC', 'INT', 'MNY', 'PER', 'HLT', 'APP'];
+          payload.senderStats = {};
+          for (const k of base) payload.senderStats[k] = state[k] || 0;
+          // For mirror: compute sender's lowest stat
+          if (card.effect.special === 'mirror_lowest') {
+            let minK = 'HLT', minV = 99;
+            for (const k of base) { if ((state[k] || 0) < minV) { minV = state[k] || 0; minK = k; } }
+            payload.mirrorKey = minK;
+            payload.mirrorVal = minV;
+          }
+          // steal_stat: sender gains 2 to their lowest stat
+          if (card.effect.special === 'steal_stat') {
+            let minK = 'SOC', minV = 99;
+            for (const k of base) { if ((state[k] || 0) < minV) { minV = state[k] || 0; minK = k; } }
+            state[minK] = (state[minK] || 0) + 2;
+            clampStats();
+          }
+          // nuke: sender also takes -3 to two random stats
+          if (card.effect.special === 'nuke') {
+            const shuffled = [...base].sort(() => Math.random() - 0.5).slice(0, 2);
+            for (const k of shuffled) state[k] = (state[k] || 0) - 3;
+            clampStats();
+          }
+        }
+        SFX.sfxCard();
+        mpSend('card_played', payload);
+        if (state.cardHistory) state.cardHistory.push({
+          age: state.age, month: state.monthOfYear,
+          cardId: card.id, cardName: card.name, direction: 'sent',
+        });
+        _changeRelation(card.effect.relationDelta || 0, `使用${card.name}`);
+        const logType = cat === 'help' ? 'mp-reunion' : 'mp-pvp';
+        pushLog(`（你对 ${mp.opponent.nickname} 使用了「${card.name}」）`, logType);
+        _renderCardsPanel();
+        _renderOpponentBar();
+        render();
+      });
+    }
+    list.appendChild(div);
+  }
+}
+
+function _showCoopInviteToast() {
+  const t = $('mp-coop-toast');
+  if (!t) return;
+  t.style.display = 'block';
+  $('mp-coop-text').textContent = `${mp.opponent.nickname} 邀请你一起进入「合伙创业」剧情`;
+}
+
+function _hideCoopInviteToast() {
+  const t = $('mp-coop-toast');
+  if (t) t.style.display = 'none';
+}
+
+function _wireMultiplayerUI() {
+  _wireMpMessageHandlers();
+
+  $('btn-mp-start')?.addEventListener('click', () => {
+    const m = $('mp-modal');
+    if (m) m.style.display = 'flex';
+  });
+
+  $('mp-back-home')?.addEventListener('click', async () => {
+    if (mp.connected || mp.peer) {
+      const ok = await showConfirm({
+        title: '退出联机',
+        body: '确定要退出联机吗？已连接的房间会断开。',
+        okText: '退出', cancelText: '取消',
+      });
+      if (!ok) return;
+      try { mpDisconnect(); } catch (e) {}
+      resetMpState();
+    }
+    $('mp-create-result').style.display = 'none';
+    $('mp-join-status').style.display = 'none';
+    $('mp-connected-banner').style.display = 'none';
+    $('mp-btn-create').disabled = false;
+    $('mp-btn-create').textContent = '创建房间';
+    $('mp-btn-join').disabled = false;
+    $('mp-btn-join').textContent = '加入房间';
+    $('mp-modal').style.display = 'none';
+  });
+
+  $('mp-tab-create')?.addEventListener('click', () => {
+    $('mp-tab-create').classList.add('active');
+    $('mp-tab-join').classList.remove('active');
+    $('mp-pane-create').style.display = '';
+    $('mp-pane-join').style.display = 'none';
+  });
+  $('mp-tab-join')?.addEventListener('click', () => {
+    $('mp-tab-join').classList.add('active');
+    $('mp-tab-create').classList.remove('active');
+    $('mp-pane-join').style.display = '';
+    $('mp-pane-create').style.display = 'none';
+  });
+
+  $('mp-btn-create')?.addEventListener('click', async () => {
+    const name = ($('mp-create-name').value || '房主').trim();
+    const btn = $('mp-btn-create');
+    btn.disabled = true; btn.textContent = '创建中...';
+    try {
+      const code = await createRoom(name);
+      $('mp-roomcode').textContent = code;
+      $('mp-create-result').style.display = 'block';
+    } catch (e) {
+      alert('创建失败: ' + (e.message || e));
+      btn.disabled = false; btn.textContent = '创建房间';
+    }
+  });
+
+  $('mp-copy-code')?.addEventListener('click', () => {
+    const code = $('mp-roomcode')?.textContent || '';
+    if (!code || code === '------') return;
+    navigator.clipboard.writeText(code).then(() => {
+      const toast = $('mp-copy-toast');
+      if (toast) { toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 1500); }
+    });
+  });
+
+  $('mp-btn-join')?.addEventListener('click', async () => {
+    const name = ($('mp-join-name').value || '玩家').trim();
+    const code = ($('mp-join-code').value || '').trim().toUpperCase();
+    if (!code || code.length !== 6) { alert('请输入6位房间码'); return; }
+    const btn = $('mp-btn-join');
+    btn.disabled = true; btn.textContent = '连接中...';
+    const status = $('mp-join-status');
+    status.style.display = 'block';
+    status.textContent = '正在连接房主...';
+    try {
+      await joinRoom(code, name);
+      status.textContent = '✅ 已连接，等待房主开始游戏';
+    } catch (e) {
+      alert('加入失败: ' + (e.message || e));
+      btn.disabled = false; btn.textContent = '加入房间';
+      status.style.display = 'none';
+    }
+  });
+
+  let _mpMyReady = false;
+  let _mpOppReady = false;
+
+  function _updateLobbyStatus() {
+    const meStatus = $('mp-lobby-me-status');
+    const oppStatus = $('mp-lobby-opp-status');
+    if (meStatus) {
+      meStatus.textContent = _mpMyReady ? '✓ 已准备' : '未准备';
+      meStatus.className = 'mp-lobby-status' + (_mpMyReady ? ' ready' : '');
+    }
+    if (oppStatus) {
+      oppStatus.textContent = _mpOppReady ? '✓ 已准备' : '未准备';
+      oppStatus.className = 'mp-lobby-status' + (_mpOppReady ? ' ready' : '');
+    }
+    const hint = $('mp-ready-hint');
+    if (hint) {
+      if (_mpMyReady && !_mpOppReady) {
+        hint.style.display = 'block';
+        hint.textContent = '等待对方准备...';
+      } else {
+        hint.style.display = 'none';
+      }
+    }
+    const btn = $('mp-ready-btn');
+    if (btn) {
+      if (_mpMyReady) {
+        btn.textContent = '取消准备';
+        btn.classList.add('cancel');
+      } else {
+        btn.textContent = '准备';
+        btn.classList.remove('cancel');
+      }
+    }
+  }
+
+  mpOn('connected', () => {
+    _mpMyReady = false;
+    _mpOppReady = false;
+    $('mp-connected-banner').style.display = 'block';
+    if ($('mp-lobby-me')) $('mp-lobby-me').textContent = mp.myNickname || '我';
+    if ($('mp-lobby-me-tag')) $('mp-lobby-me-tag').textContent = mp.isHost ? '房主' : '加入者';
+    if ($('mp-lobby-opp')) $('mp-lobby-opp').textContent = '已连接';
+    if ($('mp-lobby-opp-tag')) $('mp-lobby-opp-tag').textContent = mp.isHost ? '加入者' : '房主';
+    _updateLobbyStatus();
+  });
+  mpOn('hello', () => {
+    if ($('mp-lobby-opp')) $('mp-lobby-opp').textContent = mp.opponent.nickname;
+  });
+
+  $('mp-ready-btn')?.addEventListener('click', () => {
+    _mpMyReady = !_mpMyReady;
+    mpSend('ready_state', { ready: _mpMyReady });
+    _updateLobbyStatus();
+    if (_mpMyReady && _mpOppReady) {
+      // 双方都准备 → 开始游戏
+      mpSend('start_game', {});
+      _enterMpCreation();
+    }
+  });
+
+  mpOn('ready_state', (data) => {
+    _mpOppReady = data.ready;
+    _updateLobbyStatus();
+    if (_mpMyReady && _mpOppReady) {
+      mpSend('start_game', {});
+      _enterMpCreation();
+    }
+  });
+
+  mpOn('start_game', () => {
+    _enterMpCreation();
+  });
+
+  $('mp-cards-btn')?.addEventListener('click', () => {
+    const p = $('mp-cards-panel');
+    if (!p) return;
+    if (p.style.display === 'block') { p.style.display = 'none'; return; }
+    _renderCardsPanel();
+    p.style.display = 'block';
+  });
+  $('mp-cards-close')?.addEventListener('click', () => {
+    $('mp-cards-panel').style.display = 'none';
+  });
+
+  $('mp-coop-accept')?.addEventListener('click', () => {
+    mpSend('coop_response', { accept: true, storyline: 'partners' });
+    const ev = state.eventsMap.get(95020);
+    if (ev) applyEvent(ev);
+    _hideCoopInviteToast();
+    render();
+  });
+  $('mp-coop-decline')?.addEventListener('click', () => {
+    mpSend('coop_response', { accept: false, storyline: 'partners' });
+    _hideCoopInviteToast();
+  });
+
+  window.addEventListener('beforeunload', () => {
+    if (mp.enabled && mp.connected) {
+      try { mpSend('peer_left', {}); } catch (e) {}
+      mpDisconnect();
+    }
+  });
+}
+
+// ── 完整重置游戏状态（不 reload 页面） ─────────────────────────────────────
+function _resetGameState() {
+  // 清空 state 到初始值
+  state.phase = 'talent';
+  for (const k of STAT_KEYS) { state.alloc[k] = 0; state.allocBase[k] = 0; state[k] = 0; }
+  state.HAP = 5;
+  state.talentsPool = [];
+  state.talentsPicked = [];
+  state.talentIds = new Set();
+  state.firedEvents = new Set();
+  state.yearlyPlan = new Map();
+  state.log = [];
+  state.logRenderedCount = 0;
+  state.sex = 0;
+  state.age = 15;
+  state.monthOfYear = 1;
+  state.monthTotal = 1;
+  state.school = '无';
+  state.hsType = '';
+  state.overseas = 0;
+  state.country = '';
+  state.countryIntent = '';
+  state.schoolTier = '';
+  state.major = '';
+  state.relationship = '单身';
+  state.relationshipHistory = [];
+  state.storyline = '';
+  state.storylineStart = 0;
+  state.storylineStartMonth = 0;
+  state.profession = '高中生';
+  state.gradEndAge = 0;
+  state.gradEndMonth = 0;
+  state.pendingEvent = null;
+  state.pendingChoice = null;
+  state.lastChoiceMonth = 0;
+  state._savedAutoMode = 0;
+  state.POP = 0; state.POK = 0; state.MMR = 0;
+  state.FIT = 0; state.CKL = 0; state.ATH = 0;
+  state.MAG = 0; state.hogwartsYear = 0; state.housePt = 0; state.house = ''; state.hasOwl = 0; state.hogwartsSeed = 0;
+  // 隐藏特殊属性面板
+  state.showPOP = false; state.showPOK = false; state.showMMR = false;
+  state.showFIT = false; state.showCKL = false; state.showATH = false;
+  state.showMAG = false;
+  state.cul = 0; state.dao = 0; state.karma = 0; state.tribulation = 0;
+  state.xianxiaSeed = 0; state.yuanshen_book = 0; state.xingchen_book = 0;
+  state.statPeaks = {};
+  state.storylinesVisited = new Set();
+  state.choiceHistory = [];
+  state.milestones = [];
+  state.cardHistory = [];
+  state._frenemyDraftPool = null;
+  state._frenemyDraftPicked = [];
+  // 清除各种 flag
+  for (const flag of ['match_fixing', 'japan_path', 'jp_fluent', 'kohaku', 'scandal',
+    'party_clean', 'party_dirty', 'academic_dishonesty', 'late_dropout', 'hobby',
+    'idol_stage', 'debut_attempted', 'party_stage', 'esports_stage', 'poker_stage',
+    'fitness_stage', 'chef_stage', 'athlete_stage', 'pendingCinematic', '_cineSavedAuto']) {
+    delete state[flag];
+  }
+  // 停止自动播放
+  if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+  autoMode = 0;
+  // 清 MP end data
+  _mpMyEndData = null;
+  _mpOppEndData = null;
+  // 清 UI
+  const eventLog = $('event-log');
+  if (eventLog) eventLog.innerHTML = '';
+  const vsOverlay = $('mp-vs-overlay');
+  if (vsOverlay) vsOverlay.style.display = 'none';
+  const endOverlay = $('end-overlay');
+  if (endOverlay) endOverlay.classList.remove('active');
+  const vsBtn = $('btn-mp-vs');
+  if (vsBtn) vsBtn.style.display = 'none';
+  // 重置 step 显示状态
+  const stepTalents = $('step-talents');
+  const stepFrenemy = $('step-frenemy');
+  const stepAlloc = $('step-alloc');
+  if (stepTalents) stepTalents.style.display = '';
+  if (stepFrenemy) stepFrenemy.style.display = 'none';
+  if (stepAlloc) stepAlloc.style.display = '';
+}
+
+function _enterMpCreation() {
+  _resetGameState();
+  mp.cards = [];
+  mp.relation = 0;
+  mp.incomingCardEffect = null;
+  mp.pendingReunionAge = null;
+  mp.isWaiting = false;
+  mp.waitReason = '';
+  mp.pendingButterfly = [];
+  mp.butterflySent = new Set();
+  mp.coopInvitePending = null;
+  mp.opponent.age = 15;
+  mp.opponent.profession = '高中生';
+  mp.opponent.school = '';
+  mp.opponent.major = '';
+  mp.opponent.storyline = '';
+  mp.opponent.relationship = '单身';
+  mp.opponent.stats = { SOC: 0, INT: 0, MNY: 0, PER: 0, HLT: 0, APP: 0, HAP: 5 };
+  mp.opponent.endingId = null;
+  mp.opponent.endingScore = 0;
+  $('mp-modal').style.display = 'none';
+  state.faceVariant = Math.floor(Math.random() * 10);
+  state.topVariant = Math.floor(Math.random() * 24);
+  state.bottomVariant = Math.floor(Math.random() * 8);
+  state.outfitColorId = Math.floor(Math.random() * 16);
+  if (typeof state.skinTone !== 'number') state.skinTone = 1;
+  for (let t = 0; t < 3; t++) {
+    const el = $(`skin-${t}`);
+    if (el) el.classList.toggle('active', t === state.skinTone);
+  }
+  state.sex = 0;
+  $('sex-male').classList.add('active');
+  $('sex-female').classList.remove('active');
+  // 重新抽天赋
+  if (_allTalents) renderTalentSelect(_allTalents);
+  $('talent-confirm').disabled = true;
+  $('talent-confirm').textContent = '确认天赋（0/3）';
+  showScreen('creation-screen');
+  const scrollArea = $('creation-scroll-area');
+  if (scrollArea) scrollArea.scrollTop = 0;
+}
+
+// ── 联机模式再来一次 ──────────────────────────────────────────────────────
+let _mpRestartPending = false; // 我已发出 restart 请求
+
+function _mpHandleRestart() {
+  // 联机模式：发送 restart 请求并等待对方
+  if (!mp.enabled || !mp.connected) {
+    // 非联机或已断线，直接 reload
+    location.reload();
+    return;
+  }
+  if (_mpRestartPending) return; // 已经在等了
+  // 如果对方还没结束，提示等待
+  if (!_mpOppEndData) {
+    showConfirm({ title: '对方还在游戏中', body: '等对方也结束后才能一起再来一次哦', okText: '好的' });
+    return;
+  }
+  _mpRestartPending = true;
+  mpSend('restart_request', {});
+  // 显示等待 UI
+  const ov = $('mp-waiting-overlay');
+  if (ov) {
+    const r = $('mp-waiting-reason');
+    ov.style.display = 'flex';
+    if (r) r.textContent = '等待对方确认再来一次...';
+  }
+}
+
+function _mpOnRestartRequest() {
+  // 对方想再来一次
+  showConfirm({
+    title: '再来一次？',
+    body: `${mp.opponent.nickname} 想再来一次，一起吗？`,
+    okText: '走起！', cancelText: '算了',
+  }).then(ok => {
+    if (ok) {
+      mpSend('restart_ready', {});
+      _mpDoRestart();
+    } else {
+      mpSend('restart_decline', {});
+    }
+  });
+}
+
+function _mpOnRestartReady() {
+  // 对方同意了
+  _mpRestartPending = false;
+  _hideWaitingOverlay();
+  _mpDoRestart();
+}
+
+function _mpOnRestartDecline() {
+  // 对方拒绝了
+  _mpRestartPending = false;
+  _hideWaitingOverlay();
+  showConfirm({ title: '对方拒绝了', body: `${mp.opponent.nickname} 不想再来一次了`, okText: '好吧' });
+}
+
+function _mpDoRestart() {
+  _enterMpCreation();
+  _renderOpponentBar();
 }
 
 main();

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>Outfit grid</title>
+<style>
+  body { background:#1a1a24; color:#eee; font-family: ui-monospace, monospace; padding: 12px; }
+  .grid { display:grid; grid-template-columns: repeat(8, 96px); gap: 12px; }
+  .cell { display:flex; flex-direction:column; align-items:center; gap:4px; font-size:11px; }
+  canvas { width: 96px; height: 96px; image-rendering: pixelated; background:#2c3850; border:1px solid #555; }
+  h1 { font-size:14px; margin: 6px 0 12px; }
+  .sec { color:#9cf; margin-top:18px; }
+</style>
+</head>
+<body>
+<h1>Outfit grid · ?sex=0 male · add ?sex=1 for female</h1>
+<div id="grid" class="grid"></div>
+
+<script type="module">
+import { renderAvatar } from './js/avatar.js';
+
+const sex = +new URLSearchParams(location.search).get('sex') || 0;
+
+const OUTFITS = [
+  // school
+  'school', 'school_blazer', 'school_pe',
+  // suit
+  'suit', 'premium_suit', 'tuxedo', 'cheap_suit', 'shirt_tie', 'blazer',
+  // hoodie
+  'hoodie', 'cs_hoodie', 'grad_hoodie',
+  // xianxia
+  'hanfu', 'daoist_robe', 'sect_uniform',
+  // idol
+  'idol', 'idol_dress', 'idol_jacket',
+  // labcoat / chef
+  'labcoat', 'chef',
+  // sport
+  'tracksuit', 'tank', 'jersey', 'gaming_jersey',
+  // robe
+  'robe', 'house_robe',
+  // daily
+  'tee', 'polo', 'flannel', 'cardigan', 'sweater_v', 'turtleneck',
+  'denim_jacket', 'varsity', 'jacket', 'striped_tee', 'hawaiian',
+  // status
+  'tank',
+  // special
+  'tactical', 'trench', 'naval', 'politician', 'thief', 'poker_vest',
+  'winter_coat', 'puffer', 'art_smock', 'beret_top', 'photo_vest',
+  'ragged', 'patched_tee', 'pajamas',
+];
+
+const grid = document.getElementById('grid');
+for (const id of OUTFITS) {
+  const cell = document.createElement('div');
+  cell.className = 'cell';
+  const c = document.createElement('canvas');
+  c.width = 64; c.height = 64;
+  cell.appendChild(c);
+  const lbl = document.createElement('span');
+  lbl.textContent = id;
+  cell.appendChild(lbl);
+  grid.appendChild(cell);
+
+  const state = {
+    sex,
+    HLT: 6, INT: 6, APP: 6, MNY: 6, PER: 6, SOC: 6, HAP: 6,
+    skinTone: 1,
+    outfitColorId: 0,
+    topVariant: 0,
+    faceVariant: 0,
+    bottomVariant: 0,
+    // force outfit by stuffing storyline+stage that maps, OR by patching outfitOf:
+    _forceOutfit: id,
+  };
+
+  renderAvatar(c, state);
+}
+</script>
+</body>
+</html>

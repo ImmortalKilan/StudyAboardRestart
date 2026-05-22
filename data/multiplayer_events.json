@@ -1,0 +1,332 @@
+[
+  {
+    "_comment": "── 同学聚会事件（mp_reunion） ────────────────────────────────────────",
+    "_comment2": "由引擎在 age 25/30/35 触发，双方同时进入。事件文本由 game.js 动态合成（含对方信息）"
+  },
+  {
+    "id": 95001,
+    "event": "【同学聚会·25岁】毕业两年了。你和老同学约在了一家烧烤店，啤酒一上来就开始唠。他/她说了最近的近况，你也说了自己的。空气里有种说不清的东西——既怀念，也较劲。",
+    "noRandom": true,
+    "mp": true,
+    "logType": "mp-reunion",
+    "choices": [
+      {
+        "text": "炫耀一下近况",
+        "_mpEffect": "boast",
+        "effect": { "SOC": 1, "HAP": 1 },
+        "_mpRelation": -5,
+        "resultText": "你把最近的成就讲得绘声绘色。对方笑着点头，但眼神里有一丝复杂。"
+      },
+      {
+        "text": "真诚关心对方",
+        "_mpEffect": "care",
+        "effect": { "SOC": 1, "HAP": 1 },
+        "_mpRelation": 10,
+        "resultText": "你主动问起对方的烦恼。聊到最后，对方红着眼眶给你倒了一杯酒：「兄弟/姐妹，谢谢你还记得我。」"
+      },
+      {
+        "text": "提议合作做点什么",
+        "_mpEffect": "propose_coop",
+        "effect": { "INT": 1 },
+        "_mpRelation": 5,
+        "resultText": "你提议有机会一起搞点事。对方眼睛亮了一下：「你认真的？」"
+      },
+      {
+        "text": "酒过三巡互相吐槽",
+        "_mpEffect": "vent",
+        "effect": { "HAP": 2 },
+        "_mpRelation": 5,
+        "resultText": "你们从老师吐槽到老板，从前任骂到房东。散场时两个人都笑得眼角带泪。"
+      }
+    ]
+  },
+  {
+    "id": 95002,
+    "event": "【同学聚会·30岁】三十岁了。老同学约你在一家更安静的小酒馆。这次少了炫耀和较劲，多了沉默和叹气。你们都不再是当年那个意气风发的少年。",
+    "noRandom": true,
+    "mp": true,
+    "logType": "mp-reunion",
+    "choices": [
+      {
+        "text": "互相打气：以后还要再来",
+        "_mpEffect": "encourage",
+        "effect": { "HAP": 2, "PER": 1 },
+        "_mpRelation": 10,
+        "resultText": "你们碰了一下杯。没什么豪言壮语，但都知道彼此还在。"
+      },
+      {
+        "text": "抱怨人生的不公",
+        "_mpEffect": "complain",
+        "effect": { "HAP": -1 },
+        "_mpRelation": -3,
+        "resultText": "你说了很多。对方安静地听，偶尔点头，但你能感觉到他/她也累了。"
+      },
+      {
+        "text": "约定下次再聚",
+        "_mpEffect": "appointment",
+        "effect": { "SOC": 1 },
+        "_mpRelation": 8,
+        "resultText": "你们在结账时定了个含糊的「下次」——但都知道这次可能比上次更晚。"
+      },
+      {
+        "text": "聊聊各自的家庭",
+        "_mpEffect": "family",
+        "effect": { "HAP": 1, "PER": 1 },
+        "_mpRelation": 5,
+        "resultText": "你们聊起了父母、伴侣、孩子，或者「为什么还没有」。三十岁的话题，绕不开这个。"
+      }
+    ]
+  },
+  {
+    "id": 95003,
+    "event": "【同学聚会·35岁】这次不是约的，是某个共同好友的婚礼。你们在酒桌上重逢——头发都没有当年茂密了。新郎敬酒的时候你们对视了一眼，谁都没说话，但都笑了。",
+    "noRandom": true,
+    "mp": true,
+    "logType": "mp-reunion",
+    "choices": [
+      {
+        "text": "敬一杯，致逝去的青春",
+        "_mpEffect": "nostalgia",
+        "effect": { "HAP": 1, "PER": 1 },
+        "_mpRelation": 8,
+        "resultText": "你们各自端起一杯白的。没说话，一饮而尽。眼眶都有点湿。"
+      },
+      {
+        "text": "悄悄聊聊新郎的八卦",
+        "_mpEffect": "gossip",
+        "effect": { "HAP": 2, "SOC": 1 },
+        "_mpRelation": 5,
+        "resultText": "你们躲在角落小声嘀咕。聊到他大学时干的某件糗事，两个人笑到捂嘴。"
+      },
+      {
+        "text": "互留新的联系方式",
+        "_mpEffect": "reconnect",
+        "effect": { "SOC": 2 },
+        "_mpRelation": 12,
+        "resultText": "你们交换了新的微信、新的电话、新的地址。这次说「常联系」的时候，似乎是真心的。"
+      }
+    ]
+  },
+
+  {
+    "_comment3": "── 蝴蝶效应：收到对方拒绝后的接力事件 ──────────────────────────────",
+    "_comment4": "当对方在关键机会事件上选择「拒绝」，对方的 mp 模块发消息给你，你下个月触发对应的接力事件"
+  },
+  {
+    "id": 95010,
+    "event": "【蝴蝶效应】你听老同学说，TA 拒绝了一个大厂实习机会。对方说「机会让给你了」。你犹豫了一下——要不要去试试？",
+    "noRandom": true,
+    "mp": true,
+    "butterflyReceive": "internship",
+    "logType": "mp-butterfly",
+    "choices": [
+      {
+        "text": "接住机会，飞过去面试",
+        "effect": { "INT": 2, "MNY": 2, "SOC": 1, "HLT": -1 },
+        "_mpRelation": 8,
+        "resultText": "你拿下了 offer。入职那天你想起老同学的那句「让给你了」，悄悄发了个红包过去。"
+      },
+      {
+        "text": "礼貌婉拒，自己的路自己走",
+        "effect": { "PER": 2, "HAP": 1 },
+        "_mpRelation": -3,
+        "resultText": "你婉拒了。心里有种说不清的感觉——是骄傲，还是后悔？"
+      }
+    ]
+  },
+  {
+    "id": 95011,
+    "event": "【蝴蝶效应】老同学没去那个城市发展。TA 把当初本来想去的那个圈子的联系人介绍给了你——一个很关键的 networking 机会。",
+    "noRandom": true,
+    "mp": true,
+    "butterflyReceive": "network",
+    "logType": "mp-butterfly",
+    "choices": [
+      {
+        "text": "积极对接，建立人脉",
+        "effect": { "SOC": 3, "MNY": 1 },
+        "_mpRelation": 10,
+        "resultText": "你顺利打入了那个圈子。两年后回头看，那是改变你职业曲线的关键节点。"
+      },
+      {
+        "text": "记下联系方式，先观望",
+        "effect": { "INT": 1 },
+        "_mpRelation": 0,
+        "resultText": "你把联系人加了微信，但没主动找过。也许某天会用到。"
+      }
+    ]
+  },
+  {
+    "id": 95012,
+    "event": "【蝴蝶效应】老同学放弃了一个创业邀请，把发起人引荐给了你。对方说想拉你入伙。",
+    "noRandom": true,
+    "mp": true,
+    "butterflyReceive": "startup",
+    "logType": "mp-butterfly",
+    "choices": [
+      {
+        "text": "加入创业团队",
+        "effect": { "MNY": -1, "INT": 1, "SOC": 2, "HLT": -1 },
+        "_mpRelation": 5,
+        "resultText": "你正式入伙。开局艰难，但你觉得这一次有点不一样。"
+      },
+      {
+        "text": "委婉拒绝，求稳",
+        "effect": { "HAP": 1, "PER": 1 },
+        "_mpRelation": 0,
+        "resultText": "你说自己暂时还没准备好。后来听说那个项目跑得不错——但你也没那么后悔。"
+      }
+    ]
+  },
+  {
+    "id": 95013,
+    "event": "【蝴蝶效应】老同学没接受出国深造的机会。TA 把推荐信和教授联系方式转给了你——「我用不上了，你试试？」",
+    "noRandom": true,
+    "mp": true,
+    "butterflyReceive": "overseas_advanced",
+    "logType": "mp-butterfly",
+    "choices": [
+      {
+        "text": "申请，去读个硕士/PhD",
+        "effect": { "INT": 3, "MNY": -2, "PER": 1 },
+        "_mpRelation": 8,
+        "resultText": "你拿到了 offer。出发那天，你给老同学发了一张机场的照片。TA 回了句「替我看看」。"
+      },
+      {
+        "text": "感谢一下，但暂时不去",
+        "effect": { "SOC": 1 },
+        "_mpRelation": 2,
+        "resultText": "你说了一堆感谢的话，但心里清楚那不是属于你的路。"
+      }
+    ]
+  },
+  {
+    "id": 95014,
+    "event": "【蝴蝶效应】老同学拒绝了一段感情。TA 把对方的故事讲给你听，说「你们俩或许更合适」。",
+    "noRandom": true,
+    "mp": true,
+    "butterflyReceive": "romance",
+    "logType": "mp-butterfly",
+    "choices": [
+      {
+        "text": "见一面看看",
+        "effect": { "SOC": 2, "HAP": 1, "APP": 1 },
+        "_mpRelation": 5,
+        "resultText": "你们见面了。聊了三个小时，加了微信。后来的故事，是另外一个故事。"
+      },
+      {
+        "text": "感谢但拒绝",
+        "effect": { "PER": 1 },
+        "_mpRelation": 0,
+        "resultText": "你说自己最近不想谈感情。老同学笑着说「也好，缘分这东西强求不来」。"
+      }
+    ]
+  },
+
+  {
+    "_comment5": "── 双人合伙创业剧情入口 ─────────────────────────────────────────────",
+    "_comment6": "由 25 岁同学聚会的「提议合作」选项触发邀请；双方都同意后进入"
+  },
+  {
+    "id": 95020,
+    "event": "【合伙开始】你们在烧烤店的纸巾背面画了第一份「商业计划」。第二天清醒了看，那字迹像鬼画符——但你们都没扔。三个月后，公司注册下来了。",
+    "noRandom": true,
+    "mp": true,
+    "set": { "storyline": "partners" },
+    "logType": "mp-coop-intro",
+    "effect": { "MNY": -2, "SOC": 2, "INT": 1 }
+  },
+  {
+    "id": 95021,
+    "event": "【合伙剧情】产品的第一个版本上线了，下载量惨淡。你们坐在出租办公室里，谁都不想先说话。",
+    "noRandom": true,
+    "mp": true,
+    "storyline": "partners",
+    "weight": 6,
+    "choices": [
+      {
+        "text": "你坚持产品方向是对的",
+        "effect": { "PER": 1, "MNY": -1 },
+        "_mpRelation": -3,
+        "resultText": "你说服了对方。再撑两个月——下载量没变化，但你们撑住了。"
+      },
+      {
+        "text": "提议大改方向",
+        "effect": { "INT": 2, "MNY": -1 },
+        "_mpRelation": 3,
+        "resultText": "你们花了两周重新立项。新版本上线后，留存数据好看了一些。"
+      },
+      {
+        "text": "把决定权交给对方",
+        "effect": { "SOC": 1 },
+        "_mpRelation": 10,
+        "resultText": "你说「你来定，我跟」。对方愣了一下，然后认真地想了三天。"
+      }
+    ]
+  },
+  {
+    "id": 95022,
+    "event": "【合伙剧情】融资终于谈下来了。但对方投资人提的条款里有一条——只能一个人当 CEO。",
+    "noRandom": true,
+    "mp": true,
+    "storyline": "partners",
+    "weight": 4,
+    "choices": [
+      {
+        "text": "争取CEO位置",
+        "effect": { "SOC": 2, "MNY": 1 },
+        "_mpRelation": -15,
+        "set": { "ceo_won": true },
+        "resultText": "你最终拿下了 CEO。对方退到了 CTO。从此你们的关系变了——但公司继续往前跑。"
+      },
+      {
+        "text": "让对方当CEO，自己做CTO",
+        "effect": { "INT": 2, "PER": 2 },
+        "_mpRelation": 20,
+        "set": { "ceo_won": false },
+        "resultText": "你主动退了一步。对方紧紧握住你的手，说「这份情我记一辈子」。"
+      },
+      {
+        "text": "拒绝这笔投资，找别家",
+        "effect": { "MNY": -2, "PER": 2 },
+        "_mpRelation": 8,
+        "resultText": "你们一起拒绝了。三个月后找到了一家不要这种条款的小VC——估值低一半，但你们都松了一口气。"
+      }
+    ]
+  },
+  {
+    "id": 95023,
+    "event": "【合伙剧情·真结局】五年了。公司上市那天，你们站在交易所的钟前。镜头闪了几百次。你们没看镜头，互相看了一眼——那一眼里有创业前夜的烧烤店，有融资被拒的雨夜，有第一次发工资时手抖的瞬间。",
+    "noRandom": true,
+    "mp": true,
+    "storyline": "partners",
+    "logType": "ending",
+    "effect": { "MNY": 5, "SOC": 3, "HAP": 5 },
+    "end": true
+  },
+
+  {
+    "_comment7": "── PvP 类对抗事件（聚会期间可触发） ─────────────────────────────────",
+    "_comment8": "在同学聚会的对话里出现「比一比」选项，双方需都同意才进入"
+  },
+  {
+    "id": 95030,
+    "event": "【PvP·喝酒比拼】酒桌上有人提议「来比试一下」。你们俩对视一眼，谁也不让谁。",
+    "noRandom": true,
+    "mp": true,
+    "pvp": "drinking",
+    "logType": "mp-pvp",
+    "_mpCompare": "HLT+PER",
+    "effect": { "HAP": 1 }
+  },
+  {
+    "id": 95031,
+    "event": "【PvP·麻将开局】你们四缺二硬凑了一桌。谁手气更好？",
+    "noRandom": true,
+    "mp": true,
+    "pvp": "mahjong",
+    "logType": "mp-pvp",
+    "_mpCompare": "INT+APP",
+    "effect": { "HAP": 1 }
+  }
+]

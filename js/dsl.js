@@ -5,6 +5,9 @@ const ALIASES = {
   SCHOOL: 'school', PROF: 'profession', school: 'school', profession: 'profession',
   HS: 'hsType', hsType: 'hsType',
   OVERSEAS: 'overseas', overseas: 'overseas',
+  COUNTRY: 'country', country: 'country',
+  INTENT: 'countryIntent', countryIntent: 'countryIntent',
+  TIER: 'schoolTier', schoolTier: 'schoolTier',
   MAJOR: 'major', major: 'major',
   STORYLINE: 'storyline', storyline: 'storyline',
   MMR: 'MMR', POP: 'POP', POK: 'POK',
@@ -12,7 +15,14 @@ const ALIASES = {
   relationship: 'relationship', REL: 'relationship',
   cul: 'cul', CUL: 'cul', dao: 'dao', DAO: 'dao',
   karma: 'karma', KARMA: 'karma', tribulation: 'tribulation', TRIB: 'tribulation',
-  xianxiaSeed: 'xianxiaSeed', yuanshen_book: 'yuanshen_book', xingchen_book: 'xingchen_book'
+  xianxiaSeed: 'xianxiaSeed', yuanshen_book: 'yuanshen_book', xingchen_book: 'xingchen_book',
+  MAG: 'MAG', hogwartsYear: 'hogwartsYear', housePt: 'housePt', house: 'house',
+  hasOwl: 'hasOwl', hogwartsSeed: 'hogwartsSeed',
+  canFly: 'canFly', quidditch: 'quidditch', darkForces: 'darkForces',
+  DA_member: 'DA_member', triwizard: 'triwizard',
+  invisibility_cloak: 'invisibility_cloak', hogsmeade_secret: 'hogsmeade_secret',
+  duel_wins: 'duel_wins', duel_losses: 'duel_losses',
+  voldemort_defeated: 'voldemort_defeated'
 };
 
 function readVar(state, key) {
@@ -144,7 +154,7 @@ export function pickBranch(state, branches) {
       }
       
       if (cond === '' || evalCondition(state, cond)) {
-        validItems.push({ id: Number(idStr), weight: Number(wStr) });
+        validItems.push({ id: /^\d+$/.test(idStr) ? Number(idStr) : idStr, weight: Number(wStr) });
       }
     }
     
@@ -163,7 +173,8 @@ export function pickBranch(state, branches) {
     const idx = b.lastIndexOf('?');
     if (idx < 0) continue;
     const cond = b.slice(0, idx).trim();
-    const id = Number(b.slice(idx + 1).trim());
+    const raw = b.slice(idx + 1).trim();
+    const id = /^\d+$/.test(raw) ? Number(raw) : raw;
     if (cond === '' || evalCondition(state, cond)) return id;
   }
   return null;
