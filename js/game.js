@@ -3377,7 +3377,13 @@ function animateScore(targetScore) {
       else if (targetScore >= 9000) { rankText = 'C级 勉强算人'; rankClass = 'rank-C'; }
 
 
-      rankEl.textContent = rankText;
+      // Split into rank grade line + comment line
+      const parts = rankText.match(/^(\S+)\s+(.+)$/);
+      if (parts) {
+        rankEl.innerHTML = `<span class="rank-grade">${parts[1]}</span><span class="rank-comment">${parts[2]}</span>`;
+      } else {
+        rankEl.textContent = rankText;
+      }
       rankEl.classList.add(rankClass, 'stamp');
     }
   }
@@ -3620,11 +3626,12 @@ function renderSummary() {
     if (goBtn) goBtn.addEventListener('click', () => { openFlowchart(); });
   }
 
-  // ── MP: broadcast end data & show VS button ──
+  // ── MP: broadcast end data & show VS button & opponent status ──
   if (mp.enabled) {
     _mpBroadcastEndData();
     const vsBtn = $('btn-mp-vs');
     if (vsBtn) vsBtn.style.display = '';
+    _updateMpSummaryStatus();
   }
 }
 
@@ -3832,7 +3839,7 @@ function _mpRenderAwards(me, opp) {
       `).join('');
 
   return `
-    <div class="mp-vs-awards-title">🏅 颁奖典礼</div>
+    <div class="mp-vs-awards-title">颁奖典礼</div>
     <div class="mp-vs-awards-cols">
       <div class="mp-vs-awards-col left">
         <div class="awards-col-name">${me.nickname}</div>
@@ -3887,6 +3894,25 @@ function _mpBroadcastEndData() {
   _mpMyEndData = _mpBuildMySnapshot();
   if (mp.connected && mpSend) {
     mpSend('game_end', _mpMyEndData);
+  }
+}
+
+function _updateMpSummaryStatus() {
+  const el = $('mp-summary-status');
+  const txt = $('mp-summary-status-text');
+  if (!el || !txt) return;
+  if (!mp.enabled) { el.style.display = 'none'; return; }
+  el.style.display = 'flex';
+  const oppName = mp.opponent?.nickname || '对方';
+  if (_mpOppEndData) {
+    el.classList.add('opp-ended');
+    txt.textContent = `${oppName} 已结束人生（${_mpOppEndData.age}岁，${_mpOppEndData.score || '—'}分）— 点击「查看双人对比」`;
+  } else if (!mp.connected) {
+    el.classList.remove('opp-ended');
+    txt.textContent = `${oppName} 已断开连接`;
+  } else {
+    el.classList.remove('opp-ended');
+    txt.textContent = `${oppName} 还在奋斗中…结束后可查看双人对比`;
   }
 }
 
@@ -3954,7 +3980,7 @@ function _mpShowVsComparison() {
     const oppNeg = oppVal < 0;
     return `<div class="mp-vs-stat-row">
       <div class="mp-vs-bar-cell left">
-        <span class="mp-vs-val-label${myNeg ? ' neg' : ''}">${myWin ? '👑 ' : ''}${myVal}</span>
+        <span class="mp-vs-val-label${myNeg ? ' neg' : ''}${myWin ? ' win' : ''}">${myVal}</span>
         <div class="mp-vs-bar-track">
           <div class="mp-vs-bar${myNeg ? ' neg' : ''}" style="width:${myPct}%"></div>
         </div>
@@ -3964,7 +3990,7 @@ function _mpShowVsComparison() {
         <div class="mp-vs-bar-track">
           <div class="mp-vs-bar${oppNeg ? ' neg' : ''}" style="width:${oppPct}%"></div>
         </div>
-        <span class="mp-vs-val-label${oppNeg ? ' neg' : ''}">${oppVal}${oppWin ? ' 👑' : ''}</span>
+        <span class="mp-vs-val-label${oppNeg ? ' neg' : ''}${oppWin ? ' win' : ''}">${oppVal}</span>
       </div>
     </div>`;
   }).join('');
@@ -4016,9 +4042,9 @@ function _mpShowVsComparison() {
     awardsEl = document.createElement('div');
     awardsEl.id = 'mp-vs-awards';
     awardsEl.className = 'mp-vs-awards';
-    // Insert before commentary
-    const comEl = $('mp-vs-commentary');
-    comEl.parentNode.insertBefore(awardsEl, comEl);
+    // Insert after life comparison
+    const lifeEl2 = $('mp-vs-life');
+    lifeEl2.parentNode.insertBefore(awardsEl, lifeEl2.nextSibling);
   }
   if (opp) {
     awardsEl.innerHTML = _mpRenderAwards(me, opp);
@@ -4069,94 +4095,81 @@ function _mpShowVsComparison() {
 function _mpGenerateCommentary(me, opp) {
   const lines = [];
   let winnerName = '';
-  let loserName = '';
 
   if (opp) {
-    // Score comparison
     const scoreDiff = me.score - opp.score;
-    if (Math.abs(scoreDiff) < 500) {
+    const w = scoreDiff >= 0 ? me : opp;
+    const l = scoreDiff >= 0 ? opp : me;
+    const gap = Math.abs(scoreDiff);
+
+    if (gap < 500) {
       winnerName = '🤝 不分伯仲';
-      lines.push('两人的人生精彩程度旗鼓相当，这辈子算是势均力敌。');
-    } else if (scoreDiff > 0) {
-      winnerName = `🏆 ${me.nickname} 胜出！`;
-      if (scoreDiff > 10000) lines.push(`碾压级别的差距。${opp.nickname}，你下辈子加油吧。`);
-      else if (scoreDiff > 5000) lines.push(`${me.nickname}的人生明显更精彩，${opp.nickname}只能仰望。`);
-      else lines.push(`${me.nickname}险胜一筹，但${opp.nickname}也不差。`);
+      lines.push('势均力敌，这辈子算打了个平手');
     } else {
-      winnerName = `🏆 ${opp.nickname} 胜出！`;
-      if (-scoreDiff > 10000) lines.push(`${opp.nickname}把${me.nickname}按在地上摩擦。差距太大了。`);
-      else if (-scoreDiff > 5000) lines.push(`${opp.nickname}的人生更胜一筹，${me.nickname}要反思一下了。`);
-      else lines.push(`${opp.nickname}小幅领先，两人其实很接近。`);
+      winnerName = `🏆 ${w.nickname} 胜出！`;
+      if (gap > 10000) lines.push(`${l.nickname}，下辈子见`);
+      else if (gap > 5000) lines.push(`${w.nickname}赢得不算冤枉`);
+      else lines.push(`险胜，但也够吹一辈子了`);
     }
 
-    // Age comparison
     const ageDiff = me.age - opp.age;
-    if (ageDiff > 10) lines.push(`${me.nickname}比${opp.nickname}多活了${ageDiff}年，光是活着就已经赢了。`);
-    else if (ageDiff < -10) lines.push(`${opp.nickname}比${me.nickname}多活了${-ageDiff}年。寿命也是一种实力。`);
-    else if (me.age >= 60 && opp.age < 30) lines.push(`${me.nickname}安享晚年，${opp.nickname}英年早逝，令人唏嘘。`);
-    else if (opp.age >= 60 && me.age < 30) lines.push(`${opp.nickname}安享晚年，${me.nickname}英年早逝。活着才是硬道理啊。`);
+    if (Math.abs(ageDiff) > 10) lines.push(`多活${Math.abs(ageDiff)}年，这本身就是一种胜利`);
+    else if (me.age >= 55 && opp.age < 30) lines.push('一个安度晚年，一个英年早逝');
+    else if (opp.age >= 55 && me.age < 30) lines.push('一个安度晚年，一个英年早逝');
 
-    // Fun stat comparisons
     const myTotal = Object.values(me.stats).reduce((a, b) => a + b, 0);
     const oppTotal = Object.values(opp.stats).reduce((a, b) => a + b, 0);
-    if (myTotal > oppTotal + 15) lines.push(`${me.nickname}在六维属性上全面碾压，这不是重开，这是开挂。`);
-    else if (oppTotal > myTotal + 15) lines.push(`${opp.nickname}属性总和遥遥领先，该不会是转世大佬吧？`);
+    if (Math.abs(myTotal - oppTotal) > 15) lines.push('六维属性差距悬殊');
 
-    if (me.stats.HAP <= 1 && opp.stats.HAP >= 8) lines.push(`${me.nickname}活得痛苦不堪，${opp.nickname}却幸福满满。人生真是不公平。`);
-    else if (opp.stats.HAP <= 1 && me.stats.HAP >= 8) lines.push(`${opp.nickname}一辈子在受苦，${me.nickname}笑到了最后。`);
+    if ((me.stats.HAP <= 1 && opp.stats.HAP >= 8) || (opp.stats.HAP <= 1 && me.stats.HAP >= 8))
+      lines.push('一个快乐到飞起，一个苦到没边');
+    if ((me.stats.MNY >= 10 && opp.stats.MNY <= 2) || (opp.stats.MNY >= 10 && me.stats.MNY <= 2))
+      lines.push('贫富差距，真实写照');
 
-    if (me.stats.MNY >= 10 && opp.stats.MNY <= 2) lines.push(`${me.nickname}富甲一方，${opp.nickname}穷困潦倒。贫富差距就是这么来的。`);
-    else if (opp.stats.MNY >= 10 && me.stats.MNY <= 2) lines.push(`${opp.nickname}财务自由，${me.nickname}还在吃土。钱不是万能的，但没钱是万万不能的。`);
-
-    // Relationship
-    if (me.relationship === '单身' && opp.relationship === '已婚') lines.push(`${opp.nickname}人生圆满步入婚姻，${me.nickname}至死母胎solo。`);
-    else if (opp.relationship === '单身' && me.relationship === '已婚') lines.push(`${me.nickname}成家立业了，${opp.nickname}一辈子没脱单，建议下辈子刷颜值。`);
-    else if (me.relationship === '海王' && opp.relationship === '海王') lines.push('两人都是海王/海后，这场聚会怕不是大型修罗场。');
-    else if (me.relationship === '单身' && opp.relationship === '单身') lines.push('两个人都是单身狗，至少你们还有彼此（并没有）。');
+    if (me.relationship === '单身' && opp.relationship === '单身') lines.push('都是单身，至少这个很公平');
+    else if ((me.relationship === '海王' || me.relationship === '海后') && (opp.relationship === '海王' || opp.relationship === '海后')) lines.push('都是海王，修罗场现场');
   } else {
-    winnerName = '⏳ 对方还在奋斗…';
-    lines.push(`${me.nickname}已经结束了人生，但对方还在继续。耐心等待最终对比吧。`);
+    winnerName = '⏳ 等待对方…';
+    lines.push('你已走完全程，对方还在路上');
   }
 
-  // Pick 2-3 random lines (keep first, shuffle rest)
+  // Keep first, then 1-2 random extras
   const picked = [lines[0]];
-  const rest = lines.slice(1).sort(() => Math.random() - 0.5).slice(0, 2);
+  const rest = lines.slice(1).sort(() => Math.random() - 0.5).slice(0, 1);
   picked.push(...rest);
 
   return `
-    <div class="vc-title">最终裁决</div>
     <div class="vc-winner">${winnerName}</div>
-    ${picked.map(l => `<div class="vc-line">${l}</div>`).join('')}
+    <div class="vc-lines">${picked.map(l => `<div class="vc-line">${l}</div>`).join('')}</div>
   `;
 }
 
 function _mpGenerateRelationStory(relation, me, opp) {
   let title, desc, cls;
   if (relation >= 80) {
-    title = '💕 挚友·灵魂伴侣'; cls = 'pos';
-    desc = '两人惺惺相惜，即使人生道路不同，心始终在一起。这是跨越时空的友谊。';
+    title = '💕 灵魂伴侣'; cls = 'pos';
+    desc = '即使人生不同，心始终在一起';
   } else if (relation >= 50) {
-    title = '🤝 铁哥们/闺蜜'; cls = 'pos';
-    desc = '虽然偶有摩擦，但在关键时刻总是互相扶持。这份友情经得起考验。';
+    title = '🤝 铁哥们'; cls = 'pos';
+    desc = '关键时刻总是互相扶持';
   } else if (relation >= 20) {
     title = '😊 不错的朋友'; cls = 'pos';
-    desc = '说不上多亲密，但绝对是靠谱的朋友。毕业多年后还会偶尔联系。';
+    desc = '毕业多年后还会偶尔联系';
   } else if (relation >= -20) {
     title = '😐 点头之交'; cls = 'neutral';
-    desc = '见面打个招呼，但也仅此而已。同学群里潜水的那种关系。';
+    desc = '同学群里潜水的那种';
   } else if (relation >= -50) {
-    title = '😤 互看不爽'; cls = 'neg';
-    desc = '暗地里互相较劲，谁过得更好就在朋友圈炫耀。标准的塑料同学情。';
+    title = '😤 塑料同学情'; cls = 'neg';
+    desc = '暗地较劲，朋友圈炫耀';
   } else if (relation >= -80) {
     title = '🔥 宿敌'; cls = 'neg';
-    desc = '见面就掐，不见面也要在背后嘀咕。这辈子的冤家，下辈子最好别再碰到。';
+    desc = '下辈子最好别再碰到';
   } else {
     title = '💀 不共戴天'; cls = 'neg';
-    desc = '关系已经恶化到无法修复。如果有来生，请投胎到不同星球。';
+    desc = '请投胎到不同星球';
   }
 
   return `
-    <div class="rs-title">你们的关系</div>
     <div class="rs-val ${cls}">${relation > 0 ? '+' : ''}${relation}</div>
     <div class="rs-label">${title}</div>
     <div class="rs-desc">${desc}</div>
@@ -4183,7 +4196,7 @@ function _mpRenderTimeline(me, opp) {
     relationship: '💕', ending: '🏁',
   };
 
-  let html = `<div class="tl-title">📜 人生时间线</div><div class="tl-body">`;
+  let html = `<div class="tl-title">人生时间线</div><div class="tl-body">`;
   for (const age of sorted) {
     const myItems = myByAge[age] || [];
     const oppItems = oppByAge[age] || [];
@@ -4205,7 +4218,7 @@ function _mpRenderCardRecap(me, opp) {
   if (cards.length === 0) return '';
 
   const oppName = (opp && opp.nickname) || '对手';
-  let html = `<div class="cr-title">🎴 损友卡战报</div><div class="cr-list">`;
+  let html = `<div class="cr-title">损友卡战报</div><div class="cr-list">`;
   for (const c of cards) {
     const isSent = c.direction === 'sent';
     const fromName = isSent ? me.nickname : oppName;
@@ -5922,10 +5935,11 @@ function _wireMpMessageHandlers() {
     _cancelReunionDilemma(data.nickname || mp.opponent.nickname);
     pushLog(`【${data.nickname || mp.opponent.nickname}】结束了人生：${data.age}岁，得分 ${data.score || '—'}`, 'mp-reunion');
     render();
-    // If I already ended too, auto-refresh the VS button visibility
+    // If I already ended too, auto-refresh the VS button visibility & summary status
     if (state.phase === 'ended') {
       const vsBtn = $('btn-mp-vs');
       if (vsBtn) vsBtn.style.display = '';
+      _updateMpSummaryStatus();
     }
   });
 
@@ -5951,6 +5965,7 @@ function _wireMpMessageHandlers() {
       // Game already over — silently clean up, no disruptive modal
       mp.connected = false;
       _hideOpponentBar();
+      _updateMpSummaryStatus();
     }
   });
 
@@ -6263,6 +6278,24 @@ function _wireMultiplayerUI() {
   });
   $('mp-cards-close')?.addEventListener('click', () => {
     $('mp-cards-panel').style.display = 'none';
+  });
+
+  // 取消等待按钮（同学聚会 & 再来一次）
+  $('mp-waiting-cancel')?.addEventListener('click', () => {
+    if (_mpRestartPending) {
+      // 取消再来一次的等待
+      _mpRestartPending = false;
+      _hideWaitingOverlay();
+      mpSend('restart_decline', {});
+      return;
+    }
+    // 取消同学聚会等待
+    if (mp._reunionTimeout) { clearTimeout(mp._reunionTimeout); mp._reunionTimeout = null; }
+    mp.isWaiting = false;
+    _hideWaitingOverlay();
+    pushLog('（你决定不再等了，跳过了这次同学聚会）', 'mp-reunion');
+    mpSend('reunion_skip', { age: state.age, reason: 'cancelled' });
+    render();
   });
 
   $('mp-coop-accept')?.addEventListener('click', () => {

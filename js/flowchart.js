@@ -88,6 +88,10 @@ const RARITY_COLORS = {
 
 const LOCKED_COLOR = { fill: '#111118', stroke: '#28283a' };
 
+// ── Mobile / low-power detection ───────────────────────────────────────────
+const _isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+  || (navigator.maxTouchPoints > 1 && window.innerWidth < 1024);
+
 // Region atmosphere particle config — moderate count for performance
 const REGION_PARTICLES = {
   origin:         { color: '#ffffff', color2: '#d4a056', count: 8,  speed: 0.3, size: [1.5, 3.5] },
@@ -216,71 +220,74 @@ export function renderFlowchart(containerId) {
   // ── Defs ──
   const defs = _svgEl('defs');
 
-  // Glow filters per rarity
-  for (const [rarity, colors] of Object.entries(RARITY_COLORS)) {
-    const filter = _svgEl('filter', { id: `glow-${rarity}`, x: '-50%', y: '-50%', width: '200%', height: '200%' });
-    const flood = _svgEl('feFlood', { 'flood-color': colors.glow, 'flood-opacity': '0.6', result: 'flood' });
-    const comp = _svgEl('feComposite', { in: 'flood', in2: 'SourceGraphic', operator: 'in', result: 'masked' });
-    const blur = _svgEl('feGaussianBlur', { in: 'masked', stdDeviation: '4', result: 'blur' });
-    const merge = _svgEl('feMerge');
-    merge.appendChild(_svgEl('feMergeNode', { in: 'blur' }));
-    merge.appendChild(_svgEl('feMergeNode', { in: 'SourceGraphic' }));
-    filter.appendChild(flood); filter.appendChild(comp); filter.appendChild(blur); filter.appendChild(merge);
-    defs.appendChild(filter);
-  }
+  // Glow filters per rarity (skip on mobile — feGaussianBlur is GPU-heavy)
+  if (!_isMobile) {
+    for (const [rarity, colors] of Object.entries(RARITY_COLORS)) {
+      const filter = _svgEl('filter', { id: `glow-${rarity}`, x: '-50%', y: '-50%', width: '200%', height: '200%' });
+      const flood = _svgEl('feFlood', { 'flood-color': colors.glow, 'flood-opacity': '0.6', result: 'flood' });
+      const comp = _svgEl('feComposite', { in: 'flood', in2: 'SourceGraphic', operator: 'in', result: 'masked' });
+      const blur = _svgEl('feGaussianBlur', { in: 'masked', stdDeviation: '4', result: 'blur' });
+      const merge = _svgEl('feMerge');
+      merge.appendChild(_svgEl('feMergeNode', { in: 'blur' }));
+      merge.appendChild(_svgEl('feMergeNode', { in: 'SourceGraphic' }));
+      filter.appendChild(flood); filter.appendChild(comp); filter.appendChild(blur); filter.appendChild(merge);
+      defs.appendChild(filter);
+    }
 
-  // Fog blur (simple, no feTurbulence for performance)
-  const fogBlur = _svgEl('filter', { id: 'fog-blur', x: '-20%', y: '-20%', width: '140%', height: '140%' });
-  fogBlur.appendChild(_svgEl('feGaussianBlur', { stdDeviation: '6' }));
-  defs.appendChild(fogBlur);
+    // Fog blur (simple, no feTurbulence for performance)
+    const fogBlur = _svgEl('filter', { id: 'fog-blur', x: '-20%', y: '-20%', width: '140%', height: '140%' });
+    fogBlur.appendChild(_svgEl('feGaussianBlur', { stdDeviation: '6' }));
+    defs.appendChild(fogBlur);
+  }
 
   _svg.appendChild(defs);
 
-  // ── Layer 0: Region atmosphere particles (all regions, dimmer if unexplored) ──
-  const particleGroup = _svgEl('g', { class: 'fc-particles' });
-  for (const r of _chartData.regions) {
-    const pConfig = REGION_PARTICLES[r.id];
-    if (!pConfig) continue;
+  // ── Layer 0: Region atmosphere particles (skip entirely on mobile) ──
+  if (!_isMobile) {
+    const particleGroup = _svgEl('g', { class: 'fc-particles' });
+    for (const r of _chartData.regions) {
+      const pConfig = REGION_PARTICLES[r.id];
+      if (!pConfig) continue;
 
-    const explored = _isRegionExplored(r);
-    // Explored: vivid, many. Unexplored: fewer, dimmer but still visible
-    const count = explored ? pConfig.count : Math.ceil(pConfig.count * 0.35);
-    const opacityBase = explored ? 0.25 : 0.08;
-    const opacityRange = explored ? 0.45 : 0.12;
+      const explored = _isRegionExplored(r);
+      const count = explored ? pConfig.count : Math.ceil(pConfig.count * 0.35);
+      const opacityBase = explored ? 0.25 : 0.08;
+      const opacityRange = explored ? 0.45 : 0.12;
 
-    let rx1 = Infinity, ry1 = Infinity, rx2 = 0, ry2 = 0;
-    for (const n of r.nodes) {
-      if (n.x < rx1) rx1 = n.x;
-      if (n.y < ry1) ry1 = n.y;
-      if (n.x + NODE_W > rx2) rx2 = n.x + NODE_W;
-      if (n.y + NODE_H > ry2) ry2 = n.y + NODE_H;
+      let rx1 = Infinity, ry1 = Infinity, rx2 = 0, ry2 = 0;
+      for (const n of r.nodes) {
+        if (n.x < rx1) rx1 = n.x;
+        if (n.y < ry1) ry1 = n.y;
+        if (n.x + NODE_W > rx2) rx2 = n.x + NODE_W;
+        if (n.y + NODE_H > ry2) ry2 = n.y + NODE_H;
+      }
+      rx1 += PAD - 30; ry1 += PAD - 30;
+      rx2 += PAD + 30; ry2 += PAD + 30;
+
+      for (let i = 0; i < count; i++) {
+        const cx = rx1 + Math.random() * (rx2 - rx1);
+        const cy = ry1 + Math.random() * (ry2 - ry1);
+        const r2 = pConfig.size[0] + Math.random() * (pConfig.size[1] - pConfig.size[0]);
+        const color = Math.random() > 0.5 ? pConfig.color : pConfig.color2;
+        const dur = (3 + Math.random() * 4) / pConfig.speed;
+
+        const circle = _svgEl('circle', {
+          cx, cy, r: explored ? r2 : r2 * 0.8,
+          fill: color,
+          opacity: opacityBase + Math.random() * opacityRange,
+          class: 'fc-particle',
+        });
+
+        circle.style.setProperty('--float-x', `${(Math.random() - 0.5) * 60}px`);
+        circle.style.setProperty('--float-y', `${(Math.random() - 0.5) * 40}px`);
+        circle.style.setProperty('--float-dur', `${dur}s`);
+        circle.style.setProperty('--float-delay', `${-Math.random() * dur}s`);
+
+        particleGroup.appendChild(circle);
+      }
     }
-    rx1 += PAD - 30; ry1 += PAD - 30;
-    rx2 += PAD + 30; ry2 += PAD + 30;
-
-    for (let i = 0; i < count; i++) {
-      const cx = rx1 + Math.random() * (rx2 - rx1);
-      const cy = ry1 + Math.random() * (ry2 - ry1);
-      const r2 = pConfig.size[0] + Math.random() * (pConfig.size[1] - pConfig.size[0]);
-      const color = Math.random() > 0.5 ? pConfig.color : pConfig.color2;
-      const dur = (3 + Math.random() * 4) / pConfig.speed;
-
-      const circle = _svgEl('circle', {
-        cx, cy, r: explored ? r2 : r2 * 0.8,
-        fill: color,
-        opacity: opacityBase + Math.random() * opacityRange,
-        class: 'fc-particle',
-      });
-
-      circle.style.setProperty('--float-x', `${(Math.random() - 0.5) * 60}px`);
-      circle.style.setProperty('--float-y', `${(Math.random() - 0.5) * 40}px`);
-      circle.style.setProperty('--float-dur', `${dur}s`);
-      circle.style.setProperty('--float-delay', `${-Math.random() * dur}s`);
-
-      particleGroup.appendChild(circle);
-    }
+    _svg.appendChild(particleGroup);
   }
-  _svg.appendChild(particleGroup);
 
   // ── Layer 1: Edges ──
   const edgeGroup = _svgEl('g', { class: 'fc-edges' });
@@ -324,13 +331,14 @@ export function renderFlowchart(containerId) {
     const fx = rx1 + PAD - 35;
     const fy = ry1 + PAD - 35;
 
-    // Single fog layer with blur
-    fogGroup.appendChild(_svgEl('rect', {
+    // Single fog layer (with blur on desktop only)
+    const fogAttrs = {
       x: fx - 10, y: fy - 10, width: w + 20, height: h + 20, rx: 18,
-      fill: 'rgba(8, 8, 16, 0.75)',
-      filter: 'url(#fog-blur)',
+      fill: _isMobile ? 'rgba(8, 8, 16, 0.85)' : 'rgba(8, 8, 16, 0.75)',
       class: 'fc-fog-layer fc-fog-layer-1',
-    }));
+    };
+    if (!_isMobile) fogAttrs.filter = 'url(#fog-blur)';
+    fogGroup.appendChild(_svgEl('rect', fogAttrs));
 
     // Question mark — static, subtle
     const qm = _svgEl('text', {
@@ -381,7 +389,7 @@ export function renderFlowchart(containerId) {
         fill: colors.fill, stroke: colors.stroke,
         'stroke-width': unlocked ? '2' : '1',
       });
-      if (unlocked) rect.setAttribute('filter', `url(#glow-${rarity})`);
+      if (unlocked && !_isMobile) rect.setAttribute('filter', `url(#glow-${rarity})`);
       g.appendChild(rect);
 
       // Text label
@@ -414,13 +422,15 @@ export function renderFlowchart(containerId) {
         lockIcon.textContent = '🔒';
         g.appendChild(lockIcon);
 
-        // Inner subtle pulse border for mystery
-        const pulseRect = _svgEl('rect', {
-          width: NODE_W, height: NODE_H, rx: 6,
-          fill: 'none', stroke: '#28283a', 'stroke-width': '1',
-          class: 'fc-locked-pulse',
-        });
-        g.appendChild(pulseRect);
+        // Inner subtle pulse border for mystery (skip on mobile)
+        if (!_isMobile) {
+          const pulseRect = _svgEl('rect', {
+            width: NODE_W, height: NODE_H, rx: 6,
+            fill: 'none', stroke: '#28283a', 'stroke-width': '1',
+            class: 'fc-locked-pulse',
+          });
+          g.appendChild(pulseRect);
+        }
       }
 
       nodeGroup.appendChild(g);
@@ -528,8 +538,9 @@ function _renderLegend() {
   panel.appendChild(legend);
 }
 
-// ── Cascade Animation (3-tier) ──────────────────────────────────────────────
+// ── Cascade Animation (3-tier, skipped on mobile) ──────────────────────────
 export function playCascadeAnimation() {
+  if (_isMobile) return; // skip animation on mobile for performance
   if (!_svg || _animating) return;
   _animating = true;
 
@@ -656,6 +667,9 @@ export function initFlowchart() {
 
   const closeBtn = document.getElementById('fc-close');
   if (closeBtn) closeBtn.addEventListener('click', closeFlowchart);
+
+  const mobileCloseBtn = document.getElementById('fc-mobile-close');
+  if (mobileCloseBtn) mobileCloseBtn.addEventListener('click', closeFlowchart);
 
   overlay.addEventListener('click', e => {
     if (e.target === overlay) closeFlowchart();
