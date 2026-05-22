@@ -3956,6 +3956,23 @@ function _mpShowVsComparison() {
     $('mp-vs-score-opp').textContent = '进行中…';
   }
 
+  // ── Winner / loser visual weight ──
+  const myScore = me.score || 0;
+  const oppScore = opp ? (opp.score || 0) : 0;
+  const leftPlayer = document.querySelector('.mp-vs-left');
+  const rightPlayer = document.querySelector('.mp-vs-right');
+  if (leftPlayer) leftPlayer.classList.remove('vs-winner', 'vs-loser');
+  if (rightPlayer) rightPlayer.classList.remove('vs-winner', 'vs-loser');
+  if (opp && Math.abs(myScore - oppScore) >= 500) {
+    if (myScore > oppScore) {
+      if (leftPlayer) leftPlayer.classList.add('vs-winner');
+      if (rightPlayer) rightPlayer.classList.add('vs-loser');
+    } else {
+      if (rightPlayer) rightPlayer.classList.add('vs-winner');
+      if (leftPlayer) leftPlayer.classList.add('vs-loser');
+    }
+  }
+
   // ── Relation badge ──
   const rel = mp.relation || 0;
   const relBadge = $('mp-vs-relation-badge');
@@ -3963,37 +3980,105 @@ function _mpShowVsComparison() {
   relBadge.className = 'mp-vs-relation-badge ' + relCls;
   relBadge.textContent = `好感度 ${rel > 0 ? '+' : ''}${rel}`;
 
-  // ── Stats bars ──
+  // ── Radar Chart ──
   const statsKeys = ['SOC', 'INT', 'MNY', 'PER', 'HLT', 'APP', 'HAP'];
   const oppStats = opp ? opp.stats : (mp.opponent.stats || {});
   const statsEl = $('mp-vs-stats');
-  const maxStat = 15; // for bar width scaling
-  statsEl.innerHTML = statsKeys.map(k => {
-    const myVal = me.stats[k] || 0;
-    const oppVal = oppStats[k] || 0;
-    // Treat negative values: bar shows absolute magnitude, minimum 5% so there's something visible
-    const myPct = Math.min(100, Math.max(5, (Math.abs(myVal) / maxStat) * 100));
-    const oppPct = Math.min(100, Math.max(5, (Math.abs(oppVal) / maxStat) * 100));
-    const myWin = myVal > oppVal;
-    const oppWin = oppVal > myVal;
-    const myNeg = myVal < 0;
-    const oppNeg = oppVal < 0;
-    return `<div class="mp-vs-stat-row">
-      <div class="mp-vs-bar-cell left">
-        <span class="mp-vs-val-label${myNeg ? ' neg' : ''}${myWin ? ' win' : ''}">${myVal}</span>
-        <div class="mp-vs-bar-track">
-          <div class="mp-vs-bar${myNeg ? ' neg' : ''}" style="width:${myPct}%"></div>
-        </div>
+  const maxStat = 15;
+
+  // SVG radar geometry
+  const cx = 180, cy = 160, R = 110;
+  const n = statsKeys.length;
+  const angleStep = (2 * Math.PI) / n;
+  const startAngle = -Math.PI / 2; // top
+
+  function polar(angle, r) {
+    return [cx + r * Math.cos(angle), cy + r * Math.sin(angle)];
+  }
+
+  // Grid rings (3 levels)
+  let gridSvg = '';
+  for (const frac of [0.33, 0.66, 1]) {
+    const pts = [];
+    for (let i = 0; i < n; i++) {
+      const a = startAngle + i * angleStep;
+      pts.push(polar(a, R * frac).join(','));
+    }
+    gridSvg += `<polygon points="${pts.join(' ')}" class="mp-vs-radar-grid"/>`;
+  }
+
+  // Axes
+  let axisSvg = '';
+  for (let i = 0; i < n; i++) {
+    const a = startAngle + i * angleStep;
+    const [ex, ey] = polar(a, R);
+    axisSvg += `<line x1="${cx}" y1="${cy}" x2="${ex}" y2="${ey}" class="mp-vs-radar-axis"/>`;
+  }
+
+  // Data polygons
+  function dataPoints(stats) {
+    return statsKeys.map((k, i) => {
+      const val = Math.max(0, stats[k] || 0);
+      const r = Math.min(1, val / maxStat) * R;
+      const a = startAngle + i * angleStep;
+      return polar(a, Math.max(r, R * 0.05));
+    });
+  }
+  const myPts = dataPoints(me.stats);
+  const oppPts = dataPoints(oppStats);
+
+  // Labels + values at each axis
+  let labelSvg = '';
+  for (let i = 0; i < n; i++) {
+    const a = startAngle + i * angleStep;
+    const [lx, ly] = polar(a, R + 28);
+    labelSvg += `<text x="${lx}" y="${ly}" class="mp-vs-radar-label">${STAT_LABELS[statsKeys[i]]}</text>`;
+    // Player values below label
+    const myV = me.stats[statsKeys[i]] || 0;
+    const oppV = oppStats[statsKeys[i]] || 0;
+    labelSvg += `<text x="${lx - 12}" y="${ly + 12}" class="mp-vs-radar-val p1">${myV}</text>`;
+    labelSvg += `<text x="${lx + 12}" y="${ly + 12}" class="mp-vs-radar-val p2">${oppV}</text>`;
+  }
+
+  statsEl.innerHTML = `<svg class="mp-vs-radar-svg" viewBox="0 0 360 320">
+    ${gridSvg}${axisSvg}
+    <polygon points="${oppPts.map(p => p.join(',')).join(' ')}" class="mp-vs-radar-poly p2"/>
+    <polygon points="${myPts.map(p => p.join(',')).join(' ')}" class="mp-vs-radar-poly p1"/>
+    ${labelSvg}
+  </svg>`;
+
+  // ── Bar comparison (below radar) ──
+  let barsEl = document.getElementById('mp-vs-bars');
+  if (!barsEl) {
+    barsEl = document.createElement('div');
+    barsEl.id = 'mp-vs-bars';
+    barsEl.className = 'mp-vs-bars';
+    statsEl.parentNode.insertBefore(barsEl, statsEl.nextSibling);
+  }
+  const barMax = 15; // scale reference
+  let barsHtml = '';
+  for (const k of statsKeys) {
+    const myV = me.stats[k] || 0;
+    const oppV = oppStats[k] || 0;
+    // Width as percentage of half the bar (each side is 50%)
+    const myW = Math.min(Math.abs(myV) / barMax * 100, 100);
+    const oppW = Math.min(Math.abs(oppV) / barMax * 100, 100);
+    const myNeg = myV < 0;
+    const oppNeg = oppV < 0;
+    const myWin = myV > oppV;
+    const oppWin = oppV > myV;
+    barsHtml += `<div class="mp-vs-bar-row">
+      <span class="bar-val left${myNeg ? ' negative' : ''}">${myV}</span>
+      <div class="bar-track">
+        <div class="bar-center-line"></div>
+        <div class="bar-track-label">${STAT_LABELS[k]}</div>
+        <div class="bar-fill-left${myWin ? ' win' : ''}" style="width:${myW / 2}%"></div>
+        <div class="bar-fill-right${oppWin ? ' win' : ''}" style="width:${oppW / 2}%"></div>
       </div>
-      <div class="mp-vs-stat-label">${STAT_LABELS[k]}</div>
-      <div class="mp-vs-bar-cell right">
-        <div class="mp-vs-bar-track">
-          <div class="mp-vs-bar${oppNeg ? ' neg' : ''}" style="width:${oppPct}%"></div>
-        </div>
-        <span class="mp-vs-val-label${oppNeg ? ' neg' : ''}${oppWin ? ' win' : ''}">${oppVal}</span>
-      </div>
+      <span class="bar-val right${oppNeg ? ' negative' : ''}">${oppV}</span>
     </div>`;
-  }).join('');
+  }
+  barsEl.innerHTML = barsHtml;
 
   // ── Life comparison ──
   const oppData = opp || {};
@@ -4105,37 +4190,112 @@ function _mpGenerateCommentary(me, opp) {
     if (gap < 500) {
       winnerName = '🤝 不分伯仲';
       lines.push('势均力敌，这辈子算打了个平手');
+      lines.push('差距不到500分，你俩上辈子是不是双胞胎？');
     } else {
       winnerName = `🏆 ${w.nickname} 胜出！`;
-      if (gap > 10000) lines.push(`${l.nickname}，下辈子见`);
-      else if (gap > 5000) lines.push(`${w.nickname}赢得不算冤枉`);
-      else lines.push(`险胜，但也够吹一辈子了`);
+      if (gap > 15000) {
+        lines.push(`${l.nickname}，你这不叫人生，叫体验服试玩`);
+        lines.push(`碾压级差距，${w.nickname}赢麻了`);
+      } else if (gap > 10000) {
+        lines.push(`${l.nickname}，下辈子见`);
+        lines.push(`分差过万，建议${l.nickname}申请重开`);
+      } else if (gap > 5000) {
+        lines.push(`${w.nickname}赢得不算冤枉`);
+        lines.push(`差了${gap}分，够${l.nickname}哭好几个通宵的`);
+      } else if (gap > 2000) {
+        lines.push(`险胜，但也够吹一辈子了`);
+        lines.push(`不多不少，差了${gap}分的体面`);
+      } else {
+        lines.push(`险胜，但也够吹一辈子了`);
+        lines.push(`只差${gap}分，${l.nickname}估计要拍大腿`);
+      }
     }
 
-    const ageDiff = me.age - opp.age;
-    if (Math.abs(ageDiff) > 10) lines.push(`多活${Math.abs(ageDiff)}年，这本身就是一种胜利`);
-    else if (me.age >= 55 && opp.age < 30) lines.push('一个安度晚年，一个英年早逝');
-    else if (opp.age >= 55 && me.age < 30) lines.push('一个安度晚年，一个英年早逝');
+    // Age comparison
+    const ageDiff = Math.abs(me.age - opp.age);
+    const older = me.age >= opp.age ? me : opp;
+    const younger = me.age >= opp.age ? opp : me;
+    if (ageDiff > 20) {
+      lines.push(`${older.nickname}多活了${ageDiff}年，${younger.nickname}的人生才刚到高潮就结束了`);
+    } else if (ageDiff > 10) {
+      lines.push(`多活${ageDiff}年，这本身就是一种胜利`);
+    }
+    if (older.age >= 55 && younger.age < 30) {
+      lines.push(`一个安度晚年，一个英年早逝——命运有时候就是这么不讲道理`);
+    }
+    if (younger.age < 22) {
+      lines.push(`${younger.nickname}连毕业典礼都没等到，人生剧本写了个开头就完结了`);
+    }
 
+    // Stat contrasts
     const myTotal = Object.values(me.stats).reduce((a, b) => a + b, 0);
     const oppTotal = Object.values(opp.stats).reduce((a, b) => a + b, 0);
-    if (Math.abs(myTotal - oppTotal) > 15) lines.push('六维属性差距悬殊');
+    if (Math.abs(myTotal - oppTotal) > 20) {
+      const stronger = myTotal > oppTotal ? me : opp;
+      const weaker = myTotal > oppTotal ? opp : me;
+      lines.push(`六维属性差距悬殊，${weaker.nickname}属于被全方位碾压`);
+    }
 
-    if ((me.stats.HAP <= 1 && opp.stats.HAP >= 8) || (opp.stats.HAP <= 1 && me.stats.HAP >= 8))
-      lines.push('一个快乐到飞起，一个苦到没边');
-    if ((me.stats.MNY >= 10 && opp.stats.MNY <= 2) || (opp.stats.MNY >= 10 && me.stats.MNY <= 2))
-      lines.push('贫富差距，真实写照');
+    // Happiness
+    if (me.stats.HAP <= 1 && opp.stats.HAP >= 8) lines.push(`${me.nickname}苦了一辈子，${opp.nickname}笑了一辈子——快乐才是真赢家`);
+    else if (opp.stats.HAP <= 1 && me.stats.HAP >= 8) lines.push(`${opp.nickname}苦了一辈子，${me.nickname}笑了一辈子——快乐才是真赢家`);
+    else if (me.stats.HAP <= 2 && opp.stats.HAP <= 2) lines.push('两个人都不快乐，这局没有赢家');
 
-    if (me.relationship === '单身' && opp.relationship === '单身') lines.push('都是单身，至少这个很公平');
-    else if ((me.relationship === '海王' || me.relationship === '海后') && (opp.relationship === '海王' || opp.relationship === '海后')) lines.push('都是海王，修罗场现场');
+    // Money
+    if (me.stats.MNY >= 10 && opp.stats.MNY <= 2) lines.push(`${me.nickname}财务自由，${opp.nickname}吃土度日——贫富差距照进现实`);
+    else if (opp.stats.MNY >= 10 && me.stats.MNY <= 2) lines.push(`${opp.nickname}财务自由，${me.nickname}吃土度日——贫富差距照进现实`);
+    else if (me.stats.MNY <= 1 && opp.stats.MNY <= 1) lines.push('都穷到叮当响，至少苦难面前人人平等');
+
+    // Intelligence
+    if (Math.abs((me.stats.INT || 0) - (opp.stats.INT || 0)) > 6) {
+      const smart = (me.stats.INT || 0) > (opp.stats.INT || 0) ? me : opp;
+      const dumb = (me.stats.INT || 0) > (opp.stats.INT || 0) ? opp : me;
+      lines.push(`智力差距太大，${dumb.nickname}可能到现在还没搞懂怎么输的`);
+    }
+
+    // Health / negative stats
+    if ((me.stats.HLT || 0) < 0 || (opp.stats.HLT || 0) < 0) {
+      const sick = (me.stats.HLT || 0) < (opp.stats.HLT || 0) ? me : opp;
+      lines.push(`${sick.nickname}的健康值都成负数了，这身体怕是欠了阎王债`);
+    }
+
+    // Relationship roasts
+    if (me.relationship === '单身' && opp.relationship === '单身') {
+      lines.push('两个单身狗的碰撞，至少这个很公平');
+    } else if (me.relationship === '单身' && (opp.relationship === '已婚' || opp.relationship === '二婚')) {
+      lines.push(`${opp.nickname}找到了另一半，${me.nickname}只找到了外卖app`);
+    } else if (opp.relationship === '单身' && (me.relationship === '已婚' || me.relationship === '二婚')) {
+      lines.push(`${me.nickname}找到了另一半，${opp.nickname}只找到了外卖app`);
+    }
+    if ((me.relationship === '海王' || me.relationship === '海后') && (opp.relationship === '海王' || opp.relationship === '海后')) {
+      lines.push('都是海王，修罗场现场，建议组个渣王宇宙');
+    }
+    if ((me.relationship === '离异' && opp.relationship === '已婚') || (opp.relationship === '离异' && me.relationship === '已婚')) {
+      const divorced = me.relationship === '离异' ? me : opp;
+      lines.push(`${divorced.nickname}的婚姻没能撑到最后，有些缘分确实强求不来`);
+    }
+
+    // School comparison
+    if (me.school && opp.school && me.school !== opp.school) {
+      if (me.schoolTier === 'top' && opp.schoolTier === 'low') lines.push(`${me.nickname}名校出身，${opp.nickname}……也是读过书的`);
+      else if (opp.schoolTier === 'top' && me.schoolTier === 'low') lines.push(`${opp.nickname}名校出身，${me.nickname}……也是读过书的`);
+    }
+
+    // Death cause roast
+    if (me.deathCause && opp.deathCause && me.deathCause !== opp.deathCause) {
+      if (me.deathCause.includes('猝死') || opp.deathCause.includes('猝死')) {
+        const sudden = me.deathCause.includes('猝死') ? me : opp;
+        lines.push(`${sudden.nickname}连告别的时间都没有，人生有时候连省略号都不给你`);
+      }
+    }
   } else {
     winnerName = '⏳ 等待对方…';
     lines.push('你已走完全程，对方还在路上');
   }
 
-  // Keep first, then 1-2 random extras
+  // Pick main verdict line + 2-3 supporting lines
   const picked = [lines[0]];
-  const rest = lines.slice(1).sort(() => Math.random() - 0.5).slice(0, 1);
+  const rest = lines.slice(1).sort(() => Math.random() - 0.5).slice(0, 3);
   picked.push(...rest);
 
   return `
@@ -5613,13 +5773,16 @@ const REUNION_DILEMMA = {
 let _reunionDilemmaAge = 0;
 let _reunionMyChoice = null;
 let _reunionOppChoice = null;
+let _reunionOppChoiceAge = 0; // track which age the opp choice belongs to
 
 function _showReunionDilemma(age, oppName) {
   const cfg = REUNION_DILEMMA[age];
   if (!cfg) return;
+  // Don't reset _reunionOppChoice — opponent may have already sent their choice
+  // Only clear if it's stale (from a different reunion age)
   _reunionDilemmaAge = age;
   _reunionMyChoice = null;
-  _reunionOppChoice = null;
+  if (_reunionOppChoiceAge !== age) _reunionOppChoice = null;
 
   // Build overlay
   const overlay = document.createElement('div');
@@ -5643,11 +5806,26 @@ function _showReunionDilemma(age, oppName) {
       <div class="reunion-dilemma-waiting" style="display:none;">
         <div class="rdw-spinner"></div>
         <span>等待${oppName}做出选择…</span>
+        <button class="reunion-dilemma-dismiss">跳过</button>
       </div>
     </div>
   `;
   document.body.appendChild(overlay);
   requestAnimationFrame(() => overlay.classList.add('active'));
+
+  // Wire dismiss/skip button in waiting state
+  overlay.querySelector('.reunion-dilemma-dismiss').addEventListener('click', () => {
+    overlay.classList.remove('active');
+    setTimeout(() => overlay.remove(), 300);
+    pushLog(`（你提前离开了聚会）`, 'mp-reunion');
+    _reunionDilemmaAge = 0;
+    _reunionMyChoice = null;
+    _reunionOppChoice = null;
+    _reunionOppChoiceAge = 0;
+    state.autoPlay = state._reunionSavedAuto || false;
+    if (state._reunionSavedAutoMode) startAuto(state._reunionSavedAutoMode);
+    render();
+  });
 
   // Wire button clicks
   overlay.querySelectorAll('.reunion-dilemma-btn').forEach(btn => {
@@ -5734,6 +5912,7 @@ function _resolveReunionDilemma(age) {
   _reunionDilemmaAge = 0;
   _reunionMyChoice = null;
   _reunionOppChoice = null;
+  _reunionOppChoiceAge = 0;
 }
 
 function _getChoiceLabel(age, key) {
@@ -5779,6 +5958,7 @@ function _cancelReunionDilemma(oppName) {
   _reunionDilemmaAge = 0;
   _reunionMyChoice = null;
   _reunionOppChoice = null;
+  _reunionOppChoiceAge = 0;
 }
 
 async function _fireReunionEvent(age) {
@@ -5864,11 +6044,13 @@ function _wireMpMessageHandlers() {
 
   mpOn('reunion_choice', (data) => {
     _reunionOppChoice = data.choice;
+    _reunionOppChoiceAge = data.age;
     if (_reunionMyChoice) {
       // Both chose — resolve
       _resolveReunionDilemma(data.age);
     }
-    // Otherwise we're still waiting for local player to pick
+    // Otherwise opponent chose first — _reunionOppChoice is stored and preserved,
+    // will be checked when player clicks a button in _showReunionDilemma
   });
 
   mpOn('reunion_effect', (data) => {
