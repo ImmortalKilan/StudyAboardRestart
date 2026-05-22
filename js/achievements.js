@@ -55,6 +55,19 @@ export const ACHIEVEMENTS = [
   { id: 'end_thief',        name: '幽灵评级',     icon: '👻', rarity: 'epic',      cat: '终局',   desc: '达到了影子协会最高评级' },
   { id: 'end_hogwarts',     name: '救世之星',     icon: '⚡', rarity: 'legendary', cat: '终局',   desc: '用老魔杖击败了伏地魔' },
 
+  // ── 专业传奇终局 ──────────────────────────────────────────────────────────
+  { id: 'end_ee',           name: '半导体教父',   icon: '🔬', rarity: 'legendary', cat: '终局',   desc: '在芯片领域封神，重塑了半导体产业格局' },
+  { id: 'end_me',           name: '智造先驱',     icon: '🏭', rarity: 'legendary', cat: '终局',   desc: '成为总工程师或智造独角兽创始人' },
+  { id: 'end_bio',          name: '新药教父',     icon: '🧬', rarity: 'legendary', cat: '终局',   desc: '研发出重磅新药，改变了医药行业' },
+  { id: 'end_med',          name: '杏林圣手',     icon: '🩺', rarity: 'legendary', cat: '终局',   desc: '成为科室主任或以自己命名了新术式' },
+  { id: 'end_law',          name: '法界泰斗',     icon: '⚖️', rarity: 'legendary', cat: '终局',   desc: '成为管理合伙人或首席大检察官' },
+  { id: 'end_film',         name: '金棕榈之夜',   icon: '🎬', rarity: 'legendary', cat: '终局',   desc: '作为导演斩获国际顶级电影奖' },
+  { id: 'end_cs',           name: '硅谷传奇',     icon: '💻', rarity: 'legendary', cat: '终局',   desc: '成为大厂核心或连续创业传奇' },
+  { id: 'end_biz',          name: '金融之王',     icon: '💹', rarity: 'legendary', cat: '终局',   desc: '登顶投行或风投界的巅峰' },
+  { id: 'end_sci',          name: '学术巨擘',     icon: '🔭', rarity: 'legendary', cat: '终局',   desc: '以全奖直博身份成为学界泰斗' },
+  { id: 'end_art',          name: '传世大家',     icon: '🖋️', rarity: 'legendary', cat: '终局',   desc: '作品跨越时代，成为文学/艺术大师' },
+  { id: 'end_music',        name: '乐坛传奇',     icon: '🎵', rarity: 'legendary', cat: '终局',   desc: '在音乐领域达到传奇地位' },
+
   // ── 跨界彩蛋 ──────────────────────────────────────────────────────────────
   { id: 'easter_rhythm',     name: '节奏大师',     icon: '🎹', rarity: 'epic',      cat: '彩蛋',   desc: '音乐爱好者×CS×日本：做出了上架的音游' },
   { id: 'easter_viral',      name: '病毒式传播',   icon: '📹', rarity: 'epic',      cat: '彩蛋',   desc: '电影爱好者×商科×美国：校园纪录片爆红' },

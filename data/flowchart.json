@@ -496,6 +496,91 @@
       ]
     },
     {
+      "id": "career_endings",
+      "label": "专业巅峰",
+      "x": 2176,
+      "y": 0,
+      "nodes": [
+        {
+          "id": "n_end_ee",
+          "label": "半导体教父",
+          "achId": "end_ee",
+          "x": 2176,
+          "y": 16
+        },
+        {
+          "id": "n_end_me",
+          "label": "智造先驱",
+          "achId": "end_me",
+          "x": 2176,
+          "y": 80
+        },
+        {
+          "id": "n_end_bio",
+          "label": "新药教父",
+          "achId": "end_bio",
+          "x": 2176,
+          "y": 144
+        },
+        {
+          "id": "n_end_med",
+          "label": "杏林圣手",
+          "achId": "end_med",
+          "x": 2176,
+          "y": 208
+        },
+        {
+          "id": "n_end_law",
+          "label": "法界泰斗",
+          "achId": "end_law",
+          "x": 2176,
+          "y": 272
+        },
+        {
+          "id": "n_end_film",
+          "label": "金棕榈之夜",
+          "achId": "end_film",
+          "x": 2176,
+          "y": 336
+        },
+        {
+          "id": "n_end_cs",
+          "label": "硅谷传奇",
+          "achId": "end_cs",
+          "x": 2176,
+          "y": 400
+        },
+        {
+          "id": "n_end_biz",
+          "label": "金融之王",
+          "achId": "end_biz",
+          "x": 2176,
+          "y": 464
+        },
+        {
+          "id": "n_end_sci",
+          "label": "学术巨擘",
+          "achId": "end_sci",
+          "x": 2176,
+          "y": 528
+        },
+        {
+          "id": "n_end_art",
+          "label": "传世大家",
+          "achId": "end_art",
+          "x": 2176,
+          "y": 592
+        },
+        {
+          "id": "n_end_music",
+          "label": "乐坛传奇",
+          "achId": "end_music",
+          "x": 2176,
+          "y": 656
+        }
+      ]
+    },
+    {
       "id": "easter",
       "label": "跨界彩蛋",
       "x": 1920,
@@ -924,6 +1009,94 @@
     {
       "from": "n_end_meta",
       "to": "n_all_hidden"
+    },
+    {
+      "from": "n_top",
+      "to": "n_end_ee"
+    },
+    {
+      "from": "n_top",
+      "to": "n_end_me"
+    },
+    {
+      "from": "n_top",
+      "to": "n_end_bio"
+    },
+    {
+      "from": "n_top",
+      "to": "n_end_med"
+    },
+    {
+      "from": "n_top",
+      "to": "n_end_law"
+    },
+    {
+      "from": "n_top",
+      "to": "n_end_film"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_end_ee"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_end_me"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_end_bio"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_end_med"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_end_law"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_end_film"
+    },
+    {
+      "from": "n_top",
+      "to": "n_end_cs"
+    },
+    {
+      "from": "n_top",
+      "to": "n_end_biz"
+    },
+    {
+      "from": "n_top",
+      "to": "n_end_sci"
+    },
+    {
+      "from": "n_top",
+      "to": "n_end_art"
+    },
+    {
+      "from": "n_top",
+      "to": "n_end_music"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_end_cs"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_end_biz"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_end_sci"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_end_art"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_end_music"
     }
   ]
 }

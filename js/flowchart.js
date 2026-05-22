@@ -100,7 +100,8 @@ const REGION_PARTICLES = {
   romance:        { color: '#ff4488', color2: '#ff88bb', count: 12, speed: 0.3, size: [2, 4.5] },
   endings:        { color: '#ffaa33', color2: '#ffdd88', count: 16, speed: 0.45, size: [2, 4] },
   milestones:     { color: '#d4a056', color2: '#ffcc77', count: 8,  speed: 0.3, size: [2, 3.5] },
-  easter:         { color: '#33ddbb', color2: '#77ffdd', count: 10, speed: 0.6, size: [2, 4] },
+  easter:          { color: '#33ddbb', color2: '#77ffdd', count: 10, speed: 0.6, size: [2, 4] },
+  career_endings:  { color: '#ffa040', color2: '#ffcc66', count: 12, speed: 0.35, size: [2, 4] },
 };
 
 // ── Fuzzy hint text for locked nodes ────────────────────────────────────────
@@ -157,6 +158,17 @@ const NODE_HINTS = {
   n_all_hidden:   '需要：解锁全部四条隐藏剧情终局',
   n_stat_max:     '需要：某项属性达到极高',
   n_stat_neg:     '需要：某项属性跌入深渊',
+  n_end_ee:       '需要：在电子工程领域达到巅峰',
+  n_end_me:       '需要：在机械工程领域达到巅峰',
+  n_end_bio:      '需要：在生物医药领域达到巅峰',
+  n_end_med:      '需要：在医学领域达到巅峰',
+  n_end_law:      '需要：在法律领域达到巅峰',
+  n_end_film:     '需要：在电影领域达到巅峰',
+  n_end_cs:       '需要：在计算机领域达到巅峰',
+  n_end_biz:      '需要：在商业/金融领域达到巅峰',
+  n_end_sci:      '需要：在理科学术领域达到巅峰',
+  n_end_art:      '需要：在文学/艺术领域达到巅峰',
+  n_end_music:    '需要：在音乐领域达到巅峰',
 };
 
 // ── SVG Helpers ─────────────────────────────────────────────────────────────

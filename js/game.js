@@ -40,7 +40,12 @@ const LEGENDARY_ENDINGS = new Set([
   48390, 48391, // BIO: 新药教父, 生物医药独角兽
   48590, 48591, // MED: 科室主任, 新术式命名
   48790, 48791, // LAW: 管理合伙人, 首席大检察官
-  48990, 48991  // Film: 金棕榈独立导演, 百亿票房商业导演
+  48990, 48991, // Film: 金棕榈独立导演, 百亿票房商业导演
+  42190, 42191, // CS: 大厂核心, 连续创业者
+  43190,        // 商科: 投行精英/风投巨鳄
+  44190,        // 理科: 全奖直博巅峰
+  45191,        // 文科/文艺: 传世大家
+  49990, 49991, 49992  // 音乐: 独立音乐人, 流行歌手, 作曲家
 ]);
 
 const GOOD_ENDINGS = new Set([
@@ -1588,6 +1593,19 @@ function _checkEventAchievements(ev) {
   if (id === 86105 || id === 86120 || id === 86136) unlockAchievement('end_athlete'); // athlete top tier
   if (id === 87190) unlockAchievement('end_thief');          // thief ghost rating
   if (id === 61611) unlockAchievement('end_hogwarts');       // defeated Voldemort with Elder Wand
+
+  // Major career legendary endings
+  if (id === 48190 || id === 48191) unlockAchievement('end_ee');    // EE: 半导体教父 / 芯片独角兽
+  if (id === 48290 || id === 48291) unlockAchievement('end_me');    // ME: 总工程师 / 智造独角兽
+  if (id === 48390 || id === 48391) unlockAchievement('end_bio');   // BIO: 新药教父 / 生物医药独角兽
+  if (id === 48590 || id === 48591) unlockAchievement('end_med');   // MED: 科室主任 / 新术式命名
+  if (id === 48790 || id === 48791) unlockAchievement('end_law');   // LAW: 管理合伙人 / 首席大检察官
+  if (id === 48990 || id === 48991) unlockAchievement('end_film');  // Film: 金棕榈 / 百亿票房
+  if (id === 42190 || id === 42191) unlockAchievement('end_cs');    // CS: 大厂核心 / 连续创业者
+  if (id === 43190) unlockAchievement('end_biz');                   // 商科: 投行精英/风投巨鳄
+  if (id === 44190) unlockAchievement('end_sci');                   // 理科: 全奖直博巅峰
+  if (id === 45191) unlockAchievement('end_art');                   // 文科/文艺: 传世大家
+  if (id === 49990 || id === 49991 || id === 49992) unlockAchievement('end_music'); // 音乐: 传奇
 
   // Xianxia immortal ending: any game-end while in xianxia with high cul
   if (ev.end && state.storyline === 'xianxia' && (state.cul || 0) >= 1000) {
