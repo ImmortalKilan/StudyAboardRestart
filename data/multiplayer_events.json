@@ -109,116 +109,146 @@
   },
 
   {
-    "_comment3": "── 蝴蝶效应：收到对方拒绝后的接力事件 ──────────────────────────────",
-    "_comment4": "当对方在关键机会事件上选择「拒绝」，对方的 mp 模块发消息给你，你下个月触发对应的接力事件"
+    "_comment3": "── 蝴蝶效应：对方做出关键选择后，你收到一阵抽象的涟漪 ──────────────",
+    "_comment4": "不再传递具体机会，而是传递情绪/气运波动，跟国家、专业、职业完全解耦"
   },
   {
     "id": 95010,
-    "event": "【蝴蝶效应】你听老同学说，TA 拒绝了一个大厂实习机会。对方说「机会让给你了」。你犹豫了一下——要不要去试试？",
+    "event": "【蝴蝶效应】今天醒来的时候，你莫名其妙地觉得自己应该做点什么。不是那种「今天要交作业」的焦虑，而是一种更深的、来自远方的推力——好像世界某个角落里，有人替你迈出了你一直犹豫的那一步。",
     "noRandom": true,
     "mp": true,
     "butterflyReceive": "internship",
     "logType": "mp-butterfly",
     "choices": [
       {
-        "text": "接住机会，飞过去面试",
-        "effect": { "INT": 2, "MNY": 2, "SOC": 1, "HLT": -1 },
-        "_mpRelation": 8,
-        "resultText": "你拿下了 offer。入职那天你想起老同学的那句「让给你了」，悄悄发了个红包过去。"
+        "text": "把这股劲头用在手上的事情上",
+        "effect": { "INT": 2, "PER": 1 },
+        "_mpRelation": 5,
+        "resultText": "你比平时更专注了。那天完成的东西，质量出奇地好。"
       },
       {
-        "text": "礼貌婉拒，自己的路自己走",
-        "effect": { "PER": 2, "HAP": 1 },
-        "_mpRelation": -3,
-        "resultText": "你婉拒了。心里有种说不清的感觉——是骄傲，还是后悔？"
+        "text": "去认识一些新的人",
+        "effect": { "SOC": 2, "HAP": 1 },
+        "_mpRelation": 5,
+        "resultText": "你主动加入了一个之前一直没敢去的群组。聊了一晚上，收获意外地大。"
+      },
+      {
+        "text": "存下这份冲劲，等一个更好的时机",
+        "effect": { "PER": 2 },
+        "_mpRelation": 0,
+        "resultText": "你没有急着行动，而是把这种感觉记住了。你知道，它迟早会派上用场。"
       }
     ]
   },
   {
     "id": 95011,
-    "event": "【蝴蝶效应】老同学没去那个城市发展。TA 把当初本来想去的那个圈子的联系人介绍给了你——一个很关键的 networking 机会。",
+    "event": "【蝴蝶效应】你翻朋友圈的时候，看到一个很久没联系的人发了一条状态。说不上为什么，你突然有种冲动——想跟人说说话，想打破日常的沉默。",
     "noRandom": true,
     "mp": true,
     "butterflyReceive": "network",
     "logType": "mp-butterfly",
     "choices": [
       {
-        "text": "积极对接，建立人脉",
-        "effect": { "SOC": 3, "MNY": 1 },
-        "_mpRelation": 10,
-        "resultText": "你顺利打入了那个圈子。两年后回头看，那是改变你职业曲线的关键节点。"
+        "text": "给那个人点了个赞，然后聊了起来",
+        "effect": { "SOC": 2, "HAP": 1 },
+        "_mpRelation": 5,
+        "resultText": "你们聊了很久。对方说「还以为你把我忘了呢」，你笑了一下，觉得有些事情不应该断。"
       },
       {
-        "text": "记下联系方式，先观望",
-        "effect": { "INT": 1 },
+        "text": "关掉手机，出门走走",
+        "effect": { "HLT": 1, "HAP": 1, "PER": 1 },
         "_mpRelation": 0,
-        "resultText": "你把联系人加了微信，但没主动找过。也许某天会用到。"
+        "resultText": "你出门走了很远。路上遇到一个陌生人冲你笑了一下，你也笑了。今天挺好的。"
+      },
+      {
+        "text": "写了一段文字，但没发出去",
+        "effect": { "INT": 1, "PER": 1 },
+        "_mpRelation": 0,
+        "resultText": "你写了很长一段话。看了两遍，然后删了。但你觉得，光是写完就够了。"
       }
     ]
   },
   {
     "id": 95012,
-    "event": "【蝴蝶效应】老同学放弃了一个创业邀请，把发起人引荐给了你。对方说想拉你入伙。",
+    "event": "【蝴蝶效应】你做了一个奇怪的梦。梦里你站在一栋很高的楼顶，风很大。有个看不清脸的人跳了下去——然后飞起来了。你醒来以后心跳很快，但不是害怕，是兴奋。",
     "noRandom": true,
     "mp": true,
     "butterflyReceive": "startup",
     "logType": "mp-butterfly",
     "choices": [
       {
-        "text": "加入创业团队",
-        "effect": { "MNY": -1, "INT": 1, "SOC": 2, "HLT": -1 },
+        "text": "做一件你一直想做但不敢做的事",
+        "effect": { "MNY": 2, "SOC": 1 },
         "_mpRelation": 5,
-        "resultText": "你正式入伙。开局艰难，但你觉得这一次有点不一样。"
+        "resultText": "你终于迈出了那一步。结果没有你想象的那么可怕——甚至还挺顺利。"
       },
       {
-        "text": "委婉拒绝，求稳",
-        "effect": { "HAP": 1, "PER": 1 },
+        "text": "把这个梦讲给朋友听",
+        "effect": { "SOC": 1, "HAP": 2 },
+        "_mpRelation": 5,
+        "resultText": "朋友听完说「你是不是最近压力太大了」。你笑了——也许吧，但你更愿意相信这是个好兆头。"
+      },
+      {
+        "text": "躺回去，试着接着做那个梦",
+        "effect": { "HAP": 1, "HLT": 1 },
         "_mpRelation": 0,
-        "resultText": "你说自己暂时还没准备好。后来听说那个项目跑得不错——但你也没那么后悔。"
+        "resultText": "你没接上那个梦。但那天你心情格外好，好像被什么东西充满了。"
       }
     ]
   },
   {
     "id": 95013,
-    "event": "【蝴蝶效应】老同学没接受出国深造的机会。TA 把推荐信和教授联系方式转给了你——「我用不上了，你试试？」",
+    "event": "【蝴蝶效应】你无意间看到一张风景照——不知道是哪里，但那个地方让你很想去。你盯着看了很久，心里有种说不清的空旷感。不是难过，更像是……可能性。",
     "noRandom": true,
     "mp": true,
     "butterflyReceive": "overseas_advanced",
     "logType": "mp-butterfly",
     "choices": [
       {
-        "text": "申请，去读个硕士/PhD",
-        "effect": { "INT": 3, "MNY": -2, "PER": 1 },
-        "_mpRelation": 8,
-        "resultText": "你拿到了 offer。出发那天，你给老同学发了一张机场的照片。TA 回了句「替我看看」。"
+        "text": "开始认真规划下一步",
+        "effect": { "INT": 2, "PER": 1 },
+        "_mpRelation": 5,
+        "resultText": "你打开了一个空白文档，写下了一些以前不敢写的计划。光是写完，就觉得世界变宽了一点。"
       },
       {
-        "text": "感谢一下，但暂时不去",
-        "effect": { "SOC": 1 },
-        "_mpRelation": 2,
-        "resultText": "你说了一堆感谢的话，但心里清楚那不是属于你的路。"
+        "text": "去探索身边还没去过的地方",
+        "effect": { "HAP": 2, "APP": 1 },
+        "_mpRelation": 0,
+        "resultText": "你发现自己生活的城市里还有很多没见过的角落。远方不一定在远方。"
+      },
+      {
+        "text": "给自己买一张机票/车票",
+        "effect": { "MNY": -1, "HAP": 2, "SOC": 1 },
+        "_mpRelation": 0,
+        "resultText": "你没想太多就订了票。有时候，出发本身就是答案。"
       }
     ]
   },
   {
     "id": 95014,
-    "event": "【蝴蝶效应】老同学拒绝了一段感情。TA 把对方的故事讲给你听，说「你们俩或许更合适」。",
+    "event": "【蝴蝶效应】深夜刷手机的时候，一首老歌突然戳中了你。你说不上来是想起了谁，还是想起了某种感觉。窗外有风，你把手机放下，听了很久。",
     "noRandom": true,
     "mp": true,
     "butterflyReceive": "romance",
     "logType": "mp-butterfly",
     "choices": [
       {
-        "text": "见一面看看",
-        "effect": { "SOC": 2, "HAP": 1, "APP": 1 },
+        "text": "给一个很久没联系的人发了条消息",
+        "effect": { "SOC": 2, "HAP": 1 },
         "_mpRelation": 5,
-        "resultText": "你们见面了。聊了三个小时，加了微信。后来的故事，是另外一个故事。"
+        "resultText": "对方秒回了。你们聊到凌晨，聊的都是些不重要的事。但你睡着的时候在笑。"
       },
       {
-        "text": "感谢但拒绝",
-        "effect": { "PER": 1 },
+        "text": "把这首歌单曲循环到天亮",
+        "effect": { "PER": 1, "APP": 1 },
         "_mpRelation": 0,
-        "resultText": "你说自己最近不想谈感情。老同学笑着说「也好，缘分这东西强求不来」。"
+        "resultText": "第二天你顶着黑眼圈出门，但眼神出奇地柔和。有人说你今天看起来不一样。"
+      },
+      {
+        "text": "早点睡吧，明天还有事",
+        "effect": { "HLT": 2 },
+        "_mpRelation": 0,
+        "resultText": "你关掉了手机。翻了个身，很快就睡着了。有些感觉，不一定要抓住。"
       }
     ]
   },

@@ -679,13 +679,68 @@ export function initFlowchart() {
     if (e.key === 'Escape' && _isOpen) closeFlowchart();
   });
 
-  // ── Drag panning (mouse + touch) ──
+  // ── Zoom state ──
+  let _zoomScale = 1;
+  const ZOOM_MIN = 0.3;
+  const ZOOM_MAX = 2.0;
+  const ZOOM_STEP = 0.15;
+
+  function _applyZoom() {
+    const svg = document.querySelector('#fc-canvas .fc-svg');
+    if (!svg) return;
+    svg.style.transform = `scale(${_zoomScale})`;
+    svg.style.transformOrigin = 'top left';
+    const label = document.getElementById('fc-zoom-level');
+    if (label) label.textContent = Math.round(_zoomScale * 100) + '%';
+  }
+
+  function _zoomTo(newScale, centerX, centerY) {
+    const canvas = document.getElementById('fc-canvas');
+    if (!canvas) return;
+    const oldScale = _zoomScale;
+    _zoomScale = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, newScale));
+    if (_zoomScale === oldScale) return;
+    // Adjust scroll to keep the point under cursor/center stable
+    if (centerX !== undefined && centerY !== undefined) {
+      const scrollCX = canvas.scrollLeft + centerX;
+      const scrollCY = canvas.scrollTop + centerY;
+      const ratio = _zoomScale / oldScale;
+      canvas.scrollLeft = scrollCX * ratio - centerX;
+      canvas.scrollTop = scrollCY * ratio - centerY;
+    }
+    _applyZoom();
+  }
+
+  // Zoom buttons
+  document.getElementById('fc-zoom-in')?.addEventListener('click', () => {
+    _zoomTo(_zoomScale + ZOOM_STEP);
+  });
+  document.getElementById('fc-zoom-out')?.addEventListener('click', () => {
+    _zoomTo(_zoomScale - ZOOM_STEP);
+  });
+  document.getElementById('fc-zoom-reset')?.addEventListener('click', () => {
+    _zoomScale = 1;
+    _applyZoom();
+  });
+
+  // ── Drag panning (mouse + touch) & zoom ──
   const canvas = document.getElementById('fc-canvas');
   if (canvas) {
     let dragging = false;
     let startX = 0, startY = 0, scrollX = 0, scrollY = 0;
 
-    // Mouse
+    // Mouse wheel zoom — only on pinch (ctrlKey) or Cmd/Ctrl held
+    canvas.addEventListener('wheel', e => {
+      if (!e.ctrlKey && !e.metaKey) return;
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const cx = e.clientX - rect.left;
+      const cy = e.clientY - rect.top;
+      const delta = e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP;
+      _zoomTo(_zoomScale + delta, cx, cy);
+    }, { passive: false });
+
+    // Mouse drag
     canvas.addEventListener('mousedown', e => {
       if (e.button !== 0) return;
       dragging = true;
@@ -705,22 +760,48 @@ export function initFlowchart() {
       if (dragging) { dragging = false; canvas.style.cursor = 'grab'; }
     });
 
-    // Touch (mobile)
+    // Touch: 1-finger drag, 2-finger pinch zoom
+    let lastPinchDist = 0;
     canvas.addEventListener('touchstart', e => {
-      if (e.touches.length !== 1) return;
-      dragging = true;
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
-      scrollX = canvas.scrollLeft;
-      scrollY = canvas.scrollTop;
+      if (e.touches.length === 1) {
+        dragging = true;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        scrollX = canvas.scrollLeft;
+        scrollY = canvas.scrollTop;
+      } else if (e.touches.length === 2) {
+        dragging = false;
+        lastPinchDist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+      }
     }, { passive: true });
     canvas.addEventListener('touchmove', e => {
-      if (!dragging || e.touches.length !== 1) return;
-      canvas.scrollLeft = scrollX - (e.touches[0].clientX - startX);
-      canvas.scrollTop = scrollY - (e.touches[0].clientY - startY);
-      e.preventDefault(); // prevent page scroll
+      if (e.touches.length === 1 && dragging) {
+        canvas.scrollLeft = scrollX - (e.touches[0].clientX - startX);
+        canvas.scrollTop = scrollY - (e.touches[0].clientY - startY);
+        e.preventDefault();
+      } else if (e.touches.length === 2) {
+        e.preventDefault();
+        const dist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        if (lastPinchDist > 0) {
+          const rect = canvas.getBoundingClientRect();
+          const cx = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
+          const cy = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
+          const ratio = dist / lastPinchDist;
+          _zoomTo(_zoomScale * ratio, cx, cy);
+        }
+        lastPinchDist = dist;
+      }
     }, { passive: false });
-    canvas.addEventListener('touchend', () => { dragging = false; });
-    canvas.addEventListener('touchcancel', () => { dragging = false; });
+    canvas.addEventListener('touchend', e => {
+      dragging = false;
+      if (e.touches.length < 2) lastPinchDist = 0;
+    });
+    canvas.addEventListener('touchcancel', () => { dragging = false; lastPinchDist = 0; });
   }
 }

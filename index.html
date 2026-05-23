@@ -259,50 +259,66 @@
 
           <!-- Step 1: Stats Allocation -->
           <div class="creation-step" id="step-alloc">
-            <header class="screen-head">
-              <h1>分配属性</h1>
-              <p class="sub">总共 <strong>25</strong> 点，单项上限 10。快乐不参与分配（局内默认 5）。</p>
-            </header>
-
-            <div class="alloc-banner">剩余点数 <span id="alloc-remaining">25</span></div>
-
-            <div id="talent-bonus-banner" class="talent-bonus-banner" style="display:none;"></div>
-
-            <div class="alloc-layout">
-              <div class="alloc-avatar-wrap">
-                <canvas id="alloc-avatar-canvas"></canvas>
+            <div class="alloc-split">
+              <!-- Left: avatar large preview -->
+              <div class="alloc-left">
+                <div class="alloc-avatar-wrap-lg">
+                  <canvas id="alloc-avatar-canvas"></canvas>
+                </div>
                 <p class="alloc-avatar-hint">属性会实时影响外貌</p>
-                <div class="appearance-section">
-                  <div class="appearance-label">性别</div>
-                  <div class="sex-row">
-                    <button id="sex-male" class="chip active">♂ 男</button>
-                    <button id="sex-female" class="chip">♀ 女</button>
+                <div class="alloc-customize-row">
+                  <div class="appearance-section">
+                    <div class="appearance-label">性别</div>
+                    <div class="sex-row">
+                      <button id="sex-male" class="chip active">♂ 男</button>
+                      <button id="sex-female" class="chip">♀ 女</button>
+                    </div>
                   </div>
-                </div>
-                <div class="appearance-section">
-                  <div class="appearance-label">肤色</div>
-                  <div class="skin-row">
-                    <button id="skin-0" class="chip skin-chip skin-chip-dark" title="小麦色"></button>
-                    <button id="skin-1" class="chip skin-chip skin-chip-mid active" title="自然色"></button>
-                    <button id="skin-2" class="chip skin-chip skin-chip-light" title="白皙"></button>
+                  <div class="appearance-section">
+                    <div class="appearance-label">肤色</div>
+                    <div class="skin-row">
+                      <button id="skin-0" class="chip skin-chip skin-chip-dark" title="小麦色"></button>
+                      <button id="skin-1" class="chip skin-chip skin-chip-mid active" title="自然色"></button>
+                      <button id="skin-2" class="chip skin-chip skin-chip-light" title="白皙"></button>
+                    </div>
                   </div>
+                  <button id="btn-random-appearance" class="ghost appearance-random-btn">🎲 随机发型/服装</button>
                 </div>
-                <button id="btn-random-appearance" class="ghost appearance-random-btn">🎲 随机发型/服装</button>
               </div>
-              <div class="alloc-list">
-              <div class="alloc-row"><span>社交</span><button class="step" id="minus-SOC">−</button><span class="alloc-val" id="alloc-SOC">0</span><button class="step" id="plus-SOC">＋</button><span class="alloc-bonus" id="bonus-SOC"></span></div>
-              <div class="alloc-row"><span>智力</span><button class="step" id="minus-INT">−</button><span class="alloc-val" id="alloc-INT">0</span><button class="step" id="plus-INT">＋</button><span class="alloc-bonus" id="bonus-INT"></span></div>
-              <div class="alloc-row"><span>家境</span><button class="step" id="minus-MNY">−</button><span class="alloc-val" id="alloc-MNY">0</span><button class="step" id="plus-MNY">＋</button><span class="alloc-bonus" id="bonus-MNY"></span></div>
-              <div class="alloc-row"><span>健康</span><button class="step" id="minus-HLT">−</button><span class="alloc-val" id="alloc-HLT">0</span><button class="step" id="plus-HLT">＋</button><span class="alloc-bonus" id="bonus-HLT"></span></div>
-              <div class="alloc-row"><span>毅力</span><button class="step" id="minus-PER">−</button><span class="alloc-val" id="alloc-PER">0</span><button class="step" id="plus-PER">＋</button><span class="alloc-bonus" id="bonus-PER"></span></div>
-              <div class="alloc-row"><span>颜值</span><button class="step" id="minus-APP">−</button><span class="alloc-val" id="alloc-APP">0</span><button class="step" id="plus-APP">＋</button><span class="alloc-bonus" id="bonus-APP"></span></div>
+              <!-- Right: stats + presets -->
+              <div class="alloc-right">
+                <header class="screen-head">
+                  <h1>分配属性</h1>
+                  <p class="sub">总共 <strong>25</strong> 点，单项上限 10。快乐不参与分配（局内默认 5）。</p>
+                </header>
+                <div class="alloc-banner">剩余点数 <span id="alloc-remaining">25</span></div>
+                <div id="talent-bonus-banner" class="talent-bonus-banner" style="display:none;"></div>
+                <div class="alloc-list">
+                  <div class="alloc-row"><span>社交</span><button class="step" id="minus-SOC">−</button><span class="alloc-val" id="alloc-SOC">0</span><button class="step" id="plus-SOC">＋</button><span class="alloc-bonus" id="bonus-SOC"></span></div>
+                  <div class="alloc-row"><span>智力</span><button class="step" id="minus-INT">−</button><span class="alloc-val" id="alloc-INT">0</span><button class="step" id="plus-INT">＋</button><span class="alloc-bonus" id="bonus-INT"></span></div>
+                  <div class="alloc-row"><span>家境</span><button class="step" id="minus-MNY">−</button><span class="alloc-val" id="alloc-MNY">0</span><button class="step" id="plus-MNY">＋</button><span class="alloc-bonus" id="bonus-MNY"></span></div>
+                  <div class="alloc-row"><span>健康</span><button class="step" id="minus-HLT">−</button><span class="alloc-val" id="alloc-HLT">0</span><button class="step" id="plus-HLT">＋</button><span class="alloc-bonus" id="bonus-HLT"></span></div>
+                  <div class="alloc-row"><span>毅力</span><button class="step" id="minus-PER">−</button><span class="alloc-val" id="alloc-PER">0</span><button class="step" id="plus-PER">＋</button><span class="alloc-bonus" id="bonus-PER"></span></div>
+                  <div class="alloc-row"><span>颜值</span><button class="step" id="minus-APP">−</button><span class="alloc-val" id="alloc-APP">0</span><button class="step" id="plus-APP">＋</button><span class="alloc-bonus" id="bonus-APP"></span></div>
+                </div>
+                <!-- Presets -->
+                <div class="alloc-preset-section">
+                  <div class="alloc-preset-header">
+                    <span class="alloc-preset-label">预设方案</span>
+                    <div class="alloc-preset-actions">
+                      <button id="preset-save" class="ghost preset-btn" title="保存当前加点为预设">💾 保存</button>
+                      <button id="preset-import" class="ghost preset-btn" title="从剪贴板导入预设">📥 导入</button>
+                      <button id="preset-export" class="ghost preset-btn" title="导出预设到剪贴板">📤 导出</button>
+                    </div>
+                  </div>
+                  <div id="preset-list" class="alloc-preset-list"></div>
+                </div>
+                <div class="footer-actions">
+                  <button id="alloc-back-to-talent" class="ghost">← 返回天赋</button>
+                  <button id="alloc-random" class="ghost">随机分配</button>
+                  <button id="alloc-start" class="primary" disabled>↻ 立即重开</button>
+                </div>
               </div>
-            </div>
-
-            <div class="footer-actions">
-              <button id="alloc-back-to-talent" class="ghost">← 返回天赋</button>
-              <button id="alloc-random" class="ghost">随机分配</button>
-              <button id="alloc-start" class="primary" disabled>↻ 立即重开</button>
             </div>
           </div>
         </div><!-- end creation-right -->
@@ -539,6 +555,7 @@
             <button id="btn-mp-vs" class="primary mp-vs-btn" style="display:none;">⚔️ 查看双人对比</button>
             <button id="btn-summary-back" class="ghost">返回事件流</button>
             <button id="btn-summary-restart" class="primary">再来一次</button>
+            <button id="btn-mp-leave" class="ghost mp-leave-btn" style="display:none;">退出房间</button>
           </div>
         </header>
 
@@ -746,8 +763,29 @@
         <button id="fc-close" class="fc-close-btn" aria-label="关闭命运图谱">✕</button>
       </div>
       <div id="fc-canvas" class="fc-canvas"></div>
+      <div class="fc-zoom-controls">
+        <button id="fc-zoom-in" class="fc-zoom-btn" title="放大">＋</button>
+        <span id="fc-zoom-level" class="fc-zoom-level">100%</span>
+        <button id="fc-zoom-out" class="fc-zoom-btn" title="缩小">−</button>
+        <button id="fc-zoom-reset" class="fc-zoom-btn fc-zoom-reset" title="重置">↺</button>
+      </div>
     </div>
   </div>
+
+  <!-- Preset modal (save / import / toast) -->
+  <div id="preset-modal-overlay" class="preset-modal-overlay" style="display:none;">
+    <div class="preset-modal">
+      <div class="preset-modal-title" id="preset-modal-title">保存预设</div>
+      <div class="preset-modal-body" id="preset-modal-body">
+        <input type="text" id="preset-modal-input" class="preset-modal-input" placeholder="输入预设名称" maxlength="20" />
+      </div>
+      <div class="preset-modal-footer">
+        <button id="preset-modal-cancel" class="ghost">取消</button>
+        <button id="preset-modal-confirm" class="primary">确定</button>
+      </div>
+    </div>
+  </div>
+  <div id="preset-toast" class="preset-toast" style="display:none;"></div>
 
   <script type="module" src="js/game.js"></script>
 </body>

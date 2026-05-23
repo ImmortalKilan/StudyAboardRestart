@@ -1845,7 +1845,7 @@ function resolveChoice(index) {
     if (!mp.butterflySent.has(bfKey)) {
       mp.butterflySent.add(bfKey);
       mpSend('butterfly', { payload: { key: bfKey, srcAge: state.age } });
-      pushLog('（你放下的东西，也许会落到别人手里……）', 'mp-butterfly');
+      pushLog('（你的选择，在远方泛起了涟漪……）', 'mp-butterfly');
     }
   }
 
@@ -1997,8 +1997,10 @@ function advanceMonth() {
     if (REUNION_AGES && state.monthOfYear === 1 && REUNION_AGES.includes(state.age)) {
       _triggerReunion(state.age);
     }
-    // Process incoming butterfly effects
-    if (mp.pendingButterfly && mp.pendingButterfly.length > 0) {
+    // Process incoming butterfly effects (skip during special/hidden storylines)
+    const _inStoryline = state.storyline &&
+      (SPECIAL_STORYLINES.has(state.storyline) || HIDDEN_STORYLINES.has(state.storyline));
+    if (mp.pendingButterfly && mp.pendingButterfly.length > 0 && !_inStoryline) {
       const bf = mp.pendingButterfly.shift();
       const bfEv = _findButterflyReceive(bf.key);
       if (bfEv) applyEvent(bfEv);
@@ -2006,7 +2008,8 @@ function advanceMonth() {
 
     // ── Butterfly effect: stat-based auto-trigger ──
     // Every 6 months, check stat conditions and probabilistically send butterflies
-    if (state.monthTotal % 6 === 0 && state.age >= 18) {
+    // Skip during special/hidden storylines
+    if (state.monthTotal % 6 === 0 && state.age >= 18 && !_inStoryline) {
       if (!mp.butterflySent) mp.butterflySent = new Set();
       const _bfAutoRules = [
         { key: 'internship',        cond: () => state.INT >= 12 && state.MNY <= 3 && state.age >= 20, prob: 0.15 },
@@ -3631,6 +3634,8 @@ function renderSummary() {
     _mpBroadcastEndData();
     const vsBtn = $('btn-mp-vs');
     if (vsBtn) vsBtn.style.display = '';
+    const leaveBtn = $('btn-mp-leave');
+    if (leaveBtn) leaveBtn.style.display = '';
     _updateMpSummaryStatus();
   }
 }
@@ -3984,10 +3989,10 @@ function _mpShowVsComparison() {
   const statsKeys = ['SOC', 'INT', 'MNY', 'PER', 'HLT', 'APP', 'HAP'];
   const oppStats = opp ? opp.stats : (mp.opponent.stats || {});
   const statsEl = $('mp-vs-stats');
-  const maxStat = 15;
+  const maxStat = 20; // grid boundary = 20; values >20 burst outside
 
-  // SVG radar geometry
-  const cx = 180, cy = 160, R = 110;
+  // SVG radar geometry — use larger viewBox to accommodate overflow
+  const cx = 200, cy = 180, R = 110;
   const n = statsKeys.length;
   const angleStep = (2 * Math.PI) / n;
   const startAngle = -Math.PI / 2; // top
@@ -3996,9 +4001,9 @@ function _mpShowVsComparison() {
     return [cx + r * Math.cos(angle), cy + r * Math.sin(angle)];
   }
 
-  // Grid rings (3 levels)
+  // Grid rings (3 levels: 7, 14, 20)
   let gridSvg = '';
-  for (const frac of [0.33, 0.66, 1]) {
+  for (const frac of [0.35, 0.7, 1]) {
     const pts = [];
     for (let i = 0; i < n; i++) {
       const a = startAngle + i * angleStep;
@@ -4015,11 +4020,11 @@ function _mpShowVsComparison() {
     axisSvg += `<line x1="${cx}" y1="${cy}" x2="${ex}" y2="${ey}" class="mp-vs-radar-axis"/>`;
   }
 
-  // Data polygons
+  // Data polygons — NO cap, values >20 burst outside circle
   function dataPoints(stats) {
     return statsKeys.map((k, i) => {
       const val = Math.max(0, stats[k] || 0);
-      const r = Math.min(1, val / maxStat) * R;
+      const r = (val / maxStat) * R; // can exceed R
       const a = startAngle + i * angleStep;
       return polar(a, Math.max(r, R * 0.05));
     });
@@ -4027,20 +4032,19 @@ function _mpShowVsComparison() {
   const myPts = dataPoints(me.stats);
   const oppPts = dataPoints(oppStats);
 
-  // Labels + values at each axis
+  // Labels + values at each axis (pushed further out)
   let labelSvg = '';
   for (let i = 0; i < n; i++) {
     const a = startAngle + i * angleStep;
-    const [lx, ly] = polar(a, R + 28);
+    const [lx, ly] = polar(a, R + 34);
     labelSvg += `<text x="${lx}" y="${ly}" class="mp-vs-radar-label">${STAT_LABELS[statsKeys[i]]}</text>`;
-    // Player values below label
     const myV = me.stats[statsKeys[i]] || 0;
     const oppV = oppStats[statsKeys[i]] || 0;
-    labelSvg += `<text x="${lx - 12}" y="${ly + 12}" class="mp-vs-radar-val p1">${myV}</text>`;
-    labelSvg += `<text x="${lx + 12}" y="${ly + 12}" class="mp-vs-radar-val p2">${oppV}</text>`;
+    labelSvg += `<text x="${lx - 14}" y="${ly + 14}" class="mp-vs-radar-val p1">${myV}</text>`;
+    labelSvg += `<text x="${lx + 14}" y="${ly + 14}" class="mp-vs-radar-val p2">${oppV}</text>`;
   }
 
-  statsEl.innerHTML = `<svg class="mp-vs-radar-svg" viewBox="0 0 360 320">
+  statsEl.innerHTML = `<svg class="mp-vs-radar-svg" viewBox="0 0 400 360">
     ${gridSvg}${axisSvg}
     <polygon points="${oppPts.map(p => p.join(',')).join(' ')}" class="mp-vs-radar-poly p2"/>
     <polygon points="${myPts.map(p => p.join(',')).join(' ')}" class="mp-vs-radar-poly p1"/>
@@ -4055,27 +4059,32 @@ function _mpShowVsComparison() {
     barsEl.className = 'mp-vs-bars';
     statsEl.parentNode.insertBefore(barsEl, statsEl.nextSibling);
   }
-  const barMax = 15; // scale reference
+  // Find the max absolute value across both players for scaling
+  const allVals = statsKeys.map(k => Math.max(Math.abs(me.stats[k] || 0), Math.abs(oppStats[k] || 0)));
+  const barScale = Math.max(...allVals, 1);
+
   let barsHtml = '';
   for (const k of statsKeys) {
     const myV = me.stats[k] || 0;
     const oppV = oppStats[k] || 0;
-    // Width as percentage of half the bar (each side is 50%)
-    const myW = Math.min(Math.abs(myV) / barMax * 100, 100);
-    const oppW = Math.min(Math.abs(oppV) / barMax * 100, 100);
-    const myNeg = myV < 0;
-    const oppNeg = oppV < 0;
+    const myW = Math.abs(myV) / barScale * 100;
+    const oppW = Math.abs(oppV) / barScale * 100;
     const myWin = myV > oppV;
     const oppWin = oppV > myV;
+    const myNeg = myV < 0;
+    const oppNeg = oppV < 0;
     barsHtml += `<div class="mp-vs-bar-row">
-      <span class="bar-val left${myNeg ? ' negative' : ''}">${myV}</span>
-      <div class="bar-track">
-        <div class="bar-center-line"></div>
-        <div class="bar-track-label">${STAT_LABELS[k]}</div>
-        <div class="bar-fill-left${myWin ? ' win' : ''}" style="width:${myW / 2}%"></div>
-        <div class="bar-fill-right${oppWin ? ' win' : ''}" style="width:${oppW / 2}%"></div>
+      <div class="bar-label">${STAT_LABELS[k]}</div>
+      <div class="bar-pair">
+        <div class="bar-line">
+          <span class="bar-val p1${myNeg ? ' negative' : ''}${myWin ? ' win' : ''}">${myV}</span>
+          <div class="bar-track"><div class="bar-fill p1${myWin ? ' win' : ''}" style="width:${myW}%"></div></div>
+        </div>
+        <div class="bar-line">
+          <span class="bar-val p2${oppNeg ? ' negative' : ''}${oppWin ? ' win' : ''}">${oppV}</span>
+          <div class="bar-track"><div class="bar-fill p2${oppWin ? ' win' : ''}" style="width:${oppW}%"></div></div>
+        </div>
       </div>
-      <span class="bar-val right${oppNeg ? ' negative' : ''}">${oppV}</span>
     </div>`;
   }
   barsEl.innerHTML = barsHtml;
@@ -4775,6 +4784,218 @@ async function main() {
 
   $('alloc-start').addEventListener('click', () => { SFX.sfxConfirm(); initGame(); });
 
+  // ── Stat Preset System ──────────────────────────────────────────────────
+  const PRESET_LS_KEY = 'studyAbroad_presets_v1';
+  const SYSTEM_PRESETS = [
+    { name: '社牛', stats: { SOC: 10, INT: 3, MNY: 3, PER: 3, HLT: 3, APP: 3 }, system: true },
+    { name: '学霸', stats: { SOC: 1, INT: 10, MNY: 3, PER: 6, HLT: 2, APP: 3 }, system: true },
+    { name: '富富富', stats: { SOC: 3, INT: 3, MNY: 10, PER: 3, HLT: 3, APP: 3 }, system: true },
+    { name: '颜值狂魔', stats: { SOC: 3, INT: 2, MNY: 3, PER: 2, HLT: 5, APP: 10 }, system: true },
+    { name: '健康达人', stats: { SOC: 3, INT: 3, MNY: 3, PER: 3, HLT: 10, APP: 3 }, system: true },
+    { name: '均衡发展', stats: { SOC: 4, INT: 4, MNY: 4, PER: 5, HLT: 4, APP: 4 }, system: true },
+    { name: '意志如铁', stats: { SOC: 2, INT: 5, MNY: 2, PER: 10, HLT: 4, APP: 2 }, system: true },
+  ];
+
+  function _loadUserPresets() {
+    try {
+      return JSON.parse(localStorage.getItem(PRESET_LS_KEY) || '[]');
+    } catch { return []; }
+  }
+  function _saveUserPresets(list) {
+    localStorage.setItem(PRESET_LS_KEY, JSON.stringify(list));
+  }
+  function _applyPreset(stats) {
+    const total = Object.values(stats).reduce((a, b) => a + b, 0);
+    if (total !== ALLOC_TOTAL) return;
+    for (const k of STAT_KEYS) {
+      if (typeof stats[k] !== 'number' || stats[k] < 0 || stats[k] > MAX_PER_STAT) return;
+    }
+    for (const k of STAT_KEYS) state.alloc[k] = stats[k];
+    SFX.sfxConfirm();
+    renderAlloc();
+    updateCreationAvatar();
+  }
+  function _renderPresets() {
+    const container = $('preset-list');
+    if (!container) return;
+    const userPresets = _loadUserPresets();
+    const all = [...SYSTEM_PRESETS, ...userPresets];
+    container.innerHTML = all.map((p, i) => {
+      const isSystem = p.system;
+      const userIdx = isSystem ? -1 : i - SYSTEM_PRESETS.length;
+      const summary = STAT_KEYS.map(k => `${STAT_LABELS[k]}${p.stats[k]}`).join(' / ');
+      const dataAttr = isSystem ? `data-sysidx="${i}"` : `data-idx="${userIdx}"`;
+      return `<span class="preset-chip ${isSystem ? 'system' : 'user'}" ${dataAttr} title="${summary}">` +
+        `${p.name}` +
+        `${isSystem ? '' : `<span class="preset-del" data-delidx="${userIdx}">✕</span>`}</span>`;
+    }).join('');
+  }
+
+  $('preset-list')?.addEventListener('click', (e) => {
+    const del = e.target.closest('.preset-del');
+    if (del) {
+      const idx = parseInt(del.dataset.delidx);
+      const userPresets = _loadUserPresets();
+      if (idx >= 0 && idx < userPresets.length) {
+        userPresets.splice(idx, 1);
+        _saveUserPresets(userPresets);
+        _renderPresets();
+      }
+      return;
+    }
+    const chip = e.target.closest('.preset-chip');
+    if (!chip) return;
+    const sysIdx = parseInt(chip.dataset.sysidx ?? '-1');
+    const userIdx = parseInt(chip.dataset.idx);
+    const preset = sysIdx >= 0 ? SYSTEM_PRESETS[sysIdx] : _loadUserPresets()[userIdx];
+    if (preset) _applyPreset(preset.stats);
+  });
+
+  function _showToast(msg, duration = 2000) {
+    const el = $('preset-toast');
+    if (!el) return;
+    el.textContent = msg;
+    el.style.display = '';
+    el.style.animation = 'none';
+    el.offsetHeight; // reflow
+    el.style.animation = '';
+    clearTimeout(el._timer);
+    el._timer = setTimeout(() => { el.style.display = 'none'; }, duration);
+  }
+
+  function _showModal({ title, inputMode, placeholder, defaultValue, onConfirm }) {
+    const overlay = $('preset-modal-overlay');
+    const titleEl = $('preset-modal-title');
+    const body = $('preset-modal-body');
+    const confirmBtn = $('preset-modal-confirm');
+    const cancelBtn = $('preset-modal-cancel');
+    if (!overlay) return;
+
+    titleEl.textContent = title || '提示';
+    if (inputMode === 'textarea') {
+      body.innerHTML = `<textarea id="preset-modal-ta" class="preset-modal-textarea" placeholder="${placeholder || ''}">${defaultValue || ''}</textarea>`;
+    } else {
+      body.innerHTML = `<input type="text" id="preset-modal-input" class="preset-modal-input" placeholder="${placeholder || ''}" maxlength="20" value="${defaultValue || ''}" />`;
+    }
+    overlay.style.display = '';
+    const inputEl = body.querySelector('input, textarea');
+    setTimeout(() => inputEl?.focus(), 50);
+
+    function close() {
+      overlay.style.display = 'none';
+      confirmBtn.removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', close);
+      overlay.removeEventListener('click', onBg);
+      inputEl?.removeEventListener('keydown', onKey);
+    }
+    function onOk() {
+      const val = inputEl?.value || '';
+      close();
+      if (onConfirm) onConfirm(val);
+    }
+    function onBg(e) { if (e.target === overlay) close(); }
+    function onKey(e) { if (e.key === 'Enter' && inputMode !== 'textarea') onOk(); if (e.key === 'Escape') close(); }
+
+    confirmBtn.addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', close);
+    overlay.addEventListener('click', onBg);
+    inputEl?.addEventListener('keydown', onKey);
+  }
+
+  $('preset-save')?.addEventListener('click', () => {
+    const used = Object.values(state.alloc).reduce((a, b) => a + b, 0);
+    if (used !== ALLOC_TOTAL) {
+      _showToast('请先分配完所有点数再保存');
+      return;
+    }
+    _showModal({
+      title: '保存预设',
+      placeholder: '输入预设名称',
+      onConfirm(name) {
+        if (!name || !name.trim()) return;
+        const userPresets = _loadUserPresets();
+        userPresets.push({ name: name.trim(), stats: { ...state.alloc } });
+        _saveUserPresets(userPresets);
+        _renderPresets();
+        _showToast('预设已保存');
+      },
+    });
+  });
+
+  $('preset-export')?.addEventListener('click', () => {
+    const userPresets = _loadUserPresets();
+    const all = [
+      ...SYSTEM_PRESETS.map(p => ({ name: p.name, stats: p.stats, system: true })),
+      ...userPresets.map(p => ({ name: p.name, stats: p.stats })),
+    ];
+    if (all.length === 0) { _showToast('没有可导出的预设'); return; }
+    const overlay = $('preset-modal-overlay');
+    const titleEl = $('preset-modal-title');
+    const body = $('preset-modal-body');
+    const confirmBtn = $('preset-modal-confirm');
+    const cancelBtn = $('preset-modal-cancel');
+    titleEl.textContent = '选择要导出的预设';
+    body.innerHTML = `<div class="preset-export-pick">${all.map((p, i) => {
+      const summary = STAT_KEYS.map(k => `${STAT_LABELS[k]}${p.stats[k]}`).join('/');
+      return `<label class="preset-export-item"><input type="checkbox" value="${i}" /><span>${p.name}</span><span class="preset-export-summary">${summary}</span></label>`;
+    }).join('')}</div>`;
+    overlay.style.display = '';
+
+    function close() {
+      overlay.style.display = 'none';
+      confirmBtn.removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', close);
+      overlay.removeEventListener('click', onBg);
+    }
+    function onOk() {
+      const checks = body.querySelectorAll('input[type=checkbox]:checked');
+      const picked = Array.from(checks).map(c => {
+        const p = all[parseInt(c.value)];
+        return { name: p.name, stats: p.stats };
+      });
+      close();
+      if (picked.length === 0) { _showToast('未选择任何预设'); return; }
+      const json = JSON.stringify(picked);
+      navigator.clipboard.writeText(json).then(() => {
+        _showToast(`已导出 ${picked.length} 个预设到剪贴板`);
+      }).catch(() => {
+        _showModal({ title: '导出结果', inputMode: 'textarea', defaultValue: json });
+      });
+    }
+    function onBg(e) { if (e.target === overlay) close(); }
+    confirmBtn.addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', close);
+    overlay.addEventListener('click', onBg);
+  });
+
+  $('preset-import')?.addEventListener('click', () => {
+    _showModal({
+      title: '导入预设',
+      inputMode: 'textarea',
+      placeholder: '粘贴预设代码',
+      onConfirm(raw) {
+        if (!raw || !raw.trim()) return;
+        try {
+          const arr = JSON.parse(raw.trim());
+          if (!Array.isArray(arr)) throw new Error('格式错误');
+          const valid = arr.filter(p =>
+            p && p.name && p.stats &&
+            STAT_KEYS.every(k => typeof p.stats[k] === 'number') &&
+            Object.values(p.stats).reduce((a, b) => a + b, 0) === ALLOC_TOTAL
+          ).map(p => ({ name: p.name, stats: p.stats }));
+          if (valid.length === 0) { _showToast('没有找到有效的预设'); return; }
+          const userPresets = _loadUserPresets();
+          userPresets.push(...valid);
+          _saveUserPresets(userPresets);
+          _renderPresets();
+          _showToast(`成功导入 ${valid.length} 个预设`);
+        } catch { _showToast('导入失败，请检查格式'); }
+      },
+    });
+  });
+
+  _renderPresets();
+
   $('btn-auto-1x').addEventListener('click', () => {
     SFX.sfxAutoToggle();
     startAuto(1);
@@ -5000,6 +5221,18 @@ async function main() {
   $('mp-vs-back')?.addEventListener('click', () => {
     SFX.sfxModalClose();
     $('mp-vs-overlay').style.display = 'none';
+  });
+
+  // MP: 退出房间
+  $('btn-mp-leave')?.addEventListener('click', () => {
+    SFX.sfxNav();
+    showConfirm({
+      title: '退出房间',
+      body: '确定要退出联机房间回到主界面吗？',
+      okText: '退出', cancelText: '取消',
+    }).then(ok => {
+      if (ok) location.reload();
+    });
   });
 
   $('btn-summary-share').addEventListener('click', async () => {
@@ -6465,9 +6698,9 @@ function _wireMultiplayerUI() {
   // 取消等待按钮（同学聚会 & 再来一次）
   $('mp-waiting-cancel')?.addEventListener('click', () => {
     if (_mpRestartPending) {
-      // 取消再来一次的等待
       _mpRestartPending = false;
       _hideWaitingOverlay();
+      _mpRestartResetButton();
       mpSend('restart_decline', {});
       return;
     }
@@ -6631,24 +6864,32 @@ let _mpRestartPending = false; // 我已发出 restart 请求
 function _mpHandleRestart() {
   // 联机模式：发送 restart 请求并等待对方
   if (!mp.enabled || !mp.connected) {
-    // 非联机或已断线，直接 reload
     location.reload();
     return;
   }
   if (_mpRestartPending) return; // 已经在等了
-  // 如果对方还没结束，提示等待
   if (!_mpOppEndData) {
     showConfirm({ title: '对方还在游戏中', body: '等对方也结束后才能一起再来一次哦', okText: '好的' });
     return;
   }
   _mpRestartPending = true;
   mpSend('restart_request', {});
-  // 显示等待 UI
-  const ov = $('mp-waiting-overlay');
-  if (ov) {
-    const r = $('mp-waiting-reason');
-    ov.style.display = 'flex';
-    if (r) r.textContent = '等待对方确认再来一次...';
+  // Change button to waiting state
+  const btn = $('btn-summary-restart');
+  if (btn) {
+    btn.disabled = true;
+    btn._origText = btn.textContent;
+    btn.textContent = '等待对方确认…';
+    btn.classList.add('waiting');
+  }
+}
+
+function _mpRestartResetButton() {
+  const btn = $('btn-summary-restart');
+  if (btn) {
+    btn.disabled = false;
+    btn.textContent = btn._origText || '再来一次';
+    btn.classList.remove('waiting');
   }
 }
 
@@ -6669,16 +6910,16 @@ function _mpOnRestartRequest() {
 }
 
 function _mpOnRestartReady() {
-  // 对方同意了
   _mpRestartPending = false;
   _hideWaitingOverlay();
+  _mpRestartResetButton();
   _mpDoRestart();
 }
 
 function _mpOnRestartDecline() {
-  // 对方拒绝了
   _mpRestartPending = false;
   _hideWaitingOverlay();
+  _mpRestartResetButton();
   showConfirm({ title: '对方拒绝了', body: `${mp.opponent.nickname} 不想再来一次了`, okText: '好吧' });
 }
 
