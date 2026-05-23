@@ -1993,8 +1993,8 @@ function advanceMonth() {
       _applyIncomingCard(mp.incomingCardEffect);
       mp.incomingCardEffect = null;
     }
-    // Check reunion ages (fire on month 1 of the reunion year)
-    if (REUNION_AGES && state.monthOfYear === 1 && REUNION_AGES.includes(state.age)) {
+    // Check reunion ages (fire on month 1 of the reunion year, MP only)
+    if (mp.enabled && REUNION_AGES && state.monthOfYear === 1 && REUNION_AGES.includes(state.age)) {
       _triggerReunion(state.age);
     }
     // Process incoming butterfly effects (skip during special/hidden storylines)
