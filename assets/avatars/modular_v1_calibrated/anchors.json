@@ -1,0 +1,752 @@
+{
+  "canvas": {
+    "width": 72,
+    "height": 72
+  },
+  "layers": [
+    "bg",
+    "body_base",
+    "torso_clothes",
+    "head",
+    "hair",
+    "accessory",
+    "bubble"
+  ],
+  "removed_layers": {
+    "arms": "Removed because clothing sprites already include sleeves/hands; drawing arms caused duplicated sleeves."
+  },
+  "anchors": {
+    "body_base": {
+      "female_fit": {
+        "box": [
+          36,
+          48
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "female_low_health": {
+        "box": [
+          36,
+          48
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "female_normal": {
+        "box": [
+          36,
+          48
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "male_fit": {
+        "box": [
+          36,
+          48
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "male_low_health": {
+        "box": [
+          36,
+          48
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "male_normal": {
+        "box": [
+          36,
+          48
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      }
+    },
+    "head": {
+      "female_happy": {
+        "box": [
+          30,
+          31
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 10
+      },
+      "female_neutral": {
+        "box": [
+          30,
+          31
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 10
+      },
+      "female_tired": {
+        "box": [
+          30,
+          31
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 10
+      },
+      "male_happy": {
+        "box": [
+          30,
+          31
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 10
+      },
+      "male_neutral": {
+        "box": [
+          30,
+          31
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 10
+      },
+      "male_tired": {
+        "box": [
+          30,
+          31
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 10
+      }
+    },
+    "hair": {
+      "female_bob_pink": {
+        "box": [
+          42,
+          42
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 3
+      },
+      "female_bun_blue": {
+        "box": [
+          42,
+          50
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 0
+      },
+      "female_long_black": {
+        "box": [
+          44,
+          54
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 0
+      },
+      "female_long_blonde": {
+        "box": [
+          44,
+          54
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 0
+      },
+      "female_long_chestnut": {
+        "box": [
+          44,
+          54
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 0
+      },
+      "female_long_dark_brown": {
+        "box": [
+          44,
+          54
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 0
+      },
+      "female_ponytail_black": {
+        "box": [
+          44,
+          54
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 0
+      },
+      "female_ponytail_chestnut": {
+        "box": [
+          44,
+          54
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 0
+      },
+      "long_chestnut": {
+        "box": [
+          44,
+          54
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 0
+      },
+      "male_messy_black": {
+        "box": [
+          40,
+          34
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 1
+      },
+      "male_messy_chestnut": {
+        "box": [
+          40,
+          34
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 1
+      },
+      "male_messy_dark_brown": {
+        "box": [
+          40,
+          34
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 1
+      },
+      "male_messy_silver": {
+        "box": [
+          40,
+          34
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 1
+      },
+      "male_short_black": {
+        "box": [
+          40,
+          34
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 1
+      },
+      "male_short_blonde": {
+        "box": [
+          40,
+          34
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 1
+      },
+      "male_short_chestnut": {
+        "box": [
+          40,
+          34
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 1
+      },
+      "male_short_dark_brown": {
+        "box": [
+          40,
+          34
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 1
+      },
+      "messy_chestnut": {
+        "box": [
+          40,
+          34
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 1
+      },
+      "ponytail_chestnut": {
+        "box": [
+          44,
+          54
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 0
+      },
+      "short_fluffy_chestnut": {
+        "box": [
+          40,
+          34
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 1
+      }
+    },
+    "torso_clothes": {
+      "business_blazer": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "cardigan": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "chef_coat": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "esports_jersey": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "female_business_blazer": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "female_cardigan_cream": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "female_chef_coat": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "female_esports_jersey": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "female_gym_jacket": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "female_idol_stage": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "female_labcoat": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "female_office_shirt": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "female_party_top": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "female_preppy_blazer": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "female_suit": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "female_teal_crop_hoodie": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "female_white_blouse": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "female_wizard_robe": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "female_worn_sweater": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "female_xianxia_hanfu": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "gym_top": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "idol_jacket": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "labcoat": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "office_shirt": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "party_shirt": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "school_uniform": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "suit": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "teal_student_hoodie": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "tracksuit": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "wizard_robe": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "worn_hoodie": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "xianxia_robe": {
+        "box": [
+          52,
+          45
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      }
+    },
+    "bubble": {
+      "academic_warning": {
+        "box": [
+          18,
+          18
+        ],
+        "anchor": "center",
+        "x": 58,
+        "y": 14
+      },
+      "breakup": {
+        "box": [
+          18,
+          18
+        ],
+        "anchor": "center",
+        "x": 58,
+        "y": 14
+      },
+      "chef": {
+        "box": [
+          18,
+          18
+        ],
+        "anchor": "center",
+        "x": 58,
+        "y": 14
+      },
+      "esports": {
+        "box": [
+          18,
+          18
+        ],
+        "anchor": "center",
+        "x": 58,
+        "y": 14
+      },
+      "happy": {
+        "box": [
+          18,
+          18
+        ],
+        "anchor": "center",
+        "x": 58,
+        "y": 14
+      },
+      "love": {
+        "box": [
+          18,
+          18
+        ],
+        "anchor": "center",
+        "x": 58,
+        "y": 14
+      },
+      "magic": {
+        "box": [
+          18,
+          18
+        ],
+        "anchor": "center",
+        "x": 58,
+        "y": 14
+      },
+      "rich": {
+        "box": [
+          18,
+          18
+        ],
+        "anchor": "center",
+        "x": 58,
+        "y": 14
+      },
+      "sick": {
+        "box": [
+          18,
+          18
+        ],
+        "anchor": "center",
+        "x": 58,
+        "y": 14
+      },
+      "stress": {
+        "box": [
+          18,
+          18
+        ],
+        "anchor": "center",
+        "x": 58,
+        "y": 14
+      },
+      "tired": {
+        "box": [
+          18,
+          18
+        ],
+        "anchor": "center",
+        "x": 58,
+        "y": 14
+      },
+      "xianxia": {
+        "box": [
+          18,
+          18
+        ],
+        "anchor": "center",
+        "x": 58,
+        "y": 14
+      }
+    },
+    "accessory": {
+      "backpack_strap": {
+        "box": [
+          46,
+          43
+        ],
+        "anchor": "bottom_center",
+        "x": 36,
+        "y": 72
+      },
+      "glasses": {
+        "box": [
+          22,
+          10
+        ],
+        "anchor": "center",
+        "x": 35,
+        "y": 27
+      },
+      "headphones": {
+        "box": [
+          44,
+          38
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 4
+      },
+      "spirit_beads": {
+        "box": [
+          24,
+          18
+        ],
+        "anchor": "center",
+        "x": 36,
+        "y": 41
+      }
+    }
+  }
+}
