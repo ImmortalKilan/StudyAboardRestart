@@ -16,17 +16,17 @@ const STAT_KEYS = ['SOC', 'INT', 'MNY', 'PER', 'HLT', 'APP'];
 const STAT_LABELS = {
   SOC: '社交', INT: '智力', MNY: '家境',
   HAP: '快乐', HLT: '健康', PER: '毅力', APP: '颜值',
-  POP: '人气', POK: '牌技', MMR: '天梯分', FIT: '体能', CKL: '厨艺', ATH: '运动', MAG: '魔力',
+  POP: '人气', POK: '牌技', MMR: '天梯分', FIT: '体能', CKL: '厨艺', ATH: '运动', MAG: '魔力', REP: '声望', BND: '乐队影响力',
   cul: '修为', dao: '大道', karma: '机缘', tribulation: '渡劫', realm: '境界'
 };
-const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG', 'HEAT', 'cul', 'dao', 'karma', 'tribulation', 'darkOmen', 'courage', 'alliance', 'knowledge']);
+const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG', 'REP', 'BND', 'HEAT', 'cul', 'dao', 'karma', 'tribulation', 'darkOmen', 'courage', 'alliance', 'knowledge']);
 const XIANXIA_KEYS = ['realm', 'cul', 'dao', 'karma', 'tribulation'];
 
 // ── Special Scoring Endings ──
 const LEGENDARY_ENDINGS = new Set([
   50099, // Spy Success
   60040, // Abyss Success
-  70040, 70094, // Meta Success / Madman
+  70092, 70093, // Meta: Ctrl+W / True Ending
   82090, // CEO Peak
   83090, // Esports World Champion
   84061, // Fitness Legend
@@ -45,10 +45,14 @@ const LEGENDARY_ENDINGS = new Set([
   43190,        // 商科: 投行精英/风投巨鳄
   44190,        // 理科: 全奖直博巅峰
   45191,        // 文科/文艺: 传世大家
-  49990, 49991, 49992  // 音乐: 独立音乐人, 流行歌手, 作曲家
+  49990, 49991, 49992,  // 音乐: 独立音乐人, 流行歌手, 作曲家
+  89090, // Academic White Hat: Google Project Zero
+  89092, // Academic Black Hat: Ghost金盆洗手
+  78081, // Band: Battle of the Bands champion
 ]);
 
 const GOOD_ENDINGS = new Set([
+  70091, // Meta: Accept Ending
   80105, // Idol Superstar
   82096, // Corporate Elite
   84091, // Fitness Influencer
@@ -117,13 +121,16 @@ const STORYLINE_CFG = {
     flavor: () => abyssFlavor(),
   },
   meta: {
-    duration: 4,
-    gracePeriod: 12,
-    successEvent: 70040,
-    eventRate: 0.75,
+    gracePeriod: 6,
+    eventRate: 0.85,
     deathChecks: [
       { cond: s => s.HAP <= -5, event: 70094 },
       { cond: s => s.HLT <= -5, event: 70095 }
+    ],
+    progressChecks: [
+      { cond: s => (s.meta_aware || 0) >= 4 && !s.firedEvents.has(70010), event: 70010 },
+      { cond: s => (s.meta_aware || 0) >= 6 && !s.firedEvents.has(70020), event: 70020 },
+      { cond: s => (s.meta_aware || 0) >= 8 && !s.firedEvents.has(70040), event: 70040 }
     ],
     flavor: () => metaFlavor(),
     },
@@ -262,6 +269,27 @@ const STORYLINE_CFG = {
       { cond: s => s.match_fixing, event: 83092 },
       { cond: s => s.monthTotal - (s.storylineStartMonth || 0) >= 36, event: 83094 },
     ],
+  },
+  academic: {
+    gracePeriod: 10,
+    eventRate: 0.75,
+    deathChecks: [
+      { cond: s => s.route === 'black' && (s.REP || 0) >= 35 && (s.PER || 0) < 5, event: 89093 },
+      { cond: s => s.route === 'black' && s.HAP <= -8, event: 89094 },
+    ],
+    progressChecks: [
+      { cond: s => s.route === 'black' && (s.REP || 0) >= 20 && !s.firedEvents.has(89040), event: 89040 },
+    ],
+    flavor: () => academicFlavor(),
+  },
+  band: {
+    gracePeriod: 12,
+    eventRate: 0.75,
+    deathChecks: [
+      { cond: s => s.HLT <= -3, event: 82021 },
+    ],
+    progressChecks: [],
+    flavor: () => bandFlavor(),
   },
   idol: {
     gracePeriod: 12,
@@ -885,6 +913,182 @@ function attemptQualifier(forced) {
   render();
 }
 
+// ── Academic stage clock ──────────────────────────────────────
+const ACADEMIC_W_PREP_LEN = 12;
+const ACADEMIC_W_FORCE_LEN = 24;
+const ACADEMIC_W_DECAY_GRACE = 3;
+const ACADEMIC_W_DECAY_PER_MONTH = 2;
+const ACADEMIC_W_DECAY_CAP = 20;
+const ACADEMIC_W_PROB_FLOOR = 5;
+const ACADEMIC_W_PROB_CAP = 75;
+
+const ACADEMIC_B_PREP_LEN = 18;
+const ACADEMIC_B_FORCE_LEN = 24;
+const ACADEMIC_B_DECAY_GRACE = 3;
+const ACADEMIC_B_DECAY_PER_MONTH = 2.5;
+const ACADEMIC_B_DECAY_CAP = 25;
+const ACADEMIC_B_PROB_FLOOR = 5;
+const ACADEMIC_B_PROB_CAP = 65;
+
+function initAcademicStage() {
+  state.academic_stage = 'prep';
+  state.academic_decay = 0;
+  state.academic_attempted = false;
+  state.academic_window_start = null;
+}
+
+function updateAcademicStage() {
+  if (state.storyline !== 'academic') return;
+  if (state.academic_stage == null) initAcademicStage();
+  if (state.academic_attempted) return;
+
+  const monthsIn = state.monthTotal - (state.storylineStartMonth || 0);
+  const isBlack = state.route === 'black';
+
+  const prepLen = isBlack ? ACADEMIC_B_PREP_LEN : ACADEMIC_W_PREP_LEN;
+  const forceLen = isBlack ? ACADEMIC_B_FORCE_LEN : ACADEMIC_W_FORCE_LEN;
+  const decayGrace = isBlack ? ACADEMIC_B_DECAY_GRACE : ACADEMIC_W_DECAY_GRACE;
+  const decayRate = isBlack ? ACADEMIC_B_DECAY_PER_MONTH : ACADEMIC_W_DECAY_PER_MONTH;
+  const decayCap = isBlack ? ACADEMIC_B_DECAY_CAP : ACADEMIC_W_DECAY_CAP;
+
+  if (state.academic_stage === 'prep' && monthsIn >= prepLen) {
+    state.academic_stage = 'window';
+    state.academic_window_start = state.monthTotal;
+    state.academic_decay = 0;
+  }
+
+  if (state.academic_stage === 'window') {
+    const inWindow = state.monthTotal - (state.academic_window_start || state.monthTotal);
+    if (inWindow > decayGrace) {
+      state.academic_decay = Math.min(decayCap,
+        Math.round((inWindow - decayGrace) * decayRate));
+    }
+  }
+
+  if (state.academic_stage === 'window' && monthsIn >= forceLen) {
+    attemptAcademic(true);
+  }
+}
+
+function computeAcademicProb(s) {
+  if (s.storyline !== 'academic') return 0;
+  const isBlack = s.route === 'black';
+  let p;
+
+  if (isBlack) {
+    p = -40;
+    p += (s.REP || 0) * 1.0;
+    p += (s.PER || 0) * 2.0;
+    p += (s.MNY || 0) * 0.5;
+    p += (s.INT || 0) * 0.5;
+  } else {
+    p = -30;
+    p += (s.REP || 0) * 1.5;
+    p += (s.INT || 0) * 1.0;
+    p += (s.PER || 0) * 0.5;
+  }
+
+  p -= (s.academic_decay || 0);
+
+  const floor = isBlack ? ACADEMIC_B_PROB_FLOOR : ACADEMIC_W_PROB_FLOOR;
+  const cap = isBlack ? ACADEMIC_B_PROB_CAP : ACADEMIC_W_PROB_CAP;
+  return Math.max(floor, Math.min(cap, Math.round(p)));
+}
+
+function attemptAcademic(forced) {
+  if (state.academic_attempted) return;
+  state.academic_attempted = true;
+  state.academic_stage = 'attempted';
+
+  const prob = computeAcademicProb(state);
+  const success = Math.random() * 100 < prob;
+  const isBlack = state.route === 'black';
+
+  state.firedEvents.add(89045);
+
+  if (isBlack) {
+    const evId = success ? 89092 : 89093;
+    if (forced) {
+      pushLog(success
+        ? '你在FBI合围前的最后一刻完成了数字逃亡。'
+        : 'FBI的搜查令终于来了——你没有跑掉。');
+    }
+    const ev = state.eventsMap.get(evId);
+    if (ev) applyEvent(ev);
+  } else {
+    const evId = success ? 89090 : 89091;
+    if (forced) {
+      pushLog(success
+        ? '你的安全研究成果在业界引起了巨大反响。'
+        : '安全实习合同到期了，你回归了普通生活。');
+    }
+    const ev = state.eventsMap.get(evId);
+    if (ev) applyEvent(ev);
+  }
+  render();
+}
+
+// ── Band stage clock ─────────────────────────────────────────
+// Stages: 'rehearsal' (0-12 mo) → 'gig_window' (12-24 mo) → 'performed'
+const BAND_REHEARSAL_LEN = 12;
+const BAND_FORCE_LEN = 24;
+const BAND_DECAY_GRACE = 6;
+const BAND_DECAY_STEP = 3;
+const BAND_DECAY_AMT = 4;
+const BAND_DECAY_CAP = 45;
+const BAND_PROB_CAP = 70;
+const BAND_PROB_FLOOR = 5;
+
+function initBandStage() {
+  state.band_stage = 'rehearsal';
+  state.band_decay = 0;
+  state.band_attempted = false;
+  state.band_window_start = null;
+}
+
+function updateBandStage() {
+  if (state.storyline !== 'band') return;
+  if (state.band_stage == null) initBandStage();
+  if (state.band_attempted) return;
+  const monthsIn = state.monthTotal - (state.storylineStartMonth || 0);
+  if (state.band_stage === 'rehearsal' && monthsIn >= BAND_REHEARSAL_LEN) {
+    state.band_stage = 'gig_window';
+    state.band_window_start = state.monthTotal;
+  }
+  if (state.band_stage === 'gig_window') {
+    const inWindow = state.monthTotal - (state.band_window_start || state.monthTotal);
+    const decaySteps = Math.max(0, Math.floor((inWindow - BAND_DECAY_GRACE) / BAND_DECAY_STEP));
+    state.band_decay = Math.min(BAND_DECAY_CAP, decaySteps * BAND_DECAY_AMT);
+    if (monthsIn >= BAND_FORCE_LEN) attemptBand(true);
+  }
+}
+
+function computeBandProb(s) {
+  if (s.storyline !== 'band') return 0;
+  let p = -15;
+  p += (s.PER || 0) * 2.0;
+  p += (s.BND || 0) * 1.5;
+  p += (s.SOC || 0) * 0.8;
+  p += (s.INT || 0) * 0.3;
+  p -= (s.band_decay || 0);
+  return Math.max(BAND_PROB_FLOOR, Math.min(BAND_PROB_CAP, Math.round(p)));
+}
+
+function attemptBand(forced) {
+  if (state.band_attempted) return;
+  state.band_attempted = true;
+  state.band_stage = 'performed';
+  const prob = computeBandProb(state);
+  const success = Math.random() * 100 < prob;
+  state.firedEvents.add(78080);
+  const prelude = state.eventsMap.get(78080);
+  if (prelude) pushLog(prelude.event, 'special');
+  const evId = success ? 78081 : 78082;
+  const ev = state.eventsMap.get(evId);
+  if (ev) applyEvent(ev);
+  render();
+}
+
 // ── Poker stage clock (mirror of esports) ──────────────────────
 // Stages: 'rookie' (0-12 mo) → 'triton_window' (12-60 mo) → 'attempted'
 const POKER_ROOKIE_LEN = 12;
@@ -970,9 +1174,11 @@ const STORYLINE_NAMES = {
   athlete: '校队之星',
   thief: '影子协会',
   hogwarts: '霍格沃茨',
+  academic: '学术深渊',
+  band: '地下乐队',
 };
 const HIDDEN_STORYLINES = new Set(['spy', 'abyss', 'meta', 'xianxia', 'thief', 'hogwarts']);
-const SPECIAL_STORYLINES = new Set(['idol', 'superstar', 'streamer', 'poker', 'triton', 'local_shark', 'party', 'ceo', 'wasted', 'esports', 'worlds', 'minor_league', 'fitness', 'chef', 'athlete']);
+const SPECIAL_STORYLINES = new Set(['idol', 'superstar', 'streamer', 'poker', 'triton', 'local_shark', 'party', 'ceo', 'wasted', 'esports', 'worlds', 'minor_league', 'fitness', 'chef', 'athlete', 'academic', 'band']);
 const STORYLINE_UNLOCK_STAT = {
   idol: 'POP', superstar: 'POP', streamer: 'POP',
   poker: 'POK', triton: 'POK', local_shark: 'POK',
@@ -981,6 +1187,8 @@ const STORYLINE_UNLOCK_STAT = {
   chef: 'CKL',
   athlete: 'ATH',
   hogwarts: 'MAG',
+  academic: 'REP',
+  band: 'BND',
 };
 const STUDENT_PHASES = new Set([
   '高中生', '本科生', '理工生', '商科生', '文科生',
@@ -1319,6 +1527,16 @@ function triggerEvent(id) {
   if (ev) applyEvent(ev);
 }
 
+function _applySetObj(obj) {
+  for (const [k, v] of Object.entries(obj)) {
+    if (typeof v === 'string' && (v.startsWith('+') || v.startsWith('-'))) {
+      state[k] = (state[k] || 0) + Number(v);
+    } else {
+      state[k] = v;
+    }
+  }
+}
+
 function applyEvent(ev) {
   // Storyline replay: only show text, skip all side effects
   if (ev._replay) {
@@ -1337,7 +1555,7 @@ function applyEvent(ev) {
   if (ev.set) {
     const prevStoryline = state.storyline;
     const prevRel = state.relationship;
-    for (const [k, v] of Object.entries(ev.set)) state[k] = v;
+    _applySetObj(ev.set);
     if (ev.set.relationship !== undefined && ev.set.relationship !== prevRel) {
       if (!state.relationshipHistory) state.relationshipHistory = [];
       const last = state.relationshipHistory[state.relationshipHistory.length - 1];
@@ -1359,6 +1577,8 @@ function applyEvent(ev) {
       if (ev.set.storyline === 'fitness') initFitnessStage();
       if (ev.set.storyline === 'chef') initChefStage();
       if (ev.set.storyline === 'athlete') initAthleteStage();
+      if (ev.set.storyline === 'academic') initAcademicStage();
+      if (ev.set.storyline === 'band') initBandStage();
     }
     if (ev.set.profession && GRAD_SCHOOL_PHASES.has(ev.set.profession)) {
       scheduleGraduateCompletion();
@@ -1555,6 +1775,8 @@ function _checkEventAchievements(ev) {
         esports: 'sl_esports', worlds: 'sl_worlds',
         fitness: 'sl_fitness', chef: 'sl_chef', athlete: 'sl_athlete',
         thief: 'sl_thief', hogwarts: 'sl_hogwarts',
+        academic: 'sl_academic',
+        band: 'sl_band',
       };
       if (SL_MAP[sl]) unlockAchievement(SL_MAP[sl]);
     }
@@ -1584,7 +1806,7 @@ function _checkEventAchievements(ev) {
   if (id === 80042) unlockAchievement('debut_fail');        // idol debut failure
   if (id === 50099) unlockAchievement('end_spy');           // spy mission success
   if (id === 60040) unlockAchievement('end_abyss');         // abyss storyline success
-  if (id === 70040) unlockAchievement('end_meta');          // meta storyline success
+  if (id === 70093) unlockAchievement('end_meta');          // meta storyline true ending
   if (id === 82041 || id === 82090) unlockAchievement('end_ceo');   // CEO success
   if (id === 83090 || id === 83094) unlockAchievement('end_worlds'); // worlds win
 
@@ -1593,6 +1815,14 @@ function _checkEventAchievements(ev) {
   if (id === 86105 || id === 86120 || id === 86136) unlockAchievement('end_athlete'); // athlete top tier
   if (id === 87190) unlockAchievement('end_thief');          // thief ghost rating
   if (id === 61611) unlockAchievement('end_hogwarts');       // defeated Voldemort with Elder Wand
+  if (id === 89090) unlockAchievement('end_academic_white'); // academic white hat true ending
+  if (id === 89092) unlockAchievement('end_academic_black'); // academic black hat true ending
+  if (id === 78081) unlockAchievement('end_band_win');   // band: Battle of the Bands champion
+  if (id === 78082) unlockAchievement('end_band_fail');  // band: disbanded
+  if (id === 89041) { // FBI翻供：黑转白，重置时间线
+    state.storylineStart = state.age;
+    state.storylineStartMonth = state.monthTotal;
+  }
 
   // Major career legendary endings
   if (id === 48190 || id === 48191) unlockAchievement('end_ee');    // EE: 半导体教父 / 芯片独角兽
@@ -1754,7 +1984,7 @@ function resolveChoice(index) {
     }
   } else if (choice.next) {
     if (choice.set) {
-      for (const [k, v] of Object.entries(choice.set)) state[k] = v;
+      _applySetObj(choice.set);
     }
     if (choice.effect) {
       for (const [k, v] of Object.entries(choice.effect)) {
@@ -1762,6 +1992,7 @@ function resolveChoice(index) {
       }
       clampStats();
     }
+    if (typeof choice.happyDelta === 'number') state.HAP += choice.happyDelta;
     const ev = state.eventsMap.get(choice.next);
     if (ev) applyEvent(ev);
   } else if (choice.effect || choice.set || choice.resultText || choice.text) {
@@ -1769,7 +2000,7 @@ function resolveChoice(index) {
 
     // Inline outcome: apply effect/set and log a short result line
     if (choice.set) {
-      for (const [k, v] of Object.entries(choice.set)) state[k] = v;
+      _applySetObj(choice.set);
     }
     if (choice.effect) {
       for (const [k, v] of Object.entries(choice.effect)) {
@@ -1777,6 +2008,7 @@ function resolveChoice(index) {
       }
       clampStats();
     }
+    if (typeof choice.happyDelta === 'number') state.HAP += choice.happyDelta;
 
     const isExit = choice.set && choice.set.storyline === '' && prevStoryline;
     let logType = undefined;
@@ -1894,6 +2126,8 @@ function advanceMonth() {
     updateFitnessStage();
     updateChefStage();
     updateAthleteStage();
+    updateAcademicStage();
+    updateBandStage();
     updateHogwartsYear();
     if (state.phase === 'ended' || state.pendingChoice) { render(); return; }
     // === Storyline mode: skip normal events, only draw storyline events ===
@@ -2387,17 +2621,73 @@ function abyssFlavor() {
   ]);
 }
 
-function metaFlavor() {
+function academicFlavor() {
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  if (state.route === 'black') {
+    return pick([
+      '你检查了一下加密钱包的余额，嘴角微微上扬。',
+      '又一个客户发来了改分请求，你机械地打开了终端。',
+      '你反复刷新新闻页面，确认没有任何关于学术欺诈的报道。',
+      '你换了第三个VPN节点，然后才敢打开那个加密群。',
+      '凌晨的宿舍里只有键盘的声音和你紧张的心跳。',
+      '你看了看镜子里的自己——什么时候开始有黑眼圈的？',
+    ]);
+  }
+  return pick([
+    '你在安全实验室里测试最新的渗透脚本。',
+    '系统日志像瀑布一样在屏幕上滚动，你目不转睛。',
+    '你正在写这周的安全审计报告。',
+    '主任发来一个新的测试目标，你开始规划攻击向量。',
+    '你在漏洞平台上提交了一份新报告，等待审核。',
+    '你给安全社区的技术博客写了一篇新文章。',
+  ]);
+}
+
+function bandFlavor() {
   const pick = a => a[Math.floor(Math.random() * a.length)];
   return pick([
-    '天空的分辨率今天似乎降低了，大概是服务器在省资源。',
-    '你试图和一棵树对话，它回复了一句"交互未定义"。',
-    '你又看到了那行浮空的调试信息，然后它闪了一下消失了。',
-    '你盯着镜子看了很久，总觉得你的面部多边形有点少。',
-    '风吹过来的方向不对，好像有人把风场参数填反了。',
-    '路过的NPC第三次对你说了一模一样的台词。',
-    '你试着往地图边缘走，脚下的地面开始变得透明。',
-    '今天的日落持续了零点三秒就切换成了夜晚。',
+    '你在地下室排练到指尖发麻。贝斯的低频让整个房间都在震动。',
+    '主唱让你去买咖啡——你是乐队里唯一没有solo的人，反正闲着也是闲着。',
+    '你在油管上看了三个小时的slap bass教学视频。',
+    '你试着跟吉他手解释贝斯和吉他的区别。他说：「不就是大号吉他吗？」',
+    '今天排练的时候你把音量调大了一格。没有人注意到。',
+    '你和鼓手配合出了一段完美的groove。主唱说：「不错，鼓很好。」',
+    '有人在ins上问你们乐队有几个人。主唱回复：「三个人加一个贝斯手。」',
+    '你盯着调音台上贝斯的推子——果然又被混音师偷偷拉到了最低。',
+    '你写了一段自认为很棒的贝斯line。主唱听完说：「能不能简单点，跟着根音走就行。」',
+    '你在宿舍练指弹到深夜。室友翻了个身说：「你在按摩椅子吗？」',
+  ]);
+}
+
+function metaFlavor() {
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  const aware = state.meta_aware || 0;
+  if (aware >= 6) {
+    return pick([
+      '今天的天空蓝得过于均匀，像是某个人精心挑选的色号。',
+      '你感到那道视线还在。不是敌意——更像是……关注。',
+      '路过的每个人脸上都挂着恰到好处的微笑。太恰到好处了。',
+      '你抬头看了一眼天空。什么都没有。但你知道那里有人。',
+      '风吹过来的方向每天都不一样，但温度永远是刚好舒适的。',
+      '你发了一会儿呆。或者说——你让操控你的人休息了一会儿。',
+    ]);
+  } else if (aware >= 4) {
+    return pick([
+      '你盯着手机屏幕上的时间看了很久。分钟没有跳动。',
+      '远处的行人走路姿态重复了，就像循环播放的动画。',
+      '你闭上眼数到十。睁开时，周围的摆设有细微的位移。',
+      '你仔细听了一下环境音。它像一段30秒的loop。',
+      '你翻开昨天的笔记，发现字迹是你的，但你不记得写过。',
+      '你试着不做任何事。十分钟后，一个「事件」自动找上了你。',
+    ]);
+  }
+  return pick([
+    '今天一切正常。也许太正常了。',
+    '你有一瞬间的恍惚——刚才那一刻好像已经发生过了。',
+    '时间过得很快。你说不清是过了一天还是一个月。',
+    '你想做点什么，但又说不清想做什么。',
+    '窗外的景色和昨天一模一样。也许每一天都是同一天。',
+    '你看着日历发呆。日期跳得太快了。',
   ]);
 }
 
@@ -2419,7 +2709,8 @@ function storylineFlavor() {
     xianxia:    ['你于洞府中盘膝吐纳，岁月如水流过。', '山雨过后，林间灵气格外稠密。', '你抬头看天，一只白鹤掠过云端。', '你打坐时，听见远处有人在念诵经文。', '你拈起一片落叶，叶上灵息流转。', '你在溪边写了几个字，又被风吹散。', '你试着以神识扫过山林，鸟兽四散。', '你想起当年那本残卷，墨迹仍在脑海中流动。'],
     fitness:    ['你对着镜子检查肌肉分离度。', '又到了痛苦的练腿日。', '你在计算今天的宏量营养素。', '凌晨的健身房只有杠铃的撞击声。', '你喝下了一大口难以下咽的蛋白粉。', '你的体脂率似乎又降了一点。'],
     chef:       ['你在后厨反复翻炒，火苗窜起。', '你切土豆切得手腕发麻。', '你正在研究新的酱汁配方。', '餐车外的食客排起了长队。', '你清洗着沾满油污的铁锅。', '空气中弥漫着香料的味道。'],
-    athlete:    ['你在训练场上挥汗如雨。', '教练的哨声在耳边回响。', '你在力量房做着第无数组深蹲。', '冰敷袋贴在酸痛的膝盖上。', '你在看比赛录像分析战术。', '更衣室里弥漫着运动后的疲惫。']
+    athlete:    ['你在训练场上挥汗如雨。', '教练的哨声在耳边回响。', '你在力量房做着第无数组深蹲。', '冰敷袋贴在酸痛的膝盖上。', '你在看比赛录像分析战术。', '更衣室里弥漫着运动后的疲惫。'],
+    academic:   ['你盯着终端里滚动的日志，寻找异常。', '又一个通宵，屏幕的蓝光映在你脸上。', '你在暗网论坛潜水，看着别人讨论最新的漏洞。', '你敲下一行代码，然后又全部删掉。', '咖啡已经凉了，但你忘了喝。', '你反复确认所有痕迹都被清除干净了。']
   };
   const pool = flavors[sl];
   if (pool) return pool[Math.floor(Math.random() * pool.length)];
@@ -2620,8 +2911,10 @@ function render() {
       if (state.showCKL) shown.push('CKL');
       if (state.showATH) shown.push('ATH');
       if (state.showMAG) shown.push('MAG');
+      if (state.showREP) shown.push('REP');
+      if (state.showBND) shown.push('BND');
       const dynamicMax = Math.max(1, ...shown.filter(k => k !== 'HAP').map(k => state[k]));
-      const SPECIAL_STATS = new Set(['POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG']);
+      const SPECIAL_STATS = new Set(['POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG', 'REP', 'BND']);
       for (const k of shown) {
         const row = document.createElement('div');
         const isSpecial = SPECIAL_STATS.has(k);
@@ -2843,6 +3136,91 @@ function render() {
         }
       } else {
         esportsBox.style.display = 'none';
+      }
+    }
+
+    const academicBox = $('academic-box');
+    if (academicBox) {
+      if (state.storyline === 'academic' && !state.academic_attempted && state.phase !== 'ended') {
+        academicBox.style.display = '';
+        const stageEl = $('academic-stage');
+        const probEl = $('academic-prob');
+        const warnEl = $('academic-decay-warn');
+        const btn = $('btn-try-academic');
+        const titleEl = $('academic-title');
+        const monthsIn = state.monthTotal - (state.storylineStartMonth || 0);
+        const isBlack = state.route === 'black';
+        const prepLen = isBlack ? ACADEMIC_B_PREP_LEN : ACADEMIC_W_PREP_LEN;
+        const forceLen = isBlack ? ACADEMIC_B_FORCE_LEN : ACADEMIC_W_FORCE_LEN;
+
+        if (titleEl) titleEl.textContent = isBlack ? '🖤 金盆洗手' : '🛡️ 冲击顶级安全公司';
+
+        if (state.academic_stage === 'prep' || state.academic_stage == null) {
+          const remaining = Math.max(0, prepLen - monthsIn);
+          stageEl.textContent = isBlack ? `扩张期 · 还剩 ${remaining} 个月` : `积累期 · 还剩 ${remaining} 个月`;
+          probEl.textContent = '--';
+          warnEl.textContent = isBlack ? `满 ${prepLen} 个月后可以尝试金盆洗手` : `满 ${prepLen} 个月后可以冲击顶级公司`;
+          btn.disabled = true;
+          btn.textContent = '时机未到';
+        } else if (state.academic_stage === 'window') {
+          const prob = computeAcademicProb(state);
+          const monthsToForce = Math.max(0, forceLen - monthsIn);
+          stageEl.textContent = `窗口期 · 强制结算还剩 ${monthsToForce} 个月`;
+          probEl.textContent = prob + '%';
+          probEl.style.color = prob >= 50 ? '#7ed7a0' : prob >= 25 ? '#f5b642' : '#e06060';
+          const decayCap = isBlack ? ACADEMIC_B_DECAY_CAP : ACADEMIC_W_DECAY_CAP;
+          if ((state.academic_decay || 0) >= decayCap) {
+            warnEl.textContent = `衰减已封顶（-${decayCap}%），再拖也不会更低`;
+          } else if ((state.academic_decay || 0) > 0) {
+            warnEl.textContent = isBlack
+              ? `FBI逼近中… 已衰减 ${state.academic_decay}%`
+              : `机会在流失… 已衰减 ${state.academic_decay}%`;
+          } else {
+            warnEl.textContent = isBlack ? '趁FBI还没收网，赶紧行动' : '抓住机会，展示你的实力';
+          }
+          btn.disabled = false;
+          btn.textContent = isBlack ? '金盆洗手' : '发起冲击';
+        }
+      } else {
+        academicBox.style.display = 'none';
+      }
+    }
+
+    const bandBox = $('band-box');
+    if (bandBox) {
+      if (state.storyline === 'band' && !state.band_attempted && state.phase !== 'ended') {
+        bandBox.style.display = '';
+        const stageEl = $('band-stage');
+        const probEl = $('band-prob');
+        const warnEl = $('band-decay-warn');
+        const btn = $('btn-try-band');
+        const monthsIn = state.monthTotal - (state.storylineStartMonth || 0);
+
+        if (state.band_stage === 'rehearsal' || state.band_stage == null) {
+          const remaining = Math.max(0, BAND_REHEARSAL_LEN - monthsIn);
+          stageEl.textContent = `排练期 · 还剩 ${remaining} 个月`;
+          probEl.textContent = '--';
+          warnEl.textContent = `满 ${BAND_REHEARSAL_LEN} 个月后可以参加Battle of the Bands`;
+          btn.disabled = true;
+          btn.textContent = '时机未到';
+        } else if (state.band_stage === 'gig_window') {
+          const prob = computeBandProb(state);
+          const monthsToForce = Math.max(0, BAND_FORCE_LEN - monthsIn);
+          stageEl.textContent = `演出窗口 · 强制结算还剩 ${monthsToForce} 个月`;
+          probEl.textContent = prob + '%';
+          probEl.style.color = prob >= 50 ? '#7ed7a0' : prob >= 25 ? '#f5b642' : '#e06060';
+          if ((state.band_decay || 0) >= BAND_DECAY_CAP) {
+            warnEl.textContent = `衰减已封顶（-${BAND_DECAY_CAP}%），再拖也不会更低`;
+          } else if ((state.band_decay || 0) > 0) {
+            warnEl.textContent = `乐队热度在降… 已衰减 ${state.band_decay}%`;
+          } else {
+            warnEl.textContent = '乐队状态正佳，是时候上台了';
+          }
+          btn.disabled = false;
+          btn.textContent = '参加Battle of the Bands';
+        }
+      } else {
+        bandBox.style.display = 'none';
       }
     }
 
@@ -5154,6 +5532,55 @@ async function main() {
     });
   }
 
+  const btnTryAcademic = $('btn-try-academic');
+  if (btnTryAcademic) {
+    btnTryAcademic.addEventListener('click', async () => {
+      if (state.phase === 'ended') return;
+      if (state.storyline !== 'academic') return;
+      if (state.academic_stage !== 'window') return;
+      if (state.academic_attempted) return;
+      const prob = computeAcademicProb(state);
+      const isBlack = state.route === 'black';
+      const ok = await showConfirm({
+        title: isBlack ? '金盆洗手' : '冲击顶级安全公司',
+        body: isBlack
+          ? '清除所有数字痕迹，带着财富全身而退。失败意味着被FBI抓获。'
+          : '向Google Project Zero发起申请，用你的漏洞研究成果证明自己。',
+        stats: [
+          { label: '成功率', value: prob + '%', tone: probTone(prob) },
+          { label: '成功', value: isBlack ? 'Ghost传说' : '白骑士传奇' },
+          { label: '失败', value: isBlack ? '被捕遣返' : '回归普通生活', tone: 'warn' },
+        ],
+      });
+      if (!ok) return;
+      stopAuto();
+      attemptAcademic(false);
+    });
+  }
+
+  const btnTryBand = $('btn-try-band');
+  if (btnTryBand) {
+    btnTryBand.addEventListener('click', async () => {
+      if (state.phase === 'ended') return;
+      if (state.storyline !== 'band') return;
+      if (state.band_stage !== 'gig_window') return;
+      if (state.band_attempted) return;
+      const prob = computeBandProb(state);
+      const ok = await showConfirm({
+        title: 'Battle of the Bands',
+        body: '今晚就是决赛。台下坐满了人，前排有大厂牌的A&R。你们准备好了吗？',
+        stats: [
+          { label: '成功率', value: prob + '%', tone: probTone(prob) },
+          { label: '成功', value: '冠军 · 厂牌签约' },
+          { label: '失败', value: '乐队解散', tone: 'warn' },
+        ],
+      });
+      if (!ok) return;
+      stopAuto();
+      attemptBand(false);
+    });
+  }
+
   const btnTryTriton = $('btn-try-triton');
   if (btnTryTriton) {
     btnTryTriton.addEventListener('click', async () => {
@@ -6775,7 +7202,8 @@ function _resetGameState() {
   // 隐藏特殊属性面板
   state.showPOP = false; state.showPOK = false; state.showMMR = false;
   state.showFIT = false; state.showCKL = false; state.showATH = false;
-  state.showMAG = false;
+  state.showMAG = false; state.showREP = false; state.showBND = false;
+  state.REP = 0; state.BND = 0;
   state.cul = 0; state.dao = 0; state.karma = 0; state.tribulation = 0;
   state.xianxiaSeed = 0; state.yuanshen_book = 0; state.xingchen_book = 0;
   state.statPeaks = {};
@@ -6789,7 +7217,9 @@ function _resetGameState() {
   for (const flag of ['match_fixing', 'japan_path', 'jp_fluent', 'kohaku', 'scandal',
     'party_clean', 'party_dirty', 'academic_dishonesty', 'late_dropout', 'hobby',
     'idol_stage', 'debut_attempted', 'party_stage', 'esports_stage', 'poker_stage',
-    'fitness_stage', 'chef_stage', 'athlete_stage', 'pendingCinematic', '_cineSavedAuto']) {
+    'fitness_stage', 'chef_stage', 'athlete_stage', 'academic_stage', 'academic_attempted',
+    'academic_decay', 'academic_window_start', 'route',
+    'pendingCinematic', '_cineSavedAuto']) {
     delete state[flag];
   }
   // 停止自动播放

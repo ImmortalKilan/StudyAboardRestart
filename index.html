@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>留学重开模拟器</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
@@ -29,15 +32,18 @@
           🗺️ <span style="font-size:13px;">命运图谱</span>
         </button>
         <button id="ach-trophy-start-btn" class="ghost" title="成就墙" style="display:flex; align-items:center; gap:6px;">
-          🏆 <span id="ach-trophy-start-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/61</span>
+          🏆 <span id="ach-trophy-start-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/67</span>
         </button>
       </div>
+      <canvas id="start-particles" class="start-particles"></canvas>
       <div class="start-center">
         <h1 class="start-title">留学重开模拟器</h1>
         <p class="start-sub">这垃圾留学，一秒也不想学了！</p>
-        <button id="btn-start" class="start-btn">&#x21BB; 立即重开</button>
-        <button id="btn-mp-start" class="start-btn start-btn-mp" style="margin-top:14px;">🤝 联机重开</button>
-        <button id="btn-tutorial" class="start-btn start-btn-tutorial" style="margin-top:10px;">📖 新手教程</button>
+        <div class="start-btn-row">
+          <button id="btn-start" class="start-btn start-btn-solo">&#x21BB; 立即重开</button>
+          <button id="btn-mp-start" class="start-btn start-btn-mp">🤝 联机重开</button>
+        </div>
+        <button id="btn-tutorial" class="start-btn start-btn-tutorial">📖 新手教程</button>
       </div>
     </section>
 
@@ -396,7 +402,7 @@
               <button id="btn-summary" class="ghost" style="display:none;">查看总结</button>
               <button id="btn-restart" class="ghost">重开</button>
               <button id="ach-trophy-btn" class="ghost" title="成就墙" style="display:flex; align-items:center; gap:6px;">
-                🏆 <span id="ach-trophy-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/61</span>
+                🏆 <span id="ach-trophy-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/67</span>
               </button>
             </div>
           </div>
@@ -490,6 +496,32 @@
             </div>
             <div id="esports-decay-warn" class="banner-warn"></div>
             <button id="btn-try-qualifier" class="primary banner-btn" disabled>尝试出线</button>
+          </div>
+
+          <div id="academic-box" class="action-banner" style="display:none;">
+            <div class="banner-title-col">
+              <span id="academic-title" class="banner-title">学术深渊</span>
+              <span id="academic-stage" class="banner-stage">准备期</span>
+            </div>
+            <div class="banner-prob-col">
+              <span class="banner-prob-label">成功率</span>
+              <span id="academic-prob" class="banner-prob">--</span>
+            </div>
+            <div id="academic-decay-warn" class="banner-warn"></div>
+            <button id="btn-try-academic" class="primary banner-btn" disabled>时机未到</button>
+          </div>
+
+          <div id="band-box" class="action-banner" style="display:none;">
+            <div class="banner-title-col">
+              <span id="band-title" class="banner-title">地下乐队</span>
+              <span id="band-stage" class="banner-stage">排练期</span>
+            </div>
+            <div class="banner-prob-col">
+              <span class="banner-prob-label">成功率</span>
+              <span id="band-prob" class="banner-prob">--</span>
+            </div>
+            <div id="band-decay-warn" class="banner-warn"></div>
+            <button id="btn-try-band" class="primary banner-btn" disabled>时机未到</button>
           </div>
 
           <div id="event-log" class="event-log"></div>
@@ -743,7 +775,7 @@
     <div class="ach-wall-panel">
       <div class="ach-wall-head">
         <div class="ach-wall-title">🏆&nbsp;&nbsp;成就</div>
-        <span id="ach-wall-count" class="ach-wall-count">0/61</span>
+        <span id="ach-wall-count" class="ach-wall-count">0/67</span>
         <button id="ach-wall-close" class="ach-wall-close" aria-label="关闭成就墙">✕</button>
       </div>
       <div id="ach-wall-grid" class="ach-wall-grid"></div>
@@ -788,5 +820,163 @@
   <div id="preset-toast" class="preset-toast" style="display:none;"></div>
 
   <script type="module" src="js/game.js"></script>
+  <script>
+  /* ── Start-screen floating particles (paper planes, stamps, stars) ── */
+  (function(){
+    const cvs = document.getElementById('start-particles');
+    if (!cvs) return;
+    const ctx = cvs.getContext('2d');
+    let W, H, particles = [], raf = 0, running = false;
+
+    const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+    const COUNT = isMobile ? 18 : 35;
+
+    const SHAPES = ['plane','star','stamp','circle'];
+
+    function resize(){
+      const r = devicePixelRatio || 1;
+      W = cvs.clientWidth; H = cvs.clientHeight;
+      cvs.width = W * r; cvs.height = H * r;
+      ctx.setTransform(r,0,0,r,0,0);
+    }
+
+    function rnd(a,b){ return a + Math.random()*(b-a); }
+
+    function mkParticle(){
+      const shape = SHAPES[Math.floor(Math.random()*SHAPES.length)];
+      return {
+        x: rnd(0,W), y: rnd(-H*0.1, H),
+        vx: rnd(-0.15, 0.15),
+        vy: rnd(0.12, 0.4),
+        size: rnd(6, 14),
+        rot: rnd(0, Math.PI*2),
+        vr: rnd(-0.008, 0.008),
+        opacity: rnd(0.08, 0.22),
+        shape: shape,
+        hue: shape==='plane'? rnd(35,55) : shape==='star'? rnd(40,60) : shape==='stamp'? rnd(200,260) : rnd(210,250)
+      };
+    }
+
+    function drawPlane(p){
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.globalAlpha = p.opacity;
+      ctx.strokeStyle = `hsla(${p.hue},60%,75%,${p.opacity})`;
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      const s = p.size;
+      ctx.moveTo(0, -s);
+      ctx.lineTo(s*0.7, s*0.5);
+      ctx.lineTo(0, s*0.2);
+      ctx.lineTo(-s*0.7, s*0.5);
+      ctx.closePath();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(0, -s);
+      ctx.lineTo(0, s*0.5);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawStar(p){
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.globalAlpha = p.opacity;
+      ctx.fillStyle = `hsla(${p.hue},70%,80%,${p.opacity})`;
+      ctx.beginPath();
+      const s = p.size * 0.5;
+      for(let i=0;i<5;i++){
+        const a = Math.PI*2/5*i - Math.PI/2;
+        const r2 = s*0.45;
+        ctx.lineTo(Math.cos(a)*s, Math.sin(a)*s);
+        const a2 = a + Math.PI/5;
+        ctx.lineTo(Math.cos(a2)*r2, Math.sin(a2)*r2);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawStamp(p){
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.globalAlpha = p.opacity * 0.8;
+      ctx.strokeStyle = `hsla(${p.hue},40%,65%,${p.opacity})`;
+      ctx.lineWidth = 1;
+      const s = p.size * 0.6;
+      ctx.beginPath();
+      ctx.arc(0, 0, s, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(0, 0, s*0.65, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawCircle(p){
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.globalAlpha = p.opacity * 0.6;
+      ctx.fillStyle = `hsla(${p.hue},50%,70%,${p.opacity*0.5})`;
+      ctx.beginPath();
+      ctx.arc(0, 0, p.size*0.3, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    const drawFns = { plane:drawPlane, star:drawStar, stamp:drawStamp, circle:drawCircle };
+
+    function frame(){
+      if(!running) return;
+      ctx.clearRect(0,0,W,H);
+      for(const p of particles){
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.vr;
+        if(p.y > H + 20){
+          p.y = -20;
+          p.x = rnd(0, W);
+        }
+        if(p.x < -20) p.x = W + 20;
+        if(p.x > W + 20) p.x = -20;
+        drawFns[p.shape](p);
+      }
+      raf = requestAnimationFrame(frame);
+    }
+
+    function start(){
+      if(running) return;
+      running = true;
+      resize();
+      particles = [];
+      for(let i=0;i<COUNT;i++) particles.push(mkParticle());
+      frame();
+    }
+
+    function stop(){
+      running = false;
+      cancelAnimationFrame(raf);
+    }
+
+    window.addEventListener('resize', ()=>{ if(running) resize(); });
+
+    const obs = new MutationObserver(()=>{
+      const el = document.getElementById('start-screen');
+      if(el && el.classList.contains('active')) start();
+      else stop();
+    });
+    obs.observe(document.getElementById('start-screen'), { attributes:true, attributeFilter:['class'] });
+
+    if(document.getElementById('start-screen').classList.contains('active')) start();
+
+    document.addEventListener('visibilitychange', ()=>{
+      if(document.hidden) stop();
+      else if(document.getElementById('start-screen').classList.contains('active')) start();
+    });
+  })();
+  </script>
 </body>
 </html>

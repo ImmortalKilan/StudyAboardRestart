@@ -1,11 +1,10 @@
-// ── Story Flowchart System ──────────────────────────────────────────────────
-// Detroit-style horizontal story flowchart with:
-// - Mouse drag panning (no scroll wheel zoom)
-// - Animated fog with floating particles
-// - Region-specific atmosphere particles
-// - 3-tier node unlock animations (normal / rare / epic+legendary)
-// - Hover branch preview with fuzzy condition hints
-// - Cascade reveal animation on open
+// ── Story Flowchart — Radial Star Map ───────────────────────────────────────
+// "命运星图" layout: university at center, storylines radiate outward.
+// - Nebula fog for unexplored regions (feTurbulence + organic blobs)
+// - Polar-orbit particles per region
+// - Curved edges that bow outward from center
+// - 3-tier cascade reveal animation
+// - Hover tooltips with fuzzy hints
 
 import { isUnlocked, ACHIEVEMENTS } from './achievements.js';
 
@@ -18,7 +17,7 @@ let _animating = false;
 const STORAGE_KEY = 'studyAbroad_fc_v1';
 
 let _fcUnlocked = new Set();
-let _sessionNewUnlocks = 0; // track new unlocks this game session
+let _sessionNewUnlocks = 0;
 
 function _loadFcState() {
   try {
@@ -39,10 +38,7 @@ export function unlockFlowchartNode(nodeId) {
   }
 }
 
-/** Reset session counter (call at game start) */
 export function resetSessionUnlocks() { _sessionNewUnlocks = 0; }
-
-/** Get how many new nodes were unlocked this session */
 export function getSessionUnlocks() { return _sessionNewUnlocks; }
 
 function _isNodeUnlocked(node) {
@@ -88,24 +84,48 @@ const RARITY_COLORS = {
 
 const LOCKED_COLOR = { fill: '#111118', stroke: '#28283a' };
 
-// ── Mobile / low-power detection ───────────────────────────────────────────
+// ── Layout constants ────────────────────────────────────────────────────────
+const CX = 1400, CY = 1300;
+const NODE_W = 120, NODE_H = 36;
+const PAD = 80;
+
 const _isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
   || (navigator.maxTouchPoints > 1 && window.innerWidth < 1024);
 
-// Region atmosphere particle config — moderate count for performance
+// ── Region atmosphere config ────────────────────────────────────────────────
 const REGION_PARTICLES = {
-  origin:         { color: '#ffffff', color2: '#d4a056', count: 8,  speed: 0.3, size: [1.5, 3.5] },
-  highschool:     { color: '#88aaff', color2: '#aaccff', count: 10, speed: 0.3, size: [1.5, 3] },
-  country:        { color: '#4499ff', color2: '#66ccff', count: 12, speed: 0.35, size: [2, 4] },
-  school:         { color: '#44ddaa', color2: '#88ffcc', count: 10, speed: 0.3, size: [1.5, 3.5] },
-  career_visible: { color: '#ffcc00', color2: '#ffdd55', count: 14, speed: 0.4, size: [2, 4.5] },
-  career_hidden:  { color: '#ff3355', color2: '#ff6688', count: 14, speed: 0.5, size: [2, 5] },
-  career_other:   { color: '#ff8833', color2: '#ffaa55', count: 10, speed: 0.4, size: [2, 4] },
-  romance:        { color: '#ff4488', color2: '#ff88bb', count: 12, speed: 0.3, size: [2, 4.5] },
-  endings:        { color: '#ffaa33', color2: '#ffdd88', count: 16, speed: 0.45, size: [2, 4] },
-  milestones:     { color: '#d4a056', color2: '#ffcc77', count: 8,  speed: 0.3, size: [2, 3.5] },
-  easter:          { color: '#33ddbb', color2: '#77ffdd', count: 10, speed: 0.6, size: [2, 4] },
-  career_endings:  { color: '#ffa040', color2: '#ffcc66', count: 12, speed: 0.35, size: [2, 4] },
+  origin:          { color: '#ffffff', color2: '#d4a056', count: 6,  speed: 0.25, size: [1.5, 3] },
+  highschool:      { color: '#88aaff', color2: '#aaccff', count: 8,  speed: 0.3,  size: [1.5, 3] },
+  country:         { color: '#4499ff', color2: '#66ccff', count: 10, speed: 0.3,  size: [2, 3.5] },
+  school:          { color: '#44ddaa', color2: '#88ffcc', count: 14, speed: 0.35, size: [2, 4] },
+  career_star:     { color: '#ffcc00', color2: '#ffdd55', count: 14, speed: 0.4,  size: [2, 4] },
+  career_shadow:   { color: '#ff3355', color2: '#ff6688', count: 14, speed: 0.5,  size: [2, 4.5] },
+  career_branch:   { color: '#ff8833', color2: '#ffaa55', count: 10, speed: 0.4,  size: [2, 3.5] },
+  endings_star:    { color: '#ffaa33', color2: '#ffdd88', count: 12, speed: 0.4,  size: [2, 4] },
+  endings_shadow:  { color: '#cc2244', color2: '#ff5577', count: 10, speed: 0.45, size: [2, 4] },
+  endings_peak:    { color: '#88ddff', color2: '#bbffff', count: 14, speed: 0.35, size: [2, 4.5] },
+  endings_fate:    { color: '#d4a056', color2: '#ffcc77', count: 8,  speed: 0.3,  size: [2, 3.5] },
+  romance:         { color: '#ff4488', color2: '#ff88bb', count: 10, speed: 0.3,  size: [2, 4] },
+  milestones:      { color: '#d4a056', color2: '#ffcc77', count: 6,  speed: 0.25, size: [2, 3] },
+  easter:          { color: '#33ddbb', color2: '#77ffdd', count: 10, speed: 0.5,  size: [2, 4] },
+};
+
+// ── Nebula tint per region (for fog inner glow) ─────────────────────────────
+const NEBULA_TINT = {
+  origin:        '#d4a056',
+  highschool:    '#6688cc',
+  country:       '#3366aa',
+  school:        '#33aa77',
+  career_star:   '#cc9900',
+  career_shadow: '#991133',
+  career_branch: '#cc6622',
+  endings_star:  '#cc8822',
+  endings_shadow:'#881133',
+  endings_peak:  '#5599cc',
+  endings_fate:  '#aa8844',
+  romance:       '#cc3366',
+  milestones:    '#aa7733',
+  easter:        '#22aa88',
 };
 
 // ── Fuzzy hint text for locked nodes ────────────────────────────────────────
@@ -136,7 +156,7 @@ const NODE_HINTS = {
   n_sl_spy:     '命运在暗处低语',
   n_sl_xianxia: '天地间有不可说之事',
   n_sl_abyss:   '深处传来奇异的回响',
-  n_sl_meta:    '你是否注意到了那面墙？',
+  n_sl_meta:    '时间为什么是一个月一个月跳的？',
   n_sl_thief:   '月光下有人无声地行走',
   n_sl_hogwarts:'猫头鹰带来了一封信',
   n_sl_superstar:'光芒之上还有更高的天空',
@@ -154,7 +174,7 @@ const NODE_HINTS = {
   n_end_spy:      '功成身退，无人知晓',
   n_end_xianxia:  '大道三千，殊途同归',
   n_end_abyss:    '当你凝视深渊……',
-  n_end_meta:     '如果游戏知道自己是游戏',
+  n_end_meta:     '谢谢你陪我走到这里',
   n_end_thief:    '最好的猎手从不留下痕迹',
   n_end_hogwarts: '最终决战，光明终将到来',
   n_end_health:   '灯火渐渐黯淡',
@@ -173,6 +193,12 @@ const NODE_HINTS = {
   n_end_sci:      '真理不在意有没有人鼓掌',
   n_end_art:      '笔墨之间藏着整个宇宙',
   n_end_music:    '音符里有一个完整的世界',
+  n_sl_academic:  '代码深处藏着不该看到的东西',
+  n_end_academic_white: '键盘上的正义值得被铭记',
+  n_end_academic_black: '最好的黑客从不留下痕迹',
+  n_sl_band: '地下室里的低频震动，是梦想的声音',
+  n_end_band_win: '全场高喊Encore，贝斯手终于被记住了',
+  n_end_band_fail: '琴盒上贴满了贴纸，每一张都是回忆',
   n_easter_rhythm:   '当两种截然不同的节奏碰撞',
   n_easter_viral:    '一夜之间，所有人都在转发',
   n_easter_novelist: '键盘上敲出另一个世界',
@@ -190,11 +216,152 @@ function _svgEl(tag, attrs = {}) {
   return el;
 }
 
-// ── Render ───────────────────────────────────────────────────────────────────
-const NODE_W = 140;
-const NODE_H = 38;
-const PAD = 80;
+// ── Edge helpers ────────────────────────────────────────────────────────────
+function _nodeCenter(n) {
+  return { x: n.x + PAD + NODE_W / 2, y: n.y + PAD + NODE_H / 2 };
+}
 
+function _isEntryCorridor(n) {
+  return n.x + NODE_W / 2 < CX - 200;
+}
+
+function _makeEdgePath(from, to) {
+  const a = _nodeCenter(from);
+  const b = _nodeCenter(to);
+
+  if (_isEntryCorridor(from) && _isEntryCorridor(to)) {
+    const cx = (a.x + b.x) / 2;
+    return `M${a.x},${a.y} C${cx},${a.y} ${cx},${b.y} ${b.x},${b.y}`;
+  }
+
+  if (_isEntryCorridor(from) && !_isEntryCorridor(to)) {
+    const cx1 = a.x + (b.x - a.x) * 0.4;
+    const cy1 = a.y;
+    const cx2 = a.x + (b.x - a.x) * 0.6;
+    const cy2 = b.y;
+    return `M${a.x},${a.y} C${cx1},${cy1} ${cx2},${cy2} ${b.x},${b.y}`;
+  }
+
+  const mx = (a.x + b.x) / 2;
+  const my = (a.y + b.y) / 2;
+  const pcx = CX + PAD;
+  const pcy = CY + PAD;
+  const dx = mx - pcx;
+  const dy = my - pcy;
+  const dist = Math.max(Math.sqrt(dx * dx + dy * dy), 1);
+  const edgeLen = Math.sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2);
+  const bow = Math.min(18 + edgeLen * 0.04, 55);
+  const cpx = mx + (dx / dist) * bow;
+  const cpy = my + (dy / dist) * bow;
+  return `M${a.x},${a.y} Q${cpx},${cpy} ${b.x},${b.y}`;
+}
+
+// ── Nebula fog helpers ──────────────────────────────────────────────────────
+function _regionBounds(region) {
+  let x1 = Infinity, y1 = Infinity, x2 = 0, y2 = 0;
+  for (const n of region.nodes) {
+    if (n.x < x1) x1 = n.x;
+    if (n.y < y1) y1 = n.y;
+    if (n.x + NODE_W > x2) x2 = n.x + NODE_W;
+    if (n.y + NODE_H > y2) y2 = n.y + NODE_H;
+  }
+  return {
+    cx: (x1 + x2) / 2 + PAD,
+    cy: (y1 + y2) / 2 + PAD,
+    rx: (x2 - x1) / 2 + 60,
+    ry: (y2 - y1) / 2 + 50,
+  };
+}
+
+function _buildNebulaGroup(region, defs, seedBase) {
+  const g = _svgEl('g', { class: 'fc-nebula-group', 'data-region': region.id });
+  const b = _regionBounds(region);
+  const tint = NEBULA_TINT[region.id] || '#444466';
+  const seed = seedBase + region.id.length * 7;
+
+  if (_isMobile) {
+    const rect = _svgEl('rect', {
+      x: b.cx - b.rx - 10, y: b.cy - b.ry - 10,
+      width: (b.rx + 10) * 2, height: (b.ry + 10) * 2,
+      rx: 20,
+      fill: 'rgba(8,8,16,0.88)',
+      class: 'fc-nebula-mobile',
+    });
+    g.appendChild(rect);
+  } else {
+    const filterId = `nebula-${region.id}`;
+    const filter = _svgEl('filter', {
+      id: filterId, x: '-30%', y: '-30%', width: '160%', height: '160%',
+    });
+    const turb = _svgEl('feTurbulence', {
+      type: 'fractalNoise', baseFrequency: '0.018 0.024',
+      numOctaves: '4', seed: String(seed), result: 'noise',
+    });
+    const disp = _svgEl('feDisplacementMap', {
+      in: 'SourceGraphic', in2: 'noise', scale: '22',
+      xChannelSelector: 'R', yChannelSelector: 'G', result: 'displaced',
+    });
+    const blur = _svgEl('feGaussianBlur', {
+      in: 'displaced', stdDeviation: '6', result: 'blurred',
+    });
+    filter.appendChild(turb);
+    filter.appendChild(disp);
+    filter.appendChild(blur);
+    defs.appendChild(filter);
+
+    const outerRx = b.rx * 1.35;
+    const outerRy = b.ry * 1.35;
+    const outer = _svgEl('ellipse', {
+      cx: b.cx, cy: b.cy, rx: outerRx, ry: outerRy,
+      fill: 'rgba(6,6,14,0.55)', filter: `url(#${filterId})`,
+      class: 'fc-nebula-outer',
+    });
+    g.appendChild(outer);
+
+    const mid = _svgEl('ellipse', {
+      cx: b.cx + (Math.sin(seed) * 8), cy: b.cy + (Math.cos(seed) * 6),
+      rx: b.rx * 1.05, ry: b.ry * 1.05,
+      fill: 'rgba(8,8,18,0.7)', filter: `url(#${filterId})`,
+      class: 'fc-nebula-mid',
+    });
+    g.appendChild(mid);
+
+    const core = _svgEl('ellipse', {
+      cx: b.cx, cy: b.cy, rx: b.rx * 0.6, ry: b.ry * 0.6,
+      fill: tint, opacity: '0.08',
+      class: 'fc-nebula-core',
+    });
+    g.appendChild(core);
+
+    for (let i = 0; i < 3; i++) {
+      const angle = (seed * 37 + i * 120) % 360;
+      const rad = angle * Math.PI / 180;
+      const wx = b.cx + Math.cos(rad) * b.rx * 0.8;
+      const wy = b.cy + Math.sin(rad) * b.ry * 0.8;
+      const wisp = _svgEl('ellipse', {
+        cx: wx, cy: wy,
+        rx: 20 + i * 8, ry: 6 + i * 2,
+        fill: 'rgba(6,6,14,0.4)',
+        transform: `rotate(${angle}, ${wx}, ${wy})`,
+        class: 'fc-nebula-wisp',
+      });
+      wisp.style.setProperty('--wisp-delay', `${i * -2.5}s`);
+      g.appendChild(wisp);
+    }
+  }
+
+  const qm = _svgEl('text', {
+    x: b.cx, y: b.cy,
+    'text-anchor': 'middle', 'dominant-baseline': 'middle',
+    class: 'fc-fog-question',
+  });
+  qm.textContent = '?';
+  g.appendChild(qm);
+
+  return g;
+}
+
+// ── Render ───────────────────────────────────────────────────────────────────
 export function renderFlowchart(containerId) {
   _loadFcState();
   _container = document.getElementById(containerId);
@@ -220,7 +387,6 @@ export function renderFlowchart(containerId) {
   // ── Defs ──
   const defs = _svgEl('defs');
 
-  // Glow filters per rarity (skip on mobile — feGaussianBlur is GPU-heavy)
   if (!_isMobile) {
     for (const [rarity, colors] of Object.entries(RARITY_COLORS)) {
       const filter = _svgEl('filter', { id: `glow-${rarity}`, x: '-50%', y: '-50%', width: '200%', height: '200%' });
@@ -234,62 +400,68 @@ export function renderFlowchart(containerId) {
       defs.appendChild(filter);
     }
 
-    // Fog blur (simple, no feTurbulence for performance)
-    const fogBlur = _svgEl('filter', { id: 'fog-blur', x: '-20%', y: '-20%', width: '140%', height: '140%' });
-    fogBlur.appendChild(_svgEl('feGaussianBlur', { stdDeviation: '6' }));
-    defs.appendChild(fogBlur);
+    const edgeGlow = _svgEl('filter', { id: 'edge-flow', x: '-10%', y: '-10%', width: '120%', height: '120%' });
+    edgeGlow.appendChild(_svgEl('feGaussianBlur', { stdDeviation: '2', result: 'glow' }));
+    const em = _svgEl('feMerge');
+    em.appendChild(_svgEl('feMergeNode', { in: 'glow' }));
+    em.appendChild(_svgEl('feMergeNode', { in: 'SourceGraphic' }));
+    edgeGlow.appendChild(em);
+    defs.appendChild(edgeGlow);
   }
 
   _svg.appendChild(defs);
 
-  // ── Layer 0: Region atmosphere particles (skip entirely on mobile) ──
+  // ── Layer 0: Center ring decoration (desktop only) ──
+  if (!_isMobile) {
+    const ringGroup = _svgEl('g', { class: 'fc-center-rings', opacity: '0.12' });
+    for (const r of [200, 550, 880]) {
+      ringGroup.appendChild(_svgEl('circle', {
+        cx: CX + PAD, cy: CY + PAD, r,
+        fill: 'none', stroke: '#d4a056',
+        'stroke-width': '0.5', 'stroke-dasharray': '3 8',
+      }));
+    }
+    _svg.appendChild(ringGroup);
+  }
+
+  // ── Layer 1: Particles (desktop only) ──
   if (!_isMobile) {
     const particleGroup = _svgEl('g', { class: 'fc-particles' });
     for (const r of _chartData.regions) {
       const pConfig = REGION_PARTICLES[r.id];
       if (!pConfig) continue;
-
       const explored = _isRegionExplored(r);
-      const count = explored ? pConfig.count : Math.ceil(pConfig.count * 0.35);
-      const opacityBase = explored ? 0.25 : 0.08;
-      const opacityRange = explored ? 0.45 : 0.12;
+      const count = explored ? pConfig.count : Math.ceil(pConfig.count * 0.3);
+      const opBase = explored ? 0.2 : 0.06;
+      const opRange = explored ? 0.4 : 0.1;
 
-      let rx1 = Infinity, ry1 = Infinity, rx2 = 0, ry2 = 0;
-      for (const n of r.nodes) {
-        if (n.x < rx1) rx1 = n.x;
-        if (n.y < ry1) ry1 = n.y;
-        if (n.x + NODE_W > rx2) rx2 = n.x + NODE_W;
-        if (n.y + NODE_H > ry2) ry2 = n.y + NODE_H;
-      }
-      rx1 += PAD - 30; ry1 += PAD - 30;
-      rx2 += PAD + 30; ry2 += PAD + 30;
-
+      const b = _regionBounds(r);
       for (let i = 0; i < count; i++) {
-        const cx = rx1 + Math.random() * (rx2 - rx1);
-        const cy = ry1 + Math.random() * (ry2 - ry1);
-        const r2 = pConfig.size[0] + Math.random() * (pConfig.size[1] - pConfig.size[0]);
+        const angle = Math.random() * Math.PI * 2;
+        const dist = Math.random();
+        const px = b.cx + Math.cos(angle) * b.rx * dist * 1.2;
+        const py = b.cy + Math.sin(angle) * b.ry * dist * 1.2;
+        const pr = pConfig.size[0] + Math.random() * (pConfig.size[1] - pConfig.size[0]);
         const color = Math.random() > 0.5 ? pConfig.color : pConfig.color2;
-        const dur = (3 + Math.random() * 4) / pConfig.speed;
+        const dur = (4 + Math.random() * 5) / pConfig.speed;
 
+        const orbitR = 15 + Math.random() * 35;
         const circle = _svgEl('circle', {
-          cx, cy, r: explored ? r2 : r2 * 0.8,
+          cx: px, cy: py, r: explored ? pr : pr * 0.7,
           fill: color,
-          opacity: opacityBase + Math.random() * opacityRange,
+          opacity: opBase + Math.random() * opRange,
           class: 'fc-particle',
         });
-
-        circle.style.setProperty('--float-x', `${(Math.random() - 0.5) * 60}px`);
-        circle.style.setProperty('--float-y', `${(Math.random() - 0.5) * 40}px`);
-        circle.style.setProperty('--float-dur', `${dur}s`);
-        circle.style.setProperty('--float-delay', `${-Math.random() * dur}s`);
-
+        circle.style.setProperty('--orbit-r', `${orbitR}px`);
+        circle.style.setProperty('--orbit-dur', `${dur}s`);
+        circle.style.setProperty('--orbit-delay', `${-Math.random() * dur}s`);
         particleGroup.appendChild(circle);
       }
     }
     _svg.appendChild(particleGroup);
   }
 
-  // ── Layer 1: Edges ──
+  // ── Layer 2: Edges ──
   const edgeGroup = _svgEl('g', { class: 'fc-edges' });
   for (const edge of _chartData.edges) {
     const fromNode = _nodeMap[edge.from];
@@ -297,77 +469,48 @@ export function renderFlowchart(containerId) {
     if (!fromNode || !toNode) continue;
 
     const bothUnlocked = _isNodeUnlocked(fromNode) && _isNodeUnlocked(toNode);
-    const x1 = fromNode.x + PAD + NODE_W;
-    const y1 = fromNode.y + PAD + NODE_H / 2;
-    const x2 = toNode.x + PAD;
-    const y2 = toNode.y + PAD + NODE_H / 2;
-    const cx = (x1 + x2) / 2;
+    const d = _makeEdgePath(fromNode, toNode);
 
     const path = _svgEl('path', {
-      d: `M${x1},${y1} C${cx},${y1} ${cx},${y2} ${x2},${y2}`,
+      d,
       class: bothUnlocked ? 'fc-edge-lit' : 'fc-edge-dim',
       fill: 'none',
-      'stroke-width': bothUnlocked ? '2.5' : '1',
+      'stroke-width': bothUnlocked ? '2' : '1',
     });
+    if (bothUnlocked && !_isMobile) {
+      path.setAttribute('filter', 'url(#edge-flow)');
+    }
     edgeGroup.appendChild(path);
   }
   _svg.appendChild(edgeGroup);
 
-  // ── Layer 2: Fog overlays for unexplored regions (single-layer, lightweight) ──
+  // ── Layer 3: Nebula fog for unexplored regions ──
   const fogGroup = _svgEl('g', { class: 'fc-fog' });
+  let seedIdx = 0;
   for (const r of _chartData.regions) {
     if (_isRegionExplored(r)) continue;
-
-    let rx1 = Infinity, ry1 = Infinity, rx2 = 0, ry2 = 0;
-    for (const n of r.nodes) {
-      if (n.x < rx1) rx1 = n.x;
-      if (n.y < ry1) ry1 = n.y;
-      if (n.x + NODE_W > rx2) rx2 = n.x + NODE_W;
-      if (n.y + NODE_H > ry2) ry2 = n.y + NODE_H;
-    }
-
-    const w = rx2 - rx1 + 70;
-    const h = ry2 - ry1 + 70;
-    const fx = rx1 + PAD - 35;
-    const fy = ry1 + PAD - 35;
-
-    // Single fog layer (with blur on desktop only)
-    const fogAttrs = {
-      x: fx - 10, y: fy - 10, width: w + 20, height: h + 20, rx: 18,
-      fill: _isMobile ? 'rgba(8, 8, 16, 0.85)' : 'rgba(8, 8, 16, 0.75)',
-      class: 'fc-fog-layer fc-fog-layer-1',
-    };
-    if (!_isMobile) fogAttrs.filter = 'url(#fog-blur)';
-    fogGroup.appendChild(_svgEl('rect', fogAttrs));
-
-    // Question mark — static, subtle
-    const qm = _svgEl('text', {
-      x: fx + w / 2, y: fy + h / 2,
-      'text-anchor': 'middle', 'dominant-baseline': 'middle',
-      class: 'fc-fog-question',
-    });
-    qm.textContent = '?';
-    fogGroup.appendChild(qm);
+    fogGroup.appendChild(_buildNebulaGroup(r, defs, seedIdx));
+    seedIdx += 13;
   }
   _svg.appendChild(fogGroup);
 
-  // ── Layer 3: Region labels ──
+  // ── Layer 4: Region labels ──
   const labelGroup = _svgEl('g', { class: 'fc-labels' });
   for (const r of _chartData.regions) {
-    let minY = Infinity;
-    for (const n of r.nodes) { if (n.y < minY) minY = n.y; }
+    const b = _regionBounds(r);
+    const explored = _isRegionExplored(r);
     const lbl = _svgEl('text', {
-      x: r.nodes[0].x + PAD + NODE_W / 2,
-      y: minY + PAD - 14,
-      class: _isRegionExplored(r) ? 'fc-region-label fc-explored' : 'fc-region-label',
+      x: b.cx,
+      y: b.cy - b.ry - 10,
+      class: explored ? 'fc-region-label fc-explored' : 'fc-region-label',
       'text-anchor': 'middle',
     });
-    lbl.textContent = (_isRegionExplored(r) && r.labelRevealed) ? r.labelRevealed : r.label;
+    lbl.textContent = (explored && r.labelRevealed) ? r.labelRevealed : r.label;
     labelGroup.appendChild(lbl);
   }
   _svg.appendChild(labelGroup);
 
-  // ── Layer 4: Nodes ──
+  // ── Layer 5: Nodes ──
   const nodeGroup = _svgEl('g', { class: 'fc-nodes' });
   for (const r of _chartData.regions) {
     for (const n of r.nodes) {
@@ -383,16 +526,14 @@ export function renderFlowchart(containerId) {
         transform: `translate(${n.x + PAD}, ${n.y + PAD})`,
       });
 
-      // Background rect
       const rect = _svgEl('rect', {
-        width: NODE_W, height: NODE_H, rx: 6,
+        width: NODE_W, height: NODE_H, rx: 8,
         fill: colors.fill, stroke: colors.stroke,
         'stroke-width': unlocked ? '2' : '1',
       });
       if (unlocked && !_isMobile) rect.setAttribute('filter', `url(#glow-${rarity})`);
       g.appendChild(rect);
 
-      // Text label
       const text = _svgEl('text', {
         x: NODE_W / 2, y: NODE_H / 2 + 1,
         class: 'fc-node-text',
@@ -411,7 +552,6 @@ export function renderFlowchart(containerId) {
       }
       g.appendChild(text);
 
-      // Lock icon for locked nodes in explored regions
       if (!unlocked && regionExplored) {
         const lockIcon = _svgEl('text', {
           x: NODE_W / 2, y: NODE_H / 2 + 1,
@@ -422,10 +562,9 @@ export function renderFlowchart(containerId) {
         lockIcon.textContent = '🔒';
         g.appendChild(lockIcon);
 
-        // Inner subtle pulse border for mystery (skip on mobile)
         if (!_isMobile) {
           const pulseRect = _svgEl('rect', {
-            width: NODE_W, height: NODE_H, rx: 6,
+            width: NODE_W, height: NODE_H, rx: 8,
             fill: 'none', stroke: '#28283a', 'stroke-width': '1',
             class: 'fc-locked-pulse',
           });
@@ -438,18 +577,14 @@ export function renderFlowchart(containerId) {
   }
   _svg.appendChild(nodeGroup);
 
-  // ── Layer 5: Tooltip overlay (HTML, positioned absolutely) ──
   _setupTooltips();
-
   _container.appendChild(_svg);
   _renderStats();
 }
 
-// ── Tooltips (HTML overlay for rich hover) ──────────────────────────────────
+// ── Tooltips ────────────────────────────────────────────────────────────────
 function _setupTooltips() {
   if (!_svg) return;
-
-  // Remove existing tooltip
   const existing = document.getElementById('fc-tooltip');
   if (existing) existing.remove();
 
@@ -466,7 +601,7 @@ function _setupTooltips() {
     const node = _nodeMap[nodeId];
     if (!node) return;
 
-    nodeEl.addEventListener('mouseenter', e => {
+    nodeEl.addEventListener('mouseenter', () => {
       if (_onHoverSfx) _onHoverSfx();
       const unlocked = _isNodeUnlocked(node);
       const rarity = _rarityForNode(node);
@@ -486,9 +621,6 @@ function _setupTooltips() {
 
       tooltip.innerHTML = html;
       tooltip.style.display = 'block';
-
-      // Position near cursor
-      const canvasRect = _container.getBoundingClientRect();
       const panelRect = panel.getBoundingClientRect();
       const nodeRect = nodeEl.getBoundingClientRect();
       const tx = nodeRect.left + nodeRect.width / 2 - panelRect.left;
@@ -505,7 +637,7 @@ function _setupTooltips() {
   });
 }
 
-// ── Stats ────────────────────────────────────────────────────────────────────
+// ── Stats & Legend ───────────────────────────────────────────────────────────
 function _renderStats() {
   const statsEl = document.getElementById('fc-stats');
   if (!statsEl) return;
@@ -538,9 +670,9 @@ function _renderLegend() {
   panel.appendChild(legend);
 }
 
-// ── Cascade Animation (3-tier, skipped on mobile) ──────────────────────────
+// ── Cascade Animation ───────────────────────────────────────────────────────
 export function playCascadeAnimation() {
-  if (_isMobile) return; // skip animation on mobile for performance
+  if (_isMobile) return;
   if (!_svg || _animating) return;
   _animating = true;
 
@@ -550,14 +682,18 @@ export function playCascadeAnimation() {
       if (_isNodeUnlocked(n)) unlockedNodes.push(n);
     }
   }
-  unlockedNodes.sort((a, b) => a.x - b.x || a.y - b.y);
+  const pcx = CX + PAD, pcy = CY + PAD;
+  unlockedNodes.sort((a, b) => {
+    const da = Math.sqrt((a.x + NODE_W / 2 - CX) ** 2 + (a.y + NODE_H / 2 - CY) ** 2);
+    const db = Math.sqrt((b.x + NODE_W / 2 - CX) ** 2 + (b.y + NODE_H / 2 - CY) ** 2);
+    return da - db;
+  });
 
-  // Hide all unlocked nodes
   _svg.querySelectorAll('.fc-node.fc-unlocked').forEach(el => { el.style.opacity = '0'; });
   _svg.querySelectorAll('.fc-edge-lit').forEach(el => { el.style.opacity = '0'; });
 
   let delay = 200;
-  const STEP = 60;
+  const STEP = 55;
 
   unlockedNodes.forEach((n, i) => {
     const el = _svg.querySelector(`.fc-node[data-id="${n.id}"]`);
@@ -567,29 +703,18 @@ export function playCascadeAnimation() {
     setTimeout(() => {
       el.style.transition = 'opacity 0.4s ease-out';
       el.style.opacity = '1';
-
-      // Tier 1: Normal — simple fade
-      if (rarity === 'normal') {
-        el.classList.add('fc-reveal-t1');
-      }
-      // Tier 2: Rare — pulse glow
-      else if (rarity === 'rare') {
-        el.classList.add('fc-reveal-t2');
-      }
-      // Tier 3: Epic/Legendary — burst + ring
-      else {
-        el.classList.add('fc-reveal-t3');
-      }
+      if (rarity === 'normal') el.classList.add('fc-reveal-t1');
+      else if (rarity === 'rare') el.classList.add('fc-reveal-t2');
+      else el.classList.add('fc-reveal-t3');
     }, delay + i * STEP);
   });
 
-  // Reveal lit edges
   setTimeout(() => {
     _svg.querySelectorAll('.fc-edge-lit').forEach((el, i) => {
       setTimeout(() => {
         el.style.transition = 'opacity 0.3s ease-out';
         el.style.opacity = '1';
-      }, i * 25);
+      }, i * 20);
     });
   }, delay + unlockedNodes.length * STEP * 0.4);
 
@@ -602,7 +727,6 @@ let _onOpenSfx = null;
 let _onCloseSfx = null;
 let _onHoverSfx = null;
 
-/** Register SFX callbacks so flowchart doesn't import audio directly */
 export function setFlowchartSfx({ onOpen, onClose, onHover }) {
   _onOpenSfx = onOpen || null;
   _onCloseSfx = onClose || null;
@@ -618,7 +742,6 @@ export async function openFlowchart() {
   if (!overlay) return;
   overlay.classList.add('fc-open');
   renderFlowchart('fc-canvas');
-  // Auto-scroll to center of unlocked content
   _autoCenterCanvas();
   setTimeout(() => playCascadeAnimation(), 300);
 }
@@ -628,7 +751,6 @@ export function closeFlowchart() {
   if (_onCloseSfx) _onCloseSfx();
   const overlay = document.getElementById('fc-overlay');
   if (overlay) overlay.classList.remove('fc-open');
-  // Destroy SVG content to free GPU resources (particles, filters, animations)
   const container = document.getElementById('fc-canvas');
   if (container) container.innerHTML = '';
   _svg = null;
@@ -637,7 +759,6 @@ export function closeFlowchart() {
 function _autoCenterCanvas() {
   const canvas = document.getElementById('fc-canvas');
   if (!canvas || !_chartData) return;
-  // Find center of all unlocked nodes
   let sumX = 0, sumY = 0, count = 0;
   for (const r of _chartData.regions) {
     for (const n of r.nodes) {
@@ -648,10 +769,15 @@ function _autoCenterCanvas() {
       }
     }
   }
-  if (count === 0) return; // nothing unlocked, stay at default
+  if (count === 0) {
+    requestAnimationFrame(() => {
+      canvas.scrollLeft = CX + PAD - canvas.clientWidth / 2;
+      canvas.scrollTop = CY + PAD - canvas.clientHeight / 2;
+    });
+    return;
+  }
   const cx = sumX / count;
   const cy = sumY / count;
-  // Scroll so the center of unlocked nodes is in viewport center
   requestAnimationFrame(() => {
     canvas.scrollLeft = cx - canvas.clientWidth / 2;
     canvas.scrollTop = cy - canvas.clientHeight / 2;
@@ -679,7 +805,6 @@ export function initFlowchart() {
     if (e.key === 'Escape' && _isOpen) closeFlowchart();
   });
 
-  // ── Zoom state ──
   let _zoomScale = 1;
   const ZOOM_MIN = 0.3;
   const ZOOM_MAX = 2.0;
@@ -700,7 +825,6 @@ export function initFlowchart() {
     const oldScale = _zoomScale;
     _zoomScale = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, newScale));
     if (_zoomScale === oldScale) return;
-    // Adjust scroll to keep the point under cursor/center stable
     if (centerX !== undefined && centerY !== undefined) {
       const scrollCX = canvas.scrollLeft + centerX;
       const scrollCY = canvas.scrollTop + centerY;
@@ -711,7 +835,6 @@ export function initFlowchart() {
     _applyZoom();
   }
 
-  // Zoom buttons
   document.getElementById('fc-zoom-in')?.addEventListener('click', () => {
     _zoomTo(_zoomScale + ZOOM_STEP);
   });
@@ -723,13 +846,11 @@ export function initFlowchart() {
     _applyZoom();
   });
 
-  // ── Drag panning (mouse + touch) & zoom ──
   const canvas = document.getElementById('fc-canvas');
   if (canvas) {
     let dragging = false;
     let startX = 0, startY = 0, scrollX = 0, scrollY = 0;
 
-    // Mouse wheel zoom — only on pinch (ctrlKey) or Cmd/Ctrl held
     canvas.addEventListener('wheel', e => {
       if (!e.ctrlKey && !e.metaKey) return;
       e.preventDefault();
@@ -740,7 +861,6 @@ export function initFlowchart() {
       _zoomTo(_zoomScale + delta, cx, cy);
     }, { passive: false });
 
-    // Mouse drag
     canvas.addEventListener('mousedown', e => {
       if (e.button !== 0) return;
       dragging = true;
@@ -760,7 +880,6 @@ export function initFlowchart() {
       if (dragging) { dragging = false; canvas.style.cursor = 'grab'; }
     });
 
-    // Touch: 1-finger drag, 2-finger pinch zoom
     let lastPinchDist = 0;
     canvas.addEventListener('touchstart', e => {
       if (e.touches.length === 1) {

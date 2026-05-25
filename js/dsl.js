@@ -10,8 +10,9 @@ const ALIASES = {
   TIER: 'schoolTier', schoolTier: 'schoolTier',
   MAJOR: 'major', major: 'major',
   STORYLINE: 'storyline', storyline: 'storyline',
-  MMR: 'MMR', POP: 'POP', POK: 'POK',
+  MMR: 'MMR', POP: 'POP', POK: 'POK', REP: 'REP', BND: 'BND',
   match_fixing: 'match_fixing',
+  route: 'route',
   relationship: 'relationship', REL: 'relationship',
   cul: 'cul', CUL: 'cul', dao: 'dao', DAO: 'dao',
   karma: 'karma', KARMA: 'karma', tribulation: 'tribulation', TRIB: 'tribulation',
@@ -23,7 +24,8 @@ const ALIASES = {
   invisibility_cloak: 'invisibility_cloak', hogsmeade_secret: 'hogsmeade_secret',
   duel_wins: 'duel_wins', duel_losses: 'duel_losses',
   voldemort_defeated: 'voldemort_defeated',
-  housing: 'housing', HOUSING: 'housing'
+  housing: 'housing', HOUSING: 'housing',
+  meta_aware: 'meta_aware', meta_gentle: 'meta_gentle'
 };
 
 function readVar(state, key) {

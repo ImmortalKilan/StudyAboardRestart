@@ -97,6 +97,8 @@ function outfitOf(s) {
   if (sl === 'esports' || sl === 'worlds' || sl === 'minor_league') return pick(['gaming_jersey', 'hoodie', 'tracksuit']);
   if (sl === 'poker') return pick(['poker_vest', 'suit', 'hoodie']);
   if (sl === 'party') return pick(['politician', 'suit', 'sweater_v']);
+  if (sl === 'academic') return pick(['hoodie', 'tee', 'tracksuit']);
+  if (sl === 'band') return pick(['tee', 'hoodie', 'tracksuit']);
   if (sl === 'triton') return pick(['naval', 'tactical']);
   if (sl === 'meta') return pick(['hoodie', 'tracksuit', 'tee']);
 
@@ -173,6 +175,8 @@ function accessoryOf(s) {
   if (sl === 'abyss') return 'goggles';
   if (sl === 'thief') return 'mask';
   if (sl === 'hogwarts') return 'glasses';
+  if (sl === 'academic') return 'headphones';
+  if (sl === 'band') return 'headphones';
   if ((s.INT ?? 5) >= 8) return 'glasses';
   return null;
 }
