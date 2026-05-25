@@ -2022,7 +2022,7 @@ function flushModularRenders() {
   const entries = Array.from(MODULAR_PENDING_RENDERS.entries());
   MODULAR_PENDING_RENDERS.clear();
   for (const [canvas, state] of entries) {
-    if (canvas && canvas.isConnected !== false) renderAvatar(canvas, state);
+    if (canvas) renderAvatar(canvas, state);
   }
 }
 
@@ -2141,11 +2141,15 @@ export function renderAvatar(canvas, state) {
   canvas.style.imageRendering = 'pixelated';
   const ctx = canvas.getContext('2d');
   ctx.imageSmoothingEnabled = false;
-  if (!paintModular(ctx, canvas, state || {})) {
+  const avatarState = state || {};
+  const useLegacy = avatarState._legacyAvatar === true;
+  if (useLegacy) {
     canvas.width = W;
     canvas.height = H;
     ctx.imageSmoothingEnabled = false;
-    paint(ctx, state || {});
+    paint(ctx, avatarState);
+  } else {
+    paintModular(ctx, canvas, avatarState);
   }
   // Idle bobbing via CSS animation (no JS rAF loop needed)
   canvas.style.animation = 'avatarBob 2.6s ease-in-out infinite';
