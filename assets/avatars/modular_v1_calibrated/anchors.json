@@ -5,599 +5,1474 @@
   },
   "layers": [
     "bg",
-    "body_base",
-    "torso_clothes",
+    "body_full",
     "head",
     "hair",
     "accessory",
     "bubble"
   ],
   "removed_layers": {
-    "arms": "Removed because clothing sprites already include sleeves/hands; drawing arms caused duplicated sleeves."
+    "arms": "Removed because clothing sprites already include sleeves/hands; body_base now supplies exposed skin under short-sleeve or sleeveless outfits."
   },
+  "tuning": "AE_hair_v2: regenerated hair-only overlays for current face anchor; preview composes bg + shifted body/head/hair.",
   "anchors": {
-    "body_base": {
-      "female_fit": {
-        "box": [
-          36,
-          48
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "female_low_health": {
-        "box": [
-          36,
-          48
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "female_normal": {
-        "box": [
-          36,
-          48
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "male_fit": {
-        "box": [
-          36,
-          48
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "male_low_health": {
-        "box": [
-          36,
-          48
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "male_normal": {
-        "box": [
-          36,
-          48
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      }
-    },
     "head": {
-      "female_happy": {
-        "box": [
-          30,
-          31
+      "male_neutral": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_faceonly_head_sheet_v2.png",
+        "source_box": [
+          0,
+          0,
+          539,
+          485
         ],
-        "anchor": "top_center",
-        "x": 36,
-        "y": 10
-      },
-      "female_neutral": {
-        "box": [
-          30,
-          31
+        "canvas": [
+          72,
+          72
         ],
-        "anchor": "top_center",
-        "x": 36,
-        "y": 10
-      },
-      "female_tired": {
-        "box": [
-          30,
-          31
-        ],
-        "anchor": "top_center",
-        "x": 36,
-        "y": 10
+        "face_only": true,
+        "no_neck": true,
+        "center_x": 34,
+        "bottom_y": 35,
+        "target_height": 31,
+        "background_removed": "chroma #00ff00",
+        "generation": "regen_faceonly_v2_clean_chin"
       },
       "male_happy": {
-        "box": [
-          30,
-          31
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_faceonly_head_sheet_v2.png",
+        "source_box": [
+          539,
+          0,
+          1078,
+          485
         ],
-        "anchor": "top_center",
-        "x": 36,
-        "y": 10
-      },
-      "male_neutral": {
-        "box": [
-          30,
-          31
+        "canvas": [
+          72,
+          72
         ],
-        "anchor": "top_center",
-        "x": 36,
-        "y": 10
+        "face_only": true,
+        "no_neck": true,
+        "center_x": 34,
+        "bottom_y": 35,
+        "target_height": 31,
+        "background_removed": "chroma #00ff00",
+        "generation": "regen_faceonly_v2_clean_chin"
       },
       "male_tired": {
-        "box": [
-          30,
-          31
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_faceonly_head_sheet_v2.png",
+        "source_box": [
+          1078,
+          0,
+          1617,
+          485
         ],
-        "anchor": "top_center",
-        "x": 36,
-        "y": 10
-      }
+        "canvas": [
+          72,
+          72
+        ],
+        "face_only": true,
+        "no_neck": true,
+        "center_x": 34,
+        "bottom_y": 35,
+        "target_height": 31,
+        "background_removed": "chroma #00ff00",
+        "generation": "regen_faceonly_v2_clean_chin"
+      },
+      "female_neutral": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_faceonly_head_sheet_v2.png",
+        "source_box": [
+          0,
+          485,
+          539,
+          970
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "face_only": true,
+        "no_neck": true,
+        "center_x": 34,
+        "bottom_y": 35,
+        "target_height": 31,
+        "background_removed": "chroma #00ff00",
+        "generation": "regen_faceonly_v2_clean_chin"
+      },
+      "female_happy": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_faceonly_head_sheet_v2.png",
+        "source_box": [
+          539,
+          485,
+          1078,
+          970
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "face_only": true,
+        "no_neck": true,
+        "center_x": 34,
+        "bottom_y": 35,
+        "target_height": 31,
+        "background_removed": "chroma #00ff00",
+        "generation": "regen_faceonly_v2_clean_chin"
+      },
+      "female_tired": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_faceonly_head_sheet_v2.png",
+        "source_box": [
+          1078,
+          485,
+          1617,
+          970
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "face_only": true,
+        "no_neck": true,
+        "center_x": 34,
+        "bottom_y": 35,
+        "target_height": 31,
+        "background_removed": "chroma #00ff00",
+        "generation": "regen_faceonly_v2_clean_chin"
+      },
+      "_note": "Regenerated all heads from face-only v2 sheet; no neck/body, clean compact chin contour."
     },
     "hair": {
       "female_bob_pink": {
         "box": [
-          42,
-          42
+          30,
+          30
         ],
         "anchor": "top_center",
         "x": 36,
-        "y": 3
+        "y": 2
       },
       "female_bun_blue": {
         "box": [
-          42,
-          50
+          30,
+          35
         ],
         "anchor": "top_center",
         "x": 36,
-        "y": 0
+        "y": 1
       },
       "female_long_black": {
         "box": [
-          44,
-          54
+          30,
+          37
         ],
         "anchor": "top_center",
         "x": 36,
-        "y": 0
+        "y": 1
       },
       "female_long_blonde": {
         "box": [
-          44,
-          54
+          30,
+          37
         ],
         "anchor": "top_center",
         "x": 36,
-        "y": 0
+        "y": 1
       },
       "female_long_chestnut": {
         "box": [
-          44,
-          54
+          30,
+          37
         ],
         "anchor": "top_center",
         "x": 36,
-        "y": 0
+        "y": 1
       },
       "female_long_dark_brown": {
         "box": [
-          44,
-          54
+          30,
+          37
         ],
         "anchor": "top_center",
         "x": 36,
-        "y": 0
+        "y": 1
       },
       "female_ponytail_black": {
         "box": [
-          44,
-          54
+          30,
+          37
         ],
         "anchor": "top_center",
         "x": 36,
-        "y": 0
+        "y": 1
       },
       "female_ponytail_chestnut": {
         "box": [
-          44,
-          54
+          30,
+          37
         ],
         "anchor": "top_center",
         "x": 36,
-        "y": 0
+        "y": 1
       },
       "long_chestnut": {
         "box": [
-          44,
-          54
+          30,
+          37
         ],
         "anchor": "top_center",
         "x": 36,
-        "y": 0
+        "y": 1
       },
       "male_messy_black": {
         "box": [
-          40,
-          34
-        ],
-        "anchor": "top_center",
-        "x": 36,
-        "y": 1
-      },
-      "male_messy_chestnut": {
-        "box": [
-          40,
-          34
-        ],
-        "anchor": "top_center",
-        "x": 36,
-        "y": 1
-      },
-      "male_messy_dark_brown": {
-        "box": [
-          40,
-          34
-        ],
-        "anchor": "top_center",
-        "x": 36,
-        "y": 1
-      },
-      "male_messy_silver": {
-        "box": [
-          40,
-          34
-        ],
-        "anchor": "top_center",
-        "x": 36,
-        "y": 1
-      },
-      "male_short_black": {
-        "box": [
-          40,
-          34
-        ],
-        "anchor": "top_center",
-        "x": 36,
-        "y": 1
-      },
-      "male_short_blonde": {
-        "box": [
-          40,
-          34
-        ],
-        "anchor": "top_center",
-        "x": 36,
-        "y": 1
-      },
-      "male_short_chestnut": {
-        "box": [
-          40,
-          34
-        ],
-        "anchor": "top_center",
-        "x": 36,
-        "y": 1
-      },
-      "male_short_dark_brown": {
-        "box": [
-          40,
-          34
-        ],
-        "anchor": "top_center",
-        "x": 36,
-        "y": 1
-      },
-      "messy_chestnut": {
-        "box": [
-          40,
-          34
-        ],
-        "anchor": "top_center",
-        "x": 36,
-        "y": 1
-      },
-      "ponytail_chestnut": {
-        "box": [
-          44,
-          54
+          29,
+          24
         ],
         "anchor": "top_center",
         "x": 36,
         "y": 0
       },
-      "short_fluffy_chestnut": {
+      "male_messy_chestnut": {
         "box": [
-          40,
-          34
+          29,
+          24
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 0
+      },
+      "male_messy_dark_brown": {
+        "box": [
+          29,
+          24
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 0
+      },
+      "male_messy_silver": {
+        "box": [
+          29,
+          24
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 0
+      },
+      "male_short_black": {
+        "box": [
+          29,
+          24
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 0
+      },
+      "male_short_blonde": {
+        "box": [
+          29,
+          24
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 0
+      },
+      "male_short_chestnut": {
+        "box": [
+          29,
+          24
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 0
+      },
+      "male_short_dark_brown": {
+        "box": [
+          29,
+          24
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 0
+      },
+      "messy_chestnut": {
+        "box": [
+          29,
+          24
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 0
+      },
+      "ponytail_chestnut": {
+        "box": [
+          30,
+          37
         ],
         "anchor": "top_center",
         "x": 36,
         "y": 1
+      },
+      "short_fluffy_chestnut": {
+        "box": [
+          29,
+          24
+        ],
+        "anchor": "top_center",
+        "x": 36,
+        "y": 0
+      },
+      "male_short_neat_black": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_male_sheet_v2.png",
+        "source_box": [
+          0,
+          0,
+          314,
+          314
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "short_neat",
+        "color": "black",
+        "target_height": 25,
+        "center_x": 34,
+        "top_y": 2,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2"
+      },
+      "male_short_fluffy_black": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_male_sheet_v2.png",
+        "source_box": [
+          314,
+          0,
+          627,
+          314
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "short_fluffy",
+        "color": "black",
+        "target_height": 27,
+        "center_x": 34,
+        "top_y": 1,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2"
+      },
+      "male_messy_tousled_black": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_male_sheet_v2.png",
+        "source_box": [
+          627,
+          0,
+          940,
+          314
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "messy_tousled",
+        "color": "black",
+        "target_height": 28,
+        "center_x": 34,
+        "top_y": 0,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2"
+      },
+      "male_side_swept_black": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_male_sheet_v2.png",
+        "source_box": [
+          940,
+          0,
+          1254,
+          314
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "side_swept",
+        "color": "black",
+        "target_height": 27,
+        "center_x": 34,
+        "top_y": 2,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2"
+      },
+      "male_short_neat_chestnut": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_male_sheet_v2.png",
+        "source_box": [
+          0,
+          314,
+          314,
+          627
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "short_neat",
+        "color": "chestnut",
+        "target_height": 25,
+        "center_x": 34,
+        "top_y": 2,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2"
+      },
+      "male_short_fluffy_chestnut": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_male_sheet_v2.png",
+        "source_box": [
+          314,
+          314,
+          627,
+          627
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "short_fluffy",
+        "color": "chestnut",
+        "target_height": 27,
+        "center_x": 34,
+        "top_y": 1,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2"
+      },
+      "male_messy_tousled_chestnut": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_male_sheet_v2.png",
+        "source_box": [
+          627,
+          314,
+          940,
+          627
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "messy_tousled",
+        "color": "chestnut",
+        "target_height": 28,
+        "center_x": 34,
+        "top_y": 0,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2"
+      },
+      "male_side_swept_chestnut": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_male_sheet_v2.png",
+        "source_box": [
+          940,
+          314,
+          1254,
+          627
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "side_swept",
+        "color": "chestnut",
+        "target_height": 27,
+        "center_x": 34,
+        "top_y": 2,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2"
+      },
+      "male_short_neat_dark_brown": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_male_sheet_v2.png",
+        "source_box": [
+          0,
+          627,
+          314,
+          940
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "short_neat",
+        "color": "dark_brown",
+        "target_height": 25,
+        "center_x": 34,
+        "top_y": 2,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2"
+      },
+      "male_short_fluffy_dark_brown": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_male_sheet_v2.png",
+        "source_box": [
+          314,
+          627,
+          627,
+          940
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "short_fluffy",
+        "color": "dark_brown",
+        "target_height": 27,
+        "center_x": 34,
+        "top_y": 1,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2"
+      },
+      "male_messy_tousled_dark_brown": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_male_sheet_v2.png",
+        "source_box": [
+          627,
+          627,
+          940,
+          940
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "messy_tousled",
+        "color": "dark_brown",
+        "target_height": 28,
+        "center_x": 34,
+        "top_y": 0,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2"
+      },
+      "male_side_swept_dark_brown": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_male_sheet_v2.png",
+        "source_box": [
+          940,
+          627,
+          1254,
+          940
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "side_swept",
+        "color": "dark_brown",
+        "target_height": 27,
+        "center_x": 34,
+        "top_y": 2,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2"
+      },
+      "male_short_neat_silver": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_male_sheet_v2.png",
+        "source_box": [
+          0,
+          940,
+          314,
+          1254
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "short_neat",
+        "color": "silver",
+        "target_height": 25,
+        "center_x": 34,
+        "top_y": 2,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2"
+      },
+      "male_short_fluffy_silver": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_male_sheet_v2.png",
+        "source_box": [
+          314,
+          940,
+          627,
+          1254
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "short_fluffy",
+        "color": "silver",
+        "target_height": 27,
+        "center_x": 34,
+        "top_y": 1,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2"
+      },
+      "male_messy_tousled_silver": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_male_sheet_v2.png",
+        "source_box": [
+          627,
+          940,
+          940,
+          1254
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "messy_tousled",
+        "color": "silver",
+        "target_height": 28,
+        "center_x": 34,
+        "top_y": 0,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2"
+      },
+      "male_side_swept_silver": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_male_sheet_v2.png",
+        "source_box": [
+          940,
+          940,
+          1254,
+          1254
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "side_swept",
+        "color": "silver",
+        "target_height": 27,
+        "center_x": 34,
+        "top_y": 2,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2"
+      },
+      "female_long_straight_black": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_female_sheet_v2.png",
+        "source_box": [
+          0,
+          0,
+          314,
+          314
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "long_straight",
+        "color": "black",
+        "target_height": 46,
+        "center_x": 34,
+        "top_y": 1,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2_rescaled_female"
+      },
+      "female_bob_black": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_female_sheet_v2.png",
+        "source_box": [
+          314,
+          0,
+          627,
+          314
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "bob",
+        "color": "black",
+        "target_height": 34,
+        "center_x": 34,
+        "top_y": 3,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2_rescaled_female"
+      },
+      "female_side_ponytail_black": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_female_sheet_v2.png",
+        "source_box": [
+          627,
+          0,
+          940,
+          314
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "side_ponytail",
+        "color": "black",
+        "target_height": 46,
+        "center_x": 35,
+        "top_y": 1,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2_rescaled_female"
+      },
+      "female_messy_bun_black": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_female_sheet_v2.png",
+        "source_box": [
+          940,
+          0,
+          1254,
+          314
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "messy_bun",
+        "color": "black",
+        "target_height": 42,
+        "center_x": 35,
+        "top_y": 1,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2_rescaled_female"
+      },
+      "female_long_straight_chestnut": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_female_sheet_v2.png",
+        "source_box": [
+          0,
+          314,
+          314,
+          627
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "long_straight",
+        "color": "chestnut",
+        "target_height": 46,
+        "center_x": 34,
+        "top_y": 1,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2_rescaled_female"
+      },
+      "female_bob_chestnut": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_female_sheet_v2.png",
+        "source_box": [
+          314,
+          314,
+          627,
+          627
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "bob",
+        "color": "chestnut",
+        "target_height": 34,
+        "center_x": 34,
+        "top_y": 3,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2_rescaled_female"
+      },
+      "female_side_ponytail_chestnut": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_female_sheet_v2.png",
+        "source_box": [
+          627,
+          314,
+          940,
+          627
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "side_ponytail",
+        "color": "chestnut",
+        "target_height": 46,
+        "center_x": 35,
+        "top_y": 1,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2_rescaled_female"
+      },
+      "female_messy_bun_chestnut": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_female_sheet_v2.png",
+        "source_box": [
+          940,
+          314,
+          1254,
+          627
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "messy_bun",
+        "color": "chestnut",
+        "target_height": 42,
+        "center_x": 35,
+        "top_y": 1,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2_rescaled_female"
+      },
+      "female_long_straight_blonde": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_female_sheet_v2.png",
+        "source_box": [
+          0,
+          627,
+          314,
+          940
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "long_straight",
+        "color": "blonde",
+        "target_height": 46,
+        "center_x": 34,
+        "top_y": 1,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2_rescaled_female"
+      },
+      "female_bob_blonde": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_female_sheet_v2.png",
+        "source_box": [
+          314,
+          627,
+          627,
+          940
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "bob",
+        "color": "blonde",
+        "target_height": 34,
+        "center_x": 34,
+        "top_y": 3,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2_rescaled_female"
+      },
+      "female_side_ponytail_blonde": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_female_sheet_v2.png",
+        "source_box": [
+          627,
+          627,
+          940,
+          940
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "side_ponytail",
+        "color": "blonde",
+        "target_height": 46,
+        "center_x": 35,
+        "top_y": 1,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2_rescaled_female"
+      },
+      "female_messy_bun_blonde": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_female_sheet_v2.png",
+        "source_box": [
+          940,
+          627,
+          1254,
+          940
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "messy_bun",
+        "color": "blonde",
+        "target_height": 42,
+        "center_x": 35,
+        "top_y": 1,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2_rescaled_female"
+      },
+      "female_long_straight_rose_pink": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_female_sheet_v2.png",
+        "source_box": [
+          0,
+          940,
+          314,
+          1254
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "long_straight",
+        "color": "rose_pink",
+        "target_height": 46,
+        "center_x": 34,
+        "top_y": 1,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2_rescaled_female"
+      },
+      "female_bob_rose_pink": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_female_sheet_v2.png",
+        "source_box": [
+          314,
+          940,
+          627,
+          1254
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "bob",
+        "color": "rose_pink",
+        "target_height": 34,
+        "center_x": 34,
+        "top_y": 3,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2_rescaled_female"
+      },
+      "female_side_ponytail_rose_pink": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_female_sheet_v2.png",
+        "source_box": [
+          627,
+          940,
+          940,
+          1254
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "side_ponytail",
+        "color": "rose_pink",
+        "target_height": 46,
+        "center_x": 35,
+        "top_y": 1,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2_rescaled_female"
+      },
+      "female_messy_bun_rose_pink": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_female_sheet_v2.png",
+        "source_box": [
+          940,
+          940,
+          1254,
+          1254
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "layer": "hair",
+        "style": "messy_bun",
+        "color": "rose_pink",
+        "target_height": 42,
+        "center_x": 35,
+        "top_y": 1,
+        "background_removed": "chroma #00ff00",
+        "generation": "hair_v2_for_regen_face_v2_rescaled_female"
       }
     },
     "torso_clothes": {
-      "business_blazer": {
-        "box": [
-          52,
-          45
+      "teal_student_hoodie": {
+        "canvas": [
+          72,
+          72
         ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "cardigan": {
-        "box": [
-          52,
-          45
+        "bottom_center": [
+          36,
+          72
         ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "chef_coat": {
-        "box": [
-          52,
-          45
+        "target_box": [
+          50,
+          43
         ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "esports_jersey": {
-        "box": [
-          52,
-          45
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "female_business_blazer": {
-        "box": [
-          52,
-          45
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "female_cardigan_cream": {
-        "box": [
-          52,
-          45
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "female_chef_coat": {
-        "box": [
-          52,
-          45
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "female_esports_jersey": {
-        "box": [
-          52,
-          45
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "female_gym_jacket": {
-        "box": [
-          52,
-          45
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "female_idol_stage": {
-        "box": [
-          52,
-          45
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "female_labcoat": {
-        "box": [
-          52,
-          45
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "female_office_shirt": {
-        "box": [
-          52,
-          45
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "female_party_top": {
-        "box": [
-          52,
-          45
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "female_preppy_blazer": {
-        "box": [
-          52,
-          45
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "female_suit": {
-        "box": [
-          52,
-          45
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "female_teal_crop_hoodie": {
-        "box": [
-          52,
-          45
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "female_white_blouse": {
-        "box": [
-          52,
-          45
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "female_wizard_robe": {
-        "box": [
-          52,
-          45
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "female_worn_sweater": {
-        "box": [
-          52,
-          45
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "female_xianxia_hanfu": {
-        "box": [
-          52,
-          45
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "gym_top": {
-        "box": [
-          52,
-          45
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "idol_jacket": {
-        "box": [
-          52,
-          45
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "labcoat": {
-        "box": [
-          52,
-          45
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "office_shirt": {
-        "box": [
-          52,
-          45
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
-      },
-      "party_shirt": {
-        "box": [
-          52,
-          45
-        ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
+        "source_grid": "strict_4x4_main_component"
       },
       "school_uniform": {
-        "box": [
-          52,
-          45
+        "canvas": [
+          72,
+          72
         ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
+      },
+      "cardigan": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
+      },
+      "business_blazer": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
       },
       "suit": {
-        "box": [
-          52,
-          45
+        "canvas": [
+          72,
+          72
         ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
       },
-      "teal_student_hoodie": {
-        "box": [
-          52,
-          45
+      "labcoat": {
+        "canvas": [
+          72,
+          72
         ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
       },
-      "tracksuit": {
-        "box": [
-          52,
-          45
+      "chef_coat": {
+        "canvas": [
+          72,
+          72
         ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
       },
-      "wizard_robe": {
-        "box": [
-          52,
-          45
+      "gym_top": {
+        "canvas": [
+          72,
+          72
         ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
       },
-      "worn_hoodie": {
-        "box": [
-          52,
-          45
+      "idol_jacket": {
+        "canvas": [
+          72,
+          72
         ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
       },
       "xianxia_robe": {
-        "box": [
-          52,
-          45
+        "canvas": [
+          72,
+          72
         ],
-        "anchor": "bottom_center",
-        "x": 36,
-        "y": 72
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
+      },
+      "esports_jersey": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
+      },
+      "wizard_robe": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
+      },
+      "party_shirt": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
+      },
+      "worn_hoodie": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
+      },
+      "office_shirt": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
+      },
+      "tracksuit": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
+      },
+      "female_teal_crop_hoodie": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
+      },
+      "female_white_blouse": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
+      },
+      "female_cardigan_cream": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
+      },
+      "female_preppy_blazer": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
+      },
+      "female_business_blazer": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
+      },
+      "female_suit": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
+      },
+      "female_labcoat": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
+      },
+      "female_chef_coat": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
+      },
+      "female_gym_jacket": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
+      },
+      "female_idol_stage": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
+      },
+      "female_party_top": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
+      },
+      "female_xianxia_hanfu": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
+      },
+      "female_esports_jersey": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
+      },
+      "female_wizard_robe": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
+      },
+      "female_worn_sweater": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
+      },
+      "female_office_shirt": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "target_box": [
+          50,
+          43
+        ],
+        "source_grid": "strict_4x4_main_component"
       }
     },
     "bubble": {
@@ -713,8 +1588,8 @@
     "accessory": {
       "backpack_strap": {
         "box": [
-          46,
-          43
+          44,
+          40
         ],
         "anchor": "bottom_center",
         "x": 36,
@@ -731,12 +1606,12 @@
       },
       "headphones": {
         "box": [
-          44,
-          38
+          40,
+          34
         ],
         "anchor": "top_center",
         "x": 36,
-        "y": 4
+        "y": 5
       },
       "spirit_beads": {
         "box": [
@@ -747,6 +1622,1253 @@
         "x": 36,
         "y": 41
       }
+    },
+    "body_base": {
+      "male_normal": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "role": "skin underlay behind torso_clothes"
+      },
+      "male_fit": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "role": "skin underlay behind torso_clothes"
+      },
+      "male_low_health": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "role": "skin underlay behind torso_clothes"
+      },
+      "female_normal": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "role": "skin underlay behind torso_clothes"
+      },
+      "female_fit": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "role": "skin underlay behind torso_clothes"
+      },
+      "female_low_health": {
+        "canvas": [
+          72,
+          72
+        ],
+        "bottom_center": [
+          36,
+          72
+        ],
+        "role": "skin underlay behind torso_clothes"
+      }
+    },
+    "torso_clothes_back": {
+      "teal_student_hoodie": {
+        "canvas": [
+          72,
+          72
+        ],
+        "moved_box": [
+          30,
+          29,
+          42,
+          41
+        ],
+        "priority": "after body_base, before torso_clothes"
+      },
+      "worn_hoodie": {
+        "canvas": [
+          72,
+          72
+        ],
+        "moved_box": [
+          30,
+          29,
+          42,
+          41
+        ],
+        "priority": "after body_base, before torso_clothes"
+      },
+      "female_teal_crop_hoodie": {
+        "canvas": [
+          72,
+          72
+        ],
+        "moved_box": [
+          30,
+          29,
+          42,
+          41
+        ],
+        "priority": "after body_base, before torso_clothes"
+      },
+      "female_worn_sweater": {
+        "canvas": [
+          72,
+          72
+        ],
+        "moved_box": [
+          30,
+          29,
+          42,
+          41
+        ],
+        "priority": "after body_base, before torso_clothes"
+      }
+    },
+    "body_neck": {
+      "female_fit": {
+        "canvas": [
+          72,
+          72
+        ],
+        "mask": "small_y31_40_clean_skin_patch",
+        "priority": "above torso_clothes, below head",
+        "active": false
+      },
+      "female_low_health": {
+        "canvas": [
+          72,
+          72
+        ],
+        "mask": "small_y31_40_clean_skin_patch",
+        "priority": "above torso_clothes, below head",
+        "active": false
+      },
+      "female_normal": {
+        "canvas": [
+          72,
+          72
+        ],
+        "mask": "small_y31_40_clean_skin_patch",
+        "priority": "above torso_clothes, below head",
+        "active": false
+      },
+      "male_fit": {
+        "canvas": [
+          72,
+          72
+        ],
+        "mask": "small_y31_40_clean_skin_patch",
+        "priority": "above torso_clothes, below head",
+        "active": false
+      },
+      "male_low_health": {
+        "canvas": [
+          72,
+          72
+        ],
+        "mask": "small_y31_40_clean_skin_patch",
+        "priority": "above torso_clothes, below head",
+        "active": false
+      },
+      "male_normal": {
+        "canvas": [
+          72,
+          72
+        ],
+        "mask": "small_y31_40_clean_skin_patch",
+        "priority": "above torso_clothes, below head",
+        "active": false
+      }
+    },
+    "body_full": {
+      "teal_student_hoodie": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_male_sheet.png",
+        "grid_cell": [
+          0,
+          0,
+          384,
+          256
+        ],
+        "trim_box_in_cell": [
+          115,
+          26,
+          331,
+          256
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 12,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "school_uniform": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_male_sheet.png",
+        "grid_cell": [
+          384,
+          0,
+          768,
+          256
+        ],
+        "trim_box_in_cell": [
+          83,
+          26,
+          305,
+          256
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 12,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "cardigan": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_male_sheet.png",
+        "grid_cell": [
+          768,
+          0,
+          1152,
+          256
+        ],
+        "trim_box_in_cell": [
+          60,
+          26,
+          274,
+          256
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 12,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "business_blazer": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_male_sheet.png",
+        "grid_cell": [
+          1152,
+          0,
+          1536,
+          256
+        ],
+        "trim_box_in_cell": [
+          26,
+          26,
+          239,
+          256
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 12,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "suit": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_male_sheet.png",
+        "grid_cell": [
+          0,
+          256,
+          384,
+          512
+        ],
+        "trim_box_in_cell": [
+          108,
+          0,
+          333,
+          256
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 10,
+        "per_outfit_adjust_y": "-2 after global offsets",
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "labcoat": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_male_sheet.png",
+        "grid_cell": [
+          384,
+          256,
+          768,
+          512
+        ],
+        "trim_box_in_cell": [
+          78,
+          0,
+          306,
+          256
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 10,
+        "per_outfit_adjust_y": "-2 after global offsets",
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "chef_coat": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_male_sheet.png",
+        "grid_cell": [
+          768,
+          256,
+          1152,
+          512
+        ],
+        "trim_box_in_cell": [
+          53,
+          0,
+          275,
+          256
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 10,
+        "per_outfit_adjust_y": "-2 after global offsets",
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "gym_top": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_male_sheet.png",
+        "grid_cell": [
+          1152,
+          256,
+          1536,
+          512
+        ],
+        "trim_box_in_cell": [
+          21,
+          0,
+          242,
+          256
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 10,
+        "per_outfit_adjust_y": "-2 after global offsets",
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "idol_jacket": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_male_sheet.png",
+        "grid_cell": [
+          0,
+          512,
+          384,
+          768
+        ],
+        "trim_box_in_cell": [
+          102,
+          0,
+          322,
+          256
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 12,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "xianxia_robe": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_male_sheet.png",
+        "grid_cell": [
+          384,
+          512,
+          768,
+          768
+        ],
+        "trim_box_in_cell": [
+          70,
+          0,
+          307,
+          256
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 12,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "esports_jersey": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_male_sheet.png",
+        "grid_cell": [
+          768,
+          512,
+          1152,
+          768
+        ],
+        "trim_box_in_cell": [
+          52,
+          0,
+          267,
+          256
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 12,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "wizard_robe": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_male_sheet.png",
+        "grid_cell": [
+          1152,
+          512,
+          1536,
+          768
+        ],
+        "trim_box_in_cell": [
+          8,
+          0,
+          247,
+          256
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 12,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "party_shirt": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_male_sheet.png",
+        "grid_cell": [
+          0,
+          768,
+          384,
+          1024
+        ],
+        "trim_box_in_cell": [
+          91,
+          0,
+          320,
+          226
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          90
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 18,
+        "per_outfit_extra_y": 6,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "worn_hoodie": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_male_sheet.png",
+        "grid_cell": [
+          384,
+          768,
+          768,
+          1024
+        ],
+        "trim_box_in_cell": [
+          55,
+          0,
+          277,
+          226
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          90
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 18,
+        "per_outfit_extra_y": 6,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "office_shirt": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_male_sheet.png",
+        "grid_cell": [
+          768,
+          768,
+          1152,
+          1024
+        ],
+        "trim_box_in_cell": [
+          44,
+          0,
+          269,
+          228
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          90
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 18,
+        "per_outfit_extra_y": 6,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "tracksuit": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_male_sheet.png",
+        "grid_cell": [
+          1152,
+          768,
+          1536,
+          1024
+        ],
+        "trim_box_in_cell": [
+          1,
+          0,
+          229,
+          228
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          90
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 18,
+        "per_outfit_extra_y": 6,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "female_teal_crop_hoodie": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_female_sheet.png",
+        "grid_cell": [
+          0,
+          0,
+          362,
+          271
+        ],
+        "trim_box_in_cell": [
+          98,
+          35,
+          317,
+          265
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 12,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "female_white_blouse": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_female_sheet.png",
+        "grid_cell": [
+          362,
+          0,
+          724,
+          271
+        ],
+        "trim_box_in_cell": [
+          69,
+          35,
+          291,
+          265
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 12,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "female_cardigan_cream": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_female_sheet.png",
+        "grid_cell": [
+          724,
+          0,
+          1086,
+          271
+        ],
+        "trim_box_in_cell": [
+          53,
+          35,
+          277,
+          265
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 12,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "female_preppy_blazer": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_female_sheet.png",
+        "grid_cell": [
+          1086,
+          0,
+          1448,
+          271
+        ],
+        "trim_box_in_cell": [
+          33,
+          35,
+          257,
+          266
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 12,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "female_business_blazer": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_female_sheet.png",
+        "grid_cell": [
+          0,
+          271,
+          362,
+          542
+        ],
+        "trim_box_in_cell": [
+          93,
+          20,
+          314,
+          250
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 12,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "female_suit": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_female_sheet.png",
+        "grid_cell": [
+          362,
+          271,
+          724,
+          542
+        ],
+        "trim_box_in_cell": [
+          64,
+          21,
+          284,
+          251
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 12,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "female_labcoat": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_female_sheet.png",
+        "grid_cell": [
+          724,
+          271,
+          1086,
+          542
+        ],
+        "trim_box_in_cell": [
+          48,
+          21,
+          270,
+          251
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 12,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "female_chef_coat": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_female_sheet.png",
+        "grid_cell": [
+          1086,
+          271,
+          1448,
+          542
+        ],
+        "trim_box_in_cell": [
+          30,
+          21,
+          250,
+          251
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 12,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "female_gym_jacket": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_female_sheet.png",
+        "grid_cell": [
+          0,
+          542,
+          362,
+          813
+        ],
+        "trim_box_in_cell": [
+          93,
+          7,
+          315,
+          271
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 12,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "female_idol_stage": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_female_sheet.png",
+        "grid_cell": [
+          362,
+          542,
+          724,
+          813
+        ],
+        "trim_box_in_cell": [
+          63,
+          7,
+          289,
+          271
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 12,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "female_party_top": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_female_sheet.png",
+        "grid_cell": [
+          724,
+          542,
+          1086,
+          813
+        ],
+        "trim_box_in_cell": [
+          46,
+          6,
+          271,
+          271
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 12,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "female_xianxia_hanfu": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_female_sheet.png",
+        "grid_cell": [
+          1086,
+          542,
+          1448,
+          813
+        ],
+        "trim_box_in_cell": [
+          7,
+          6,
+          278,
+          271
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 12,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "female_esports_jersey": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_female_sheet.png",
+        "grid_cell": [
+          0,
+          813,
+          362,
+          1084
+        ],
+        "trim_box_in_cell": [
+          103,
+          0,
+          312,
+          223
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 12,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "female_wizard_robe": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_female_sheet.png",
+        "grid_cell": [
+          362,
+          813,
+          724,
+          1084
+        ],
+        "trim_box_in_cell": [
+          47,
+          0,
+          293,
+          216
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 12,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "female_worn_sweater": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_female_sheet.png",
+        "grid_cell": [
+          724,
+          813,
+          1086,
+          1084
+        ],
+        "trim_box_in_cell": [
+          38,
+          0,
+          269,
+          216
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 12,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      },
+      "female_office_shirt": {
+        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_female_sheet.png",
+        "grid_cell": [
+          1086,
+          813,
+          1448,
+          1084
+        ],
+        "trim_box_in_cell": [
+          26,
+          0,
+          244,
+          222
+        ],
+        "canvas": [
+          72,
+          72
+        ],
+        "target_height": 54,
+        "bottom_center": [
+          36,
+          84
+        ],
+        "includes": [
+          "clothes",
+          "arms",
+          "hands",
+          "neck"
+        ],
+        "body_y_offset_applied": 12,
+        "green_despill_passes": 3,
+        "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
+      }
     }
+  },
+  "render": {
+    "character_y_offset": 3
   }
 }
