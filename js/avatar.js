@@ -2119,7 +2119,6 @@ function modularBubbleId(state) {
 function modularAccessoryId(state) {
   const sl = state.storyline || '';
   if (sl === 'esports' || sl === 'worlds' || sl === 'minor_league') return 'headphones';
-  if ((state.INT ?? 0) >= 8) return 'glasses';
   return null;
 }
 
