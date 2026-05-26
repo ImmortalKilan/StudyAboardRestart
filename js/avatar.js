@@ -2013,6 +2013,19 @@ const BODY_ASSET_BY_OUTFIT = {
   },
 };
 
+const MODULAR_LAYER_TRANSFORMS = {
+  body_full: {
+    gym_top: { y: -3 },
+    teal_student_hoodie: { y: -3 },
+  },
+  hair: {
+    male_short_fluffy_black: { x: -1, y: -1, scale: 1.13 },
+    male_short_fluffy_chestnut: { x: -1, y: -1, scale: 1.13 },
+    male_short_fluffy_dark_brown: { x: -1, y: -1, scale: 1.16 },
+    male_short_fluffy_silver: { x: 1, y: 1, scale: 0.94 },
+  },
+};
+
 function normIndex(value, size) {
   const n = Number.isFinite(value) ? Math.trunc(value) : 0;
   return ((n % size) + size) % size;
@@ -2046,7 +2059,17 @@ function drawModularAsset(ctx, folder, id, canvas, state) {
   if (!id) return true;
   const entry = modularImage(assetUrl(folder, id));
   if (entry.loaded) {
-    ctx.drawImage(entry.img, 0, 0, MODULAR_W, MODULAR_H);
+    const transform = MODULAR_LAYER_TRANSFORMS[folder]?.[id];
+    if (transform) {
+      const scale = transform.scale || 1;
+      const w = Math.round(MODULAR_W * scale);
+      const h = Math.round(MODULAR_H * scale);
+      const x = Math.round((MODULAR_W - w) / 2 + (transform.x || 0));
+      const y = Math.round((MODULAR_H - h) / 2 + (transform.y || 0));
+      ctx.drawImage(entry.img, x, y, w, h);
+    } else {
+      ctx.drawImage(entry.img, 0, 0, MODULAR_W, MODULAR_H);
+    }
     return true;
   }
   if (!entry.failed) MODULAR_PENDING_RENDERS.set(canvas, state);
@@ -2054,10 +2077,9 @@ function drawModularAsset(ctx, folder, id, canvas, state) {
 }
 
 function expressionId(state) {
-  const hlt = state.HLT ?? 5;
   const hap = state.HAP ?? 5;
-  if (hlt <= 2 || hap <= 2) return 'tired';
-  if (hap >= 7 || (state.faceVariant ?? 0) % 3 === 1) return 'happy';
+  if (hap < 3) return 'tired';
+  if (hap > 7) return 'happy';
   return 'neutral';
 }
 
@@ -2077,7 +2099,7 @@ function modularHairId(state) {
 
 function modularBodyId(state) {
   const sex = state.sex === 1 ? 'female' : 'male';
-  if ((state.HLT ?? 5) <= 1 && (state.MNY ?? 5) <= 3) {
+  if ((state.HLT ?? 5) <= -2 && (state.MNY ?? 5) <= 3) {
     return sex === 'female' ? 'female_worn_sweater' : 'worn_hoodie';
   }
   const outfit = outfitOf(state);
@@ -2096,7 +2118,7 @@ function modularBgId(state) {
   if (sl === 'idol' || sl === 'superstar' || sl === 'streamer') return 'campus';
   const rel = state.relationship || '';
   if (rel && rel !== '单身' && rel !== '鍗曡韩') return 'cafe_date';
-  if ((state.HAP ?? 5) <= 2 || (state.HLT ?? 5) <= 2) return 'dorm_night';
+  if ((state.HAP ?? 5) <= 2 || (state.HLT ?? 5) <= -2) return 'dorm_night';
   if ((state.INT ?? 0) >= 8) return 'library';
   if ((state.age ?? 15) >= 23 || (state.profession || '').includes('作')) return 'office';
   if ((state.school && state.school !== '无') || (state.profession || '').includes('学')) return 'campus';
@@ -2106,7 +2128,7 @@ function modularBgId(state) {
 function modularBubbleId(state) {
   const sl = state.storyline || '';
   const rel = state.relationship || '';
-  if ((state.HLT ?? 5) <= 1) return 'sick';
+  if ((state.HLT ?? 5) <= -4) return 'sick';
   if ((state.HAP ?? 5) <= 2) return 'stress';
   if (sl === 'xianxia') return 'xianxia';
   if (sl === 'hogwarts') return 'magic';
@@ -2116,13 +2138,15 @@ function modularBubbleId(state) {
   if ((state.MNY ?? 0) >= 9) return 'rich';
   if ((state.INT ?? 0) >= 8) return 'academic';
   if ((state.HAP ?? 5) >= 8) return 'happy';
-  if ((state.HLT ?? 5) <= 3) return 'tired';
+  if ((state.HLT ?? 5) <= -2) return 'tired';
   return null;
 }
 
 function modularAccessoryId(state) {
   const sl = state.storyline || '';
-  if (sl === 'esports' || sl === 'worlds' || sl === 'minor_league') return 'headphones';
+  if (sl === 'esports' || sl === 'worlds' || sl === 'minor_league' || sl === 'band') return 'headphones';
+  if (sl === 'hogwarts' || sl === 'academic' || (state.INT ?? 0) >= 8) return 'glasses';
+  if (sl === 'xianxia') return 'spirit_beads';
   return null;
 }
 
