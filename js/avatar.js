@@ -1,7 +1,8 @@
 // js/avatar.js — Low-resolution pixel portrait
 // Logical canvas: 64×80 pixels, scaled up smoothly via CSS (pixelated).
 // Face is an explicit oval shape (row-width table) — NOT a square.
-// No external image assets.
+// Default renderer uses modular image assets; the old procedural painter stays
+// as a fallback while images are loading or if an asset is missing.
 //
 // Layer order (bottom→top):
 //   bg → back-hair → body/outfit → head (masked oval) → face → front-hair → accessory
@@ -12,6 +13,8 @@
 
 const W = 64;
 const H = 64;
+const MODULAR_W = 72;
+const MODULAR_H = 72;
 const OUTLINE = '#1b1320';
 
 // ─── Palettes ─────────────────────────────────────────────────
@@ -1959,24 +1962,209 @@ function paint(ctx, state) {
 }
 
 // ─── Public API ───────────────────────────────────────────────
+// Modular image avatar -------------------------------------------------------
+const MODULAR_ROOT = new URL('../assets/avatars/modular_v1_calibrated/', import.meta.url).href;
+const MODULAR_IMAGES = new Map();
+const MODULAR_PENDING_RENDERS = new Map();
+
+const MALE_HAIR_STYLES = ['short_neat', 'short_fluffy', 'side_swept'];
+const MALE_HAIR_COLORS = ['black', 'chestnut', 'dark_brown', 'silver'];
+const FEMALE_HAIR_STYLES = ['bob', 'long_straight', 'side_ponytail'];
+const FEMALE_HAIR_COLORS = ['black', 'chestnut', 'blonde', 'rose_pink'];
+
+const BODY_ASSET_BY_OUTFIT = {
+  male: {
+    school: 'school_uniform', school_blazer: 'school_uniform', school_pe: 'gym_top',
+    suit: 'suit', premium_suit: 'business_blazer', tuxedo: 'suit', cheap_suit: 'office_shirt',
+    shirt_tie: 'office_shirt', blazer: 'business_blazer',
+    hoodie: 'teal_student_hoodie', cs_hoodie: 'teal_student_hoodie', grad_hoodie: 'teal_student_hoodie',
+    hanfu: 'xianxia_robe', daoist_robe: 'xianxia_robe', sect_uniform: 'xianxia_robe',
+    robe: 'wizard_robe', house_robe: 'wizard_robe', labcoat: 'labcoat', chef: 'chef_coat',
+    idol: 'idol_jacket', idol_dress: 'idol_jacket', idol_jacket: 'idol_jacket',
+    tracksuit: 'tracksuit', tank: 'gym_top', jersey: 'esports_jersey', gaming_jersey: 'esports_jersey',
+    poker_vest: 'business_blazer', thief: 'worn_hoodie', tactical: 'tracksuit',
+    trench: 'business_blazer', naval: 'business_blazer', politician: 'business_blazer',
+    tee: 'teal_student_hoodie', polo: 'office_shirt', cardigan: 'cardigan',
+    sweater_v: 'cardigan', turtleneck: 'cardigan', denim_jacket: 'teal_student_hoodie',
+    varsity: 'teal_student_hoodie', jacket: 'teal_student_hoodie', flannel: 'party_shirt',
+    hawaiian: 'party_shirt', striped_tee: 'teal_student_hoodie', winter_coat: 'worn_hoodie',
+    puffer: 'worn_hoodie', art_smock: 'office_shirt', beret_top: 'cardigan',
+    photo_vest: 'party_shirt', ragged: 'worn_hoodie', patched_tee: 'worn_hoodie', pajamas: 'worn_hoodie',
+  },
+  female: {
+    school: 'female_preppy_blazer', school_blazer: 'female_preppy_blazer', school_pe: 'female_gym_jacket',
+    suit: 'female_suit', premium_suit: 'female_business_blazer', tuxedo: 'female_suit',
+    cheap_suit: 'female_office_shirt', shirt_tie: 'female_office_shirt', blazer: 'female_business_blazer',
+    hoodie: 'female_teal_crop_hoodie', cs_hoodie: 'female_teal_crop_hoodie', grad_hoodie: 'female_teal_crop_hoodie',
+    hanfu: 'female_xianxia_hanfu', daoist_robe: 'female_xianxia_hanfu', sect_uniform: 'female_xianxia_hanfu',
+    robe: 'female_wizard_robe', house_robe: 'female_wizard_robe', labcoat: 'female_labcoat',
+    chef: 'female_chef_coat', idol: 'female_idol_stage', idol_dress: 'female_idol_stage',
+    idol_jacket: 'female_idol_stage', tracksuit: 'female_gym_jacket', tank: 'female_gym_jacket',
+    jersey: 'female_esports_jersey', gaming_jersey: 'female_esports_jersey',
+    poker_vest: 'female_business_blazer', thief: 'female_worn_sweater', tactical: 'female_gym_jacket',
+    trench: 'female_business_blazer', naval: 'female_business_blazer', politician: 'female_business_blazer',
+    tee: 'female_white_blouse', polo: 'female_white_blouse', cardigan: 'female_cardigan_cream',
+    sweater_v: 'female_worn_sweater', turtleneck: 'female_worn_sweater',
+    denim_jacket: 'female_teal_crop_hoodie', varsity: 'female_teal_crop_hoodie',
+    jacket: 'female_teal_crop_hoodie', flannel: 'female_party_top', hawaiian: 'female_party_top',
+    striped_tee: 'female_white_blouse', winter_coat: 'female_worn_sweater', puffer: 'female_worn_sweater',
+    art_smock: 'female_white_blouse', beret_top: 'female_cardigan_cream', photo_vest: 'female_party_top',
+    ragged: 'female_worn_sweater', patched_tee: 'female_worn_sweater', pajamas: 'female_worn_sweater',
+  },
+};
+
+function normIndex(value, size) {
+  const n = Number.isFinite(value) ? Math.trunc(value) : 0;
+  return ((n % size) + size) % size;
+}
+
+function assetUrl(folder, id) {
+  return `${MODULAR_ROOT}${folder}/${id}.png`;
+}
+
+function flushModularRenders() {
+  const entries = Array.from(MODULAR_PENDING_RENDERS.entries());
+  MODULAR_PENDING_RENDERS.clear();
+  for (const [canvas, state] of entries) {
+    if (canvas) renderAvatar(canvas, state);
+  }
+}
+
+function modularImage(src) {
+  let entry = MODULAR_IMAGES.get(src);
+  if (entry) return entry;
+  const img = new Image();
+  entry = { img, loaded: false, failed: false };
+  img.onload = () => { entry.loaded = true; flushModularRenders(); };
+  img.onerror = () => { entry.failed = true; flushModularRenders(); };
+  img.src = src;
+  MODULAR_IMAGES.set(src, entry);
+  return entry;
+}
+
+function drawModularAsset(ctx, folder, id, canvas, state) {
+  if (!id) return true;
+  const entry = modularImage(assetUrl(folder, id));
+  if (entry.loaded) {
+    ctx.drawImage(entry.img, 0, 0, MODULAR_W, MODULAR_H);
+    return true;
+  }
+  if (!entry.failed) MODULAR_PENDING_RENDERS.set(canvas, state);
+  return entry.failed;
+}
+
+function expressionId(state) {
+  const hlt = state.HLT ?? 5;
+  const hap = state.HAP ?? 5;
+  if (hlt <= 2 || hap <= 2) return 'tired';
+  if (hap >= 7 || (state.faceVariant ?? 0) % 3 === 1) return 'happy';
+  return 'neutral';
+}
+
+function modularHeadId(state) {
+  return `${state.sex === 1 ? 'female' : 'male'}_${expressionId(state)}`;
+}
+
+function modularHairId(state) {
+  const female = state.sex === 1;
+  const styles = female ? FEMALE_HAIR_STYLES : MALE_HAIR_STYLES;
+  const colors = female ? FEMALE_HAIR_COLORS : MALE_HAIR_COLORS;
+  const sex = female ? 'female' : 'male';
+  const style = styles[normIndex(state.topVariant ?? 0, styles.length)];
+  const color = colors[normIndex(state.outfitColorId ?? 0, colors.length)];
+  return `${sex}_${style}_${color}`;
+}
+
+function modularBodyId(state) {
+  const sex = state.sex === 1 ? 'female' : 'male';
+  if ((state.HLT ?? 5) <= 1 && (state.MNY ?? 5) <= 3) {
+    return sex === 'female' ? 'female_worn_sweater' : 'worn_hoodie';
+  }
+  const outfit = outfitOf(state);
+  return BODY_ASSET_BY_OUTFIT[sex][outfit] || (sex === 'female' ? 'female_teal_crop_hoodie' : 'teal_student_hoodie');
+}
+
+function modularBgId(state) {
+  const sl = state.storyline || '';
+  if (sl === 'xianxia') return 'xianxia_temple';
+  if (sl === 'hogwarts') return 'magic_corridor';
+  if (sl === 'chef') return 'kitchen';
+  if (sl === 'esports' || sl === 'worlds' || sl === 'minor_league') return 'esports_room';
+  if (sl === 'fitness' || sl === 'athlete') return 'gym';
+  if (sl === 'poker' || sl === 'triton' || sl === 'local_shark') return 'casino_party';
+  if (sl === 'party' || sl === 'ceo' || sl === 'spy') return 'office';
+  if (sl === 'idol' || sl === 'superstar' || sl === 'streamer') return 'campus';
+  const rel = state.relationship || '';
+  if (rel && rel !== '单身' && rel !== '鍗曡韩') return 'cafe_date';
+  if ((state.HAP ?? 5) <= 2 || (state.HLT ?? 5) <= 2) return 'dorm_night';
+  if ((state.INT ?? 0) >= 8) return 'library';
+  if ((state.age ?? 15) >= 23 || (state.profession || '').includes('作')) return 'office';
+  if ((state.school && state.school !== '无') || (state.profession || '').includes('学')) return 'campus';
+  return 'dorm_day';
+}
+
+function modularBubbleId(state) {
+  const sl = state.storyline || '';
+  const rel = state.relationship || '';
+  if ((state.HLT ?? 5) <= 1) return 'sick';
+  if ((state.HAP ?? 5) <= 2) return 'stress';
+  if (sl === 'xianxia') return 'xianxia';
+  if (sl === 'hogwarts') return 'magic';
+  if (sl === 'chef') return 'chef';
+  if (sl === 'esports' || sl === 'worlds' || sl === 'minor_league') return 'esports';
+  if (rel && rel !== '单身' && rel !== '鍗曡韩') return 'love';
+  if ((state.MNY ?? 0) >= 9) return 'rich';
+  if ((state.INT ?? 0) >= 8) return 'academic';
+  if ((state.HAP ?? 5) >= 8) return 'happy';
+  if ((state.HLT ?? 5) <= 3) return 'tired';
+  return null;
+}
+
+function modularAccessoryId(state) {
+  const sl = state.storyline || '';
+  if (sl === 'esports' || sl === 'worlds' || sl === 'minor_league') return 'headphones';
+  return null;
+}
+
+function paintModular(ctx, canvas, state) {
+  ctx.clearRect(0, 0, MODULAR_W, MODULAR_H);
+  let usable = true;
+  usable = drawModularAsset(ctx, 'bg', modularBgId(state), canvas, state) && usable;
+  usable = drawModularAsset(ctx, 'body_full', modularBodyId(state), canvas, state) && usable;
+  usable = drawModularAsset(ctx, 'head', modularHeadId(state), canvas, state) && usable;
+  usable = drawModularAsset(ctx, 'hair', modularHairId(state), canvas, state) && usable;
+  usable = drawModularAsset(ctx, 'accessory', modularAccessoryId(state), canvas, state) && usable;
+  usable = drawModularAsset(ctx, 'bubble', modularBubbleId(state), canvas, state) && usable;
+  return usable;
+}
+
 export function renderAvatar(canvas, state) {
-  canvas.width = W;
-  canvas.height = H;
+  canvas.width = MODULAR_W;
+  canvas.height = MODULAR_H;
   canvas.style.imageRendering = 'pixelated';
   const ctx = canvas.getContext('2d');
   ctx.imageSmoothingEnabled = false;
-  paint(ctx, state);
+  const avatarState = state || {};
+  const useLegacy = avatarState._legacyAvatar === true;
+  if (useLegacy) {
+    canvas.width = W;
+    canvas.height = H;
+    ctx.imageSmoothingEnabled = false;
+    paint(ctx, avatarState);
+  } else {
+    paintModular(ctx, canvas, avatarState);
+  }
   // Idle bobbing via CSS animation (no JS rAF loop needed)
   canvas.style.animation = 'avatarBob 2.6s ease-in-out infinite';
 }
 
 export function createStandaloneAvatar(state) {
   const canvas = document.createElement('canvas');
-  canvas.width = W;
-  canvas.height = H;
+  canvas.width = MODULAR_W;
+  canvas.height = MODULAR_H;
   canvas.style.imageRendering = 'pixelated';
   const ctx = canvas.getContext('2d');
   ctx.imageSmoothingEnabled = false;
-  paint(ctx, state);
+  paintModular(ctx, canvas, state || {});
   return canvas;
 }

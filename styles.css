@@ -939,7 +939,7 @@ button.ghost:active {
 .alloc-avatar-wrap-lg {
   width: 100%;
   max-width: 280px;
-  aspect-ratio: 2 / 3;
+  aspect-ratio: 1 / 1;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -947,6 +947,7 @@ button.ghost:active {
 .alloc-avatar-wrap-lg canvas {
   width: 100%;
   height: 100%;
+  object-fit: contain;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   filter: drop-shadow(0 8px 24px rgba(0,0,0,0.4));
@@ -4668,7 +4669,7 @@ body.in-summary {
 }
 .mp-vs-player { text-align: center; flex: 1; max-width: 180px; }
 .mp-vs-avatar {
-  width: 80px; height: 120px; image-rendering: pixelated;
+  width: 96px; height: 96px; image-rendering: pixelated;
   border-radius: 8px; border: 2px solid var(--vs-border);
   background: var(--vs-card);
 }
@@ -5015,7 +5016,7 @@ body.in-summary {
 /* ── VS Mobile ── */
 @media (max-width: 760px) {
   .mp-vs-container { padding: 16px 14px 40px; }
-  .mp-vs-avatar { width: 64px; height: 96px; }
+  .mp-vs-avatar { width: 72px; height: 72px; }
   .mp-vs-score { font-size: 18px !important; }
   .mp-vs-player.vs-winner .mp-vs-score { font-size: 22px !important; }
   .mp-vs-spark { font-size: 12px; }
