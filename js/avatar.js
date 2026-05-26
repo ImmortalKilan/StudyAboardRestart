@@ -2150,12 +2150,17 @@ function modularAccessoryId(state) {
   return null;
 }
 
+function modularAccessoryUnderId(state) {
+  return modularAccessoryId(state) === 'headphones' ? 'headphones' : null;
+}
+
 function paintModular(ctx, canvas, state) {
   ctx.clearRect(0, 0, MODULAR_W, MODULAR_H);
   let usable = true;
   usable = drawModularAsset(ctx, 'bg', modularBgId(state), canvas, state) && usable;
   usable = drawModularAsset(ctx, 'body_full', modularBodyId(state), canvas, state) && usable;
   usable = drawModularAsset(ctx, 'head', modularHeadId(state), canvas, state) && usable;
+  usable = drawModularAsset(ctx, 'accessory_under', modularAccessoryUnderId(state), canvas, state) && usable;
   usable = drawModularAsset(ctx, 'hair', modularHairId(state), canvas, state) && usable;
   usable = drawModularAsset(ctx, 'accessory', modularAccessoryId(state), canvas, state) && usable;
   usable = drawModularAsset(ctx, 'bubble', modularBubbleId(state), canvas, state) && usable;
