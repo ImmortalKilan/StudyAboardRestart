@@ -2026,6 +2026,17 @@ const MODULAR_LAYER_TRANSFORMS = {
   },
 };
 
+function modularLayerTransform(folder, id, state) {
+  const base = MODULAR_LAYER_TRANSFORMS[folder]?.[id] || null;
+  const isMale = (state?.sex ?? 0) === 0;
+  const maleHeadGear =
+    isMale &&
+    ((folder === 'accessory' && (id === 'glasses' || id === 'headphones')) ||
+     (folder === 'accessory_under' && id === 'headphones'));
+  if (!maleHeadGear) return base;
+  return { ...(base || {}), x: (base?.x || 0) + 1 };
+}
+
 function normIndex(value, size) {
   const n = Number.isFinite(value) ? Math.trunc(value) : 0;
   return ((n % size) + size) % size;
@@ -2059,7 +2070,7 @@ function drawModularAsset(ctx, folder, id, canvas, state) {
   if (!id) return true;
   const entry = modularImage(assetUrl(folder, id));
   if (entry.loaded) {
-    const transform = MODULAR_LAYER_TRANSFORMS[folder]?.[id];
+    const transform = modularLayerTransform(folder, id, state);
     if (transform) {
       const scale = transform.scale || 1;
       const w = Math.round(MODULAR_W * scale);
