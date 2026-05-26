@@ -25,7 +25,11 @@ const ALIASES = {
   duel_wins: 'duel_wins', duel_losses: 'duel_losses',
   voldemort_defeated: 'voldemort_defeated',
   housing: 'housing', HOUSING: 'housing',
-  meta_aware: 'meta_aware', meta_gentle: 'meta_gentle'
+  meta_aware: 'meta_aware', meta_gentle: 'meta_gentle',
+  deja_vu: 'deja_vu', taint_score: 'taint_score', knows_clue: 'knows_clue',
+  timeloop_escaped: 'timeloop_escaped', timeloop_scarred: 'timeloop_scarred',
+  timeloop_trapped: 'timeloop_trapped', timeloop_round: 'timeloop_round',
+  timeloop_loop_count: 'timeloop_loop_count'
 };
 
 function readVar(state, key) {

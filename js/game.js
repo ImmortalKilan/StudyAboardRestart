@@ -16,7 +16,7 @@ const STAT_KEYS = ['SOC', 'INT', 'MNY', 'PER', 'HLT', 'APP'];
 const STAT_LABELS = {
   SOC: '社交', INT: '智力', MNY: '家境',
   HAP: '快乐', HLT: '健康', PER: '毅力', APP: '颜值',
-  POP: '人气', POK: '牌技', MMR: '天梯分', FIT: '体能', CKL: '厨艺', ATH: '运动', MAG: '魔力', REP: '声望', BND: '乐队影响力',
+  POP: '人气', POK: '牌技', MMR: '天梯分', FIT: '体能', CKL: '厨艺', ATH: '运动', MAG: '魔力', REP: '声望', BND: '影响力',
   cul: '修为', dao: '大道', karma: '机缘', tribulation: '渡劫', realm: '境界'
 };
 const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG', 'REP', 'BND', 'HEAT', 'cul', 'dao', 'karma', 'tribulation', 'darkOmen', 'courage', 'alliance', 'knowledge']);
@@ -133,6 +133,12 @@ const STORYLINE_CFG = {
       { cond: s => (s.meta_aware || 0) >= 8 && !s.firedEvents.has(70040), event: 70040 }
     ],
     flavor: () => metaFlavor(),
+    },
+    timeloop: {
+      gracePeriod: 999,
+      eventRate: 0,
+      deathChecks: [],
+      flavor: () => '时间凝固了。你能听到自己的心跳声在空荡的走廊里回响。',
     },
     fitness: {
     gracePeriod: 12,
@@ -1152,6 +1158,100 @@ function attemptTriton(forced) {
   render();
 }
 
+// ── Time-loop helpers ─────────────────────────────────────────────
+function _triggerFakeCredits() {
+  state.pendingCinematic = true;
+  state._cineSavedAuto = autoMode;
+  stopAuto();
+  _playFakeCredits();
+}
+
+function _playFakeCredits() {
+  state._timeloopCreditsActive = true;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'timeloop-credits-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:#000;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;cursor:pointer;';
+
+  const roll = document.createElement('div');
+  roll.style.cssText = 'color:#ccc;font-size:16px;line-height:2.2;text-align:center;white-space:pre-line;animation:timeloop-credits-scroll 18s linear forwards;';
+
+  const playerName = state.sex === 1 ? '她' : '他';
+  const lines = [
+    'STUDY ABROAD RESTART',
+    '',
+    '—— CONGRATULATIONS ——',
+    'You have DESTROYED the game.',
+    '',
+    'Director .............. CLM HCK SZQ',
+    'Lead Designer ......... SZQ',
+    'Narrative Writer ...... HCK',
+    'Engine Programmer ..... Claude',
+    'Art Director .......... CodeX',
+    'Sound Design .......... Claude',
+    'QA Lead ............... Claude',
+    '',
+    'Special Thanks',
+    '——————————',
+    playerName,
+    '',
+    '你还在看吗？',
+    '',
+    'Quality Assurance',
+    '——————————',
+    '时间管理员',
+    '第143号观测者',
+    '',
+    '© 2026 StudyAbroad Interactive',
+    'All Rights Reserved',
+    '',
+    '',
+    '',
+  ];
+  roll.textContent = lines.join('\n');
+
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes timeloop-credits-scroll {
+      0% { transform: translateY(100vh); }
+      100% { transform: translateY(-100%); }
+    }
+  `;
+  overlay.appendChild(style);
+  overlay.appendChild(roll);
+  document.body.appendChild(overlay);
+
+  const finish = () => {
+    overlay.remove();
+    state._timeloopCreditsActive = false;
+    state.pendingCinematic = false;
+    state.timeloop_fake_credits = 0;
+    // 字幕播完 → 排队死循环事件 79630
+    const deathLoopEv = state.eventsMap.get(79630);
+    if (deathLoopEv) state.pendingEvent = deathLoopEv;
+    const saved = state._cineSavedAuto || 0;
+    state._cineSavedAuto = 0;
+    if (saved > 0) startAuto(saved);
+    render();
+  };
+
+  overlay.addEventListener('click', finish);
+  setTimeout(finish, 19000);
+}
+
+function _timeloopTrappedCheck() {
+  try {
+    if (localStorage.getItem('sasr_timeloop_trapped')) {
+      unlockAchievement('end_timeloop_escape');
+      localStorage.removeItem('sasr_timeloop_trapped');
+    }
+  } catch(e) {}
+}
+
+function _markTimeloopTrapped() {
+  try { localStorage.setItem('sasr_timeloop_trapped', '1'); } catch(e) {}
+}
+
 const STORYLINE_NAMES = {
   spy: '国际特工',
   abyss: '深渊科技',
@@ -1176,8 +1276,9 @@ const STORYLINE_NAMES = {
   hogwarts: '霍格沃茨',
   academic: '学术深渊',
   band: '地下乐队',
+  timeloop: '时间回环',
 };
-const HIDDEN_STORYLINES = new Set(['spy', 'abyss', 'meta', 'xianxia', 'thief', 'hogwarts']);
+const HIDDEN_STORYLINES = new Set(['spy', 'abyss', 'meta', 'xianxia', 'thief', 'hogwarts', 'timeloop']);
 const SPECIAL_STORYLINES = new Set(['idol', 'superstar', 'streamer', 'poker', 'triton', 'local_shark', 'party', 'ceo', 'wasted', 'esports', 'worlds', 'minor_league', 'fitness', 'chef', 'athlete', 'academic', 'band']);
 const STORYLINE_UNLOCK_STAT = {
   idol: 'POP', superstar: 'POP', streamer: 'POP',
@@ -1259,18 +1360,20 @@ let autoMode = 0;
 let sessionPlayCount = 0;
 
 async function loadData() {
-  const [talents, events, ages, randomEvents, xianxiaEvents, hogwartsEvents, mpEvents] = await Promise.all([
+  const [talents, events, ages, randomEvents, xianxiaEvents, hogwartsEvents, mpEvents, timeloopEvents] = await Promise.all([
     fetch('data/talents.json').then(r => r.json()),
     fetch('data/events.json').then(r => r.json()),
     fetch('data/ages.json').then(r => r.json()),
     fetch('data/random_events.json').then(r => r.json()),
     fetch('data/xianxia_events.json').then(r => r.json()).catch(() => []),
     fetch('data/hogwarts_events.json').then(r => r.json()).catch(() => []),
-    fetch('data/multiplayer_events.json').then(r => r.json()).catch(() => [])
+    fetch('data/multiplayer_events.json').then(r => r.json()).catch(() => []),
+    fetch('data/timeloop_events.json').then(r => r.json()).catch(() => [])
   ]);
   state.eventsMap = new Map(events.map(e => [e.id, e]));
   state.agesMap = ages;
-  state.randomEvents = randomEvents.concat(xianxiaEvents).concat(hogwartsEvents);
+  const realTimeloopEvents = timeloopEvents.filter(e => typeof e.id === 'number');
+  state.randomEvents = randomEvents.concat(xianxiaEvents).concat(hogwartsEvents).concat(realTimeloopEvents);
   // Also index random events into eventsMap for branch lookups
   for (const re of state.randomEvents) state.eventsMap.set(re.id, re);
   // Index mp events but DON'T put them in random pool (they're triggered explicitly)
@@ -1777,6 +1880,7 @@ function _checkEventAchievements(ev) {
         thief: 'sl_thief', hogwarts: 'sl_hogwarts',
         academic: 'sl_academic',
         band: 'sl_band',
+        timeloop: 'sl_timeloop',
       };
       if (SL_MAP[sl]) unlockAchievement(SL_MAP[sl]);
     }
@@ -1851,6 +1955,11 @@ function _checkEventAchievements(ev) {
   if (id === 49645) unlockAchievement('easter_medtech');
   if (id === 49646) unlockAchievement('easter_courtroom');
   if (id === 49647) unlockAchievement('easter_nomad');
+
+  // Timeloop
+  if (id === 79431) unlockAchievement('end_timeloop');
+  if (id === 79610) _triggerFakeCredits();
+  if (id === 79630) _markTimeloopTrapped();
 }
 
 function _parseRequireHint(expr) {
@@ -2092,6 +2201,10 @@ function resolveChoice(index) {
 function advanceMonth() {
   // 如果有待选择，阻塞推进
   if (state.pendingChoice || state.pendingCinematic) return;
+
+  // ── 时间回环：假 Staff Roll 播放中，拦截一切推进 ──
+  if (state._timeloopCreditsActive) return;
+
   SFX.sfxTick();
 
   // Fire pending event from previous branch before advancing
@@ -2099,6 +2212,16 @@ function advanceMonth() {
     const pe = state.pendingEvent;
     state.pendingEvent = null;
     applyEvent(pe);
+    render();
+    return;
+  }
+
+  // ── 时间回环：冻结月份，不推进 age/month ──
+  if (state.storyline === 'timeloop') {
+    const cfg = STORYLINE_CFG.timeloop;
+    const re = drawRandomEvent();
+    if (re) applyEvent(re);
+    else pushLog(cfg.flavor());
     render();
     return;
   }
@@ -3541,6 +3664,7 @@ function startAuto(mode) {
 }
 
 function initGame() {
+  _timeloopTrappedCheck();
   for (const k of STAT_KEYS) state[k] = state.alloc[k];
   state.HAP = 5;
   state.talentIds = new Set(state.talentsPicked.map(t => t.id));
@@ -7219,7 +7343,12 @@ function _resetGameState() {
     'idol_stage', 'debut_attempted', 'party_stage', 'esports_stage', 'poker_stage',
     'fitness_stage', 'chef_stage', 'athlete_stage', 'academic_stage', 'academic_attempted',
     'academic_decay', 'academic_window_start', 'route',
-    'pendingCinematic', '_cineSavedAuto']) {
+    'pendingCinematic', '_cineSavedAuto',
+    'deja_vu', 'taint_score', 'knows_clue', 'timeloop_round',
+    'timeloop_r1_choice', 'timeloop_escaped', 'timeloop_scarred',
+    'timeloop_trapped', 'timeloop_active', 'timeloop_fake_credits',
+    '_timeloopCreditsPlayed', '_timeloopCreditsActive',
+    'timeloop_loop_count']) {
     delete state[flag];
   }
   // 停止自动播放

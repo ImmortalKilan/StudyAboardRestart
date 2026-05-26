@@ -11,7 +11,7 @@ export const ACHIEVEMENTS = [
   { id: 'school_expelled',  name: '学业未竟',     icon: '📋', rarity: 'normal',    cat: '里程碑', desc: '被学校开除或遣返回国' },
   { id: 'stat_max',         name: '天赋异禀',     icon: '💪', rarity: 'rare',      cat: '里程碑', desc: '某项基础属性达到了 10 点' },
   { id: 'stat_negative',    name: '人生低谷',     icon: '📉', rarity: 'normal',    cat: '里程碑', desc: '某项基础属性跌入了负数' },
-  { id: 'all_hidden',       name: '见过世面',     icon: '👁️', rarity: 'legendary', cat: '里程碑', desc: '解锁了全部四条隐藏剧情' },
+  { id: 'all_hidden',       name: '见过世面',     icon: '👁️', rarity: 'legendary', cat: '里程碑', desc: '解锁了全部隐藏剧情' },
 
   // ── 感情 ─────────────────────────────────────────────────────────────────
   { id: 'romance_first',    name: '初坠爱河',     icon: '💕', rarity: 'normal',    cat: '感情',   desc: '触发了人生第一段恋爱' },
@@ -83,6 +83,11 @@ export const ACHIEVEMENTS = [
   { id: 'easter_medtech',    name: '赛博华佗',     icon: '🧬', rarity: 'epic',      cat: '彩蛋',   desc: '医学爱好者×CS×新加坡：AI辅助诊断获奖' },
   { id: 'easter_courtroom',  name: '模拟大律师',   icon: '⚖️', rarity: 'epic',      cat: '彩蛋',   desc: '法律爱好者×商科×香港：模拟庭审全场最佳' },
   { id: 'easter_nomad',      name: '数字游牧',     icon: '🌍', rarity: 'epic',      cat: '彩蛋',   desc: '科技爱好者×商科×欧洲：远程创业走遍三国' },
+
+  // ── 时间回环 ───────────────────────────────────────────────────────────
+  { id: 'sl_timeloop',         name: '既视感',       icon: '🔁', rarity: 'epic',      cat: '剧情',   desc: '时间开始重复了' },
+  { id: 'end_timeloop',        name: '阳光的角度',   icon: '☀️', rarity: 'legendary', cat: '终局',   desc: '从时间回环中完美逃出——影子带你回了家' },
+  { id: 'end_timeloop_escape', name: '逃离了永恒',   icon: '🚪', rarity: 'legendary', cat: '终局',   desc: '你关掉了游戏。这就是出口。' },
 ];
 
 let _unlocked = new Set();
@@ -122,7 +127,7 @@ export function unlockAchievement(id) {
 
   // Combo: unlock "见过世面" when all four hidden storylines done
   if (id !== 'all_hidden' &&
-      ['sl_spy', 'sl_xianxia', 'sl_abyss', 'sl_meta'].every(x => _unlocked.has(x))) {
+      ['sl_spy', 'sl_xianxia', 'sl_abyss', 'sl_meta', 'sl_thief', 'sl_hogwarts', 'sl_timeloop'].every(x => _unlocked.has(x))) {
     unlockAchievement('all_hidden');
   }
   return true;
