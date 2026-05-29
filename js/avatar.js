@@ -2016,7 +2016,7 @@ const BODY_ASSET_BY_OUTFIT = {
 const MODULAR_LAYER_TRANSFORMS = {
   body_full: {
     gym_top: { y: -3 },
-    teal_student_hoodie: { y: -3 },
+    teal_student_hoodie: { y: 0 },
   },
   hair: {
     male_short_fluffy_black: { x: -1, y: -1, scale: 1.13 },
