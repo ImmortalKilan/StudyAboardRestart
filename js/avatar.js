@@ -1967,7 +1967,7 @@ const MODULAR_ROOT = new URL('../assets/avatars/modular_v1_calibrated/', import.
 const MODULAR_IMAGES = new Map();
 const MODULAR_PENDING_RENDERS = new Map();
 
-const MALE_HAIR_STYLES = ['short_neat', 'short_fluffy', 'side_swept'];
+const MALE_HAIR_STYLES = ['short_fluffy', 'side_swept'];
 const MALE_HAIR_COLORS = ['black', 'chestnut', 'dark_brown', 'silver'];
 const FEMALE_HAIR_STYLES = ['bob', 'long_straight', 'side_ponytail'];
 const FEMALE_HAIR_COLORS = ['black', 'chestnut', 'blonde', 'rose_pink'];
