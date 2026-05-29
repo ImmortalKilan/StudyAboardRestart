@@ -2022,7 +2022,7 @@ const MODULAR_LAYER_TRANSFORMS = {
     male_short_fluffy_black: { x: -1, y: -1, scale: 1.13 },
     male_short_fluffy_chestnut: { x: -1, y: -1, scale: 1.13 },
     male_short_fluffy_dark_brown: { x: -1, y: -1, scale: 1.16 },
-    male_short_fluffy_silver: { x: 1, y: 1, scale: 0.94 },
+    male_short_fluffy_silver: { x: -2, y: -2, scale: 0.94 },
   },
 };
 
