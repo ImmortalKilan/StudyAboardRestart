@@ -321,25 +321,20 @@
               <div class="alloc-left">
                 <div class="alloc-avatar-wrap-lg">
                   <canvas id="alloc-avatar-canvas"></canvas>
-                </div>
-                <p class="alloc-avatar-hint">属性会实时影响外貌</p>
-                <div class="alloc-customize-row">
-                  <div class="appearance-section">
-                    <div class="appearance-label">性别</div>
-                    <div class="sex-row">
-                      <button id="sex-male" class="chip active">♂ 男</button>
-                      <button id="sex-female" class="chip">♀ 女</button>
+                  <!-- Overlay controls inside avatar frame -->
+                  <div class="avatar-overlay-controls">
+                    <div class="avatar-ov-group avatar-ov-sex">
+                      <button id="sex-male" class="avatar-ov-btn active" title="男">♂</button>
+                      <button id="sex-female" class="avatar-ov-btn" title="女">♀</button>
+                    </div>
+                    <button id="btn-random-appearance" class="avatar-ov-btn avatar-ov-dice" title="随机发型/服装">🎲</button>
+                    <div class="avatar-ov-group avatar-ov-skin">
+                      <button id="skin-0" class="avatar-ov-skin-dot skin-dot-dark" title="小麦色"></button>
+                      <button id="skin-1" class="avatar-ov-skin-dot skin-dot-mid active" title="自然色"></button>
+                      <button id="skin-2" class="avatar-ov-skin-dot skin-dot-light" title="白皙"></button>
                     </div>
                   </div>
-                  <div class="appearance-section">
-                    <div class="appearance-label">肤色</div>
-                    <div class="skin-row">
-                      <button id="skin-0" class="chip skin-chip skin-chip-dark" title="小麦色"></button>
-                      <button id="skin-1" class="chip skin-chip skin-chip-mid active" title="自然色"></button>
-                      <button id="skin-2" class="chip skin-chip skin-chip-light" title="白皙"></button>
-                    </div>
-                  </div>
-                  <button id="btn-random-appearance" class="ghost appearance-random-btn">🎲 随机发型/服装</button>
+                  <div class="avatar-ov-hint">属性会实时影响外貌</div>
                 </div>
                 <!-- Achievement bonus panel -->
                 <div class="alloc-ach-panel">
@@ -808,7 +803,7 @@
             <div class="poster-subtitle">STUDY ABROAD SIMULATOR</div>
           </div>
           <div class="poster-qr">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://cchck.itch.io/studyabroadsimulator" alt="QR Code">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://immortalkilan.github.io/StudyAboardRestart" alt="QR Code">
             <span class="poster-qr-hint">快来扫码玩！</span>
           </div>
         </div>

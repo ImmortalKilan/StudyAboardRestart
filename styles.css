@@ -923,11 +923,11 @@ button.ghost:active {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
   background: linear-gradient(160deg, #2b3648 0%, #1a2230 60%, #131923 100%);
   border: 1px solid var(--line);
   border-radius: 14px;
-  padding: 24px 20px;
+  padding: 12px 12px 10px;
   position: relative;
   overflow: hidden;
 }
@@ -943,11 +943,14 @@ button.ghost:active {
 }
 .alloc-avatar-wrap-lg {
   width: 100%;
-  max-width: 240px;
-  aspect-ratio: 2 / 3;
+  flex: 1;
+  min-height: 0;
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
 }
 .alloc-avatar-wrap-lg canvas {
   width: 100%;
@@ -957,32 +960,140 @@ button.ghost:active {
   image-rendering: crisp-edges;
   filter: drop-shadow(0 8px 24px rgba(0,0,0,0.4));
 }
-.alloc-avatar-hint {
-  font-size: 11px;
-  color: var(--ink-faint);
-  margin: 0;
+
+/* ── Overlay hint (top) ── */
+.avatar-ov-hint {
+  position: absolute;
+  top: 8px;
+  left: 0;
+  right: 0;
   text-align: center;
-  line-height: 1.4;
+  font-size: 10px;
+  color: rgba(200, 210, 230, 0.5);
+  letter-spacing: 0.06em;
+  pointer-events: none;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.6);
 }
-.alloc-customize-row {
+
+/* ── Overlay controls bar (bottom) ── */
+.avatar-overlay-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
   align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-  justify-content: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  background: linear-gradient(to top, rgba(8, 12, 20, 0.75) 0%, rgba(8, 12, 20, 0.4) 60%, transparent 100%);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 5;
 }
-.alloc-customize-row .appearance-section {
+
+/* ── Button groups ── */
+.avatar-ov-group {
+  display: flex;
   align-items: center;
   gap: 4px;
 }
-.alloc-customize-row .appearance-label {
-  font-size: 10px;
-  letter-spacing: 0.08em;
+
+/* ── Generic overlay button ── */
+.avatar-ov-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(220, 225, 240, 0.7);
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+  line-height: 1;
 }
-.alloc-customize-row .appearance-random-btn {
-  padding: 6px 12px;
-  font-size: 11px;
+
+.avatar-ov-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  transform: translateY(-1px);
 }
+
+.avatar-ov-btn:active {
+  transform: translateY(0) scale(0.92);
+  transition-duration: 0.08s;
+}
+
+.avatar-ov-btn.active {
+  background: rgba(201, 169, 120, 0.2);
+  border-color: rgba(201, 169, 120, 0.45);
+  color: #e8d5b0;
+  box-shadow: 0 0 8px rgba(201, 169, 120, 0.15);
+}
+
+/* ── Dice button (center) ── */
+.avatar-ov-dice {
+  width: 38px;
+  height: 38px;
+  font-size: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.avatar-ov-dice:hover {
+  background: rgba(245, 182, 66, 0.15);
+  border-color: rgba(245, 182, 66, 0.35);
+}
+
+.avatar-ov-dice:active {
+  animation: ov-dice-spin 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes ov-dice-spin {
+  0%   { transform: scale(0.85) rotate(0deg); }
+  50%  { transform: scale(1.1) rotate(180deg); }
+  100% { transform: scale(1) rotate(360deg); }
+}
+
+/* ── Skin tone dots ── */
+.avatar-ov-skin-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.avatar-ov-skin-dot:hover {
+  transform: scale(1.15);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.avatar-ov-skin-dot:active {
+  transform: scale(0.9);
+  transition-duration: 0.08s;
+}
+
+.avatar-ov-skin-dot.active {
+  border-color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.skin-dot-dark  { background: #693a1f; }
+.skin-dot-mid   { background: #c48a5a; }
+.skin-dot-light { background: #f4caa4; }
+
+/* Legacy customize row — hidden now, controls are in overlay */
+.alloc-customize-row { display: none; }
+.alloc-avatar-hint { display: none; }
 .alloc-right {
   flex: 1;
   display: flex;
@@ -4622,43 +4733,63 @@ body.in-summary {
     font-size: 10px;
     padding: 2px 6px;
   }
-  /* Avatar: horizontal compact row */
+  /* Avatar: horizontal strip on mobile — avatar left, controls right */
   #step-alloc .alloc-left {
     flex-direction: row;
-    padding: 10px 12px;
+    padding: 6px;
     border-radius: 10px;
-    gap: 12px;
-    align-items: center;
-    justify-content: center;
+    gap: 0;
+    align-items: stretch;
+    min-height: 100px;
   }
   #step-alloc .alloc-avatar-wrap-lg {
-    max-width: 72px;
-    flex-shrink: 0;
+    flex: 0 0 90px;
+    width: 90px;
+    min-height: 0;
+    border-radius: 8px;
+    overflow: hidden;
   }
-  #step-alloc .alloc-avatar-hint {
-    display: none;
-  }
-  #step-alloc .alloc-customize-row {
+  /* On mobile, move controls out of absolute overlay into a side column */
+  #step-alloc .avatar-overlay-controls {
+    position: static;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-  }
-  #step-alloc .alloc-customize-row .appearance-section {
-    flex-direction: row;
+    justify-content: center;
     align-items: center;
     gap: 6px;
+    padding: 6px 10px;
+    background: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    flex: 1;
   }
-  #step-alloc .alloc-customize-row .chip {
-    padding: 3px 10px;
-    font-size: 11px;
+  #step-alloc .avatar-ov-hint {
+    position: static;
+    font-size: 9px;
+    order: -1;
+    padding: 0;
+    color: rgba(200, 210, 230, 0.35);
   }
-  #step-alloc .alloc-customize-row .skin-chip {
-    width: 24px;
-    height: 24px;
+  #step-alloc .avatar-ov-group {
+    gap: 5px;
   }
-  #step-alloc .alloc-customize-row .appearance-random-btn {
-    font-size: 11px;
-    padding: 4px 8px;
+  #step-alloc .avatar-ov-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+    border-radius: 8px;
+  }
+  #step-alloc .avatar-ov-dice {
+    width: 34px;
+    height: 34px;
+    font-size: 16px;
+  }
+  #step-alloc .avatar-ov-skin-dot {
+    width: 20px;
+    height: 20px;
+  }
+  /* Hide achievement panel detail on mobile to save space */
+  #step-alloc .alloc-ach-panel {
+    padding: 6px 10px;
   }
   /* Stats: 2-col compact */
   #step-alloc .alloc-list {
