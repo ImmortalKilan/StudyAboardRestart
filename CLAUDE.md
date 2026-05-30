@@ -142,6 +142,30 @@ The full alias table lives at the top of `js/dsl.js`. New hidden keys must be ad
 
 Any event with `"end": true` terminates the game (`state.phase = 'ended'`). The summary score and rank tier come from `LEGENDARY_ENDINGS` / `GOOD_ENDINGS` sets at the top of `game.js` plus stat-derived heuristics. Rare endings should be added to those sets so they get the right "S/A级" stamp on the summary screen.
 
+## PWA / 离线支持
+
+站点通过 Service Worker (`sw.js`) + Web App Manifest (`manifest.json`) 提供 PWA 离线能力。用户可在手机浏览器中"添加到主屏幕"获得类原生体验。
+
+### 发布更新流程
+
+每次 push 包含内容变更（JS / JSON / CSS / 图片）时，**必须同时修改 `sw.js` 第 3 行的版本号**：
+
+```js
+const CACHE_VER = 'sasr-v1';  // → 'sasr-v2', 'sasr-v3', ...
+```
+
+否则已安装的用户会一直使用旧缓存。版本号变更后，用户下次打开 App 时后台自动拉取新资源，关闭再重新打开即为新版本。
+
+### 新增资源时
+
+如果新增了图片、音效、JS 或 JSON 文件，需要同时将路径添加到 `sw.js` 的 `CORE_ASSETS` 数组中，否则该文件不会被离线缓存。
+
+### 注意事项
+
+- 跨域资源（CDN 上的 `html2canvas`、二维码 API）不受 SW 管理，断网时不可用
+- iOS 上只有 Safari 支持 PWA 安装，Chrome/Firefox 不支持
+- 移动端首次访问时会弹出安装引导（`#pwa-install-guide`），用户点"我知道了"后通过 `localStorage` 永久隐藏
+
 ## File map
 
 - `js/game.js` — engine, monthly tick, all storyline logic, render loop, summary screen
@@ -154,4 +178,8 @@ Any event with `"end": true` terminates the game (`state.phase = 'ended'`). The 
 - `data/random_events.json` — bulk of content; weighted monthly random pool
 - `data/xianxia_events.json` — cultivation storyline events; merged into the random pool at load time
 - `data/ages.json` — age → list of main-line event ids
+- `js/memory.js` — memory card system (前世记忆), carousel UI, localStorage persistence
+- `sw.js` — Service Worker, pre-caches all game assets for offline play
+- `manifest.json` — PWA manifest (app name, icons, theme)
+- `assets/icons/` — PWA icons (192×192, 512×512)
 - `assets/avatars/` — currently only used for LPC sprite reference; the live avatar is procedurally drawn, not blitted

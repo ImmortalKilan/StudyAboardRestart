@@ -2108,6 +2108,9 @@ function applyEvent(ev) {
       if (ev.set.storyline === 'band') initBandStage();
       if (ev.set.storyline === 'influencer') initInfluencerStage();
     }
+    // Reveal the career stat for this storyline in both desktop and mobile panels
+    const _unlockStat = STORYLINE_UNLOCK_STAT[ev.set.storyline];
+    if (_unlockStat) state['show' + _unlockStat] = true;
     if (ev.set.profession && GRAD_SCHOOL_PHASES.has(ev.set.profession)) {
       scheduleGraduateCompletion();
     }
@@ -2230,6 +2233,7 @@ function applyEvent(ev) {
         const saved = state._cineSavedAuto || 0;
         state._cineSavedAuto = 0;
         if (saved > 0) startAuto(saved);
+        render();
       }
     });
   }
@@ -5729,7 +5733,7 @@ function updateMobileStatsGrid(grid) {
   // 基础 7 项：社/智/家/乐 + 健/毅/颜（HAP 放在第4格）
   // 触发剧情后追加 career stat 凑成 2x4（用 show* 标志判断）
   const baseKeys = ['SOC', 'INT', 'MNY', 'HAP', 'HLT', 'PER', 'APP'];
-  const careerKeys = ['POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG'];
+  const careerKeys = ['POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG', 'REP', 'BND', 'FAN'];
 
   let cellsHtml = '';
   for (const k of baseKeys) {
