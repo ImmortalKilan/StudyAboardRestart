@@ -46,7 +46,57 @@
         </div>
         <button id="btn-tutorial" class="start-btn start-btn-tutorial">📖 新手教程</button>
       </div>
+
+      <!-- Memory Card Panel (left sidebar) -->
+      <div id="memory-panel" class="memory-panel">
+        <div class="memory-panel-inner">
+          <div class="memory-panel-mirror">
+            <img src="assets/ui/memory-mirror.png" alt="前世记忆" class="memory-mirror-img" />
+            <div class="memory-mirror-glow"></div>
+          </div>
+          <div class="memory-panel-content">
+            <div class="memory-panel-title">前世记忆</div>
+            <div class="memory-panel-subtitle">解锁前世的记忆碎片</div>
+            <div class="memory-panel-card-row">
+              <span class="memory-card-label">记忆卡</span>
+              <span class="memory-card-count">0</span>
+            </div>
+            <div class="memory-progress">再重开 3 次可获得记忆卡</div>
+            <div class="memory-stats">0次重开 · 0/18条线索</div>
+            <div class="memory-panel-cta">
+              <span class="memory-cta-text">查看全部线索</span>
+              <span class="memory-cta-arrow">→</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
+
+    <!-- Memory Card Carousel Modal -->
+    <div id="memory-modal" class="memory-modal">
+      <div class="mm-backdrop"></div>
+      <div class="mm-container">
+        <header class="mm-header">
+          <div class="mm-header-left">
+            <span class="mm-header-icon">🃏</span>
+            <span class="mm-header-title">前世记忆</span>
+          </div>
+          <div class="mm-header-right">
+            <span class="mm-available-label">可用卡牌</span>
+            <span class="mm-available-count">0</span>
+          </div>
+          <button class="mm-close" aria-label="关闭">&times;</button>
+        </header>
+        <div class="mm-viewport">
+          <button class="mm-nav mm-nav-prev" aria-label="上一个">‹</button>
+          <div class="mm-track-wrapper">
+            <div id="mm-track" class="mm-track"></div>
+          </div>
+          <button class="mm-nav mm-nav-next" aria-label="下一个">›</button>
+        </div>
+        <div id="mm-indicator" class="mm-indicator"></div>
+      </div>
+    </div>
 
     <!-- ── Step-by-step Guide Overlay (A层) ─────────────────────────── -->
     <div id="guide-overlay" class="guide-overlay" style="display:none;">

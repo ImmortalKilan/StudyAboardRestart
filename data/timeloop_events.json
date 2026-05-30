@@ -5,7 +5,7 @@
   {
     "id": 79003,
     "event": "洗衣机吃了你一只袜子。你翻遍了滚筒也没找到。",
-    "weight": 2,
+    "weight": 1,
     "repeatable": true,
     "include": "(AGE>=16)&(AGE<=19)",
     "logType": "hidden",

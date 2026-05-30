@@ -145,11 +145,16 @@ export function getUnlockedCount() { return _unlocked.size; }
 // ── Achievement Bonus System ─────────────────────────────────────────────
 // Cumulative milestones: unlock N achievements → extra distributable points
 const ACH_MILESTONES = [
-  { threshold: 5,  pts: 1 },
-  { threshold: 15, pts: 1 },   // total +2
-  { threshold: 30, pts: 1 },   // total +3
-  { threshold: 50, pts: 2 },   // total +5
-  { threshold: 67, pts: 2 },   // total +7
+  { threshold: 3,  pts: 1 },   // Lv.1  — total +1
+  { threshold: 7,  pts: 1 },   // Lv.2  — total +2
+  { threshold: 12, pts: 1 },   // Lv.3  — total +3
+  { threshold: 18, pts: 1 },   // Lv.4  — total +4
+  { threshold: 25, pts: 1 },   // Lv.5  — total +5
+  { threshold: 33, pts: 1 },   // Lv.6  — total +6
+  { threshold: 42, pts: 1 },   // Lv.7  — total +7
+  { threshold: 52, pts: 2 },   // Lv.8  — total +9
+  { threshold: 62, pts: 2 },   // Lv.9  — total +11
+  { threshold: 67, pts: 2 },   // Lv.10 — total +13
 ];
 
 // Specific achievements → fixed stat boosts (applied automatically, not distributable)

@@ -3,6 +3,7 @@ import { renderAvatar, createStandaloneAvatar } from './avatar.js';
 import { playStorylineIntro, playStorylineExit } from './cinematic.js';
 import { initAchievements, unlockAchievement, setOnUnlock, getAchievementBonuses } from './achievements.js';
 import { initFlowchart, openFlowchart, unlockFlowchartNode, setFlowchartSfx, resetSessionUnlocks, getSessionUnlocks } from './flowchart.js';
+import { initMemoryUI, renderMemoryPanel, recordPlaythrough, showNewCardToast } from './memory.js';
 import * as SFX from './audio.js';
 // Multiplayer — loaded dynamically so single-player works even if it fails
 let mp = { enabled: false, connected: false, cards: [], opponent: {} };
@@ -2200,6 +2201,12 @@ function applyEvent(ev) {
     if (mp._reunionTimeout) { clearTimeout(mp._reunionTimeout); mp._reunionTimeout = null; }
     mp.isWaiting = false;
     _hideWaitingOverlay();
+    // Record playthrough for memory card system
+    const memResult = recordPlaythrough();
+    if (memResult.newCard) {
+      setTimeout(() => showNewCardToast(), 1500);
+    }
+    renderMemoryPanel();
   }
 
   // Cinematic intro when entering a special/hidden storyline
@@ -2764,6 +2771,7 @@ function advanceMonth() {
       unlockAchievement('end_health');
       if (mp._reunionTimeout) { clearTimeout(mp._reunionTimeout); mp._reunionTimeout = null; }
       mp.isWaiting = false;
+      const memR1 = recordPlaythrough(); if (memR1.newCard) setTimeout(() => showNewCardToast(), 1500); renderMemoryPanel();
     }
     if (state.age >= 60) {
       pushLog('你退休了。回首这一生，百感交集。', 'ending');
@@ -2771,6 +2779,7 @@ function advanceMonth() {
       unlockAchievement('end_retire');
       if (mp._reunionTimeout) { clearTimeout(mp._reunionTimeout); mp._reunionTimeout = null; }
       mp.isWaiting = false;
+      const memR2 = recordPlaythrough(); if (memR2.newCard) setTimeout(() => showNewCardToast(), 1500); renderMemoryPanel();
     }
   }
 
@@ -6706,6 +6715,7 @@ async function main() {
 
   renderTalentSelect(talents);
   updateCreationAvatar();
+  initMemoryUI();
   showScreen('start-screen');
 
   // ── Tutorial system ──────────────────────────────────────────────
