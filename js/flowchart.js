@@ -56,6 +56,8 @@ export async function loadFlowchartData() {
   if (_chartData) return _chartData;
   const resp = await fetch('data/flowchart.json');
   _chartData = await resp.json();
+  // Auto-compute node x/y from region col/yCenter/gap/grid
+  _computeLayout(_chartData);
   _nodeMap = {};
   _regionMap = {};
   for (const r of _chartData.regions) {
@@ -89,6 +91,51 @@ const CX = 1400, CY = 1300;
 const NODE_W = 120, NODE_H = 36;
 const PAD = 80;
 
+// ── Auto-layout engine ─────────────────────────────────────────────────────
+// Column X positions (indexed 0-8). Regions declare a `col` index;
+// add entries here when you need a new column.
+const COL_X = [150, 380, 480, 680, 1050, 1200, 1480, 1860, 2200];
+const DEFAULT_GAP = 100;
+const ZIGZAG = 20;
+
+function _computeLayout(data) {
+  for (const r of data.regions) {
+    const baseX = r.baseX ?? COL_X[r.col] ?? 0;
+    const yCenter = r.yCenter ?? CY;
+    const nodes = r.nodes;
+    const N = nodes.length;
+    if (N === 0) continue;
+
+    if (r.grid) {
+      // Grid layout (e.g. endings_peak): cols × rows
+      const { cols, colGap = 120, rowGap = 180 } = r.grid;
+      const rows = Math.ceil(N / cols);
+      const gridW = (Math.min(N, cols) - 1) * colGap;
+      const gridH = (rows - 1) * rowGap;
+      for (let i = 0; i < N; i++) {
+        const c = i % cols;
+        const row = Math.floor(i / cols);
+        nodes[i].x = Math.round(baseX + c * colGap);
+        nodes[i].y = Math.round(yCenter - gridH / 2 + row * rowGap);
+      }
+    } else {
+      // Vertical list with zigzag
+      const gap = r.gap ?? DEFAULT_GAP;
+      const totalH = (N - 1) * gap;
+      const yStart = yCenter - totalH / 2;
+      for (let i = 0; i < N; i++) {
+        const zig = (i % 2 === 1) ? ZIGZAG : 0;
+        nodes[i].x = Math.round(baseX + zig);
+        nodes[i].y = Math.round(yStart + i * gap);
+      }
+    }
+
+    // Set region x/y for compat (particle bounds, etc.)
+    r.x = nodes[0].x;
+    r.y = nodes[0].y;
+  }
+}
+
 const _isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
   || (navigator.maxTouchPoints > 1 && window.innerWidth < 1024);
 
@@ -108,6 +155,7 @@ const REGION_PARTICLES = {
   romance:         { color: '#ff4488', color2: '#ff88bb', count: 10, speed: 0.3,  size: [2, 4] },
   milestones:      { color: '#d4a056', color2: '#ffcc77', count: 6,  speed: 0.25, size: [2, 3] },
   easter:          { color: '#33ddbb', color2: '#77ffdd', count: 10, speed: 0.5,  size: [2, 4] },
+  endings_meta:    { color: '#ffd700', color2: '#ffffff', count: 8,  speed: 0.6,  size: [2, 5] },
 };
 
 // ── Nebula tint per region (for fog inner glow) ─────────────────────────────
@@ -126,6 +174,7 @@ const NEBULA_TINT = {
   romance:       '#cc3366',
   milestones:    '#aa7733',
   easter:        '#22aa88',
+  endings_meta:  '#ccaa00',
 };
 
 // ── Fuzzy hint text for locked nodes ────────────────────────────────────────
@@ -159,7 +208,9 @@ const NODE_HINTS = {
   n_sl_meta:    '时间为什么是一个月一个月跳的？',
   n_sl_thief:   '月光下有人无声地行走',
   n_sl_hogwarts:'猫头鹰带来了一封信',
+  n_sl_timeloop:'这一幕……好像在哪里见过',
   n_sl_superstar:'光芒之上还有更高的天空',
+  n_sl_mcn:      '签了合同，你就不再是一个人在战斗',
   n_sl_streamer: '镜头前的人生也是人生',
   n_sl_poker:   '暗流涌动的牌桌',
   n_sl_worlds:  '站在世界的聚光灯下',
@@ -177,6 +228,11 @@ const NODE_HINTS = {
   n_end_meta:     '谢谢你陪我走到这里',
   n_end_thief:    '最好的猎手从不留下痕迹',
   n_end_hogwarts: '最终决战，光明终将到来',
+  n_end_timeloop: '影子带你穿过了阳光',
+  n_end_timeloop_escape: '你关掉了一切，这就是出口',
+  n_sl_influencer: '从第一条视频开始的逆袭',
+  n_end_influencer_top: '全网都在喊你的名字',
+  n_end_influencer_comeback: '所有人以为你完了——你没有',
   n_end_health:   '灯火渐渐黯淡',
   n_end_retire:   '平淡也是一种圆满',
   n_all_hidden:   '当所有暗门都被推开之后',

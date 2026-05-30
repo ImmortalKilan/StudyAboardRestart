@@ -2,17 +2,17 @@
   {
     "_comment": "========== 既视感种子事件（大一~大二上，repeatable，为触发条件埋伏笔）=========="
   },
-
   {
     "id": 79003,
     "event": "洗衣机吃了你一只袜子。你翻遍了滚筒也没找到。",
-    "weight": 12,
+    "weight": 2,
     "repeatable": true,
     "include": "(AGE>=16)&(AGE<=19)",
     "logType": "hidden",
-    "set": { "deja_vu": 1 }
+    "set": {
+      "deja_vu": 1
+    }
   },
-
   {
     "_comment": "========== 起点：既视感触发（大二6月，进入时间回环）=========="
   },
@@ -29,11 +29,14 @@
       "knows_clue": 0,
       "timeloop_r1_choice": ""
     },
-    "effect": { "HAP": -2 },
+    "effect": {
+      "HAP": -2
+    },
     "logType": "hidden",
-    "branch": ["?79100"]
+    "branch": [
+      "?79100"
+    ]
   },
-
   {
     "_comment": "========== 第一轮：日常的伪装 =========="
   },
@@ -45,45 +48,67 @@
     "choices": [
       {
         "text": "沿着昨天的脚印走，老老实实去上课",
-        "set": { "timeloop_r1_choice": "A" },
+        "set": {
+          "timeloop_r1_choice": "A"
+        },
         "next": 79101
       },
       {
         "text": "在校门口的咖啡馆坐到关门",
-        "set": { "timeloop_r1_choice": "B" },
+        "set": {
+          "timeloop_r1_choice": "B"
+        },
         "next": 79102
       },
       {
         "text": "数清从宿舍到教室有多少步",
-        "set": { "timeloop_r1_choice": "C" },
+        "set": {
+          "timeloop_r1_choice": "C"
+        },
         "next": 79103
       }
-    ]
+    ],
+    "repeatable": true
   },
   {
     "id": 79101,
     "event": "你走在去教室的路上。一辆红色轿车在你身边猛按喇叭，你差点跳起来。司机戴着墨镜，冲你摆了摆手，像是在打招呼。你不认识他。但你注意到了他后视镜上挂着的东西——一只丢失的袜子。你加快了脚步。",
     "noRandom": true,
     "storyline": "timeloop",
-    "effect": { "PER": 1 },
-    "branch": ["?79110"]
+    "effect": {
+      "PER": 1
+    },
+    "branch": [
+      "?79110"
+    ],
+    "repeatable": true
   },
   {
     "id": 79102,
     "event": "咖啡馆很安静。你在窗边坐下，无聊地用指甲刮桌面。指甲划过一道旧痕——不，是一组划痕。你凑近了看：五道竖线，一道斜杠划掉。又五道，又划掉。一共七组。正好是……你数了数……三十五天。你环顾四周，没有别人。但你确信这些痕迹是新鲜的。",
     "noRandom": true,
     "storyline": "timeloop",
-    "effect": { "INT": 1 },
-    "branch": ["?79110"]
+    "effect": {
+      "INT": 1
+    },
+    "branch": [
+      "?79110"
+    ],
+    "repeatable": true
   },
   {
     "id": 79103,
     "event": "一步，两步，三步……你认真地数着。经过花坛的时候你多绕了一步。到教室门口，你看了看手机备忘录上的数字：143。你抬头看教室门牌号——143。你推开门，里面空无一人。黑板上写着一行字，笔迹是你的：「你已经数过了。」",
     "noRandom": true,
     "storyline": "timeloop",
-    "effect": { "INT": 1 },
+    "effect": {
+      "INT": 1
+    },
     "happyDelta": -1,
-    "branch": ["?79110"]
+    "branch": [
+      "?79110"
+    ],
+    "repeatable": true
   },
   {
     "id": 79110,
@@ -91,9 +116,11 @@
     "noRandom": true,
     "storyline": "timeloop",
     "happyDelta": -1,
-    "branch": ["?79200"]
+    "branch": [
+      "?79200"
+    ],
+    "repeatable": true
   },
-
   {
     "_comment": "========== 第二轮：分歧的种子 =========="
   },
@@ -102,54 +129,102 @@
     "event": "闹钟再次炸响。你看日期——还是六月那一天。你揉了揉眼睛又看了一遍。没变。你试图回忆昨天做了什么，记忆像玻璃一样清晰。这不是梦。时间没有往前走。",
     "noRandom": true,
     "storyline": "timeloop",
-    "set": { "timeloop_round": 2 },
+    "set": {
+      "timeloop_round": 2
+    },
     "happyDelta": -2,
     "choices": [
       {
         "text": "去做和昨天不一样的日常",
-        "set": { "taint_score": "+1" },
+        "set": {
+          "taint_score": "+1"
+        },
         "next": 79210
       },
       {
         "text": "你脑海中闪过一支股票的走势图——你「知道」它明天会涨",
-        "set": { "taint_score": "+1" },
+        "set": {
+          "taint_score": "+1"
+        },
         "next": 79220
       },
       {
         "text": "拨打手机里那个没有号码的未接来电",
-        "set": { "knows_clue": 1 },
-        "next": 79230
+        "next": 79235
       }
-    ]
+    ],
+    "repeatable": true
   },
   {
     "id": 79210,
     "event": "你选了一个昨天没走过的方向。街景在眼前展开，一切都是新鲜的——或者说，一切都在假装是新鲜的。你路过一面橱窗，倒影里的你嘴角挂着一种你此刻并没有在做的微笑。你加快脚步，不敢回头看。",
     "noRandom": true,
     "storyline": "timeloop",
-    "effect": { "PER": -1 },
+    "effect": {
+      "PER": -1
+    },
     "happyDelta": -1,
-    "branch": ["?79300"]
+    "branch": [
+      "?79300"
+    ],
+    "repeatable": true
   },
   {
     "id": 79220,
     "event": "你打开手机券商App，手指飞快地敲入代码和金额。你不知道这个预感从哪来的，但你无比确信。收盘时，你的账户余额翻了一倍。你盯着那串数字，心跳很快——不是因为兴奋。是因为这笔钱来得太容易了。好像有人把答案塞进了你的脑子里。",
     "noRandom": true,
     "storyline": "timeloop",
-    "effect": { "MNY": 8 },
+    "effect": {
+      "MNY": 8
+    },
     "happyDelta": 5,
-    "branch": ["?79300"]
+    "branch": [
+      "?79300"
+    ],
+    "repeatable": true
   },
   {
     "id": 79230,
     "event": "你按下拨打键。听筒里先是一阵刺耳的白噪音，然后是你自己的声音——冰冷的、没有感情的、像是从很深很深的井底传来的：「别相信正面的光。影子才会带你回家。」然后断线了。你呆呆地看着手机屏幕。通话记录显示这通电话持续了零秒。",
     "noRandom": true,
     "storyline": "timeloop",
-    "effect": { "INT": 1 },
+    "effect": {
+      "INT": 1
+    },
     "happyDelta": -3,
-    "branch": ["?79300"]
+    "branch": [
+      "?79300"
+    ],
+    "repeatable": true,
+    "set": {
+      "knows_clue": 1
+    }
   },
-
+  {
+    "_comment": "电话路由：检查是否被困"
+  },
+  {
+    "id": 79235,
+    "event": "",
+    "noRandom": true,
+    "repeatable": true,
+    "storyline": "timeloop",
+    "branch": [
+      "(timeloop_trapped==1)?79236",
+      "?79230"
+    ]
+  },
+  {
+    "id": 79236,
+    "event": "你拿起手机，拨出那个没有号码的未接来电。听筒接通了。一秒的沉默。然后——是你自己的笑声。疯狂的、尖锐的、像是笑了一万年都停不下来的笑。笑声越来越大，大到手机震动，大到你的耳膜嗡嗡作响。你挂断电话。手在发抖。通话记录显示：通话时长——永恒。",
+    "noRandom": true,
+    "repeatable": true,
+    "storyline": "timeloop",
+    "happyDelta": -6,
+    "branch": [
+      "?79300"
+    ]
+  },
   {
     "_comment": "========== 第三轮：重影与欲望具象化 =========="
   },
@@ -158,12 +233,16 @@
     "event": "又一次。闹钟。同一天。你已经不惊讶了。但这一次有什么不一样——你翻开钱包，里面的纸币全变成了白纸。只有边缘还残留着一丝油墨的痕迹，像是什么东西正在被一层一层地擦掉。走廊尽头，你从没注意过的一扇铁门今天虚掩着。",
     "noRandom": true,
     "storyline": "timeloop",
-    "set": { "timeloop_round": 3 },
+    "set": {
+      "timeloop_round": 3
+    },
     "happyDelta": -2,
     "choices": [
       {
         "text": "走向那个突然在走廊拦住你、红着脸表白的完美异性",
-        "set": { "taint_score": "+1" },
+        "set": {
+          "taint_score": "+1"
+        },
         "next": 79310
       },
       {
@@ -172,38 +251,56 @@
       },
       {
         "text": "不管了，回宿舍锁门刷手机等这一天过去",
-        "set": { "taint_score": "+1" },
+        "set": {
+          "taint_score": "+1"
+        },
         "next": 79330
       }
-    ]
+    ],
+    "repeatable": true
   },
   {
     "id": 79310,
     "event": "TA从人群里走出来，脸红到耳根。TA说了你最想听的话。TA的手温暖、柔软、真实得令人窒息。你们牵着手走过黄昏的校道，路灯依次亮起来，每一盏都像是为你们准备的。你从未如此幸福过。你们回到宿舍，聊到凌晨三点，困意袭来。你在TA的呼吸声中沉入梦乡。第二天早上闹钟响起时，你伸手去摸身边——床是冷的。TA的号码不存在。全校查无此人。你翻遍手机相册，没有任何一张合照。只有你枕头上残留的一点点体温，正在迅速冷却。",
     "noRandom": true,
     "storyline": "timeloop",
-    "effect": { "APP": 5, "HAP": 8 },
-    "branch": ["?79400"]
+    "effect": {
+      "APP": 5,
+      "HAP": 8
+    },
+    "branch": [
+      "?79400"
+    ],
+    "repeatable": true
   },
   {
     "id": 79320,
     "event": "铁门后面是一面落地镜。镜子里的你正在梳头——但你此刻没有在梳头。你僵在原地。镜中的你慢慢转过身，和你四目相对。TA张了张嘴，但没有声音。你注意到镜框边缘刻着一行数字：143。然后镜中的你微微摇了摇头——不是否定，更像是……怜悯。",
     "noRandom": true,
     "storyline": "timeloop",
-    "effect": { "INT": 1 },
+    "effect": {
+      "INT": 1
+    },
     "happyDelta": -3,
-    "branch": ["?79400"]
+    "branch": [
+      "?79400"
+    ],
+    "repeatable": true
   },
   {
     "id": 79330,
     "event": "你锁上门，爬上床，打开手机。你刷了六个小时短视频。每一条都是你看过的。你假装没注意到。",
     "noRandom": true,
     "storyline": "timeloop",
-    "effect": { "PER": -2 },
+    "effect": {
+      "PER": -2
+    },
     "happyDelta": -1,
-    "branch": ["?79400"]
+    "branch": [
+      "?79400"
+    ],
+    "repeatable": true
   },
-
   {
     "_comment": "========== 第四轮：终极审判 · 生死大分流 =========="
   },
@@ -212,12 +309,16 @@
     "event": "闹钟。你甚至没去看日期。你知道的。世界开始变得僵硬了——空气有一种不自然的粘稠感，阳光像被用尺子量过一样均匀地铺在地板上。走廊里没有人，但大礼堂的方向传来轰鸣般的掌声。你的衣柜门不知道什么时候开了一条缝——里面黑得不正常。",
     "noRandom": true,
     "storyline": "timeloop",
-    "set": { "timeloop_round": 4 },
+    "set": {
+      "timeloop_round": 4
+    },
     "happyDelta": -3,
     "choices": [
       {
         "text": "跑向大礼堂——那场掌声是为你准备的",
-        "set": { "taint_score": "+1" },
+        "set": {
+          "taint_score": "+1"
+        },
         "next": 79410
       },
       {
@@ -228,19 +329,24 @@
         "text": "熄灭所有的灯。逆着阳光，走进衣柜深处的阴影",
         "next": 79430
       }
-    ]
+    ],
+    "repeatable": true
   },
   {
     "id": 79410,
     "event": "你冲进大礼堂。灯光打在你身上，全场起立鼓掌。校长亲手把一座水晶奖杯递给你，刻着你的名字和一行字：「最杰出本科生·终身成就」。你握着奖杯，泪流满面。掌声经久不息。你觉得这一切值了。……奖杯在你手心越来越轻。你低头看——它变成了白纸折的。台下的观众全部是同一张脸。掌声还在继续，但你已经知道了：你又贪了。",
     "noRandom": true,
     "storyline": "timeloop",
-    "effect": { "INT": 5, "PER": 3 },
+    "effect": {
+      "INT": 5,
+      "PER": 3
+    },
     "happyDelta": -5,
     "branch": [
       "(taint_score>=3)?79600",
       "?79500"
-    ]
+    ],
+    "repeatable": true
   },
   {
     "id": 79420,
@@ -248,7 +354,10 @@
     "noRandom": true,
     "storyline": "timeloop",
     "happyDelta": -4,
-    "branch": ["?79500"]
+    "branch": [
+      "?79500"
+    ],
+    "repeatable": true
   },
   {
     "id": 79430,
@@ -259,7 +368,8 @@
       "(taint_score==0)&(knows_clue==1)?79431",
       "(taint_score>=2)?79433",
       "?79432"
-    ]
+    ],
+    "repeatable": true
   },
   {
     "_comment": "真结局入口：taint=0, knows_clue=true"
@@ -275,7 +385,10 @@
       "timeloop_active": 0,
       "timeloop_round": 0
     },
-    "effect": { "INT": 3, "PER": 3 },
+    "effect": {
+      "INT": 3,
+      "PER": 3
+    },
     "happyDelta": 5
   },
   {
@@ -287,7 +400,10 @@
     "noRandom": true,
     "storyline": "timeloop",
     "happyDelta": -5,
-    "branch": ["?79500"]
+    "branch": [
+      "?79500"
+    ],
+    "repeatable": true
   },
   {
     "_comment": "taint>=2：暴走子线，衣柜坍塌直接跳第六轮"
@@ -298,9 +414,11 @@
     "noRandom": true,
     "storyline": "timeloop",
     "happyDelta": -8,
-    "branch": ["?79600"]
+    "branch": [
+      "?79600"
+    ],
+    "repeatable": true
   },
-
   {
     "_comment": "========== 第五轮：最后的狂乱 =========="
   },
@@ -309,7 +427,9 @@
     "event": "天空变成了惨紫色。你不记得是什么时候变的。路上的行人都戴着面具——不是万圣节面具，是那种僵硬的、只有嘴巴在动的面具。他们在笑。空洞的、机械的笑。一个戴面具的人向你走来，递给你一面镜子。你低头看——你也戴着面具。",
     "noRandom": true,
     "storyline": "timeloop",
-    "set": { "timeloop_round": 5 },
+    "set": {
+      "timeloop_round": 5
+    },
     "happyDelta": -5,
     "choices": [
       {
@@ -324,7 +444,8 @@
         "text": "什么都不做。坐在原地，闭眼，数自己的心跳",
         "next": 79530
       }
-    ]
+    ],
+    "repeatable": true
   },
   {
     "id": 79510,
@@ -332,7 +453,10 @@
     "noRandom": true,
     "storyline": "timeloop",
     "happyDelta": -8,
-    "branch": ["?79600"]
+    "branch": [
+      "?79600"
+    ],
+    "repeatable": true
   },
   {
     "id": 79520,
@@ -340,7 +464,10 @@
     "noRandom": true,
     "storyline": "timeloop",
     "happyDelta": -8,
-    "branch": ["?79600"]
+    "branch": [
+      "?79600"
+    ],
+    "repeatable": true
   },
   {
     "id": 79530,
@@ -350,7 +477,8 @@
     "branch": [
       "(taint_score==1)&(knows_clue==1)?79531",
       "?79532"
-    ]
+    ],
+    "repeatable": true
   },
   {
     "_comment": "减刑结局：taint=1 + knows_clue=true → 带伤逃出"
@@ -366,7 +494,10 @@
       "timeloop_active": 0,
       "timeloop_round": 0
     },
-    "effect": { "INT": 1, "PER": 1 },
+    "effect": {
+      "INT": 1,
+      "PER": 1
+    },
     "happyDelta": -2
   },
   {
@@ -378,9 +509,11 @@
     "noRandom": true,
     "storyline": "timeloop",
     "happyDelta": -8,
-    "branch": ["?79600"]
+    "branch": [
+      "?79600"
+    ],
+    "repeatable": true
   },
-
   {
     "_comment": "========== 第六轮：虚无的终点 =========="
   },
@@ -389,7 +522,9 @@
     "event": "声音消失了。光线消失了。你站在一片绝对的虚无中。没有地面但你不会坠落。没有空气但你不会窒息。你伸出手——看不见自己的手指。你张嘴说话——听不见自己的声音。只有意识还在，困在一个没有维度的牢笼里。",
     "noRandom": true,
     "storyline": "timeloop",
-    "set": { "timeloop_round": 6 },
+    "set": {
+      "timeloop_round": 6
+    },
     "happyDelta": -10,
     "choices": [
       {
@@ -400,7 +535,8 @@
         "text": "闭上眼睛。融入黑暗。不再挣扎。",
         "next": 79620
       }
-    ]
+    ],
+    "repeatable": true
   },
   {
     "_comment": "选项N：假Staff Roll → 死循环"
@@ -410,7 +546,10 @@
     "event": "你的声音在虚空中回荡了一秒——然后所有声音都停了。屏幕变黑。一段白色的字幕开始从下方缓缓滚动。",
     "noRandom": true,
     "storyline": "timeloop",
-    "set": { "timeloop_fake_credits": 1 }
+    "set": {
+      "timeloop_fake_credits": 1
+    },
+    "repeatable": true
   },
   {
     "_comment": "选项O：沉默 → 直接死循环"
@@ -421,7 +560,10 @@
     "noRandom": true,
     "storyline": "timeloop",
     "happyDelta": -3,
-    "branch": ["?79630"]
+    "branch": [
+      "?79630"
+    ],
+    "repeatable": true
   },
   {
     "_comment": "死循环触发（N和O殊途同归）"
@@ -434,72 +576,29 @@
     "set": {
       "timeloop_trapped": 1,
       "timeloop_round": 1,
-      "timeloop_loop_count": 1
+      "timeloop_loop_count": "+1",
+      "knows_clue": 0
     },
     "happyDelta": -5,
-    "branch": ["?79700"]
-  },
-
-  {
-    "_comment": "========== 死循环：伪重开后的绝望轮回 =========="
-  },
-  {
-    "id": 79700,
-    "event": "闹钟炸响。六月。同一天。你知道该怎么做了——至少你以为你知道。",
-    "noRandom": true,
-    "storyline": "timeloop",
-    "choices": [
-      {
-        "text": "这次一定不贪——直接去打那个电话",
-        "next": 79710
-      },
-      {
-        "text": "管他的，反正都困住了，享受吧",
-        "next": 79720
-      },
-      {
-        "text": "试试直接走进衣柜",
-        "next": 79730
-      }
-    ]
+    "branch": [
+      "?79640"
+    ],
+    "repeatable": true
   },
   {
-    "id": 79710,
-    "event": "你拿起手机，拨出那个没有号码的未接来电。听筒接通了。一秒的沉默。然后——是你自己的笑声。疯狂的、尖锐的、像是笑了一万年都停不下来的笑。笑声越来越大，大到手机震动，大到你的耳膜嗡嗡作响。你挂断电话。手在发抖。通话记录显示：通话时长——永恒。",
-    "noRandom": true,
-    "storyline": "timeloop",
-    "happyDelta": -6,
-    "branch": ["?79740"]
+    "_comment": "死循环路由：检查循环次数"
   },
   {
-    "id": 79720,
-    "event": "你打开手机买了股票。涨了。你去食堂。饭是热的。你去找那个完美的异性。TA还在那里。一切都和上次一模一样。你甚至能提前说出TA要说的每一句情话。但你发现你根本笑不出来了。快乐的数字还在往上跳。你的脸上只有麻木。",
-    "noRandom": true,
-    "storyline": "timeloop",
-    "effect": { "MNY": 8 },
-    "happyDelta": -3,
-    "branch": ["?79740"]
-  },
-  {
-    "id": 79730,
-    "event": "你径直走向衣柜，一把拉开门。里面的黑暗中伸出无数只手——它们缠住你的手臂、肩膀、脸。你被拖了进去。坠落。坠落。坠落。然后你再次躺在床上。闹钟响了。",
-    "noRandom": true,
-    "storyline": "timeloop",
-    "happyDelta": -6,
-    "branch": ["?79740"]
-  },
-  {
-    "id": 79740,
+    "id": 79640,
     "event": "",
     "noRandom": true,
+    "repeatable": true,
     "storyline": "timeloop",
-    "set": { "timeloop_loop_count": "+1" },
     "branch": [
       "(timeloop_loop_count>=3)?79750",
-      "?79700"
+      "?79100"
     ]
   },
-
   {
     "_comment": "死循环第三次：微弱提示"
   },
@@ -509,9 +608,11 @@
     "noRandom": true,
     "storyline": "timeloop",
     "happyDelta": -3,
-    "branch": ["?79700"]
+    "branch": [
+      "?79100"
+    ],
+    "repeatable": true
   },
-
   {
     "_comment": "========== 真结局后的 Flavor 彩蛋（正常生活中偶尔刷出）=========="
   },
@@ -520,7 +621,9 @@
     "event": "周二的下午。你在图书馆看书，突然抬头看了一眼窗外。阳光穿过树叶的方式让你愣了一秒。好像在哪里见过。但你想不起来了。你低头继续看书。",
     "include": "(timeloop_escaped==1)&(AGE>=20)&(AGE<=24)",
     "weight": 3,
-    "effect": { "HAP": -1 }
+    "effect": {
+      "HAP": -1
+    }
   },
   {
     "id": 79802,
@@ -549,7 +652,6 @@
     "weight": 3,
     "happyDelta": -1
   },
-
   {
     "_comment": "========== 减刑结局后的 Flavor 彩蛋 =========="
   },

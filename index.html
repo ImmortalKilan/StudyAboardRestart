@@ -33,6 +33,7 @@
         </button>
         <button id="ach-trophy-start-btn" class="ghost" title="成就墙" style="display:flex; align-items:center; gap:6px;">
           🏆 <span id="ach-trophy-start-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/67</span>
+          <span id="ach-start-level" class="ach-start-level">Lv.0</span>
         </button>
       </div>
       <canvas id="start-particles" class="start-particles"></canvas>
@@ -290,6 +291,31 @@
                   </div>
                   <button id="btn-random-appearance" class="ghost appearance-random-btn">🎲 随机发型/服装</button>
                 </div>
+                <!-- Achievement bonus panel -->
+                <div class="alloc-ach-panel">
+                  <div class="alloc-ach-header">
+                    <span class="alloc-ach-icon">🏆</span>
+                    <span class="alloc-ach-title">成就加成</span>
+                    <span id="alloc-ach-level" class="alloc-ach-level">Lv.0</span>
+                    <span id="alloc-ach-summary" class="alloc-ach-summary"></span>
+                    <button id="alloc-ach-info" class="alloc-ach-info-btn" title="查看详情">?</button>
+                  </div>
+                  <!-- Detail popover (positioned absolute inside panel) -->
+                  <div id="ach-detail-popover" class="ach-detail-popover" style="display:none;">
+                    <div class="ach-pop-header">
+                      <span class="ach-pop-title">成就加成详情</span>
+                      <button id="ach-pop-close" class="ach-pop-close">&times;</button>
+                    </div>
+                    <div class="ach-pop-section">
+                      <div class="ach-pop-label">里程碑奖励 <span class="ach-pop-hint">（额外可分配点数）</span></div>
+                      <div id="ach-pop-milestones" class="ach-pop-milestones"></div>
+                    </div>
+                    <div class="ach-pop-section">
+                      <div class="ach-pop-label">成就属性加成 <span class="ach-pop-hint">（自动生效）</span></div>
+                      <div id="ach-pop-stats" class="ach-pop-stats"></div>
+                    </div>
+                  </div>
+                </div>
               </div>
               <!-- Right: stats + presets -->
               <div class="alloc-right">
@@ -323,6 +349,10 @@
                   <button id="alloc-back-to-talent" class="ghost">← 返回天赋</button>
                   <button id="alloc-random" class="ghost">随机分配</button>
                   <button id="alloc-start" class="primary" disabled>↻ 立即重开</button>
+                </div>
+                <!-- Stat radar chart -->
+                <div class="alloc-radar-wrap">
+                  <svg id="alloc-radar" class="alloc-radar" viewBox="0 0 200 200"></svg>
                 </div>
               </div>
             </div>
@@ -524,6 +554,19 @@
             <button id="btn-try-band" class="primary banner-btn" disabled>时机未到</button>
           </div>
 
+          <div id="influencer-box" class="action-banner" style="display:none;">
+            <div class="banner-title-col">
+              <span class="banner-title">出圈</span>
+              <span id="influencer-stage" class="banner-stage">涨粉期</span>
+            </div>
+            <div class="banner-prob-col">
+              <span class="banner-prob-label">成功率</span>
+              <span id="influencer-prob" class="banner-prob">--</span>
+            </div>
+            <div id="influencer-decay-warn" class="banner-warn"></div>
+            <button id="btn-try-viral" class="primary banner-btn" disabled>冲一波</button>
+          </div>
+
           <div id="event-log" class="event-log"></div>
         </section>
 
@@ -707,54 +750,57 @@
 
     <!-- Hidden Poster Template for Image Generation -->
     <div id="poster-template-container" style="position: absolute; left: -9999px; top: 0; pointer-events: none;">
-      <div id="poster-template" class="poster-template">
-        <div class="poster-header">
-          <div class="poster-title">留学重开模拟器</div>
-          <div class="poster-subtitle">我的专属人生档案</div>
+      <div id="poster-template" class="poster-template" data-rank="C">
+        <!-- Row 1: Header bar — title left, QR right -->
+        <div class="poster-topbar">
+          <div class="poster-brand">
+            <div class="poster-title">留学重开模拟器</div>
+            <div class="poster-subtitle">STUDY ABROAD SIMULATOR</div>
+          </div>
+          <div class="poster-qr">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://cchck.itch.io/studyabroadsimulator" alt="QR Code">
+            <span class="poster-qr-hint">快来扫码玩！</span>
+          </div>
         </div>
-        
+
+        <!-- Row 2: Hero — avatar + score/rank -->
         <div class="poster-hero">
           <div class="poster-avatar-box">
             <img id="poster-avatar" src="" alt="Avatar">
           </div>
-          <div class="poster-hero-info">
-            <div class="poster-score-box">
-              <div class="poster-score-label">综合评分</div>
-              <div class="poster-score-val" id="poster-score-val">0</div>
-            </div>
+          <div class="poster-hero-right">
+            <div class="poster-score-val" id="poster-score-val">0</div>
             <div id="poster-rank" class="poster-rank"></div>
+            <div id="poster-meta" class="poster-meta-row"></div>
           </div>
         </div>
 
-        <div id="poster-meta" class="poster-meta-grid"></div>
-
-        <div class="poster-section">
-          <div class="poster-section-title">核心属性终值</div>
-          <div id="poster-stats" class="poster-stats-grid"></div>
+        <!-- Row 3: Stats bar -->
+        <div class="poster-stats-bar">
+          <div class="poster-bar-label">终值</div>
+          <div id="poster-stats" class="poster-stats-row"></div>
         </div>
 
-        <div class="poster-section">
-          <div class="poster-section-title">所选天赋</div>
-          <div id="poster-talents" class="poster-talents-grid"></div>
+        <!-- Row 4: Talents chips -->
+        <div class="poster-talents-bar">
+          <div class="poster-bar-label">天赋</div>
+          <div id="poster-talents" class="poster-talents-row"></div>
         </div>
 
-        <div class="poster-section">
-          <div class="poster-section-title">最终结局</div>
+        <!-- Row 5: Life milestones (storyline + romance + school) -->
+        <div class="poster-life-bar">
+          <div class="poster-bar-label">经历</div>
+          <div id="poster-life" class="poster-life-row"></div>
+        </div>
+
+        <!-- Row 6: Ending -->
+        <div class="poster-ending-bar">
           <div id="poster-ending" class="poster-ending-content"></div>
         </div>
 
-        <div class="poster-section">
-          <div class="poster-section-title">人生轨迹</div>
-          <div id="poster-highlights" class="poster-highlights-content"></div>
-        </div>
-
-        <div class="poster-footer">
-          <div class="poster-qrcode">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://cchck.itch.io/studyabroadsimulator" alt="QR Code" style="width:100%; height:100%; object-fit:contain; border-radius: 6px;">
-          </div>
-          <div class="poster-footer-text" id="poster-footer-text">
-            我在留学重开模拟器中玩出了<span id="poster-footer-rank"></span>级人生，你也快来试试吧！
-          </div>
+        <!-- Row 7: Footer tagline -->
+        <div class="poster-foot">
+          <span id="poster-footer-text">我玩出了<span id="poster-footer-rank"></span>级人生，你也快来试试！</span>
         </div>
       </div>
     </div>

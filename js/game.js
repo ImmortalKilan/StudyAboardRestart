@@ -1,7 +1,7 @@
 import { evalCondition, pickBranch, pickWeightedBranch } from './dsl.js';
 import { renderAvatar, createStandaloneAvatar } from './avatar.js';
 import { playStorylineIntro, playStorylineExit } from './cinematic.js';
-import { initAchievements, unlockAchievement, setOnUnlock } from './achievements.js';
+import { initAchievements, unlockAchievement, setOnUnlock, getAchievementBonuses } from './achievements.js';
 import { initFlowchart, openFlowchart, unlockFlowchartNode, setFlowchartSfx, resetSessionUnlocks, getSessionUnlocks } from './flowchart.js';
 import * as SFX from './audio.js';
 // Multiplayer — loaded dynamically so single-player works even if it fails
@@ -16,10 +16,10 @@ const STAT_KEYS = ['SOC', 'INT', 'MNY', 'PER', 'HLT', 'APP'];
 const STAT_LABELS = {
   SOC: '社交', INT: '智力', MNY: '家境',
   HAP: '快乐', HLT: '健康', PER: '毅力', APP: '颜值',
-  POP: '人气', POK: '牌技', MMR: '天梯分', FIT: '体能', CKL: '厨艺', ATH: '运动', MAG: '魔力', REP: '声望', BND: '影响力',
+  POP: '人气', POK: '牌技', MMR: '天梯分', FIT: '体能', CKL: '厨艺', ATH: '运动', MAG: '魔力', REP: '声望', BND: '影响力', FAN: '粉丝',
   cul: '修为', dao: '大道', karma: '机缘', tribulation: '渡劫', realm: '境界'
 };
-const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG', 'REP', 'BND', 'HEAT', 'cul', 'dao', 'karma', 'tribulation', 'darkOmen', 'courage', 'alliance', 'knowledge']);
+const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG', 'REP', 'BND', 'FAN', 'HEAT', 'cul', 'dao', 'karma', 'tribulation', 'darkOmen', 'courage', 'alliance', 'knowledge']);
 const XIANXIA_KEYS = ['realm', 'cul', 'dao', 'karma', 'tribulation'];
 
 // ── Special Scoring Endings ──
@@ -49,6 +49,8 @@ const LEGENDARY_ENDINGS = new Set([
   89090, // Academic White Hat: Google Project Zero
   89092, // Academic Black Hat: Ghost金盆洗手
   78081, // Band: Battle of the Bands champion
+  76090, // Influencer: 全网顶流 (Forbes 30U30)
+  76096, // Influencer: 咸鱼翻身
 ]);
 
 const GOOD_ENDINGS = new Set([
@@ -64,7 +66,8 @@ const GOOD_ENDINGS = new Set([
   48392, // BIO: 生信逆袭
   48592, // MED: 受人尊敬的主治
   48792, // LAW: 知名人权律师
-  48992  // Film: 奥斯卡编剧
+  48992, // Film: 奥斯卡编剧
+  76095, // Influencer: MCN合约到期平稳退出
 ]);
 
 function deriveRealm(cul) {
@@ -79,8 +82,10 @@ function deriveRealm(cul) {
   if (cul < 1500) return '羽化境';
   return '仙人境';
 }
-const ALLOC_TOTAL = 25;
+const ALLOC_TOTAL_BASE = 25;
 const MAX_PER_STAT = 10;
+/** Dynamic alloc total = base + achievement bonus pts */
+function getAllocTotal() { return ALLOC_TOTAL_BASE + (state._achExtraPts || 0); }
 
 
 const DEFAULT_PROF_BY_AGE = [
@@ -354,6 +359,41 @@ const STORYLINE_CFG = {
     deathChecks: [],
     flavor: () => hogwartsFlavor(),
   },
+  influencer: {
+    gracePeriod: 12,
+    eventRate: 0.7,
+    deathChecks: [
+      { cond: s => s.HLT <= -2, event: 76091 },
+      { cond: s => s.influencer_scandal && (s.SOC || 0) <= 0, event: 76092 },
+    ],
+    progressChecks: [],
+    flavor: () => influencerFlavor(),
+  },
+  mcn: {
+    gracePeriod: 12,
+    eventRate: 0.6,
+    progressChecks: [
+      { cond: s => (s.FAN || 0) >= 80, event: () => Math.random() < 0.7 ? 76090 : 76093 },
+      { cond: s => s.INT < 4, event: 76094 },
+      { cond: s => s.age - s.storylineStart >= 3, event: 76095 },
+    ],
+    deathChecks: [
+      { cond: s => s.HLT <= -2, event: 76091 },
+    ],
+    flavor: () => mcnFlavor(),
+  },
+  washed: {
+    gracePeriod: 12,
+    eventRate: 0.6,
+    progressChecks: [
+      { cond: s => s.age - s.storylineStart >= 2 && (s.FAN || 0) >= 30, event: 76096 },
+      { cond: s => s.age - s.storylineStart >= 2 && (s.FAN || 0) < 30, event: 76097 },
+    ],
+    deathChecks: [
+      { cond: s => s.influencer_scandal && (s.SOC || 0) <= 0, event: 76092 },
+    ],
+    flavor: () => washedFlavor(),
+  },
 };
 
 // ── Hogwarts flavor lines ──────────────────────────────────────
@@ -369,6 +409,120 @@ function hogwartsFlavor() {
     '草药学课上，你成功让曼德拉草安静下来了。',
   ];
   return lines[Math.floor(Math.random() * lines.length)];
+}
+
+// ── Influencer flavor lines ──────────────────────────────────────
+function influencerFlavor() {
+  const lines = [
+    '你在调色板前反复修改视频的滤镜参数，三个小时过去了。',
+    '你刷了一晚上竞品的视频找灵感，越看越焦虑。',
+    '你在构思下一期的选题，笔记本上画满了脑图。',
+    '今天拍了十七遍开头，每一遍你都觉得不够自然。',
+    '后台数据出来了，昨天那条视频的完播率创了新高。',
+    '粉丝在评论区催更了。你打了一行字又删掉。',
+    '室友说你天天对着手机自言自语像个疯子。',
+    '你研究了一下午平台算法，感觉在做没有答案的数学题。',
+    '深夜两点，你还在回复私信。手机屏幕的光映在脸上。',
+    '你在咖啡馆取景时，服务员投来了好奇的目光。',
+  ];
+  return lines[Math.floor(Math.random() * lines.length)];
+}
+
+function mcnFlavor() {
+  const lines = [
+    '经纪人把你的日程排满了一整个月，你已经记不清今天星期几。',
+    '品牌方寄来的产品堆满了半个房间，助理花了一整天才登记完。',
+    '你在选品会议上划掉了三分之二的产品，品质是最后的底线。',
+    '剪辑师把你今天的高光镜头剪成了短视频，一小时就破了百万。',
+    '你打开热搜，发现自己又上了。这次是因为昨天的一句口误。',
+    '商务团队又递来一份六位数的代言合约等你签字。',
+    '深夜的酒店房间里，你对着镜子练习明天活动的笑容。',
+    '助理递来第四杯咖啡，你已经分不清是几点了。',
+    '你的新视频还没发就已经有品牌方来询价了。',
+    '化妆师一边给你补妆一边说你最近瘦了，要注意身体。',
+  ];
+  return lines[Math.floor(Math.random() * lines.length)];
+}
+
+function washedFlavor() {
+  const lines = [
+    '你盯着后台个位数的播放量发呆了很久。',
+    '曾经合作的品牌已经不回你消息了。',
+    '你打开直播间，在线人数只有三个人，其中两个是机器人。',
+    '你翻出巅峰时期的视频，评论区全是「爷青回」。',
+    '今天又有一个粉丝取关了。你已经不会为此难过了。',
+    '你在便利店买泡面时想起以前被餐厅邀请试吃的日子。',
+    '你把账号设成了仅自己可见，安静了一会儿。',
+    '以前的同行现在都是百万博主了，你默默退出了群聊。',
+  ];
+  return lines[Math.floor(Math.random() * lines.length)];
+}
+
+// ── Influencer stage clock ───────────────────────────────────────
+// Stages: 'growing' (0-12 mo) → 'viral_window' (12-30 mo) → 'exploded'
+const INFLUENCER_GROWING_LEN = 12;
+const INFLUENCER_FORCE_LEN = 30;
+const INFLUENCER_DECAY_GRACE = 8;
+const INFLUENCER_DECAY_STEP = 3;
+const INFLUENCER_DECAY_AMT = 5;
+const INFLUENCER_DECAY_CAP = 50;
+const INFLUENCER_PROB_CAP = 75;
+const INFLUENCER_PROB_FLOOR = 5;
+
+function initInfluencerStage() {
+  state.influencer_stage = 'growing';
+  state.influencer_decay = 0;
+  state.influencer_attempted = false;
+  state.influencer_window_start_month = null;
+}
+
+function updateInfluencerStage() {
+  if (state.storyline !== 'influencer') return;
+  if (state.influencer_stage === undefined || state.influencer_stage === null) initInfluencerStage();
+  if (state.influencer_attempted) return;
+  const monthsIn = state.monthTotal - (state.storylineStartMonth || 0);
+  if (state.influencer_stage === 'growing' && monthsIn >= INFLUENCER_GROWING_LEN) {
+    state.influencer_stage = 'viral_window';
+    state.influencer_window_start_month = state.monthTotal;
+  }
+  if (state.influencer_stage === 'viral_window') {
+    const inWindow = state.monthTotal - (state.influencer_window_start_month || state.monthTotal);
+    const decaySteps = Math.max(0, Math.floor((inWindow - INFLUENCER_DECAY_GRACE) / INFLUENCER_DECAY_STEP));
+    state.influencer_decay = Math.min(INFLUENCER_DECAY_CAP, decaySteps * INFLUENCER_DECAY_AMT);
+    if (monthsIn >= INFLUENCER_FORCE_LEN) attemptViral(true);
+  }
+}
+
+function computeViralProb(s) {
+  if (s.storyline !== 'influencer') return 0;
+  let p = -10;
+  p += (s.FAN || 0) * 1.5;
+  p += (s.APP || 0) * 1.2;
+  p += (s.SOC || 0) * 1.0;
+  p += (s.INT || 0) * 0.5;
+  if (s.content_style === 'drama') p += 5;
+  if (s.content_style === '知识') p += 3;
+  if (s.influencer_scandal) p -= 20;
+  p -= (s.influencer_decay || 0);
+  return Math.max(INFLUENCER_PROB_FLOOR, Math.min(INFLUENCER_PROB_CAP, Math.round(p)));
+}
+
+function attemptViral(forced) {
+  if (state.influencer_attempted) return;
+  state.influencer_attempted = true;
+  state.influencer_stage = 'exploded';
+  const prob = computeViralProb(state);
+  const success = Math.random() * 100 < prob;
+  state.firedEvents.add(76040);
+  const evId = success ? 76041 : 76042;
+  const ev = state.eventsMap.get(evId);
+  if (forced) {
+    pushLog(success
+      ? '你的一条视频突然被算法疯狂推荐——MCN闻讯赶来了。'
+      : '算法的窗口悄悄关上了，推荐量再也回不到从前。');
+  }
+  if (ev) applyEvent(ev);
+  render();
 }
 
 // ── Idol stage clock (System D) ─────────────────────────────────
@@ -1252,6 +1406,271 @@ function _markTimeloopTrapped() {
   try { localStorage.setItem('sasr_timeloop_trapped', '1'); } catch(e) {}
 }
 
+// ── Time-loop glitch system ──────────────────────────────────────
+// Visual corruption that escalates with each death-loop iteration.
+// Level 1 (loop 1): subtle — brief stat flicker, month jump, one char glitch
+// Level 2 (loop 2): noticeable — scanlines, button shake, phantom text
+// Level 3 (loop 3+): alarming — red flash, all-same stats, persistent corruption, ghost choice
+
+const TL_GLITCH_CHARS = '■▓░█▒▊▋▌▍▎▏◼︎◾︎';
+
+function _tlGlitchLevel() {
+  if (state.storyline !== 'timeloop') return 0;
+  return Math.min(3, state.timeloop_loop_count || 0);
+}
+
+/**
+ * Corrupt a string by replacing random characters with glitch symbols.
+ * @param {string} str - original text
+ * @param {number} intensity - 0 to 1, fraction of chars to corrupt
+ * @returns {string} HTML with <span class="tl-corrupt-char"> wrapping corrupted chars
+ */
+function _tlCorruptText(str, intensity) {
+  if (!str || intensity <= 0) return str;
+  const arr = [...str];
+  const count = Math.max(1, Math.floor(arr.length * intensity));
+  const indices = new Set();
+  while (indices.size < count && indices.size < arr.length) {
+    indices.add(Math.floor(Math.random() * arr.length));
+  }
+  return arr.map((ch, i) => {
+    if (indices.has(i) && ch.trim()) {
+      const g = TL_GLITCH_CHARS[Math.floor(Math.random() * TL_GLITCH_CHARS.length)];
+      return `<span class="tl-corrupt-char">${g}</span>`;
+    }
+    return ch;
+  }).join('');
+}
+
+/** Screen flash effect (red or invert) */
+function _tlFlashScreen(type) {
+  const el = document.createElement('div');
+  el.className = type === 'invert' ? 'tl-flash-invert' : 'tl-flash-red';
+  document.body.appendChild(el);
+  el.addEventListener('animationend', () => el.remove());
+}
+
+/** Brief stat value corruption: show wrong value, revert after delay */
+function _tlGlitchStats(level) {
+  const statsEl = $('stats-panel');
+  if (!statsEl) return;
+
+  // Make stats-panel position:relative for scanline pseudo-element
+  statsEl.style.position = 'relative';
+
+  if (level >= 2) {
+    // Scanlines
+    statsEl.classList.add('tl-scanlines');
+    setTimeout(() => statsEl.classList.remove('tl-scanlines'), 2500 + Math.random() * 2000);
+  }
+
+  // Pick a random stat row to glitch
+  const rows = statsEl.querySelectorAll('.stat-row');
+  if (!rows.length) return;
+
+  if (level >= 3) {
+    // Level 3: ALL stats briefly show the same number
+    const cursedNum = Math.floor(Math.random() * 3) === 0 ? -7 : 7;
+    for (const row of rows) {
+      const valEl = row.querySelector('.stat-val');
+      if (!valEl) continue;
+      const orig = valEl.textContent;
+      valEl.textContent = String(cursedNum);
+      row.classList.add('tl-stat-glitch');
+      setTimeout(() => {
+        valEl.textContent = orig;
+        row.classList.remove('tl-stat-glitch');
+      }, 1200 + Math.random() * 600);
+    }
+  } else {
+    // Single stat glitch
+    const targetRow = rows[Math.floor(Math.random() * rows.length)];
+    const valEl = targetRow.querySelector('.stat-val');
+    if (!valEl) return;
+    const origVal = valEl.textContent;
+    const fakeVals = ['-7', '99', '0', '■', 'NaN', '∞'];
+    valEl.textContent = fakeVals[Math.floor(Math.random() * fakeVals.length)];
+    targetRow.classList.add('tl-stat-glitch');
+    const revertTime = level >= 2 ? 600 : 300;
+    setTimeout(() => {
+      valEl.textContent = origVal;
+      targetRow.classList.remove('tl-stat-glitch');
+    }, revertTime);
+  }
+}
+
+/** Brief month/time display jump */
+function _tlGlitchTime(level) {
+  const timeEl = $('time-display');
+  if (!timeEl) return;
+  const orig = timeEl.textContent;
+  const fakeMonths = ['99岁13个月', '0岁0个月', '■岁■个月', '∞岁∞个月'];
+  if (level >= 3) {
+    timeEl.textContent = fakeMonths[Math.floor(Math.random() * fakeMonths.length)];
+  } else {
+    // Just wrong month number
+    const fakeM = Math.floor(Math.random() * 12) + 1;
+    timeEl.textContent = `${state.age}岁${fakeM}个月`;
+  }
+  timeEl.classList.add('tl-time-glitch');
+  setTimeout(() => {
+    timeEl.textContent = orig;
+    timeEl.classList.remove('tl-time-glitch');
+  }, level >= 2 ? 500 : 250);
+}
+
+/** Corrupt choice button text */
+function _tlGlitchChoices(level) {
+  const container = document.querySelector('.choice-container');
+  if (!container) return;
+  const btns = container.querySelectorAll('.choice-btn:not(.tl-ghost-choice)');
+  if (!btns.length) return;
+
+  if (level >= 2) {
+    // Shake all buttons
+    btns.forEach(b => {
+      b.classList.add('tl-choice-shake');
+      b.addEventListener('animationend', () => b.classList.remove('tl-choice-shake'), { once: true });
+    });
+  }
+
+  if (level >= 1) {
+    // Corrupt 1-2 button texts briefly (level 1) or persistently (level 3)
+    const targetCount = level >= 3 ? btns.length : 1;
+    const intensity = level >= 3 ? 0.15 : level >= 2 ? 0.08 : 0.04;
+    const chosen = new Set();
+    while (chosen.size < targetCount && chosen.size < btns.length) {
+      chosen.add(Math.floor(Math.random() * btns.length));
+    }
+    for (const idx of chosen) {
+      const btn = btns[idx];
+      const origHtml = btn.innerHTML;
+      const origText = btn.textContent;
+      btn.innerHTML = _tlCorruptText(origText, intensity);
+      if (level < 3) {
+        // Revert after brief flash
+        setTimeout(() => { btn.innerHTML = origHtml; }, level >= 2 ? 800 : 500);
+      }
+      // Level 3: corruption stays — truly unsettling
+    }
+  }
+}
+
+/** Inject a ghost "醒来" choice that does nothing */
+function _tlInjectGhostChoice() {
+  const container = document.querySelector('.choice-container');
+  if (!container || container.querySelector('.tl-ghost-choice')) return;
+  const ghostTexts = ['醒来', '停下来', '回头', '不要选', '█████'];
+  const ghost = document.createElement('button');
+  ghost.className = 'choice-btn tl-ghost-choice';
+  ghost.textContent = ghostTexts[Math.floor(Math.random() * ghostTexts.length)];
+  ghost.addEventListener('click', (e) => {
+    e.stopPropagation();
+    ghost.textContent = '「还不行。」';
+    ghost.style.color = 'rgba(180,60,60,0.8)';
+    setTimeout(() => ghost.remove(), 1500);
+  });
+  container.appendChild(ghost);
+}
+
+/** Fade old log entries to suggest memory loss */
+function _tlFadeOldLogs(level) {
+  const logEl = $('event-log');
+  if (!logEl) return;
+  if (level >= 3) {
+    logEl.classList.add('tl-log-fading');
+  } else {
+    logEl.classList.remove('tl-log-fading');
+  }
+}
+
+/** Inject a phantom line into the latest log entry */
+function _tlInjectPhantomText(level) {
+  if (level < 2) return;
+  const logEl = $('event-log');
+  if (!logEl) return;
+  const latest = logEl.querySelector('.log-entry.log-latest .log-text');
+  if (!latest) return;
+  const phantoms = [
+    '「你已经选过这个了。」',
+    '「为什么还在重复？」',
+    '「这不是你第一次来这里。」',
+    '「时间在折叠。」',
+    '「有人在看着你。」',
+    '「你听到了倒计时的声音。」',
+  ];
+  {
+    const phantom = document.createElement('span');
+    phantom.style.cssText = 'display:block;color:rgba(180,60,60,0.35);font-size:0.85em;margin-top:2px;font-style:italic;';
+    phantom.textContent = phantoms[Math.floor(Math.random() * phantoms.length)];
+    latest.appendChild(phantom);
+    if (level < 3) {
+      setTimeout(() => phantom.remove(), 2500);
+    }
+  }
+}
+
+/**
+ * Master glitch controller — called from render() when in timeloop.
+ * Randomly triggers effects based on loop_count.
+ */
+let _tlGlitchCooldown = 0;
+function _timeloopGlitchTick() {
+  const level = _tlGlitchLevel();
+  if (level <= 0) return;
+
+  // Don't glitch every single render — throttle to once per ~render cycle
+  const now = Date.now();
+  if (now - _tlGlitchCooldown < 800) return;
+  _tlGlitchCooldown = now;
+
+  // Every effect fires every tick (gated only by level threshold)
+
+  // Stat glitch: always
+  setTimeout(() => _tlGlitchStats(level), Math.random() * 1500);
+
+  // Time display jump: always
+  setTimeout(() => _tlGlitchTime(level), 500 + Math.random() * 2000);
+
+  // Choice corruption (only when choices are showing)
+  if (state.pendingChoice) {
+    setTimeout(() => _tlGlitchChoices(level), 200);
+  }
+
+  // Ghost choice injection: level 3+
+  if (level >= 3 && state.pendingChoice) {
+    setTimeout(() => _tlInjectGhostChoice(), 300);
+  }
+
+  // Phantom text in log
+  _tlInjectPhantomText(level);
+
+  // Fade old logs at level 3
+  _tlFadeOldLogs(level);
+}
+
+/**
+ * Flash effect triggered when entering round 1 of a new loop.
+ * Called from applyEvent when event 79100 fires and loop_count > 0.
+ */
+function _tlLoopStartFlash() {
+  const level = _tlGlitchLevel();
+  if (level >= 3) {
+    _tlFlashScreen('invert');
+    setTimeout(() => _tlFlashScreen('red'), 200);
+  } else if (level >= 2) {
+    _tlFlashScreen('red');
+  } else if (level >= 1) {
+    // Subtle: brief opacity dip on the whole game screen
+    const gs = $('game-screen');
+    if (gs) {
+      gs.style.transition = 'opacity 0.1s';
+      gs.style.opacity = '0.7';
+      setTimeout(() => { gs.style.opacity = '1'; }, 150);
+    }
+  }
+}
+
 const STORYLINE_NAMES = {
   spy: '国际特工',
   abyss: '深渊科技',
@@ -1277,9 +1696,12 @@ const STORYLINE_NAMES = {
   academic: '学术深渊',
   band: '地下乐队',
   timeloop: '时间回环',
+  influencer: '自媒体博主',
+  mcn: '头部网红',
+  washed: '过气博主',
 };
 const HIDDEN_STORYLINES = new Set(['spy', 'abyss', 'meta', 'xianxia', 'thief', 'hogwarts', 'timeloop']);
-const SPECIAL_STORYLINES = new Set(['idol', 'superstar', 'streamer', 'poker', 'triton', 'local_shark', 'party', 'ceo', 'wasted', 'esports', 'worlds', 'minor_league', 'fitness', 'chef', 'athlete', 'academic', 'band']);
+const SPECIAL_STORYLINES = new Set(['idol', 'superstar', 'streamer', 'poker', 'triton', 'local_shark', 'party', 'ceo', 'wasted', 'esports', 'worlds', 'minor_league', 'fitness', 'chef', 'athlete', 'academic', 'band', 'influencer', 'mcn']);
 const STORYLINE_UNLOCK_STAT = {
   idol: 'POP', superstar: 'POP', streamer: 'POP',
   poker: 'POK', triton: 'POK', local_shark: 'POK',
@@ -1290,6 +1712,7 @@ const STORYLINE_UNLOCK_STAT = {
   hogwarts: 'MAG',
   academic: 'REP',
   band: 'BND',
+  influencer: 'FAN', mcn: 'FAN',
 };
 const STUDENT_PHASES = new Set([
   '高中生', '本科生', '理工生', '商科生', '文科生',
@@ -1344,7 +1767,7 @@ const state = {
   _savedAutoMode: 0,
   SOC: 0, INT: 0, MNY: 0, PER: 0, HLT: 0, APP: 0,
   HAP: 5,
-  POP: 0, POK: 0, MMR: 0,
+  POP: 0, POK: 0, MMR: 0, FAN: 0,
   cul: 0, dao: 0, karma: 0, tribulation: 0,
   xianxiaSeed: 0, yuanshen_book: 0, xingchen_book: 0,
   MAG: 0, hogwartsYear: 0, housePt: 0, house: '', hasOwl: 0, hogwartsSeed: 0,
@@ -1400,7 +1823,7 @@ function gachaDraw(talents, n) {
   // Rarity roll thresholds: grade 0 (white) 80%, 1 (blue) 15%, 2 (purple) 4%, 3 (orange) 1%
   function rollGrade() {
     const r = Math.random() * 100;
-    if (r < 2) return 3;   // orange
+    if (r < 4) return 3;   // orange
     if (r < 10) return 2;   // purple
     if (r < 30) return 1;  // blue
     return 0;               // white
@@ -1457,7 +1880,7 @@ function applyTalentEffects() {
 
 function clampStats() {
   state.HAP = Math.min(10, state.HAP);
-  const trackKeys = ['SOC', 'INT', 'MNY', 'HAP', 'HLT', 'PER', 'APP', 'POP', 'POK', 'MMR', 'FIT', 'CKL', 'cul', 'dao', 'karma', 'tribulation'];
+  const trackKeys = ['SOC', 'INT', 'MNY', 'HAP', 'HLT', 'PER', 'APP', 'POP', 'POK', 'MMR', 'FIT', 'CKL', 'FAN', 'cul', 'dao', 'karma', 'tribulation'];
   for (const k of trackKeys) {
     const v = state[k] || 0;
     if (state.statPeaks[k] === undefined || v > state.statPeaks[k]) state.statPeaks[k] = v;
@@ -1682,6 +2105,7 @@ function applyEvent(ev) {
       if (ev.set.storyline === 'athlete') initAthleteStage();
       if (ev.set.storyline === 'academic') initAcademicStage();
       if (ev.set.storyline === 'band') initBandStage();
+      if (ev.set.storyline === 'influencer') initInfluencerStage();
     }
     if (ev.set.profession && GRAD_SCHOOL_PHASES.has(ev.set.profession)) {
       scheduleGraduateCompletion();
@@ -1881,6 +2305,7 @@ function _checkEventAchievements(ev) {
         academic: 'sl_academic',
         band: 'sl_band',
         timeloop: 'sl_timeloop',
+        influencer: 'sl_influencer',
       };
       if (SL_MAP[sl]) unlockAchievement(SL_MAP[sl]);
     }
@@ -1960,6 +2385,12 @@ function _checkEventAchievements(ev) {
   if (id === 79431) unlockAchievement('end_timeloop');
   if (id === 79610) _triggerFakeCredits();
   if (id === 79630) _markTimeloopTrapped();
+  if (id === 79100 && (state.timeloop_loop_count || 0) > 0) _tlLoopStartFlash();
+
+  // Influencer
+  if (id === 76090) unlockAchievement('end_influencer_top');     // 全网顶流
+  if (id === 76096) unlockAchievement('end_influencer_comeback'); // 咸鱼翻身
+  if (id === 76041) unlockAchievement('influencer_mcn');          // MCN签约
 }
 
 function _parseRequireHint(expr) {
@@ -2251,6 +2682,7 @@ function advanceMonth() {
     updateAthleteStage();
     updateAcademicStage();
     updateBandStage();
+    updateInfluencerStage();
     updateHogwartsYear();
     if (state.phase === 'ended' || state.pendingChoice) { render(); return; }
     // === Storyline mode: skip normal events, only draw storyline events ===
@@ -2825,6 +3257,9 @@ function storylineFlavor() {
     local_shark:['你在牌桌上不动声色。', '又是一个漫长的夜晚。', '你点了一杯威士忌，继续等待。'],
     party:      ['你在组织下一场派对的细节。', '手机响个不停，全是派对邀请。', '你和朋友们在策划一个大活动。'],
     ceo:        ['你在咖啡厅里和合伙人讨论商业计划。', '投资人的电话一个接一个。', '你在白板上画着公司的未来蓝图。'],
+    influencer: ['你在调色板前反复修改视频的滤镜参数。', '你刷了一晚上竞品的视频找灵感。', '你在构思下一期的选题。', '今天拍了十七遍开头。', '后台数据出来了，完播率创了新高。', '粉丝在评论区催更了。', '室友说你天天对着手机自言自语像个疯子。', '深夜两点，你还在回复私信。'],
+    mcn:        ['经纪人把你的日程排满了一整个月。', '品牌方寄来的产品堆满了半个房间。', '你在选品会议上划掉了三分之二的产品。', '剪辑师把今天的高光镜头剪成了短视频。', '你打开热搜，发现自己又上了。', '商务团队又递来一份六位数的代言合约。', '深夜的酒店房间里，你对着镜子练习明天的笑容。', '化妆师一边补妆一边说你最近瘦了。'],
+    washed:     ['你盯着后台个位数的播放量发呆。', '曾经合作的品牌已经不回你消息了。', '你翻出巅峰时期的视频，评论区全是「爷青回」。', '今天又有一个粉丝取关了。', '以前的同行现在都是百万博主了。', '你把账号设成了仅自己可见，安静了一会儿。'],
     wasted:     ['你宿醉未醒，盯着天花板发呆。', '昨晚的记忆一片模糊。', '你翻了翻空空如也的钱包。', '出租屋的水电费又欠了一个月。', '你打开冰箱，里面只剩半瓶过期的啤酒。', '你发了个朋友圈，没人点赞。', '你点了一份最便宜的麦当劳外卖。', '你刷了一晚上短视频，太阳又升起来了。', '你想找老朋友聚聚，发现已经没人愿意接你电话。', '你看着窗外别人忙碌的身影，感到一种说不出的疲倦。'],
     esports:    ['你坐在电竞椅上看着回放录像。', '训练赛打到凌晨三点，眼睛干涩发酸。', '你在练习瞄准，一遍又一遍。'],
     worlds:     ['全世界的目光都聚焦在这里。', '你在后台调整着鼠标DPI。', '赛前的紧张感让你手心冒汗。'],
@@ -2915,11 +3350,18 @@ function renderTalentSelect(talents) {
 }
 
 function renderAlloc() {
+  // ── Achievement bonuses ──
+  const achData = getAchievementBonuses();
+  state._achExtraPts = achData.extraPts;
+  state._achFixedBonus = achData.fixedBonus;
+
+  const allocTotal = getAllocTotal();
   const baseTotal = Object.values(state.allocBase).reduce((a, b) => a + b, 0);
   const used = Object.values(state.alloc).reduce((a, b) => a + b, 0) - baseTotal;
-  const remaining = ALLOC_TOTAL - used;
+  const remaining = allocTotal - used;
   $('alloc-remaining').textContent = remaining;
 
+  // Merge talent bonuses + achievement fixed bonuses for display
   const bonusByStat = {};
   for (const k of STAT_KEYS) bonusByStat[k] = 0;
   for (const t of state.talentsPicked || []) {
@@ -2927,6 +3369,10 @@ function renderAlloc() {
     for (const [k, v] of Object.entries(t.effect)) {
       if (STAT_KEYS.includes(k)) bonusByStat[k] += v;
     }
+  }
+  // Add achievement fixed bonuses (shown alongside talent bonuses)
+  for (const [k, v] of Object.entries(achData.fixedBonus)) {
+    if (STAT_KEYS.includes(k)) bonusByStat[k] += v;
   }
 
   for (const k of STAT_KEYS) {
@@ -2972,6 +3418,172 @@ function renderAlloc() {
   }
 
   $('alloc-start').disabled = remaining !== 0;
+
+  // ── Achievement panel UI ──
+  _renderAchPanel(achData);
+
+  // ── Radar chart ──
+  _renderAllocRadar();
+}
+
+function _renderAchPanel(achData) {
+  const levelEl = $('alloc-ach-level');
+  const summaryEl = $('alloc-ach-summary');
+  if (!levelEl) return;
+
+  levelEl.textContent = `Lv.${achData.level}`;
+
+  // Compact one-line summary
+  if (summaryEl) {
+    if (achData.extraPts === 0 && Object.keys(achData.fixedBonus).length === 0) {
+      summaryEl.innerHTML = `<span style="color:var(--ink-faint)">暂无加成</span>`;
+    } else {
+      const parts = [];
+      if (achData.extraPts > 0) parts.push(`<b>+${achData.extraPts}</b>点`);
+      const totalFixed = Object.values(achData.fixedBonus).reduce((a, b) => a + b, 0);
+      if (totalFixed > 0) parts.push(`<span class="ach-sum-stat">属性+${totalFixed}</span>`);
+      summaryEl.innerHTML = parts.join(' · ');
+    }
+  }
+
+  // Cache achData for popover rendering
+  _cachedAchData = achData;
+}
+
+let _cachedAchData = null;
+let _achPopBound = false;
+
+function _initAchPopover() {
+  if (_achPopBound) return;
+  _achPopBound = true;
+
+  const infoBtn = $('alloc-ach-info');
+  const popover = $('ach-detail-popover');
+  const closeBtn = $('ach-pop-close');
+  if (!infoBtn || !popover) return;
+
+  infoBtn.addEventListener('click', () => {
+    if (popover.style.display !== 'none') {
+      popover.style.display = 'none';
+      return;
+    }
+    _fillAchPopover();
+    popover.style.display = '';
+  });
+
+  closeBtn?.addEventListener('click', () => { popover.style.display = 'none'; });
+
+  // Close on outside click
+  document.addEventListener('click', (e) => {
+    if (popover.style.display === 'none') return;
+    if (!popover.contains(e.target) && e.target !== infoBtn && !infoBtn.contains(e.target)) {
+      popover.style.display = 'none';
+    }
+  });
+}
+
+function _fillAchPopover() {
+  const d = _cachedAchData;
+  if (!d) return;
+
+  // Milestones
+  const msEl = $('ach-pop-milestones');
+  if (msEl) {
+    let cumulPts = 0;
+    let foundNext = false;
+    msEl.innerHTML = d.milestoneDetails.map(m => {
+      cumulPts += m.pts;
+      let cls, pct;
+      if (m.reached) {
+        cls = 'done'; pct = 100;
+      } else if (!foundNext) {
+        cls = 'next'; pct = Math.min(99, Math.round(d.unlockedCount / m.threshold * 100));
+        foundNext = true;
+      } else {
+        cls = 'locked'; pct = 0;
+      }
+      const check = m.reached ? '<span class="ach-ms-check">✓</span>' : '';
+      return `<div class="ach-ms-row ${cls}">
+        <span class="ach-ms-label">${d.unlockedCount >= m.threshold ? m.threshold : d.unlockedCount}/${m.threshold}</span>
+        <div class="ach-ms-bar"><div class="ach-ms-fill" style="width:${pct}%"></div></div>
+        <span class="ach-ms-reward">+${m.pts}点</span>
+        ${check}
+      </div>`;
+    }).join('');
+  }
+
+  // Stat bonuses from specific achievements
+  const stEl = $('ach-pop-stats');
+  if (stEl && d.statBonusDetails) {
+    stEl.innerHTML = d.statBonusDetails.map(s => {
+      const cls = s.unlocked ? 'done' : 'locked';
+      const bonusStr = Object.entries(s.bonuses).map(([k, v]) => `${STAT_LABELS[k] || k}+${v}`).join(' ');
+      const check = s.unlocked ? '<span class="ach-stat-check">✓</span>' : '🔒';
+      return `<div class="ach-stat-row ${cls}">
+        <span class="ach-stat-name">${s.achIcon} ${s.achName}</span>
+        <span class="ach-stat-bonus">${bonusStr}</span>
+        ${check}
+      </div>`;
+    }).join('');
+  }
+}
+
+function _renderAllocRadar() {
+  const svg = $('alloc-radar');
+  if (!svg) return;
+  const cx = 100, cy = 100, R = 72;
+  const keys = STAT_KEYS; // SOC, INT, MNY, PER, HLT, APP
+  const labels = keys.map(k => STAT_LABELS[k]);
+  const n = 6;
+  const maxVal = MAX_PER_STAT; // 10
+
+  // Compute vertices for each stat
+  const pts = keys.map((k, i) => {
+    const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
+    const val = (state.alloc[k] || 0) / maxVal;
+    return {
+      x: cx + R * val * Math.cos(angle),
+      y: cy + R * val * Math.sin(angle),
+      lx: cx + (R + 16) * Math.cos(angle),
+      ly: cy + (R + 16) * Math.sin(angle),
+    };
+  });
+
+  // Build SVG content
+  let html = '';
+
+  // Grid rings (3 levels)
+  for (let level = 1; level <= 3; level++) {
+    const r = (R * level) / 3;
+    const ringPts = [];
+    for (let i = 0; i < n; i++) {
+      const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
+      ringPts.push(`${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`);
+    }
+    html += `<polygon class="radar-grid" points="${ringPts.join(' ')}" />`;
+  }
+
+  // Axis lines
+  for (let i = 0; i < n; i++) {
+    const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
+    html += `<line class="radar-axis" x1="${cx}" y1="${cy}" x2="${cx + R * Math.cos(angle)}" y2="${cy + R * Math.sin(angle)}" />`;
+  }
+
+  // Data polygon
+  const dataPts = pts.map(p => `${p.x},${p.y}`).join(' ');
+  html += `<polygon class="radar-fill" points="${dataPts}" />`;
+
+  // Data dots
+  pts.forEach(p => {
+    html += `<circle class="radar-dot" cx="${p.x}" cy="${p.y}" r="3" />`;
+  });
+
+  // Labels
+  labels.forEach((label, i) => {
+    html += `<text class="radar-label" x="${pts[i].lx}" y="${pts[i].ly}">${label}</text>`;
+  });
+
+  svg.innerHTML = html;
 }
 
 function render() {
@@ -3036,8 +3648,9 @@ function render() {
       if (state.showMAG) shown.push('MAG');
       if (state.showREP) shown.push('REP');
       if (state.showBND) shown.push('BND');
+      if (state.showFAN) shown.push('FAN');
       const dynamicMax = Math.max(1, ...shown.filter(k => k !== 'HAP').map(k => state[k]));
-      const SPECIAL_STATS = new Set(['POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG', 'REP', 'BND']);
+      const SPECIAL_STATS = new Set(['POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG', 'REP', 'BND', 'FAN']);
       for (const k of shown) {
         const row = document.createElement('div');
         const isSpecial = SPECIAL_STATS.has(k);
@@ -3507,6 +4120,46 @@ function render() {
       }
     }
 
+    const influencerBox = $('influencer-box');
+    if (influencerBox) {
+      if (state.storyline === 'influencer' && !state.influencer_attempted && state.phase !== 'ended') {
+        influencerBox.style.display = '';
+        const stageEl = $('influencer-stage');
+        const probEl = $('influencer-prob');
+        const warnEl = $('influencer-decay-warn');
+        const btn = $('btn-try-viral');
+        const monthsIn = state.monthTotal - (state.storylineStartMonth || 0);
+        if (state.influencer_stage === 'growing' || state.influencer_stage == null) {
+          const remaining = Math.max(0, INFLUENCER_GROWING_LEN - monthsIn);
+          stageEl.textContent = `涨粉期 · 还剩 ${remaining} 个月`;
+          probEl.textContent = '--';
+          warnEl.textContent = '满 12 个月后开放爆发窗口';
+          btn.disabled = true;
+        } else if (state.influencer_stage === 'viral_window') {
+          const prob = computeViralProb(state);
+          const inWin = state.monthTotal - (state.influencer_window_start_month || state.monthTotal);
+          const monthsToForce = Math.max(0, INFLUENCER_FORCE_LEN - monthsIn);
+          stageEl.textContent = `爆发窗口 · 强制结算还剩 ${monthsToForce} 个月`;
+          probEl.textContent = prob + '%';
+          probEl.style.color = prob >= 50 ? '#7ed7a0' : prob >= 25 ? '#f5b642' : '#e06060';
+          const inGrace = inWin < INFLUENCER_DECAY_GRACE;
+          const monthsToNextDecay = inGrace
+            ? INFLUENCER_DECAY_GRACE - inWin
+            : (INFLUENCER_DECAY_STEP - ((inWin - INFLUENCER_DECAY_GRACE) % INFLUENCER_DECAY_STEP)) || INFLUENCER_DECAY_STEP;
+          if ((state.influencer_decay || 0) >= INFLUENCER_DECAY_CAP) {
+            warnEl.textContent = `衰减已封顶（-${INFLUENCER_DECAY_CAP}%），再拖也不会更低`;
+          } else if (inGrace) {
+            warnEl.textContent = `${monthsToNextDecay} 个月后开始衰减（每 3 个月 -5%）`;
+          } else {
+            warnEl.textContent = `已衰减 ${state.influencer_decay || 0}% · ${monthsToNextDecay} 个月后再 -5%`;
+          }
+          btn.disabled = false;
+        }
+      } else {
+        influencerBox.style.display = 'none';
+      }
+    }
+
     $('time-display').textContent = `${state.age}岁${state.monthOfYear}个月`;
 
     const logEl = $('event-log');
@@ -3615,6 +4268,9 @@ function render() {
   updateAutoButtons();
   if (_mobileStatsStripUpdate) _mobileStatsStripUpdate();
   if (_mobileStatsGridUpdate) _mobileStatsGridUpdate();
+
+  // ── Time-loop glitch effects ──
+  _timeloopGlitchTick();
 }
 
 function updateAutoButtons() {
@@ -3667,6 +4323,15 @@ function initGame() {
   _timeloopTrappedCheck();
   for (const k of STAT_KEYS) state[k] = state.alloc[k];
   state.HAP = 5;
+
+  // Apply achievement fixed stat bonuses
+  if (state._achFixedBonus) {
+    for (const [k, v] of Object.entries(state._achFixedBonus)) {
+      if (k === 'HAP') { state.HAP += v; }
+      else if (STAT_KEYS.includes(k)) { state[k] = (state[k] || 0) + v; }
+    }
+  }
+
   state.talentIds = new Set(state.talentsPicked.map(t => t.id));
   state.statPeaks = {};
   state.storylinesVisited = new Set();
@@ -3766,84 +4431,106 @@ function dismissEndOverlay() {
 function calculateScore() {
   let score = 0;
   const peaks = state.statPeaks || {};
-  
-  // Base stats
-  score += (peaks.INT || 0) * 100;
-  score += (peaks.MNY || 0) * 100;
-  score += (peaks.APP || 0) * 100;
-  score += (peaks.SOC || 0) * 100;
-  score += (peaks.HLT || 0) * 100;
-  score += (peaks.PER || 0) * 120; // PER is harder
-  score += (peaks.HAP || 0) * 80;
+  const eid = state.endingId;
+  const isLegendary = eid && LEGENDARY_ENDINGS.has(eid);
+  const isGood = eid && GOOD_ENDINGS.has(eid);
+  const isStorylineEnding = isLegendary || isGood;
 
-  // Breakthrough bonuses
-  for (const k of ['INT', 'MNY', 'APP', 'SOC', 'HLT', 'PER', 'HAP']) {
-    if ((peaks[k] || 0) >= 10) score += 300;
+  // ═══ 1. ENDING QUALITY (0 ~ 20000) — 50% weight ═══
+  // 结局质量是评分的核心：传奇结局直接决定S级潜力
+  if (isLegendary) {
+    score += 16000;
+  } else if (isGood) {
+    score += 9000;
+  } else if (state.age >= 60) {
+    // 正常退休：平淡但完整的人生
+    score += 3000;
+  } else {
+    // 中途猝死 / 被遣返 / 其他非正常结局
+    score += 1000;
   }
 
-  // Special Stats
-  if (peaks.POP) score += peaks.POP * 50;
-  if (peaks.POK) score += peaks.POK * 500;
-  if (peaks.MMR) score += peaks.MMR * 1;
-  if (peaks.cul) score += peaks.cul * 20;
-
-  // Education bonus
-  if (state.schoolTier === 'top' || state.school === 'T20') score += 1000;
-  else if (state.schoolTier === 'mid' || state.school === 'T50') score += 500;
-  else if (state.school === '遣返' || state.school === '退学') score -= 1000;
-
-  // Storyline / Hidden Paths
+  // ═══ 2. STORYLINE EXPERIENCE (0 ~ 10000) — 25% weight ═══
+  // 隐藏剧情 > 特殊剧情 > 普通剧情
   if (state.storylinesVisited && state.storylinesVisited.size > 0) {
-    score += state.storylinesVisited.size * 2000;
-  }
-
-  // Romance / Relationship modifier
-  if (state.relationship) {
-    const rel = state.relationship;
-    if (rel === '已婚' || rel === '二婚') score += 1500; // 人生圆满
-    else if (rel === '恋爱' || rel === '校园恋' || rel === '同居') score += 800;
-    else if (rel === '傍大款') score += 500; 
-    else if (rel === '海王') score += 2000; // 海王高分
-    else if (rel === '离异') score -= 500;
-    else if (rel === '地下恋' || rel === '快餐恋' || rel === '异地恋') score += 300;
-  }
-  // 奖励丰富的情感经历
-  if (state.romanceHistory && state.romanceHistory.length > 0) {
-    score += state.romanceHistory.length * 200; // 每一段过去的感情加200阅历分
-  }
-
-  // Emotional modifier
-  const finalHap = state.HAP || 5;
-  const finalHlt = state.HLT || 5;
-  
-  let multiplier = 1.0;
-  if (finalHap < 3) multiplier *= 0.9;
-  if (finalHlt < 2) multiplier *= 0.9;
-  if (finalHap >= 8 && finalHlt >= 8) multiplier *= 1.1;
-
-  // ── Ending & Timing Bonuses ──
-  // 传奇结局与好结局的固定加分与百分比加成
-  // 并且越早触发传奇结局，加分越多
-  if (state.endingId) {
-    const eid = state.endingId;
-    const eage = state.endingAge || state.age;
-    
-    if (LEGENDARY_ENDINGS.has(eid)) {
-      score += 2000; // 传奇结局固定加5000
-      multiplier += 0.2; // 额外50%总分加成
-      
-      // 越早达成越牛：以28岁为基准，每早一年多加1000分
-      const earlyBonus = Math.max(0, (30 - eage) * 400);
-      score += earlyBonus;
-    } else if (GOOD_ENDINGS.has(eid)) {
-      score += 1000; // 好结局固定加2000
-      multiplier += 0.1; // 额外20%总分加成
-      
-      // 越早达成越牛：每早一年多加400分
-      const earlyBonus = Math.max(0, (30 - eage) * 200);
-      score += earlyBonus;
+    for (const sl of state.storylinesVisited) {
+      if (HIDDEN_STORYLINES.has(sl)) {
+        score += 2500;   // 隐藏剧情线（间谍、深渊、修仙等）
+      } else if (SPECIAL_STORYLINES.has(sl)) {
+        score += 1800;   // 职业剧情线（偶像、电竞等）
+      } else {
+        score += 1000;   // 其他剧情
+      }
     }
   }
+
+  // ═══ 3. STATS (0 ~ 5000) — ~12.5% weight ═══
+  // 属性只是锦上添花，不再是评分主体
+  for (const k of ['INT', 'MNY', 'APP', 'SOC', 'HLT', 'PER']) {
+    score += (peaks[k] || 0) * 40;       // 6属性满10 = 2400
+    if ((peaks[k] || 0) >= 10) score += 150; // 破10奖励，满6项 = 900
+  }
+  score += (peaks.HAP || 0) * 30;          // 快乐峰值 = 最多300
+
+  // 特殊属性（封顶2000，避免某条线的隐藏属性碾压评分）
+  const specialBonus = Math.min(2000,
+    (peaks.POP || 0) * 30 +
+    (peaks.POK || 0) * 30 +
+    Math.min(peaks.MMR || 0, 100) * 3 +
+    (peaks.FIT || 0) * 30 +
+    (peaks.CKL || 0) * 30 +
+    (peaks.ATH || 0) * 30 +
+    (peaks.BND || 0) * 30 +
+    (peaks.FAN || 0) * 5 +
+    (peaks.cul || 0) * 5
+  );
+  score += specialBonus;
+
+  // ═══ 4. LIFESPAN (0 ~ 5000) — ~12.5% weight ═══
+  // 剧情线结局免疫寿命惩罚（很多剧情强制在年轻时结束）
+  if (isStorylineEnding) {
+    score += 3000;  // 剧情线结局给一个固定的"人生丰富度"分
+  } else {
+    // 普通结局：寿命越长越好，鼓励玩家活下去
+    const age = state.age || 15;
+    if (age <= 18) {
+      score += 0;
+    } else if (age <= 30) {
+      score += (age - 18) * 80;           // 18-30: 0 ~ 960
+    } else if (age <= 50) {
+      score += 960 + (age - 30) * 120;    // 30-50: 960 ~ 3360
+    } else {
+      score += 3360 + Math.min(1640, (age - 50) * 164); // 50-60: 3360 ~ 5000
+    }
+  }
+
+  // ═══ 5. EDUCATION (0 ~ 800) ═══
+  if (state.schoolTier === 'top') score += 800;
+  else if (state.schoolTier === 'mid') score += 400;
+  else if (state.school === '遣返' || state.school === '退学') score -= 500;
+
+  // ═══ 6. ROMANCE (0 ~ 1200) ═══
+  if (state.relationship) {
+    const rel = state.relationship;
+    if (rel === '已婚' || rel === '二婚') score += 600;
+    else if (rel === '恋爱中' || rel === '同居') score += 400;
+    else if (rel === '海王' || rel === '海后') score += 800;
+    else if (rel === '离异') score += 200;
+    else if (rel === '恋爱' || rel === '校园恋') score += 400;
+    else if (rel === '地下恋' || rel === '快餐恋' || rel === '异地恋') score += 200;
+  }
+  if (state.romanceHistory && state.romanceHistory.length > 0) {
+    score += Math.min(600, state.romanceHistory.length * 100);
+  }
+
+  // ═══ 7. FINAL MULTIPLIER (0.9 ~ 1.05) ═══
+  // 微调，不再大幅影响评分
+  let multiplier = 1.0;
+  const finalHap = state.HAP || 5;
+  const finalHlt = state.HLT || 5;
+  if (finalHap < 3) multiplier *= 0.95;
+  if (finalHlt < 2) multiplier *= 0.95;
+  if (finalHap >= 8 && finalHlt >= 8) multiplier *= 1.05;
 
   return Math.max(0, Math.floor(score * multiplier));
 }
@@ -3875,11 +4562,12 @@ function animateScore(targetScore) {
       // Determine Rank
       let rankText = 'F级 你是人吗';
       let rankClass = 'rank-F';
-      if (targetScore >= 30000) { rankText = 'S+ 璀璨传奇'; rankClass = 'rank-S'; }
-      else if (targetScore >= 25000) { rankText = 'S级 人中龙凤'; rankClass = 'rank-S'; }
-      else if (targetScore >= 20000) { rankText = 'A级 高质量人类'; rankClass = 'rank-A'; }
-      else if (targetScore >= 15000) { rankText = 'B级 人上人'; rankClass = 'rank-B'; }
-      else if (targetScore >= 9000) { rankText = 'C级 勉强算人'; rankClass = 'rank-C'; }
+      if (targetScore >= 28000) { rankText = 'S+ GOAT'; rankClass = 'rank-S'; }
+      else if (targetScore >= 22000) { rankText = 'S级 人中龙凤'; rankClass = 'rank-S'; }
+      else if (targetScore >= 15000) { rankText = 'A级 人上人上人'; rankClass = 'rank-A'; }
+      else if (targetScore >= 10000) { rankText = 'B级 人上人'; rankClass = 'rank-B'; }
+      else if (targetScore >= 6000) { rankText = 'C级 泯然众人'; rankClass = 'rank-C'; }
+      else if (targetScore >= 3000) { rankText = 'D级 勉强算人'; rankClass = 'rank-D'; }
 
 
       // Split into rank grade line + comment line
@@ -4032,6 +4720,7 @@ function renderSummary() {
   if (state.statPeaks.MMR !== undefined && state.statPeaks.MMR > 0) keys.push('MMR');
   if (state.statPeaks.FIT !== undefined && state.statPeaks.FIT > 0) keys.push('FIT');
   if (state.statPeaks.CKL !== undefined && state.statPeaks.CKL > 0) keys.push('CKL');
+  if (state.statPeaks.FAN !== undefined && state.statPeaks.FAN > 0) keys.push('FAN');
   if (state.statPeaks.cul !== undefined && state.statPeaks.cul > 0) keys.push('cul');
   if (state.statPeaks.dao !== undefined && state.statPeaks.dao > 0) keys.push('dao');
   if (state.statPeaks.karma !== undefined && state.statPeaks.karma > 0) keys.push('karma');
@@ -4039,7 +4728,7 @@ function renderSummary() {
   statsEl.innerHTML = keys.map(k => {
     const peak = state.statPeaks[k] ?? 0;
     const cur = state[k] ?? 0;
-    const isSpec = ['POP','POK','MMR','FIT','CKL','cul','dao','karma','tribulation'].includes(k);
+    const isSpec = ['POP','POK','MMR','FIT','CKL','FAN','cul','dao','karma','tribulation'].includes(k);
     return `
       <div class="stat-line ${isSpec ? 'spec' : ''}">
         <span class="stat-line-label">${STAT_LABELS[k]}</span>
@@ -5089,6 +5778,12 @@ function updateCreationAvatar() {
       }
     }
   }
+  // Apply achievement fixed bonuses to preview
+  if (state._achFixedBonus) {
+    for (const [k, v] of Object.entries(state._achFixedBonus)) {
+      if (STAT_KEYS.includes(k)) state[k] = (state[k] || 0) + v;
+    }
+  }
   for (const id of ['creation-avatar-canvas', 'alloc-avatar-canvas']) {
     const canvas = $(id);
     if (canvas) renderAvatar(canvas, state);
@@ -5242,7 +5937,7 @@ async function main() {
   for (const k of STAT_KEYS) {
     $(`plus-${k}`).addEventListener('click', () => {
       const used = Object.values(state.alloc).reduce((a, b) => a + b, 0);
-      if (used < ALLOC_TOTAL && state.alloc[k] < MAX_PER_STAT) {
+      if (used < getAllocTotal() && state.alloc[k] < MAX_PER_STAT) {
         SFX.sfxAllocTick();
         state.alloc[k] += 1;
         renderAlloc();
@@ -5272,7 +5967,7 @@ async function main() {
   $('alloc-random').addEventListener('click', () => {
     SFX.sfxShuffle();
     for (const k of STAT_KEYS) state.alloc[k] = 0;
-    let remaining = ALLOC_TOTAL;
+    let remaining = getAllocTotal();
     while (remaining > 0) {
       const availableKeys = STAT_KEYS.filter(k => state.alloc[k] < MAX_PER_STAT);
       if (availableKeys.length === 0) break;
@@ -5285,6 +5980,9 @@ async function main() {
   });
 
   $('alloc-start').addEventListener('click', () => { SFX.sfxConfirm(); initGame(); });
+
+  // ── Achievement popover ──
+  _initAchPopover();
 
   // ── Stat Preset System ──────────────────────────────────────────────────
   const PRESET_LS_KEY = 'studyAbroad_presets_v1';
@@ -5308,7 +6006,7 @@ async function main() {
   }
   function _applyPreset(stats) {
     const total = Object.values(stats).reduce((a, b) => a + b, 0);
-    if (total !== ALLOC_TOTAL) return;
+    if (total > getAllocTotal()) return; // accept presets with fewer pts — player distributes the rest
     for (const k of STAT_KEYS) {
       if (typeof stats[k] !== 'number' || stats[k] < 0 || stats[k] > MAX_PER_STAT) return;
     }
@@ -5406,7 +6104,7 @@ async function main() {
 
   $('preset-save')?.addEventListener('click', () => {
     const used = Object.values(state.alloc).reduce((a, b) => a + b, 0);
-    if (used !== ALLOC_TOTAL) {
+    if (used !== getAllocTotal()) {
       _showToast('请先分配完所有点数再保存');
       return;
     }
@@ -5483,7 +6181,7 @@ async function main() {
           const valid = arr.filter(p =>
             p && p.name && p.stats &&
             STAT_KEYS.every(k => typeof p.stats[k] === 'number') &&
-            Object.values(p.stats).reduce((a, b) => a + b, 0) === ALLOC_TOTAL
+            Object.values(p.stats).reduce((a, b) => a + b, 0) <= getAllocTotal()
           ).map(p => ({ name: p.name, stats: p.stats }));
           if (valid.length === 0) { _showToast('没有找到有效的预设'); return; }
           const userPresets = _loadUserPresets();
@@ -5705,6 +6403,29 @@ async function main() {
     });
   }
 
+  const btnTryViral = $('btn-try-viral');
+  if (btnTryViral) {
+    btnTryViral.addEventListener('click', async () => {
+      if (state.phase === 'ended') return;
+      if (state.storyline !== 'influencer') return;
+      if (state.influencer_stage !== 'viral_window') return;
+      if (state.influencer_attempted) return;
+      const prob = computeViralProb(state);
+      const ok = await showConfirm({
+        title: '冲一波',
+        body: '全力冲刺一波流量——成了就是头部博主，败了就被算法抛弃。',
+        stats: [
+          { label: '成功率', value: prob + '%', tone: probTone(prob) },
+          { label: '成功', value: 'MCN签约 · 头部网红' },
+          { label: '失败', value: '过气博主', tone: 'warn' },
+        ],
+      });
+      if (!ok) return;
+      stopAuto();
+      attemptViral(false);
+    });
+  }
+
   const btnTryTriton = $('btn-try-triton');
   if (btnTryTriton) {
     btnTryTriton.addEventListener('click', async () => {
@@ -5800,91 +6521,120 @@ async function main() {
         $('poster-avatar').src = avatarCanvas.toDataURL('image/png');
       }
 
+      // Score
       $('poster-score-val').textContent = $('summary-score-val').textContent;
+
+      // Rank — extract letter and description
       const rankEl = $('summary-score-rank');
-      const pRankEl = $('poster-rank');
-      pRankEl.className = 'poster-rank ' + rankEl.className.replace('score-rank', '').replace('stamp', '').trim();
-      
-      const fullRankText = rankEl.textContent; // e.g. "C级 勉强算人"
-      const rankMatch = fullRankText.match(/^([SABCD]级)(.*)$/);
+      const fullRankText = rankEl.textContent; // e.g. "S+ 载入史册"
+      const rankMatch = fullRankText.match(/^(S\+|[SABCDF]级?)\s*(.*)$/);
       let rankLetter = fullRankText;
-      let rankDesc = "";
+      let rankDesc = '';
       if (rankMatch) {
-          rankLetter = rankMatch[1]; // "C级"
-          rankDesc = rankMatch[2].trim(); // "勉强算人"
+        rankLetter = rankMatch[1];
+        rankDesc = rankMatch[2].trim();
       }
+      const pRankEl = $('poster-rank');
       pRankEl.innerHTML = `<div class="poster-rank-letter">${rankLetter}</div><div class="poster-rank-desc">${rankDesc}</div>`;
 
-      // Meta
+      // Determine rank key for data-rank color theming
+      let rankKey = 'C';
+      if (/S/.test(rankLetter)) rankKey = 'S';
+      else if (/A/.test(rankLetter)) rankKey = 'A';
+      else if (/B/.test(rankLetter)) rankKey = 'B';
+      else if (/D/.test(rankLetter)) rankKey = 'D';
+      else if (/F/.test(rankLetter)) rankKey = 'F';
+      $('poster-template').setAttribute('data-rank', rankKey);
+
+      // Meta chips
       const heroChips = document.querySelectorAll('#summary-hero-meta .hero-chip');
       let metaHTML = '';
-      const labels = ['生存时长', '最终学历', '主修方向', '职业身份', '感情状态', '其他'];
-      heroChips.forEach((chip, i) => {
-        const val = chip.innerText;
-        if(val) metaHTML += `<div class="poster-meta-item"><span class="poster-meta-k">${labels[i]||'状态'}</span><span class="poster-meta-v">${val}</span></div>`;
+      heroChips.forEach(chip => {
+        const val = chip.innerText.trim();
+        if (val) metaHTML += `<span class="poster-meta-chip">${val}</span>`;
       });
       $('poster-meta').innerHTML = metaHTML;
 
-      // Stats
+      // Stats — compact cells
       const keys = ['SOC', 'INT', 'MNY', 'HAP', 'HLT', 'PER', 'APP'];
       let statsHTML = '';
       keys.forEach(k => {
-         const cur = state[k] ?? 0;
-         statsHTML += `<div class="poster-stat-box"><div class="poster-stat-label">${STAT_LABELS[k]}</div><div class="poster-stat-val">${cur}</div></div>`;
+        const cur = state[k] ?? 0;
+        statsHTML += `<div class="poster-stat-cell"><div class="poster-stat-label">${STAT_LABELS[k]}</div><div class="poster-stat-val">${cur}</div></div>`;
       });
       $('poster-stats').innerHTML = statsHTML;
 
-      // Talents
+      // Talents — compact chips (name only, no description)
       const pTalentsEl = $('poster-talents');
       if (state.talentsPicked && state.talentsPicked.length) {
         pTalentsEl.innerHTML = state.talentsPicked.map(t =>
-          `<div class="poster-talent-item grade-${t.grade}">
-            <span class="poster-talent-name">${t.name}</span>
-            <span class="poster-talent-desc">${t.description}</span>
-          </div>`
+          `<span class="poster-talent-chip grade-${t.grade}">${t.name}</span>`
         ).join('');
       } else {
-        pTalentsEl.innerHTML = `<div class="poster-hl-item">未选择任何天赋。</div>`;
+        pTalentsEl.innerHTML = `<span class="poster-talent-chip grade-0">无天赋</span>`;
+      }
+
+      // Life milestones — storyline, romance, school, country, key choices
+      {
+        let lifeChips = [];
+        // Country
+        if (state.country) lifeChips.push(`🌏 <b>${state.country}</b>`);
+        // School
+        if (state.school && state.school !== '无') lifeChips.push(`🎓 <b>${state.school}</b>`);
+        // Major
+        if (state.major) lifeChips.push(`📚 ${state.major}`);
+        // Storyline
+        const STORYLINE_NAMES = {
+          spy: '间谍线', idol: '偶像线', superstar: '巨星线', streamer: '主播线',
+          xianxia: '修仙线', chef: '厨神线', athlete: '运动员线', fitness: '健身线',
+          poker: '德扑线', triton: '赌神线', esports: '电竞线', worlds: '世界赛线',
+          ceo: 'CEO线', party: '派对线', meta: '元叙事线', abyss: '深渊线',
+          thief: '怪盗线', hogwarts: '魔法线', timeloop: '时间循环'
+        };
+        if (state.storyline && STORYLINE_NAMES[state.storyline]) {
+          lifeChips.push(`⚡ <b>${STORYLINE_NAMES[state.storyline]}</b>`);
+        }
+        // Romance
+        const REL_ICONS = { '恋爱中': '💕', '已婚': '💍', '二婚': '💍', '离异': '💔', '海王': '🐟', '海后': '🐟' };
+        if (state.relationship && state.relationship !== '单身') {
+          lifeChips.push(`${REL_ICONS[state.relationship] || '❤️'} ${state.relationship}`);
+        } else {
+          lifeChips.push('🚶 单身');
+        }
+        // Key highlights from choice records (top 2)
+        const hlEl2 = $('summary-highlights');
+        if (hlEl2) {
+          const records = hlEl2.querySelectorAll('.choice-record');
+          for (let i = 0; i < Math.min(records.length, 2); i++) {
+            const picked = records[i].querySelector('.choice-opt-picked')?.innerText?.trim();
+            if (picked) lifeChips.push(`📌 ${picked}`);
+          }
+        }
+        $('poster-life').innerHTML = lifeChips.map(c => `<span class="poster-life-chip">${c}</span>`).join('');
       }
 
       // Ending
       const reversed = [...state.log].reverse();
       const endingLog = reversed.find(e => e.logType === 'ending');
       if (endingLog) {
-        $('poster-ending').innerHTML = `<div class="poster-ending-tag">${endingLog.tag}</div><div class="poster-ending-text">${endingLog.text}</div>`;
+        $('poster-ending').innerHTML = `<div class="poster-ending-tag">结局</div><div class="poster-ending-text">${endingLog.text}</div>`;
       } else {
         $('poster-ending').innerHTML = `<div class="poster-ending-text">这一生平淡如水。</div>`;
       }
 
-      // Highlights
-      const hlEl = $('summary-highlights');
-      let hlHTML = '';
-      if (hlEl) {
-         const records = hlEl.querySelectorAll('.choice-record');
-         for(let i=0; i<Math.min(records.length, 3); i++) {
-            const ctx = records[i].querySelector('.choice-record-ctx')?.innerText || '';
-            const picked = records[i].querySelector('.choice-opt-picked')?.innerText || '';
-            if(ctx && picked) {
-              hlHTML += `<div class="poster-hl-item">面临 <b>${ctx}</b>，最终选择了 <b>${picked}</b></div>`;
-            }
-         }
-      }
-      if(!hlHTML) hlHTML = `<div class="poster-hl-item">按部就班的一生，未经历重大命运抉择。</div>`;
-      $('poster-highlights').innerHTML = hlHTML;
-
-      // Footer message
+      // Footer rank
       const pFooterRank = $('poster-footer-rank');
-      const letterOnlyMatch = fullRankText.match(/^([SABCD])/);
-      pFooterRank.textContent = letterOnlyMatch ? letterOnlyMatch[1] : fullRankText[0];
-      pFooterRank.className = rankEl.className.replace('score-rank', '').replace('stamp', '').trim();
+      pFooterRank.textContent = rankLetter;
 
       // Small delay to ensure any CSS/DOM updates are applied
       await new Promise(r => setTimeout(r, 150));
       
       const pTemplate = $('poster-template');
       
+      // Use computed background from rank theme
+      const posterBg = getComputedStyle(pTemplate).getPropertyValue('background-color') || '#141618';
       const canvas = await html2canvas(pTemplate, {
-        backgroundColor: '#0d1117',
+        backgroundColor: posterBg,
         scale: window.devicePixelRatio || 2,
         useCORS: true
       });
@@ -7321,12 +8071,12 @@ function _resetGameState() {
   state.lastChoiceMonth = 0;
   state._savedAutoMode = 0;
   state.POP = 0; state.POK = 0; state.MMR = 0;
-  state.FIT = 0; state.CKL = 0; state.ATH = 0;
+  state.FIT = 0; state.CKL = 0; state.ATH = 0; state.FAN = 0;
   state.MAG = 0; state.hogwartsYear = 0; state.housePt = 0; state.house = ''; state.hasOwl = 0; state.hogwartsSeed = 0;
   // 隐藏特殊属性面板
   state.showPOP = false; state.showPOK = false; state.showMMR = false;
   state.showFIT = false; state.showCKL = false; state.showATH = false;
-  state.showMAG = false; state.showREP = false; state.showBND = false;
+  state.showMAG = false; state.showREP = false; state.showBND = false; state.showFAN = false;
   state.REP = 0; state.BND = 0;
   state.cul = 0; state.dao = 0; state.karma = 0; state.tribulation = 0;
   state.xianxiaSeed = 0; state.yuanshen_book = 0; state.xingchen_book = 0;
@@ -7343,6 +8093,8 @@ function _resetGameState() {
     'idol_stage', 'debut_attempted', 'party_stage', 'esports_stage', 'poker_stage',
     'fitness_stage', 'chef_stage', 'athlete_stage', 'academic_stage', 'academic_attempted',
     'academic_decay', 'academic_window_start', 'route',
+    'influencer_stage', 'influencer_attempted', 'influencer_decay', 'influencer_window_start_month',
+    'influencer_scandal', 'content_style',
     'pendingCinematic', '_cineSavedAuto',
     'deja_vu', 'taint_score', 'knows_clue', 'timeloop_round',
     'timeloop_r1_choice', 'timeloop_escaped', 'timeloop_scarred',
@@ -7351,6 +8103,11 @@ function _resetGameState() {
     'timeloop_loop_count']) {
     delete state[flag];
   }
+  // Clean up timeloop visual artifacts
+  const logEl = $('event-log');
+  if (logEl) logEl.classList.remove('tl-log-fading');
+  const statsEl = $('stats-panel');
+  if (statsEl) statsEl.classList.remove('tl-scanlines');
   // 停止自动播放
   if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
   autoMode = 0;

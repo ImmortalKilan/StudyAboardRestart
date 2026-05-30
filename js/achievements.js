@@ -88,6 +88,12 @@ export const ACHIEVEMENTS = [
   { id: 'sl_timeloop',         name: '既视感',       icon: '🔁', rarity: 'epic',      cat: '剧情',   desc: '时间开始重复了' },
   { id: 'end_timeloop',        name: '阳光的角度',   icon: '☀️', rarity: 'legendary', cat: '终局',   desc: '从时间回环中完美逃出——影子带你回了家' },
   { id: 'end_timeloop_escape', name: '逃离了永恒',   icon: '🚪', rarity: 'legendary', cat: '终局',   desc: '你关掉了游戏。这就是出口。' },
+
+  // ── 网红/自媒体 ───────────────────────────────────────────────────────
+  { id: 'sl_influencer',          name: '第一条视频',  icon: '📱', rarity: 'rare',      cat: '剧情',   desc: '开始了自媒体之路，从零粉丝起步' },
+  { id: 'influencer_mcn',         name: 'MCN签约',     icon: '📝', rarity: 'epic',      cat: '剧情',   desc: '签约顶级MCN，成为头部博主' },
+  { id: 'end_influencer_top',     name: '全网顶流',    icon: '👑', rarity: 'legendary', cat: '终局',   desc: '登上福布斯30U30，从留学生到顶流网红' },
+  { id: 'end_influencer_comeback', name: '咸鱼翻身',   icon: '🐟', rarity: 'legendary', cat: '终局',   desc: '所有人都以为你过气了——你用一条素颜视频打了所有人的脸' },
 ];
 
 let _unlocked = new Set();
@@ -134,6 +140,84 @@ export function unlockAchievement(id) {
 }
 
 export function isUnlocked(id) { return _unlocked.has(id); }
+export function getUnlockedCount() { return _unlocked.size; }
+
+// ── Achievement Bonus System ─────────────────────────────────────────────
+// Cumulative milestones: unlock N achievements → extra distributable points
+const ACH_MILESTONES = [
+  { threshold: 5,  pts: 1 },
+  { threshold: 15, pts: 1 },   // total +2
+  { threshold: 30, pts: 1 },   // total +3
+  { threshold: 50, pts: 2 },   // total +5
+  { threshold: 67, pts: 2 },   // total +7
+];
+
+// Specific achievements → fixed stat boosts (applied automatically, not distributable)
+const ACH_STAT_BONUSES = {
+  school_t20:        { INT: 1 },          // 名校之路 → 智力+1
+  all_hidden:        { SOC: 1, INT: 1 },  // 见过世面 → 社交+1, 智力+1
+  romance_married:   { HAP: 1 },          // 白头到老 → 快乐+1 (HAP is applied separately)
+  stat_max:          { PER: 1 },          // 天赋异禀 → 毅力+1
+  end_retire:        { HLT: 1 },          // 安然退休 → 健康+1
+  end_spy:           { SOC: 1 },          // 特工的荣耀 → 社交+1
+  end_xianxia:       { HLT: 1 },          // 羽化登仙 → 健康+1
+  end_ceo:           { MNY: 1 },          // 商界传奇 → 家境+1
+  end_worlds:        { PER: 1 },          // 全球冠军 → 毅力+1
+  end_meta:          { INT: 1 },          // 第五面墙 → 智力+1
+  end_fitness:       { HLT: 1 },          // 健美传奇 → 健康+1
+  end_chef:          { APP: 1 },          // 三星主厨 → 颜值+1
+  end_athlete:       { PER: 1 },          // 体坛之巅 → 毅力+1
+  romance_sea_king:  { SOC: 1 },          // 海王/海后 → 社交+1
+  easter_rhythm:     { APP: 1 },          // 节奏大师 → 颜值+1
+};
+
+/**
+ * Calculate all achievement bonuses for the current unlock state.
+ * @returns {{ extraPts: number, level: number, fixedBonus: Object<string,number>, milestoneDetails: Array }}
+ */
+export function getAchievementBonuses() {
+  const count = _unlocked.size;
+
+  // Cumulative extra points
+  let extraPts = 0;
+  let level = 0;
+  const milestoneDetails = [];
+  for (const m of ACH_MILESTONES) {
+    if (count >= m.threshold) {
+      extraPts += m.pts;
+      level++;
+      milestoneDetails.push({ threshold: m.threshold, pts: m.pts, reached: true });
+    } else {
+      milestoneDetails.push({ threshold: m.threshold, pts: m.pts, reached: false });
+    }
+  }
+
+  // Fixed stat bonuses from specific achievements
+  const fixedBonus = {};
+  for (const [achId, bonuses] of Object.entries(ACH_STAT_BONUSES)) {
+    if (_unlocked.has(achId)) {
+      for (const [stat, val] of Object.entries(bonuses)) {
+        fixedBonus[stat] = (fixedBonus[stat] || 0) + val;
+      }
+    }
+  }
+
+  // Per-achievement stat bonus details (for popover)
+  const statBonusDetails = [];
+  for (const [achId, bonuses] of Object.entries(ACH_STAT_BONUSES)) {
+    const achDef = ACHIEVEMENTS.find(a => a.id === achId);
+    const unlocked = _unlocked.has(achId);
+    statBonusDetails.push({
+      achId,
+      achName: achDef ? achDef.name : achId,
+      achIcon: achDef ? achDef.icon : '?',
+      bonuses, // e.g. { INT: 1 }
+      unlocked
+    });
+  }
+
+  return { extraPts, level, fixedBonus, milestoneDetails, statBonusDetails, totalAch: ACHIEVEMENTS.length, unlockedCount: count };
+}
 
 // ── Toast notification (slides in from bottom-right) ──────────────────────
 function _showToast(def) {
@@ -166,10 +250,19 @@ function _showToast(def) {
 
 // ── Trophy badge count ────────────────────────────────────────────────────
 function _updateBadge() {
+  const count = _unlocked.size;
+  const total = ACHIEVEMENTS.length;
   const badge = document.getElementById('ach-trophy-badge');
-  if (badge) badge.textContent = `${_unlocked.size}/${ACHIEVEMENTS.length}`;
+  if (badge) badge.textContent = `${count}/${total}`;
   const startBadge = document.getElementById('ach-trophy-start-badge');
-  if (startBadge) startBadge.textContent = `${_unlocked.size}/${ACHIEVEMENTS.length}`;
+  if (startBadge) startBadge.textContent = `${count}/${total}`;
+  // Level on start screen
+  const levelEl = document.getElementById('ach-start-level');
+  if (levelEl) {
+    let lv = 0;
+    for (const m of ACH_MILESTONES) { if (count >= m.threshold) lv++; }
+    levelEl.textContent = `Lv.${lv}`;
+  }
 }
 
 // ── Achievement wall ──────────────────────────────────────────────────────
