@@ -4733,59 +4733,44 @@ body.in-summary {
     font-size: 10px;
     padding: 2px 6px;
   }
-  /* Avatar: horizontal strip on mobile — avatar left, controls right */
+  /* Avatar: full-width on mobile, controls stay as overlay */
   #step-alloc .alloc-left {
-    flex-direction: row;
-    padding: 6px;
+    flex-direction: column;
+    padding: 0;
     border-radius: 10px;
     gap: 0;
     align-items: stretch;
-    min-height: 100px;
+    min-height: 0;
   }
   #step-alloc .alloc-avatar-wrap-lg {
-    flex: 0 0 90px;
-    width: 90px;
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    max-height: 42vh;
     min-height: 0;
-    border-radius: 8px;
+    border-radius: 10px;
     overflow: hidden;
   }
-  /* On mobile, move controls out of absolute overlay into a side column */
+  /* Keep overlay controls absolute on mobile too */
   #step-alloc .avatar-overlay-controls {
-    position: static;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 10px;
-    background: none;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    flex: 1;
+    padding: 6px 8px;
   }
   #step-alloc .avatar-ov-hint {
-    position: static;
     font-size: 9px;
-    order: -1;
-    padding: 0;
-    color: rgba(200, 210, 230, 0.35);
-  }
-  #step-alloc .avatar-ov-group {
-    gap: 5px;
   }
   #step-alloc .avatar-ov-btn {
-    width: 32px;
-    height: 32px;
-    font-size: 14px;
-    border-radius: 8px;
+    width: 30px;
+    height: 30px;
+    font-size: 13px;
+    border-radius: 7px;
   }
   #step-alloc .avatar-ov-dice {
-    width: 34px;
-    height: 34px;
-    font-size: 16px;
+    width: 32px;
+    height: 32px;
+    font-size: 15px;
   }
   #step-alloc .avatar-ov-skin-dot {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
   }
   /* Hide achievement panel detail on mobile to save space */
   #step-alloc .alloc-ach-panel {
