@@ -7859,3 +7859,169 @@ body.in-summary {
 body.memory-modal-open {
   overflow: hidden;
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   PWA Install Guide
+   ══════════════════════════════════════════════════════════════════ */
+.pwa-guide {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+.pwa-guide.pwa-guide-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.pwa-guide-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.pwa-guide-sheet {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 12px 0;
+  background: linear-gradient(170deg, #1e2538 0%, #141a28 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: none;
+  border-radius: 20px 20px 0 0;
+  padding: 24px 20px 28px;
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.5);
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.pwa-guide-visible .pwa-guide-sheet {
+  transform: translateY(0);
+}
+
+/* Close X */
+.pwa-guide-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.pwa-guide-close:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+/* Header */
+.pwa-guide-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.pwa-guide-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
+}
+.pwa-guide-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #e8ecf4;
+  letter-spacing: 0.02em;
+}
+.pwa-guide-sub {
+  font-size: 12px;
+  color: rgba(200, 210, 230, 0.5);
+  margin-top: 3px;
+}
+
+/* Steps */
+.pwa-guide-steps {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  margin-bottom: 20px;
+}
+.pwa-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+.pwa-step-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f5b642, #e09530);
+  color: #1a1a2e;
+  font-size: 13px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(245, 182, 66, 0.3);
+}
+.pwa-step-icon {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  color: rgba(200, 210, 230, 0.6);
+}
+.pwa-step-text {
+  font-size: 14px;
+  color: rgba(220, 225, 240, 0.85);
+  line-height: 1.5;
+}
+.pwa-step-text strong {
+  color: #f5b642;
+  font-weight: 600;
+}
+
+/* Arrow between steps */
+.pwa-step-arrow {
+  display: flex;
+  justify-content: center;
+  padding: 4px 0;
+  color: rgba(200, 210, 230, 0.2);
+}
+
+/* Dismiss button */
+.pwa-guide-dismiss {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(200, 210, 230, 0.45);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.pwa-guide-dismiss:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(200, 210, 230, 0.7);
+}

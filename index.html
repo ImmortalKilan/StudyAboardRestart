@@ -1077,5 +1077,93 @@
       navigator.serviceWorker.register('./sw.js').catch(() => {});
     }
   </script>
+
+  <!-- PWA Install Guide (iOS / Android) -->
+  <div id="pwa-install-guide" class="pwa-guide" style="display:none">
+    <div class="pwa-guide-backdrop"></div>
+    <div class="pwa-guide-sheet">
+      <button class="pwa-guide-close" id="pwa-guide-close">&times;</button>
+      <div class="pwa-guide-header">
+        <img src="assets/icons/icon-192.png" class="pwa-guide-icon" alt="App Icon" />
+        <div>
+          <div class="pwa-guide-title">添加到主屏幕</div>
+          <div class="pwa-guide-sub">离线也能玩，像原生 App 一样体验</div>
+        </div>
+      </div>
+      <div class="pwa-guide-steps" id="pwa-guide-steps">
+        <!-- Filled by JS based on platform -->
+      </div>
+      <button class="pwa-guide-dismiss" id="pwa-guide-dismiss">我知道了，不再提示</button>
+    </div>
+  </div>
+
+  <script>
+  (function() {
+    // Don't show if already installed as PWA
+    if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) return;
+    // Don't show on desktop
+    if (!/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) return;
+    // Don't show if user dismissed
+    if (localStorage.getItem('pwa_guide_dismissed')) return;
+
+    var guide = document.getElementById('pwa-install-guide');
+    var stepsEl = document.getElementById('pwa-guide-steps');
+    var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    var isAndroid = /Android/i.test(navigator.userAgent);
+
+    // Build steps based on platform
+    var steps;
+    if (isIOS) {
+      steps = [
+        { num: '1', icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="12" y1="9" x2="12" y2="3"/><polyline points="8 7 12 3 16 7"/></svg>', text: '点击 Safari 底部的<strong>分享按钮</strong>' },
+        { num: '2', icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/><rect x="3" y="3" width="18" height="18" rx="3"/></svg>', text: '向下滑动，找到<strong>"添加到主屏幕"</strong>' },
+        { num: '3', icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>', text: '点击右上角<strong>"添加"</strong>即可完成' }
+      ];
+    } else {
+      steps = [
+        { num: '1', icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>', text: '点击浏览器右上角<strong>菜单按钮 ⋮</strong>' },
+        { num: '2', icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/><rect x="3" y="3" width="18" height="18" rx="3"/></svg>', text: '选择<strong>"添加到主屏幕"</strong>或<strong>"安装应用"</strong>' },
+        { num: '3', icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>', text: '点击<strong>"安装"</strong>即可完成' }
+      ];
+    }
+
+    var html = '';
+    for (var i = 0; i < steps.length; i++) {
+      var s = steps[i];
+      html += '<div class="pwa-step">' +
+        '<div class="pwa-step-num">' + s.num + '</div>' +
+        '<div class="pwa-step-icon">' + s.icon + '</div>' +
+        '<div class="pwa-step-text">' + s.text + '</div>' +
+      '</div>';
+      if (i < steps.length - 1) html += '<div class="pwa-step-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>';
+    }
+    stepsEl.innerHTML = html;
+
+    // Show after a short delay (let user see the game first)
+    setTimeout(function() {
+      guide.style.display = '';
+      requestAnimationFrame(function() { guide.classList.add('pwa-guide-visible'); });
+    }, 2500);
+
+    // Close (temporary)
+    document.getElementById('pwa-guide-close').addEventListener('click', function() {
+      guide.classList.remove('pwa-guide-visible');
+      setTimeout(function() { guide.style.display = 'none'; }, 350);
+    });
+
+    // Dismiss permanently
+    document.getElementById('pwa-guide-dismiss').addEventListener('click', function() {
+      localStorage.setItem('pwa_guide_dismissed', '1');
+      guide.classList.remove('pwa-guide-visible');
+      setTimeout(function() { guide.style.display = 'none'; }, 350);
+    });
+
+    // Close on backdrop tap
+    document.querySelector('.pwa-guide-backdrop').addEventListener('click', function() {
+      guide.classList.remove('pwa-guide-visible');
+      setTimeout(function() { guide.style.display = 'none'; }, 350);
+    });
+  })();
+  </script>
 </body>
 </html>
