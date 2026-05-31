@@ -4,6 +4,7 @@ import { playStorylineIntro, playStorylineExit } from './cinematic.js';
 import { initAchievements, unlockAchievement, setOnUnlock, getAchievementBonuses } from './achievements.js';
 import { initFlowchart, openFlowchart, unlockFlowchartNode, setFlowchartSfx, resetSessionUnlocks, getSessionUnlocks } from './flowchart.js';
 import { initMemoryUI, renderMemoryPanel, recordPlaythrough, showNewCardToast } from './memory.js';
+import { initMoments, tickMoments, checkPostable, playerPost, mountMomentsUI, mountMobileMoments, openMobileMoments, resetMoments, showPostPrompt, isMomentsVisible, getClassReunion, reactToPlayerEvent, setMomentsActionHandler, setMomentsDramaHandler, addMomLastPost, getDiscoveredEggs, setMomentsHiddenEntryHandler } from './moments.js';
 import * as SFX from './audio.js';
 // Multiplayer — loaded dynamically so single-player works even if it fails
 let mp = { enabled: false, connected: false, cards: [], opponent: {} };
@@ -2054,6 +2055,73 @@ function triggerEvent(id) {
   if (ev) applyEvent(ev);
 }
 
+/**
+ * Apply an inline event from a朋友圈 action button.
+ * Supports: text (string with ${npcName}), effect, set, chanceEffect, choices
+ * This is a simpler version of applyEvent for moments-originated events.
+ */
+function applyMomentsActionEvent(ev, npc) {
+  if (!ev) return;
+  const npcName = npc?.name || '';
+  const fillTemplate = (s) => (s || '').replace(/\$\{npcName\}/g, npcName);
+
+  // Snapshot stats for change animation
+  const _preFx = {};
+  for (const k of STAT_KEYS) _preFx[k] = state[k] || 0;
+  _preFx.HAP = state.HAP || 0;
+
+  // Apply main effect
+  if (ev.effect) {
+    for (const [k, v] of Object.entries(ev.effect)) {
+      if (EFFECT_KEYS.has(k)) state[k] = (state[k] || 0) + v;
+    }
+  }
+  if (ev.set) _applySetObj(ev.set);
+
+  // Push main text
+  const mainText = fillTemplate(ev.text);
+  if (mainText) pushLog(mainText, 'moments-action');
+
+  // Apply chanceEffect (probabilistic bonus outcome)
+  if (ev.chanceEffect) {
+    const ce = ev.chanceEffect;
+    const condOk = !ce.condition || ce.condition(state);
+    if (condOk && Math.random() < (ce.chance ?? 1.0)) {
+      if (ce.effect) {
+        for (const [k, v] of Object.entries(ce.effect)) {
+          if (EFFECT_KEYS.has(k)) state[k] = (state[k] || 0) + v;
+        }
+      }
+      if (ce.set) _applySetObj(ce.set);
+      const bonusText = fillTemplate(ce.text);
+      if (bonusText) pushLog(bonusText, 'moments-action');
+    }
+  }
+
+  clampStats();
+
+  // Track stat changes for animation
+  state._statChanges = {};
+  for (const k of [...STAT_KEYS, 'HAP']) {
+    const delta = (state[k] || 0) - (_preFx[k] || 0);
+    if (delta !== 0) state._statChanges[k] = delta;
+  }
+
+  // If event has choices, set up pendingChoice (array of choice objects)
+  if (ev.choices && ev.choices.length > 0) {
+    state.pendingChoice = ev.choices.map(c => ({
+      text: c.label || c.text || '...',
+      effect: c.effect,
+      set: c.set,
+    }));
+    state.lastChoiceMonth = state.monthTotal;
+    state._savedAutoMode = autoMode;
+    stopAuto();
+  }
+
+  render();
+}
+
 function _applySetObj(obj) {
   for (const [k, v] of Object.entries(obj)) {
     if (typeof v === 'string' && (v.startsWith('+') || v.startsWith('-'))) {
@@ -2082,7 +2150,11 @@ function applyEvent(ev) {
   if (ev.set) {
     const prevStoryline = state.storyline;
     const prevRel = state.relationship;
+    // Stash previous relationship for moments reaction system
+    state._prevRelationshipForMoments = prevRel;
     _applySetObj(ev.set);
+    // Trigger NPC reactions for significant player events (school/relationship/storyline)
+    try { reactToPlayerEvent(ev, state); } catch (e) { console.warn('reactToPlayerEvent failed', e); }
     if (ev.set.relationship !== undefined && ev.set.relationship !== prevRel) {
       if (!state.relationshipHistory) state.relationshipHistory = [];
       const last = state.relationshipHistory[state.relationshipHistory.length - 1];
@@ -2195,6 +2267,26 @@ function applyEvent(ev) {
   if (_hasUp && !_hasDown) SFX.sfxStatUp();
   else if (_hasDown && !_hasUp) SFX.sfxStatDown();
 
+  // ── Moments: check if this event is postable (player post prompt) ──
+  const _postPrompt = checkPostable(ev, state);
+  if (_postPrompt && !ev.end) {
+    // Defer the prompt slightly so the event text renders first
+    setTimeout(() => {
+      showPostPrompt(_postPrompt, state, (choice) => {
+        if (choice === 'share') {
+          playerPost(_postPrompt.type, _postPrompt.arg, state);
+          state.HAP = Math.min(10, (state.HAP || 0) + 2);
+          render();
+        } else if (choice === 'quiet') {
+          playerPost(_postPrompt.type, _postPrompt.arg, state);
+          state.SOC = (state.SOC || 0) + 1;
+          render();
+        }
+        // 'skip' — do nothing
+      });
+    }, 300);
+  }
+
   if (ev.end) {
     state.phase = 'ended';
     state.endingId = ev.id;
@@ -2204,6 +2296,14 @@ function applyEvent(ev) {
     if (mp._reunionTimeout) { clearTimeout(mp._reunionTimeout); mp._reunionTimeout = null; }
     mp.isWaiting = false;
     _hideWaitingOverlay();
+    // 朋友圈彩蛋 #2：妈妈最后一条
+    try {
+      const tone = LEGENDARY_ENDINGS.has(ev.id) ? 'legendary'
+                 : GOOD_ENDINGS.has(ev.id) ? 'good'
+                 : (state.HLT <= -5 || state.HAP <= -5) ? 'tragedy'
+                 : 'normal';
+      addMomLastPost(state, tone);
+    } catch (e) { console.warn('mom last post failed', e); }
     // Record playthrough for memory card system
     const memResult = recordPlaythrough();
     if (memResult.newCard) {
@@ -2785,6 +2885,11 @@ function advanceMonth() {
       mp.isWaiting = false;
       const memR2 = recordPlaythrough(); if (memR2.newCard) setTimeout(() => showNewCardToast(), 1500); renderMemoryPanel();
     }
+  }
+
+  // ── Moments (朋友圈) tick ──
+  if (state.phase !== 'ended') {
+    tickMoments(state);
   }
 
   // ── Multiplayer per-tick hooks ──
@@ -4363,6 +4468,13 @@ function initGame() {
   planYear(15);
 
   sessionPlayCount++;
+  // 全局重开计数 (跨 session, 用于朋友圈 déjà vu 彩蛋触发)
+  try {
+    const prev = parseInt(localStorage.getItem('sasr_total_plays') || '0', 10) || 0;
+    localStorage.setItem('sasr_total_plays', String(prev + 1));
+  } catch {}
+  // 给玩家中文名一个 fallback 供朋友圈 déjà vu 使用 — 沿用玩家自定义名字或默认
+  state._playerCnName = state.playerName || state.cnName || '同学';
   if (sessionPlayCount <= 1) {
     pushLog('你重生了，重生在15岁的冬天。');
   } else {
@@ -4377,6 +4489,10 @@ function initGame() {
   }
 
   showScreen('game-screen');
+
+  // Initialize moments (social feed) system
+  initMoments(state);
+
   render();
 
   // Multiplayer: show opponent bar & broadcast initial state
@@ -4799,6 +4915,53 @@ function renderSummary() {
         return `<span class="rom-stage${isLast ? ' rom-stage-final' : ''}">${h.rel}<span class="rom-stage-age">${h.age}岁</span></span>`;
       }).join('<span class="rom-arrow">→</span>');
       romEl.innerHTML = `<div class="romance-flow">${chips || `<span class="rom-stage">${finalRelation}</span>`}</div>`;
+    }
+  }
+
+  // 同窗去向（朋友圈 NPC 十年后的结局）
+  const reunionEl = $('summary-reunion');
+  if (reunionEl) {
+    const reunion = getClassReunion();
+    if (reunion.length === 0) {
+      reunionEl.innerHTML = `<div class="empty-hint">这一生没有同窗</div>`;
+    } else {
+      reunionEl.innerHTML = `<div class="reunion-list">${reunion.map(r => {
+        // Style "A " prefix if close friend
+        const nameHtml = (r.isClose && r.name.startsWith('A '))
+          ? `<span class="moments-name-close">A</span> ${r.name.slice(2)}`
+          : r.name;
+        return `
+        <div class="reunion-row">
+          <div class="reunion-avatar" style="background:${r.avatarBg}; color:${r.color}">${r.initial}</div>
+          <div class="reunion-body">
+            <div class="reunion-head">
+              <span class="reunion-name" style="color:${r.color}">${nameHtml}</span>
+            </div>
+            <div class="reunion-ending">${r.ending}</div>
+          </div>
+        </div>
+      `;}).join('')}</div>`;
+    }
+  }
+
+  // 🥚 朋友圈彩蛋
+  const eggsEl = $('summary-eggs');
+  if (eggsEl) {
+    const eggs = getDiscoveredEggs();
+    const found = eggs.filter(e => e.discovered);
+    if (found.length === 0) {
+      eggsEl.innerHTML = `<div class="empty-hint">还没发现任何朋友圈彩蛋。<br/>下次玩仔细看看每个 NPC 的帖子吧 👀</div>`;
+    } else {
+      eggsEl.innerHTML = `<div class="eggs-list">
+        <div class="eggs-count">已发现 ${found.length} / ${eggs.length}</div>
+        ${eggs.map(e => `
+          <div class="egg-row${e.discovered ? ' found' : ' locked'}">
+            <span class="egg-icon">${e.discovered ? '🥚' : '🔒'}</span>
+            <span class="egg-name">${e.discovered ? e.name : '???'}</span>
+            <span class="egg-hint">${e.discovered ? e.hint : '未发现'}</span>
+          </div>
+        `).join('')}
+      </div>`;
     }
   }
 
@@ -5677,6 +5840,15 @@ function rearrangeMobileLayout(entering) {
       const timeChip = document.createElement('div');
       timeChip.className = 'mp-strip-time';
       strip.appendChild(timeChip);
+      // 朋友圈按钮
+      const momBtn = document.createElement('button');
+      momBtn.className = 'moments-strip-btn';
+      momBtn.innerHTML = '朋友圈<span id="moments-badge-mobile" class="moments-badge-mobile" style="display:none">0</span>';
+      momBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openMobileMoments();
+      });
+      strip.appendChild(momBtn);
       strip.appendChild(rightHead);   // 按钮区在时间右边
       initStripDrag(strip);
       _mobileStatsStripUpdate = () => updateMobileStatsStrip(strip);
@@ -5870,6 +6042,43 @@ async function main() {
   }
   const talents = await loadData();
   _allTalents = talents;
+
+  // Mount moments (朋友圈) UI — floating widget on desktop
+  mountMomentsUI();
+
+  // Hook for朋友圈 action buttons → apply inline events to game state
+  setMomentsActionHandler((eventDef, npc) => {
+    if (!eventDef) return;
+    applyMomentsActionEvent(eventDef, npc);
+  });
+
+  // Hook for朋友圈 hidden entry (#5 EASTER EGG) → trigger hidden storyline
+  setMomentsHiddenEntryHandler((storylineId, hint) => {
+    if (state.storyline) return; // 已在剧情中，不二次触发
+    // 合成一个 fake 事件触发对应 hidden storyline
+    const fakeEv = {
+      id: 99500 + (Date.now() % 500),
+      text: `（你在朋友圈回复了那个奇怪的暗号。${hint}。一条新的路打开了...）`,
+      set: { storyline: storylineId },
+      noRandom: true,
+    };
+    applyEvent(fakeEv);
+  });
+
+  // Hook for朋友圈 drama resolutions → small HAP nudge for火上浇油
+  setMomentsDramaHandler((key) => {
+    if (key === 'fuel') {
+      state.HAP = Math.min(10, (state.HAP || 0) + 2);
+      pushLog('（你看到撕逼撕得火热，心里有点爽。）', 'moments-drama');
+      clampStats();
+      render();
+    } else if (key === 'peace') {
+      state.SOC = (state.SOC || 0) + 1;
+      pushLog('（你劝和了一场撕逼，社交+1。）', 'moments-drama');
+      clampStats();
+      render();
+    }
+  });
 
 
   $('sex-male').addEventListener('click', () => { SFX.sfxToggleOption(); state.sex = 0; $('sex-male').classList.add('active'); $('sex-female').classList.remove('active'); updateCreationAvatar(); });
@@ -6221,6 +6430,8 @@ async function main() {
 
   document.querySelector('.right-panel').addEventListener('click', (e) => {
     if (e.target.closest('button')) return;
+    // Don't advance when clicking inside the moments float panel
+    if (e.target.closest('#moments-panel')) return;
     if (state.phase === 'ended') {
       if (!_endCinematicShown) showEndCinematic();
       return;
