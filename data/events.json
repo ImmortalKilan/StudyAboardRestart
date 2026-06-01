@@ -1183,6 +1183,7 @@
     "id": 10401,
     "text": "你正式落地海外，开启大一生活。",
     "include": "AGE=19&HS==国际&school!=无",
+    "fixedMonth": 8,
     "set": {
       "profession": "本科生",
       "overseas": 1
@@ -1290,8 +1291,8 @@
   },
   {
     "id": 10500,
-    "text": "大一快结束了，专业方向要在暑假前定下来。你翻着选课手册，反复掂量。",
-    "include": "AGE=19&HS==国际",
+    "text": "开学没多久，academic advisor 就让你想想专业方向。你翻着选课手册，反复掂量。",
+    "include": "AGE=19&HS==国际&overseas==1",
     "fixedMonth": 9,
     "pickN": 4,
     "choices": [

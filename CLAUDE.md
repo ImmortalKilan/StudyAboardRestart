@@ -151,8 +151,12 @@ Any event with `"end": true` terminates the game (`state.phase = 'ended'`). The 
 每次 push 包含内容变更（JS / JSON / CSS / 图片）时，**必须同时修改 `sw.js` 第 3 行的版本号**：
 
 ```js
-const CACHE_VER = 'sasr-v1';  // → 'sasr-v2', 'sasr-v3', ...
+const CACHE_VER = 'sasr-1.0';  // 小改动 → '1.1', '1.2'... 大改动 → '2.0', '3.0'...
 ```
+
+版本号规则（semver-lite）：
+- **小改动**（bug 修复、文案微调、小功能补丁）→ 递增小版本：`1.0` → `1.1` → `1.2`
+- **大改动**（新模块、大型重构、UI 大改）→ 递增大版本：`1.x` → `2.0`
 
 否则已安装的用户会一直使用旧缓存。版本号变更后，用户下次打开 App 时后台自动拉取新资源，关闭再重新打开即为新版本。
 

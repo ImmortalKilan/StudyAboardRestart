@@ -111,7 +111,7 @@
     "effect": {
       "HAP": -2
     },
-    "include": "(INT<4)&(AGE>=18)",
+    "include": "(INT<4)&(AGE>=18)&(AGE<=22)",
     "weight": 5
   },
   {
@@ -121,7 +121,7 @@
       "PER": -2,
       "HLT": -1
     },
-    "include": "(INT<5)&(AGE>=18)",
+    "include": "(INT<5)&(AGE>=18)&(AGE<=22)",
     "weight": 2
   },
   {
@@ -130,7 +130,7 @@
     "effect": {
       "HAP": 2
     },
-    "include": "(INT>8)&(AGE>=18)",
+    "include": "(INT>8)&(AGE>=18)&(PROF==本科生|PROF==研究生)",
     "weight": 3
   },
   {
@@ -463,7 +463,7 @@
       "INT": 1,
       "HAP": -1
     },
-    "include": "(PER>8)&(AGE>=18)",
+    "include": "(PER>8)&(AGE>=18)&(OVERSEAS==1)",
     "exclude": "EVT?[16002]",
     "weight": 1
   },
@@ -1164,7 +1164,7 @@
       "SOC": 2,
       "INT": -1
     },
-    "include": "(HLT>8)&(INT<4)&(SOC>7)&(AGE>=18)",
+    "include": "(HLT>8)&(INT<4)&(SOC>7)&(AGE>=18)&(AGE<=22)",
     "weight": 2
   },
   {
@@ -12993,7 +12993,7 @@
         "next": 97036
       }
     ],
-    "include": "(AGE>=18)&(AGE<=24)&(MNY<=3)",
+    "include": "(SEX==0)&(AGE>=18)&(AGE<=24)&(MNY<=3)",
     "weight": 4
   },
   {
@@ -18713,7 +18713,7 @@
   {
     "id": 88001,
     "event": "化妆品过海关被抽查，海关大叔翻了半天你的行李箱，最后放行时说了句「Nice collection」。",
-    "include": "(SEX==1)&(AGE>=18)&((MTH==1)|(MTH==8))",
+    "include": "(SEX==1)&(AGE>=18)&(OVERSEAS==1)&((MTH==1)|(MTH==8))",
     "weight": 5,
     "effect": {
       "HAP": 1
@@ -18798,7 +18798,7 @@
   {
     "id": 88010,
     "event": "闺蜜失恋了，半夜三点给你打电话哭了一个小时。第二天你顶着黑眼圈去上课，但她说你是她最好的朋友。",
-    "include": "(SEX==1)&(AGE>=18)&(SOC>=3)",
+    "include": "(SEX==1)&(AGE>=18)&(AGE<=22)&(SOC>=3)",
     "weight": 6,
     "effect": {
       "SOC": 1,
@@ -19715,7 +19715,7 @@
   {
     "id": 47114,
     "event": "英国一年硕的同学已经开始写毕业论文了，你还在读大二。他拍拍你的肩说：「别急，我羡慕你还有时间 enjoy student life。」你突然觉得三年制也没那么糟。",
-    "include": "(country==英国)&(AGE>=20)",
+    "include": "(country==英国)&(AGE>=20)&(AGE<=22)",
     "weight": 5,
     "effect": {
       "HAP": 1
