@@ -24,7 +24,7 @@ const ALIASES = {
   DA_member: 'DA_member', triwizard: 'triwizard',
   invisibility_cloak: 'invisibility_cloak', hogsmeade_secret: 'hogsmeade_secret',
   duel_wins: 'duel_wins', duel_losses: 'duel_losses',
-  voldemort_defeated: 'voldemort_defeated',
+  voldemort_defeated: 'voldemort_defeated', horcrux: 'horcrux',
   housing: 'housing', HOUSING: 'housing',
   meta_aware: 'meta_aware', meta_gentle: 'meta_gentle',
   deja_vu: 'deja_vu', taint_score: 'taint_score', knows_clue: 'knows_clue',

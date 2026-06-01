@@ -1175,8 +1175,18 @@ const COMMENT_TEMPLATES = {
 const PLAYER_POST_TEMPLATES = {
   school: (school) => `刚刚录取了 ${school}！要不要发个朋友圈庆祝一下？`,
   relationship_start: () => '恋爱了！要不要在朋友圈官宣一下？',
+  relationship_married: () => '结婚了！要不要在朋友圈晒一下？',
   relationship_breakup: () => '分手了...要不要在朋友圈说点什么？',
-  storyline: (name) => `进入了${name}剧情线！要不要分享一下这个特殊时刻？`,
+  storyline_idol: () => '收到了练习生公司的邀请！要不要发个朋友圈？',
+  storyline_esports: () => '签约了电竞战队！要不要发个朋友圈炫一下？',
+  storyline_poker: () => '发现了一个地下牌局...要不要发个朋友圈暗示一下？',
+  storyline_fitness: () => '开始认真健身了！要不要在朋友圈立个 flag？',
+  storyline_chef: () => '决定走厨师这条路了！要不要发个朋友圈纪念一下？',
+  storyline_athlete: () => '入选了校队！要不要发个朋友圈庆祝一下？',
+  storyline_band: () => '加入了一支乐队！要不要发个朋友圈宣传一下？',
+  storyline_influencer: () => '决定做自媒体了！要不要发条朋友圈开张？',
+  storyline_party: () => '今晚有个大 party！要不要发个朋友圈？',
+  storyline_academic: () => '发现了一个不得了的东西...要不要发个朋友圈？',
   graduation: () => '毕业了！要不要发个朋友圈纪念一下？',
   achievement: (text) => `${text}！要不要发个朋友圈炫耀一下？`,
 };
@@ -1192,14 +1202,24 @@ const PLAYER_POST_CONTENT = {
     '官宣❤️ 从今天开始，多了一个人一起走',
     '终于脱单了！感谢命运的安排💕',
   ],
+  relationship_married: () => [
+    '余生请多指教 💍',
+    '今天起，我们是一家人了❤️',
+  ],
   relationship_breakup: () => [
     '有些路，注定要一个人走。',
     '结束了。感谢你教会我的一切。',
   ],
-  storyline: (name) => [
-    `人生的新篇章：${name}。全力以赴！🔥`,
-    `没想到人生会走上这条路...${name}，我准备好了`,
-  ],
+  storyline_idol: () => ['收到了一封改变命运的邮件...练习生之路，开始了🎤', '从今天起，我是练习生了！✨'],
+  storyline_esports: () => ['正式签约战队了！电竞梦，启动🎮', 'LFG!! 职业选手之路开始了🔥'],
+  storyline_poker: () => ['最近发现了一个很有意思的"兴趣小组"🃏', '人生就是一场牌局，不是吗？'],
+  storyline_fitness: () => ['今天开始认真练了💪 先立个 flag', '新目标：站上那个舞台🏋️'],
+  storyline_chef: () => ['做了一道菜，被夸了。也许这就是天赋？🍳', '厨房是我的新战场🔥'],
+  storyline_athlete: () => ['入选校队了！！🏅 努力没白费', '从今天起，我是正式队员了💪'],
+  storyline_band: () => ['加入了一支乐队！虽然我只是贝斯手🎸', '第一次排练完，耳朵还在嗡嗡响 🎵'],
+  storyline_influencer: () => ['第一条视频发出去了...有点紧张📱', '决定试试自媒体，万一火了呢？'],
+  storyline_party: () => ['今晚的 party 绝了🍾', '社交场才是真正的战场😎'],
+  storyline_academic: () => ['发现了一个挺有意思的东西...🤔', '有些事知道了就回不去了'],
   graduation: () => [
     '毕业了🎓 感谢这段旅程中遇到的每一个人',
     '学生时代结束了。下一站，新的开始！🌟',
@@ -1989,19 +2009,15 @@ export function checkPostable(ev, gameState) {
   if (ev.set.school && ev.set.school !== '无' && ev.set.school !== '退学' && ev.set.school !== '遣返') {
     promptType = 'school';
     promptArg = ev.set.school;
-  } else if (ev.set.relationship === '恋爱中' || ev.set.relationship === '已婚') {
+  } else if (ev.set.relationship === '已婚') {
+    promptType = 'relationship_married';
+  } else if (ev.set.relationship === '恋爱中') {
     promptType = 'relationship_start';
   } else if (ev.set.relationship === '单身' && gameState.relationship === '恋爱中') {
     promptType = 'relationship_breakup';
-  } else if (ev.set.storyline && !HIDDEN_STORYLINE_SET.has(ev.set.storyline)) {
-    const STORYLINE_NAMES_LOCAL = {
-      idol: '偶像出道', esports: '电竞之路', poker: '牌王之路',
-      fitness: '健身达人', chef: '厨神之路', athlete: '体育之星',
-      ceo: 'CEO之路', band: '乐队之路', influencer: '网红之路',
-      academic: '学术之路', triton: '牌王之路',
-    };
-    promptType = 'storyline';
-    promptArg = STORYLINE_NAMES_LOCAL[ev.set.storyline] || ev.set.storyline;
+  } else if (ev.set.storyline && !HIDDEN_STORYLINE_SET.has(ev.set.storyline)
+    && PLAYER_POST_TEMPLATES['storyline_' + ev.set.storyline]) {
+    promptType = 'storyline_' + ev.set.storyline;
   } else if (ev.end && ev.id !== 99999) {
     // Graduation-like endings
     promptType = 'graduation';
@@ -2032,7 +2048,7 @@ export function playerPost(type, arg, gameState) {
     color: '#f5b642',
     avatarBg: '#2a2008',
     text,
-    postType: type === 'school' || type === 'graduation' ? 'flex' : type === 'relationship_start' ? 'love' : type === 'relationship_breakup' ? 'struggle' : 'flex',
+    postType: type === 'school' || type === 'graduation' ? 'flex' : type === 'relationship_start' || type === 'relationship_married' ? 'love' : type === 'relationship_breakup' ? 'struggle' : 'flex',
     age: gameState.age,
     month: gameState.monthOfYear,
     time: _formatTime(gameState),

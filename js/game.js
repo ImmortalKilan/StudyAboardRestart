@@ -62,7 +62,7 @@ const GOOD_ENDINGS = new Set([
   84091, // Fitness Influencer
   85091, 85092, // Chef 2-Star / 1-Star
   90050, 90052, 90054, 90056, // Late dropout good endings
-  61612, 61613, // Hogwarts: defeated Voldemort (patronus / resurrection)
+  61612, // Hogwarts: sacrificial victory (all horcruxes but low MAG)
   48192, // EE: 转码逆袭
   48292, // ME: 转码逆袭
   48392, // BIO: 生信逆袭
@@ -358,7 +358,11 @@ const STORYLINE_CFG = {
     progressChecks: [
       { cond: s => (s.hogwartsYear || 1) >= 7 && !s.firedEvents.has(61600) && (s.darkForces || 0) === 0, event: 61500 },
     ],
-    deathChecks: [],
+    deathChecks: [
+      { cond: s => (s.MAG || 0) <= 0, event: 61950 },
+      { cond: s => (s.HLT || 0) <= -5 && (s.darkForces || 0) === 1, event: 61951 },
+      { cond: s => (s.PER || 0) <= -3, event: 61952 },
+    ],
     flavor: () => hogwartsFlavor(),
   },
   influencer: {
@@ -1772,7 +1776,7 @@ const state = {
   POP: 0, POK: 0, MMR: 0, FAN: 0,
   cul: 0, dao: 0, karma: 0, tribulation: 0,
   xianxiaSeed: 0, yuanshen_book: 0, xingchen_book: 0,
-  MAG: 0, hogwartsYear: 0, housePt: 0, house: '', hasOwl: 0, hogwartsSeed: 0,
+  MAG: 0, hogwartsYear: 0, housePt: 0, house: '', hasOwl: 0, hogwartsSeed: 0, horcrux: 0,
 
   // Summary tracking
   statPeaks: {},
@@ -2445,7 +2449,7 @@ function _checkEventAchievements(ev) {
   if (id === 80041) unlockAchievement('end_idol');          // idol debut success
   if (id === 80042) unlockAchievement('debut_fail');        // idol debut failure
   if (id === 50099) unlockAchievement('end_spy');           // spy mission success
-  if (id === 60040) unlockAchievement('end_abyss');         // abyss storyline success
+  if (id === 60090 || id === 60095) unlockAchievement('end_abyss');
   if (id === 70093) unlockAchievement('end_meta');          // meta storyline true ending
   if (id === 82041 || id === 82090) unlockAchievement('end_ceo');   // CEO success
   if (id === 83090 || id === 83094) unlockAchievement('end_worlds'); // worlds win
@@ -2526,14 +2530,16 @@ function _parseRequireHint(expr) {
   return parts.length > 0 ? '需要 ' + parts.join('，') : '条件不满足';
 }
 
-function pushLog(text, typeOverride) {
+function pushLog(text, typeOverride, opts) {
   const tag = `${state.age}岁${state.monthOfYear}月`;
   let logType = typeOverride || '';
   if (!logType && state.storyline) {
     if (state.storyline === 'hogwarts') logType = 'hogwarts';
     else logType = HIDDEN_STORYLINES.has(state.storyline) ? 'hidden' : 'special';
   }
-  state.log.push({ tag, text, logType });
+  const entry = { tag, text, logType };
+  if (opts?.flavor) entry.flavor = true;
+  state.log.push(entry);
   if (state.log.length > 200) {
     state.log.shift();
     state.logRenderedCount = Math.max(0, state.logRenderedCount - 1);
@@ -2763,7 +2769,7 @@ function advanceMonth() {
     const cfg = STORYLINE_CFG.timeloop;
     const re = drawRandomEvent();
     if (re) applyEvent(re);
-    else pushLog(cfg.flavor());
+    else pushLog(cfg.flavor(), null, { flavor: true });
     render();
     return;
   }
@@ -2824,13 +2830,13 @@ function advanceMonth() {
       else {
         const re = Math.random() < (cfg.eventRate || 0.8) ? drawRandomEvent() : null;
         if (re) applyEvent(re);
-        else pushLog(cfg.flavor ? cfg.flavor() : storylineFlavor());
+        else pushLog(cfg.flavor ? cfg.flavor() : storylineFlavor(), null, { flavor: true });
       }
     } else {
       // Generic storyline without config — just draw storyline events
       const re = Math.random() < 0.3 ? drawRandomEvent() : null;
       if (re) applyEvent(re);
-      else pushLog(storylineFlavor());
+      else pushLog(storylineFlavor(), null, { flavor: true });
     }
   } else {
     // === Normal mode ===
@@ -2843,11 +2849,11 @@ function advanceMonth() {
       const ev = state.eventsMap.get(id);
       const ok = ev && evalCondition(state, ev.include) && (!ev.exclude || !evalCondition(state, ev.exclude));
       if (ok) applyEvent(ev);
-      else pushLog('……');
+      else pushLog('……', null, { flavor: true });
     } else {
       const re = Math.random() < 0.4 ? drawRandomEvent() : null;
       if (re) applyEvent(re);
-      else pushLog(seasonalFlavor());
+      else pushLog(seasonalFlavor(), null, { flavor: true });
     }
   }
 
@@ -2954,20 +2960,20 @@ function seasonalFlavor() {
   // 高中前过渡期 (15岁, 9月前)
   if (age === 15 && m <= 8) {
     if (m <= 2) return pick([
-      '寒假在家，刷刷手机看看剧。',
-      '放假第一天就开始熬夜，生物钟彻底崩了。',
-      '被亲戚问「以后要出国吗」，你笑了笑没说话。',
-      '窝在被子里刷手机，假期真是太快乐了。',
-      '在家每天睡到中午，感觉自己在坐牢。',
-      '妈妈开始帮你研究各种高中，你还没什么感觉。',
+      '寒假。手机→外卖→睡觉→循环。',
+      '放假第一天熬到凌晨四点。第二天中午才是早晨。',
+      '亲戚问你以后出不出国。你微笑、点头、岔开话题。三连。',
+      '被窝是今天唯一的主战场。',
+      '每天睡到中午，感觉自己在服刑。',
+      '妈妈在客厅研究高中。你在房间研究通关攻略。',
     ]);
     if (m <= 4) return pick([
-      '还在等高中的消息，心里有点忐忑。',
-      '樱花开了，和同学出去拍了一波照。',
-      '春困袭来，每天都昏昏沉沉的。',
-      '偶尔翻翻英语书，假装在为未来做准备。',
-      '和朋友约了几次饭，聊聊以后的打算。',
-      '爸妈带你参观了一所国际学校，感觉还不错。',
+      '高中还没着落，焦虑开始生根发芽。',
+      '樱花开了。朋友圈里全是同一棵树。',
+      '春困。上课靠意志力续命。',
+      '翻了翻英语书，看了两页，合上了。仪式感到位。',
+      '和朋友约饭。聊了两小时未来，结论是都不知道。',
+      '参观了一所国际学校。学费看完沉默了。',
     ]);
     if (m <= 6) return pick([
       '中考结束了，漫长的暑假正式开始。',
@@ -4290,7 +4296,7 @@ function render() {
       const entry = state.log[i];
       const div = document.createElement('div');
       const logCls = entry.logType ? ' log-' + entry.logType : '';
-      div.className = 'log-entry' + logCls;
+      div.className = 'log-entry' + logCls + (entry.flavor ? ' log-flavor' : '');
       div.innerHTML = `<span class="log-tag">${entry.tag}</span><span class="log-text">${entry.text}</span>`;
       logEl.appendChild(div);
     }

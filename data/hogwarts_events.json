@@ -313,7 +313,7 @@
       },
       {
         "text": "\"盔甲护身！\"防御反击",
-        "showExpr": "MAG>=5",
+        "showExpr": "MAG>=3",
         "effect": {
           "MAG": 1,
           "PER": 2,
@@ -344,7 +344,7 @@
       "duel_win": 1
     },
     "branch": [
-      "MAG>=10?61305",
+      "MAG>=5?61305",
       "?61306"
     ]
   },
@@ -361,7 +361,7 @@
       "duel_win": 1
     },
     "branch": [
-      "MAG>=10?61305",
+      "MAG>=5?61305",
       "?61306"
     ]
   },
@@ -428,7 +428,7 @@
     "choices": [
       {
         "text": "正面对决，用连续咒语压制",
-        "showExpr": "MAG>=10",
+        "showExpr": "MAG>=5",
         "effect": {
           "MAG": 3,
           "housePt": 40,
@@ -487,7 +487,7 @@
     "id": 61400,
     "storyline": "hogwarts",
     "text": "四年级开学典礼上，邓布利多宣布：\"今年，霍格沃茨将举办三强争霸赛！\"火焰杯的蓝色火焰在大礼堂中央跃动。",
-    "include": "hogwartsYear>=4&MAG>=6",
+    "include": "hogwartsYear>=4&MAG>=3",
     "weight": 10,
     "choices": [
       {
@@ -541,7 +541,7 @@
       },
       {
         "text": "用变形术把岩石变成猎犬分散注意力",
-        "showExpr": "MAG>=8",
+        "showExpr": "MAG>=4",
         "effect": {
           "MAG": 3,
           "INT": 1,
@@ -554,7 +554,7 @@
       },
       {
         "text": "用召唤咒把金蛋直接飞过来",
-        "showExpr": "MAG>=6",
+        "showExpr": "MAG>=3",
         "effect": {
           "MAG": 2,
           "PER": 1,
@@ -618,7 +618,7 @@
       },
       {
         "text": "用泡头咒撑出空气泡",
-        "showExpr": "MAG>=10",
+        "showExpr": "MAG>=5",
         "effect": {
           "MAG": 3,
           "housePt": 25
@@ -681,7 +681,7 @@
     "choices": [
       {
         "text": "\"呼神护卫！\"召唤守护神照亮前路",
-        "showExpr": "MAG>=10",
+        "showExpr": "MAG>=5",
         "effect": {
           "MAG": 4,
           "housePt": 40
@@ -690,7 +690,7 @@
       },
       {
         "text": "用\"给我指路\"咒寻找方向",
-        "showExpr": "MAG>=8",
+        "showExpr": "MAG>=4",
         "effect": {
           "MAG": 3,
           "INT": 1,
@@ -700,7 +700,7 @@
       },
       {
         "text": "施放荧光闪烁标记走过的路",
-        "showExpr": "MAG>=4",
+        "showExpr": "MAG>=2",
         "effect": {
           "MAG": 2,
           "PER": 2,
@@ -813,7 +813,7 @@
     "choices": [
       {
         "text": "\"昏昏倒地！\"连续攻击",
-        "showExpr": "MAG>=6",
+        "showExpr": "MAG>=3",
         "effect": {
           "MAG": 3,
           "housePt": 20,
@@ -822,7 +822,7 @@
       },
       {
         "text": "\"呼神护卫！\"召唤守护神",
-        "showExpr": "MAG>=8",
+        "showExpr": "MAG>=4",
         "effect": {
           "MAG": 4,
           "HAP": 2,
@@ -831,7 +831,7 @@
       },
       {
         "text": "\"盔甲护身！\"掩护同学撤退",
-        "showExpr": "MAG>=5",
+        "showExpr": "MAG>=3",
         "effect": {
           "MAG": 2,
           "SOC": 3,
@@ -870,7 +870,7 @@
     "choices": [
       {
         "text": "冲在最前线，用所有学过的咒语战斗",
-        "showExpr": "MAG>=12",
+        "showExpr": "MAG>=6",
         "effect": {
           "MAG": 3,
           "HLT": -3,
@@ -928,26 +928,16 @@
     "noRandom": true,
     "storyline": "hogwarts",
     "logType": "hogwarts",
-    "choices": [
-      {
-        "text": "\"除你武器！\"——以老魔杖的力量正面抗衡",
-        "showExpr": "MAG>=10",
-        "next": 61611
-      },
-      {
-        "text": "\"呼神护卫！\"——以守护神阻挡死咒",
-        "showExpr": "MAG>=8",
-        "next": 61612
-      },
-      {
-        "text": "闭上眼睛，接受命运",
-        "next": 61613
-      }
+    "branch": [
+      "(horcrux>=5)&(MAG>=20)?61611",
+      "(horcrux>=5)&(MAG<40)?61612",
+      "(horcrux<5)&(MAG>=13)?61613",
+      "?61614"
     ]
   },
   {
     "id": 61611,
-    "text": "两道光束在空中相撞！老魔杖在你手中爆发出从未有过的力量——它认出了它真正的主人。伏地魔的杀戮咒被弹了回去，击中他自己。黑魔王倒下了。晨光洒在废墟上，欢呼声从四面八方涌来。",
+    "text": "两道光束在空中相撞！你不再恐惧——因为你知道他已经不完整了。那些你亲手摧毁的碎片，日记、戒指、挂坠盒、金杯、冠冕……他的灵魂早已千疮百孔。老魔杖在你手中爆发出从未有过的力量，绿光被弹了回去。伏地魔的身体像瓷器一样碎裂，化为灰烬消散在晨风中。这一次，他不会再回来了。",
     "noRandom": true,
     "storyline": "hogwarts",
     "logType": "hogwarts",
@@ -964,15 +954,14 @@
   },
   {
     "id": 61612,
-    "text": "银色的守护神挡住了死咒，为你争取了一瞬间。你趁机挥出老魔杖——\"Expelliarmus！\"伏地魔的魔杖脱手飞出。失去魔杖的黑魔王化为灰烬消散在风中。结束了。",
+    "text": "你拼尽全力挥出老魔杖——\"除你武器！\"两道光束激烈碰撞。你知道他的灵魂碎片已经被全部摧毁，这是最后的机会。但他的力量依然恐怖。冲击波将你掀飞，你重重砸在废墟上。当你再次睁眼，伏地魔倒下了——但你也已经站不起来了。邓布利多跪在你身边，第一次流下了眼泪。",
     "noRandom": true,
     "storyline": "hogwarts",
     "logType": "hogwarts",
     "effect": {
-      "MAG": 8,
-      "HAP": 8,
-      "SOC": 3,
-      "housePt": 80
+      "MAG": 5,
+      "HAP": 3,
+      "PER": 5
     },
     "set": {
       "voldemort_defeated": 1
@@ -981,18 +970,27 @@
   },
   {
     "id": 61613,
-    "text": "绿光吞没了一切。但在无尽的白色中，你醒了过来。一个熟悉的声音说：\"你可以选择回去。\"你选择了回去。死而复生的你重新站起，拿起老魔杖，向伏地魔走去。这一次，你不再恐惧。",
+    "text": "你用尽所有力气挡下了死咒，老魔杖在你手中嗡鸣。伏地魔被击退，身体扭曲、溃散——但在他消失的最后一刻，你看到他的嘴角扯出一个诡异的微笑。他的身体虽然毁了，但你能感觉到……有什么东西还残留在这个世界上。几年后的某个深夜，你的老魔杖再次灼热起来。",
     "noRandom": true,
     "storyline": "hogwarts",
     "logType": "hogwarts",
     "effect": {
       "MAG": 5,
-      "HAP": 5,
-      "PER": 5,
-      "housePt": 50
+      "HAP": 2
     },
     "set": {
-      "voldemort_defeated": 1
+      "voldemort_defeated": 0
+    },
+    "end": true
+  },
+  {
+    "id": 61614,
+    "text": "绿光吞没了一切。你倒在了霍格沃茨的废墟中。老魔杖从你无力的手中滚落，伏地魔俯身捡起了它。黑暗笼罩了魔法世界。",
+    "noRandom": true,
+    "storyline": "hogwarts",
+    "logType": "hogwarts",
+    "effect": {
+      "HAP": -10
     },
     "end": true
   },
@@ -1001,7 +999,7 @@
     "storyline": "hogwarts",
     "text": "圣诞节到了，大礼堂挂满了冰柱装饰和活圣诞树。你在壁炉旁拆开礼物——一件隐形衣！",
     "include": "hogwartsYear<=3",
-    "weight": 4,
+    "weight": 15,
     "effect": {
       "HAP": 3
     },
@@ -1589,7 +1587,7 @@
       },
       {
         "text": "先给曼德拉草哼摇篮曲安抚它再拔",
-        "showExpr": "MAG>=3",
+        "showExpr": "MAG>=2",
         "effect": { "MAG": 2, "INT": 1, "housePt": 10 }
       },
       {
@@ -1607,7 +1605,7 @@
     "choices": [
       {
         "text": "全神贯注，一气呵成完美变形",
-        "showExpr": "MAG>=4",
+        "showExpr": "MAG>=2",
         "effect": { "MAG": 2, "INT": 1, "housePt": 10 }
       },
       {
@@ -1634,7 +1632,7 @@
       },
       {
         "text": "\"阿拉霍洞开！\"——直接用开锁咒绕过谜题",
-        "showExpr": "MAG>=3",
+        "showExpr": "MAG>=2",
         "effect": { "MAG": 2, "housePt": 10 }
       },
       {
@@ -1913,7 +1911,7 @@
       },
       {
         "text": "尝试用魔杖触碰镜面，和画面建立更深的连接",
-        "showExpr": "MAG>=4",
+        "showExpr": "MAG>=2",
         "effect": { "MAG": 3, "darkOmen": 1 },
         "set": { "mirrorVision": 1 }
       },
@@ -1937,7 +1935,7 @@
       },
       {
         "text": "用泡头咒潜入湖底，直接去和人鱼沟通",
-        "showExpr": "MAG>=5",
+        "showExpr": "MAG>=3",
         "effect": { "MAG": 2, "SOC": 1, "darkOmen": 1 }
       },
       {
@@ -2067,7 +2065,7 @@
     "choices": [
       {
         "text": "\"盔甲护身！\"在两边之间撑起护盾阻止冲突",
-        "showExpr": "MAG>=4",
+        "showExpr": "MAG>=2",
         "effect": { "MAG": 2, "SOC": 2, "housePt": 15 }
       },
       {
@@ -2276,12 +2274,12 @@
       },
       {
         "text": "昏昏倒地 (Stupefy) —— 一击制敌",
-        "showExpr": "MAG>=6",
+        "showExpr": "MAG>=3",
         "next": 62011
       },
       {
         "text": "盔甲护身 (Protego) —— 防守反击",
-        "showExpr": "MAG>=5",
+        "showExpr": "MAG>=3",
         "next": 62012
       },
       {
@@ -2296,11 +2294,11 @@
     "storyline": "hogwarts",
     "text": "\"Expelliarmus！\"红光笔直射出——",
     "branch": [
-      "MAG>=8?62020:3",
-      "MAG>=4?62020:2",
+      "MAG>=4?62020:3",
+      "MAG>=2?62020:2",
       "?62020:1",
-      "MAG>=8?62021:1",
-      "MAG>=4?62021:2",
+      "MAG>=4?62021:1",
+      "MAG>=2?62021:2",
       "?62021:3"
     ]
   },
@@ -2310,11 +2308,11 @@
     "storyline": "hogwarts",
     "text": "\"Stupefy！\"一道猩红色的光芒从杖尖爆发——",
     "branch": [
-      "MAG>=10?62020:4",
-      "MAG>=6?62020:3",
+      "MAG>=5?62020:4",
+      "MAG>=3?62020:3",
       "?62020:1",
-      "MAG>=10?62021:1",
-      "MAG>=6?62021:2",
+      "MAG>=5?62021:1",
+      "MAG>=3?62021:2",
       "?62021:3"
     ]
   },
@@ -2324,11 +2322,11 @@
     "storyline": "hogwarts",
     "text": "\"Protego！\"银色屏障出现在你面前——",
     "branch": [
-      "MAG>=8?62020:3",
-      "MAG>=4?62020:2",
+      "MAG>=4?62020:3",
+      "MAG>=2?62020:2",
       "?62020:1",
-      "MAG>=8?62021:1",
-      "MAG>=4?62021:2",
+      "MAG>=4?62021:1",
+      "MAG>=2?62021:2",
       "?62021:3"
     ]
   },
@@ -2385,12 +2383,12 @@
       },
       {
         "text": "昏昏倒地 (Stupefy)",
-        "showExpr": "MAG>=6",
+        "showExpr": "MAG>=3",
         "next": 62041
       },
       {
         "text": "盔甲护身 (Protego)",
-        "showExpr": "MAG>=5",
+        "showExpr": "MAG>=3",
         "next": 62042
       },
       {
@@ -2405,11 +2403,11 @@
     "storyline": "hogwarts",
     "text": "\"Expelliarmus！\"你再次施出缴械咒——",
     "branch": [
-      "MAG>=8?62050:3",
-      "MAG>=4?62050:2",
+      "MAG>=4?62050:3",
+      "MAG>=2?62050:2",
       "?62050:1",
-      "MAG>=8?62051:1",
-      "MAG>=4?62051:2",
+      "MAG>=4?62051:1",
+      "MAG>=2?62051:2",
       "?62051:3"
     ]
   },
@@ -2419,11 +2417,11 @@
     "storyline": "hogwarts",
     "text": "\"Stupefy！\"猩红色光芒再次爆发——",
     "branch": [
-      "MAG>=10?62050:4",
-      "MAG>=6?62050:3",
+      "MAG>=5?62050:4",
+      "MAG>=3?62050:3",
       "?62050:1",
-      "MAG>=10?62051:1",
-      "MAG>=6?62051:2",
+      "MAG>=5?62051:1",
+      "MAG>=3?62051:2",
       "?62051:3"
     ]
   },
@@ -2433,11 +2431,11 @@
     "storyline": "hogwarts",
     "text": "\"Protego！\"你举起防御屏障等待反击机会——",
     "branch": [
-      "MAG>=8?62050:3",
-      "MAG>=4?62050:2",
+      "MAG>=4?62050:3",
+      "MAG>=2?62050:2",
       "?62050:1",
-      "MAG>=8?62051:1",
-      "MAG>=4?62051:2",
+      "MAG>=4?62051:1",
+      "MAG>=2?62051:2",
       "?62051:3"
     ]
   },
@@ -2520,17 +2518,17 @@
       },
       {
         "text": "昏昏倒地 (Stupefy)",
-        "showExpr": "MAG>=6",
+        "showExpr": "MAG>=3",
         "next": 62081
       },
       {
         "text": "盔甲护身 (Protego)",
-        "showExpr": "MAG>=5",
+        "showExpr": "MAG>=3",
         "next": 62082
       },
       {
         "text": "神锋无影 (Sectumsempra) ——禁咒！",
-        "showExpr": "MAG>=12",
+        "showExpr": "MAG>=6",
         "next": 62086
       },
       {
@@ -2545,11 +2543,11 @@
     "storyline": "hogwarts",
     "text": "\"Expelliarmus！\"决胜的缴械咒——",
     "branch": [
-      "MAG>=8?62090:3",
-      "MAG>=4?62090:2",
+      "MAG>=4?62090:3",
+      "MAG>=2?62090:2",
       "?62090:1",
-      "MAG>=8?62091:1",
-      "MAG>=4?62091:2",
+      "MAG>=4?62091:1",
+      "MAG>=2?62091:2",
       "?62091:3"
     ]
   },
@@ -2559,11 +2557,11 @@
     "storyline": "hogwarts",
     "text": "\"Stupefy！\"决胜的昏迷咒——",
     "branch": [
-      "MAG>=10?62090:4",
-      "MAG>=6?62090:3",
+      "MAG>=5?62090:4",
+      "MAG>=3?62090:3",
       "?62090:1",
-      "MAG>=10?62091:1",
-      "MAG>=6?62091:2",
+      "MAG>=5?62091:1",
+      "MAG>=3?62091:2",
       "?62091:3"
     ]
   },
@@ -2573,11 +2571,11 @@
     "storyline": "hogwarts",
     "text": "\"Protego！\"决胜的防御——",
     "branch": [
-      "MAG>=8?62090:3",
-      "MAG>=4?62090:2",
+      "MAG>=4?62090:3",
+      "MAG>=2?62090:2",
       "?62090:1",
-      "MAG>=8?62091:1",
-      "MAG>=4?62091:2",
+      "MAG>=4?62091:1",
+      "MAG>=2?62091:2",
       "?62091:3"
     ]
   },
@@ -2664,7 +2662,7 @@
     "choices": [
       {
         "text": "\"Lumos！\"点亮魔杖照亮走廊",
-        "showExpr": "MAG>=3",
+        "showExpr": "MAG>=2",
         "next": 62102
       },
       {
@@ -2829,5 +2827,178 @@
       "SOC": 1,
       "HAP": 1
     }
+  },
+
+  {
+    "id": 61850,
+    "storyline": "hogwarts",
+    "text": "图书馆禁书区的角落里，你发现了一本没有标题的黑色日记。随手翻开，页面空白。但当你的墨水滴上去时，文字像有生命一样浮现：\"你好。我叫汤姆。你是谁？\"",
+    "include": "hogwartsYear>=2&INT>=5",
+    "weight": 60,
+    "logType": "hogwarts",
+    "choices": [
+      {
+        "text": "继续写下去——它似乎什么都知道，也许能帮你通过考试",
+        "effect": { "INT": 3 }
+      },
+      {
+        "text": "这东西让人不安……撕碎它",
+        "next": 61851
+      }
+    ]
+  },
+  {
+    "id": 61851,
+    "noRandom": true,
+    "storyline": "hogwarts",
+    "text": "你用力撕开日记的封面——一声凄厉的尖叫响彻禁书区，黑色的墨水像血一样从书页中涌出。日记在你手中剧烈颤抖，随后化为灰烬。你手指发麻，心跳如鼓。",
+    "logType": "hogwarts",
+    "effect": { "HAP": -1 },
+    "set": { "horcrux": "+1" }
+  },
+
+  {
+    "id": 61852,
+    "storyline": "hogwarts",
+    "text": "禁林深处，你在一间长满藤蔓的废弃小屋里发现了一枚黑色戒指。戒指上刻着一个你从未见过的三角符号。拿起它的瞬间，一股温热的力量顺着手指涌上手臂——你的魔力似乎在增强。",
+    "include": "hogwartsYear>=2&PER>=4",
+    "weight": 60,
+    "logType": "hogwarts",
+    "choices": [
+      {
+        "text": "戴上它——这股力量太诱人了",
+        "effect": { "MAG": 3 }
+      },
+      {
+        "text": "不对劲。用魔杖对准它施咒击碎",
+        "showExpr": "MAG>=3",
+        "next": 61853
+      }
+    ]
+  },
+  {
+    "id": 61853,
+    "noRandom": true,
+    "storyline": "hogwarts",
+    "text": "\"粉碎！\"——魔杖的光束击中戒指的瞬间，一股黑色的烟雾从裂缝中喷涌而出，化为一张扭曲的人脸，无声地尖叫着消散。戒指碎成齑粉。冲击波灼伤了你的手掌。",
+    "logType": "hogwarts",
+    "effect": { "HLT": -2 },
+    "set": { "horcrux": "+1" }
+  },
+
+  {
+    "id": 61854,
+    "storyline": "hogwarts",
+    "text": "深夜，你在城堡地下一层的走廊尽头发现了一扇从未注意过的门。门后是一间积满灰尘的小房间，架子上只放着一个刻有蛇形字母\"S\"的银色挂坠盒。打开它时，一阵冰冷的微风拂过你的脸。盒盖内侧映出了一幅画面：你最渴望的未来。",
+    "include": "hogwartsYear>=3&MAG>=4",
+    "weight": 60,
+    "logType": "hogwarts",
+    "choices": [
+      {
+        "text": "凝视那个画面……太美了，你不想移开眼睛",
+        "effect": { "HAP": 5 }
+      },
+      {
+        "text": "不……这种感觉太假了。砸碎它",
+        "showExpr": "MAG>=5",
+        "next": 61855
+      }
+    ]
+  },
+  {
+    "id": 61855,
+    "noRandom": true,
+    "storyline": "hogwarts",
+    "text": "你举起魔杖猛击挂坠盒——它发出一声介于尖叫和哭泣之间的声音。画面碎裂，黑色的雾气疯狂旋转，冲击波将你掀翻在地。等你爬起来时，地上只剩下一堆扭曲的银色碎片。你的耳朵在嗡鸣。",
+    "logType": "hogwarts",
+    "effect": { "PER": -1 },
+    "set": { "horcrux": "+1" }
+  },
+
+  {
+    "id": 61856,
+    "storyline": "hogwarts",
+    "text": "你披着隐形衣潜入城堡地下深处一个从未被标记在地图上的密室。石台上放着一只精致的金杯，杯身刻着獾的纹章——赫奇帕奇的遗物。周围的空气像被冻住一样，防御咒文在地面上微微发光。这东西价值连城。",
+    "include": "hogwartsYear>=4&invisibility_cloak=1",
+    "weight": 60,
+    "logType": "hogwarts",
+    "choices": [
+      {
+        "text": "把金杯带走——这可是创始人的遗物",
+        "effect": { "MNY": 5 }
+      },
+      {
+        "text": "对它施放烈火咒——你说不清为什么，但直觉告诉你必须这么做",
+        "showExpr": "MAG>=8",
+        "next": 61857
+      }
+    ]
+  },
+  {
+    "id": 61857,
+    "noRandom": true,
+    "storyline": "hogwarts",
+    "text": "\"烈火焚身！\"——地狱之火吞没了金杯。一声震耳欲聋的惨叫从火焰中传出，密室开始剧烈震动，石块从天花板落下。你拼命往回跑，身后的通道在你身后逐段坍塌。你从裂缝中滚了出来，浑身是灰，喘着粗气。",
+    "logType": "hogwarts",
+    "effect": { "HLT": -3 },
+    "set": { "horcrux": "+1" }
+  },
+
+  {
+    "id": 61858,
+    "storyline": "hogwarts",
+    "text": "有求必应屋。今天你走进去时，它变成了一间堆满无主之物的巨大仓库。在第三排书架的最顶层，你感应到了某种东西在呼唤你。爬上去后，你看到一顶落满灰尘的冠冕。拿起它的瞬间，无穷的知识涌入脑海——你看到了咒语的本质、魔法的源头、宇宙的法则。",
+    "include": "hogwartsYear>=5&MAG>=10&horcrux>=3&DA_member=1",
+    "weight": 100,
+    "logType": "hogwarts",
+    "choices": [
+      {
+        "text": "戴上它——这就是全知。你穷尽一生都学不完的东西，它一秒就能给你",
+        "effect": { "INT": 8 }
+      },
+      {
+        "text": "……你听到它在低语了。摧毁它",
+        "next": 61859
+      }
+    ]
+  },
+  {
+    "id": 61859,
+    "noRandom": true,
+    "storyline": "hogwarts",
+    "text": "你将冠冕扔在地上，对准它倾泻了所有魔力。冠冕炸裂的瞬间，一道黑色的闪电击穿了你的身体——你感觉自己的一部分也被撕裂了。仓库里的物品开始自燃。你踉跄着跑出房间，身后传来了最后一声绝望的嘶吼。门关上后，一切归于寂静。",
+    "logType": "hogwarts",
+    "effect": { "HLT": -3, "MAG": -2 },
+    "set": { "horcrux": "+1" }
+  },
+
+  {
+    "id": 61950,
+    "storyline": "hogwarts",
+    "noRandom": true,
+    "text": "你的魔力彻底枯竭了。魔杖在你手中不再有任何反应，就像一根普通的木棍。麦格教授语气沉重地找你谈话：\"我们尽了最大的努力，但……也许魔法世界并不适合每个人。\"你被遣送回了麻瓜世界。霍格沃茨的一切像一场遥远的梦。",
+    "logType": "hogwarts",
+    "effect": { "HAP": -5 },
+    "set": { "storyline": "" },
+    "end": true
+  },
+  {
+    "id": 61951,
+    "storyline": "hogwarts",
+    "noRandom": true,
+    "text": "保卫战进行到第三天。你的身体早就超过了极限。在掩护低年级学生撤退时，一道绿光擦过你的肩膀，你倒在了走廊上。最后看到的，是窗外灰蒙蒙的天空。",
+    "logType": "hogwarts",
+    "effect": { "HAP": -5 },
+    "end": true
+  },
+  {
+    "id": 61952,
+    "storyline": "hogwarts",
+    "noRandom": true,
+    "text": "你开始害怕一切——上课、走廊、黑暗、魔杖发出的每一道光。圣芒戈魔法医院的治疗师说这叫\"魔法恐惧症\"。你被转移到了长期疗养区。窗外的猫头鹰来来去去，但再也没有一封信是写给你的。",
+    "logType": "hogwarts",
+    "effect": { "HAP": -5 },
+    "set": { "storyline": "" },
+    "end": true
   }
 ]

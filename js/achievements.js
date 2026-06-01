@@ -40,10 +40,8 @@ export const ACHIEVEMENTS = [
   { id: 'sl_academic',      name: '学术深渊',     icon: '💻', rarity: 'rare',      cat: '剧情',   desc: '发现了学校考试系统的漏洞' },
 
   // ── 终局 ─────────────────────────────────────────────────────────────────
-  { id: 'end_health',       name: '油尽灯枯',     icon: '💀', rarity: 'normal',    cat: '终局',   desc: '因健康耗尽而离开了人世' },
-  { id: 'end_retire',       name: '安然退休',     icon: '🏡', rarity: 'normal',    cat: '终局',   desc: '活到 60 岁，平静退休' },
+  { id: 'end_health',       name: '油尽灯枯',     icon: '💀', rarity: 'normal',    cat: '人生',   desc: '因健康耗尽而离开了人世' },
   { id: 'end_idol',         name: '闪耀登场',     icon: '🌟', rarity: 'epic',      cat: '终局',   desc: '成功以偶像身份出道' },
-  { id: 'debut_fail',       name: '遗憾落幕',     icon: '😔', rarity: 'normal',    cat: '终局',   desc: '偶像出道以失败告终' },
   { id: 'end_spy',          name: '特工的荣耀',   icon: '🏅', rarity: 'legendary', cat: '终局',   desc: '圆满完成了国际特工任务' },
   { id: 'end_abyss',        name: '深渊彼岸',     icon: '🌌', rarity: 'legendary', cat: '终局',   desc: '完成了深渊科技剧情' },
   { id: 'end_meta',         name: '第五面墙',     icon: '🔮', rarity: 'legendary', cat: '终局',   desc: '和屏幕另一边的人和解了' },
@@ -54,12 +52,11 @@ export const ACHIEVEMENTS = [
   { id: 'end_chef',         name: '三星主厨',     icon: '⭐', rarity: 'legendary', cat: '终局',   desc: '获得了米其林三星评级' },
   { id: 'end_athlete',      name: '体坛之巅',     icon: '🏆', rarity: 'legendary', cat: '终局',   desc: '成为了职业体育的传奇' },
   { id: 'end_thief',        name: '幽灵评级',     icon: '👻', rarity: 'legendary', cat: '终局',   desc: '达到了影子协会最高评级' },
-  { id: 'end_hogwarts',     name: '救世之星',     icon: '⚡', rarity: 'legendary', cat: '终局',   desc: '用老魔杖击败了伏地魔' },
+  { id: 'end_hogwarts',     name: '救世之星',     icon: '⚡', rarity: 'legendary', cat: '终局',   desc: '摧毁了所有魂器，彻底终结了黑魔王' },
   { id: 'end_academic_white', name: '白骑士',    icon: '🛡️', rarity: 'legendary', cat: '终局',   desc: 'CVE上有你的名字——Google Project Zero最年轻的成员' },
   { id: 'end_academic_black', name: 'Ghost',     icon: '👻', rarity: 'legendary', cat: '终局',   desc: '金盆洗手，无人知晓你曾是暗网上的Ghost' },
   { id: 'sl_band',           name: '地下新声',   icon: '🎸', rarity: 'rare',      cat: '剧情',   desc: '加入了一支地下乐队，虽然你只是贝斯手' },
   { id: 'end_band_win',      name: 'Encore!',    icon: '🏆', rarity: 'legendary', cat: '终局',   desc: '在Battle of the Bands中获得冠军，全场高喊Encore' },
-  { id: 'end_band_fail',     name: '散场之后',   icon: '🎵', rarity: 'rare',      cat: '终局',   desc: '乐队解散了，但那些日子你永远不会忘' },
 
   // ── 专业传奇终局 ──────────────────────────────────────────────────────────
   { id: 'end_ee',           name: '半导体教父',   icon: '🔬', rarity: 'legendary', cat: '终局',   desc: '在芯片领域封神，重塑了半导体产业格局' },
@@ -176,7 +173,6 @@ const ACH_STAT_BONUSES = {
   all_hidden:        { SOC: 1, INT: 1 },  // 见过世面 → 社交+1, 智力+1
   romance_married:   { HAP: 1 },          // 白头到老 → 快乐+1 (HAP is applied separately)
   stat_max:          { PER: 1 },          // 天赋异禀 → 毅力+1
-  end_retire:        { HLT: 1 },          // 安然退休 → 健康+1
   end_spy:           { SOC: 1 },          // 特工的荣耀 → 社交+1
   end_xianxia:       { HLT: 1 },          // 羽化登仙 → 健康+1
   end_ceo:           { MNY: 1 },          // 商界传奇 → 家境+1
