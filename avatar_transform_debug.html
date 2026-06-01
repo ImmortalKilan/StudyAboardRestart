@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Avatar Transform Debugger</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #11151c;
+    --panel: #1b222d;
+    --line: #303a4b;
+    --text: #eef3fb;
+    --muted: #9aa7b8;
+    --accent: #6cc8bd;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 13px/1.45 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(17, 21, 28, 0.96);
+    backdrop-filter: blur(10px);
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 18px;
+  }
+
+  main {
+    display: grid;
+    grid-template-columns: minmax(300px, 420px) 1fr;
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .panel {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--panel);
+    padding: 12px;
+  }
+
+  .preview {
+    display: grid;
+    gap: 12px;
+    align-content: start;
+    justify-items: center;
+  }
+
+  .canvas-wrap {
+    width: min(70vw, 520px);
+    max-width: 100%;
+    aspect-ratio: 1 / 1;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #26303e;
+    overflow: hidden;
+  }
+
+  canvas {
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+  }
+
+  .controls {
+    display: grid;
+    gap: 12px;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 108px 1fr;
+    gap: 8px;
+    align-items: center;
+  }
+
+  label {
+    color: var(--muted);
+  }
+
+  select,
+  input,
+  textarea,
+  button {
+    width: 100%;
+    min-height: 32px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #202837;
+    color: var(--text);
+    font: inherit;
+  }
+
+  input[type="range"] {
+    accent-color: var(--accent);
+  }
+
+  .range-line {
+    display: grid;
+    grid-template-columns: 1fr 64px;
+    gap: 8px;
+    align-items: center;
+  }
+
+  button {
+    cursor: pointer;
+    background: #243447;
+  }
+
+  .buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  textarea {
+    min-height: 170px;
+    padding: 8px;
+    resize: vertical;
+    font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  .hint {
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  @media (max-width: 860px) {
+    main {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Avatar Transform Debugger</h1>
+</header>
+
+<main>
+  <section class="panel controls">
+    <div class="row">
+      <label for="bg">bg</label>
+      <select id="bg"></select>
+    </div>
+    <div class="row">
+      <label for="body_full">body</label>
+      <select id="body_full"></select>
+    </div>
+    <div class="row">
+      <label for="head">head</label>
+      <select id="head"></select>
+    </div>
+    <div class="row">
+      <label for="accessory_under">under</label>
+      <select id="accessory_under"></select>
+    </div>
+    <div class="row">
+      <label for="hair">hair</label>
+      <select id="hair"></select>
+    </div>
+    <div class="row">
+      <label for="accessory">accessory</label>
+      <select id="accessory"></select>
+    </div>
+    <div class="row">
+      <label for="bubble">bubble</label>
+      <select id="bubble"></select>
+    </div>
+
+    <hr style="width:100%; border:0; border-top:1px solid var(--line)">
+
+    <div class="row">
+      <label for="editLayer">edit layer</label>
+      <select id="editLayer"></select>
+    </div>
+    <div class="row">
+      <label>x</label>
+      <div class="range-line">
+        <input id="x" type="range" min="-16" max="16" step="1">
+        <input id="xNum" type="number" step="1">
+      </div>
+    </div>
+    <div class="row">
+      <label>y</label>
+      <div class="range-line">
+        <input id="y" type="range" min="-16" max="16" step="1">
+        <input id="yNum" type="number" step="1">
+      </div>
+    </div>
+    <div class="row">
+      <label>scale</label>
+      <div class="range-line">
+        <input id="scale" type="range" min="0.70" max="1.35" step="0.01">
+        <input id="scaleNum" type="number" min="0.70" max="1.35" step="0.01">
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button id="resetOne" type="button">Reset One</button>
+      <button id="resetAll" type="button">Reset All</button>
+      <button id="copyJson" type="button">Copy JSON</button>
+    </div>
+    <textarea id="jsonOut" spellcheck="false"></textarea>
+    <div class="hint">Adjust values here, then copy the JSON or the single layer line back to Codex.</div>
+  </section>
+
+  <section class="panel preview">
+    <div class="canvas-wrap">
+      <canvas id="canvas" width="72" height="72"></canvas>
+    </div>
+    <div class="hint" id="currentKey"></div>
+  </section>
+</main>
+
+<script>
+const ROOT = './assets/avatars/modular_v1_calibrated/';
+const W = 72;
+const H = 72;
+
+const ASSETS = {
+  bg: ['dorm_day', 'dorm_night', 'campus', 'cafe_date', 'casino_party', 'esports_room', 'gym', 'kitchen', 'library', 'magic_corridor', 'office', 'xianxia_temple'],
+  body_full: ['business_blazer', 'cardigan', 'chef_coat', 'esports_jersey', 'female_business_blazer', 'female_cardigan_cream', 'female_chef_coat', 'female_esports_jersey', 'female_gym_jacket', 'female_idol_stage', 'female_labcoat', 'female_office_shirt', 'female_party_top', 'female_preppy_blazer', 'female_suit', 'female_teal_crop_hoodie', 'female_white_blouse', 'female_wizard_robe', 'female_worn_hoodie', 'female_worn_sweater', 'female_xianxia_hanfu', 'gym_top', 'idol_jacket', 'labcoat', 'office_shirt', 'party_shirt', 'school_uniform', 'suit', 'teal_student_hoodie', 'tracksuit', 'wizard_robe', 'worn_hoodie', 'xianxia_robe'],
+  head: ['male_neutral', 'male_happy', 'male_tired', 'female_neutral', 'female_happy', 'female_tired'],
+  accessory_under: ['', 'headphones'],
+  hair: ['female_bob_black', 'female_bob_blonde', 'female_bob_chestnut', 'female_bob_rose_pink', 'female_long_straight_black', 'female_long_straight_blonde', 'female_long_straight_chestnut', 'female_long_straight_rose_pink', 'female_side_ponytail_black', 'female_side_ponytail_blonde', 'female_side_ponytail_chestnut', 'female_side_ponytail_rose_pink', 'male_short_fluffy_black', 'male_short_fluffy_chestnut', 'male_short_fluffy_dark_brown', 'male_short_fluffy_silver', 'male_side_swept_black', 'male_side_swept_chestnut', 'male_side_swept_dark_brown', 'male_side_swept_silver'],
+  accessory: ['', 'glasses', 'headphones', 'spirit_beads'],
+  bubble: ['', 'academic', 'chef', 'esports', 'happy', 'love', 'magic', 'rich', 'sick', 'stress', 'tired', 'xianxia'],
+};
+
+const DEFAULT_TRANSFORMS = {
+  'body_full:female_worn_sweater': { x: 0, y: 2, scale: 1 },
+  'body_full:gym_top': { x: 0, y: -3, scale: 1 },
+  'body_full:teal_student_hoodie': { x: 0, y: 0, scale: 1 },
+  'body_full:worn_hoodie': { x: 1, y: 5, scale: 1 },
+  'hair:female_bob_black': { x: 1, y: 1, scale: 1.08 },
+  'hair:female_side_ponytail_black': { x: 4, y: -3, scale: 1.01 },
+  'hair:female_side_ponytail_blonde': { x: 3, y: -1, scale: 0.96 },
+  'hair:female_side_ponytail_chestnut': { x: 3, y: -1, scale: 0.96 },
+  'hair:female_side_ponytail_rose_pink': { x: 3, y: -1, scale: 0.96 },
+  'hair:male_short_fluffy_black': { x: -1, y: -1, scale: 1.13 },
+  'hair:male_short_fluffy_chestnut': { x: -1, y: -1, scale: 1.13 },
+  'hair:male_short_fluffy_dark_brown': { x: -1, y: -1, scale: 1.16 },
+  'hair:male_short_fluffy_silver': { x: 0, y: -2, scale: 1.06 },
+};
+
+const LAYERS = ['bg', 'body_full', 'head', 'accessory_under', 'hair', 'accessory', 'bubble'];
+const els = Object.fromEntries([...LAYERS, 'editLayer', 'x', 'xNum', 'y', 'yNum', 'scale', 'scaleNum', 'jsonOut', 'canvas', 'currentKey'].map(id => [id, document.getElementById(id)]));
+const images = new Map();
+
+let transforms = loadTransforms();
+
+function loadTransforms() {
+  try {
+    return { ...DEFAULT_TRANSFORMS, ...JSON.parse(localStorage.getItem('avatar-transform-debug') || '{}') };
+  } catch {
+    return { ...DEFAULT_TRANSFORMS };
+  }
+}
+
+function saveTransforms() {
+  localStorage.setItem('avatar-transform-debug', JSON.stringify(diffTransforms(), null, 2));
+}
+
+function diffTransforms() {
+  const diff = {};
+  Object.keys(transforms).sort().forEach(key => {
+    const value = normalizeTransform(transforms[key]);
+    const base = normalizeTransform(DEFAULT_TRANSFORMS[key]);
+    if (value.x !== base.x || value.y !== base.y || value.scale !== base.scale) diff[key] = value;
+  });
+  return diff;
+}
+
+function normalizeTransform(value) {
+  return {
+    x: Number(value?.x || 0),
+    y: Number(value?.y || 0),
+    scale: Number(value?.scale || 1),
+  };
+}
+
+function assetUrl(folder, id) {
+  return `${ROOT}${folder}/${id}.png`;
+}
+
+function imageFor(folder, id) {
+  if (!id) return null;
+  const src = assetUrl(folder, id);
+  if (images.has(src)) return images.get(src);
+  const img = new Image();
+  img.onload = draw;
+  img.onerror = draw;
+  img.src = src;
+  images.set(src, img);
+  return img;
+}
+
+function currentLayerKey() {
+  const folder = els.editLayer.value;
+  return `${folder}:${els[folder].value}`;
+}
+
+function transformFor(folder, id) {
+  return normalizeTransform(transforms[`${folder}:${id}`]);
+}
+
+function drawImage(ctx, folder, id) {
+  const img = imageFor(folder, id);
+  if (!img || !img.complete || img.naturalWidth === 0) return;
+  const t = transformFor(folder, id);
+  const width = Math.round(W * t.scale);
+  const height = Math.round(H * t.scale);
+  const x = Math.round((W - width) / 2 + t.x);
+  const y = Math.round((H - height) / 2 + t.y);
+  ctx.drawImage(img, x, y, width, height);
+}
+
+function draw() {
+  const ctx = els.canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  ctx.clearRect(0, 0, W, H);
+  LAYERS.forEach(layer => drawImage(ctx, layer, els[layer].value));
+  syncJson();
+}
+
+function syncControlsFromLayer() {
+  const t = normalizeTransform(transforms[currentLayerKey()]);
+  els.x.value = els.xNum.value = t.x;
+  els.y.value = els.yNum.value = t.y;
+  els.scale.value = els.scaleNum.value = t.scale;
+  els.currentKey.textContent = currentLayerKey();
+  syncJson();
+}
+
+function setCurrentTransform(patch) {
+  const key = currentLayerKey();
+  transforms[key] = { ...normalizeTransform(transforms[key]), ...patch };
+  saveTransforms();
+  syncControlsFromLayer();
+  draw();
+}
+
+function syncJson() {
+  const diff = diffTransforms();
+  const grouped = {};
+  Object.entries(diff).forEach(([key, value]) => {
+    const [folder, id] = key.split(':');
+    grouped[folder] ||= {};
+    grouped[folder][id] = value;
+  });
+  els.jsonOut.value = JSON.stringify(grouped, null, 2);
+}
+
+function fillSelect(id) {
+  ASSETS[id].forEach(value => {
+    const option = document.createElement('option');
+    option.value = value;
+    option.textContent = value || '(none)';
+    els[id].appendChild(option);
+  });
+}
+
+function init() {
+  LAYERS.forEach(fillSelect);
+  LAYERS.forEach(layer => {
+    const option = document.createElement('option');
+    option.value = layer;
+    option.textContent = layer;
+    els.editLayer.appendChild(option);
+  });
+
+  els.bg.value = 'dorm_day';
+  els.body_full.value = 'female_teal_crop_hoodie';
+  els.head.value = 'female_neutral';
+  els.hair.value = 'female_side_ponytail_black';
+  els.bubble.value = 'rich';
+  els.editLayer.value = 'hair';
+
+  LAYERS.forEach(layer => els[layer].addEventListener('change', () => {
+    syncControlsFromLayer();
+    draw();
+  }));
+  els.editLayer.addEventListener('change', syncControlsFromLayer);
+
+  [['x', 'xNum'], ['y', 'yNum'], ['scale', 'scaleNum']].forEach(([rangeId, numId]) => {
+    const update = event => {
+      const value = Number(event.target.value);
+      setCurrentTransform({ [rangeId]: value });
+    };
+    els[rangeId].addEventListener('input', update);
+    els[numId].addEventListener('change', update);
+  });
+
+  document.getElementById('resetOne').addEventListener('click', () => {
+    const key = currentLayerKey();
+    if (DEFAULT_TRANSFORMS[key]) transforms[key] = { ...DEFAULT_TRANSFORMS[key] };
+    else delete transforms[key];
+    saveTransforms();
+    syncControlsFromLayer();
+    draw();
+  });
+
+  document.getElementById('resetAll').addEventListener('click', () => {
+    transforms = { ...DEFAULT_TRANSFORMS };
+    localStorage.removeItem('avatar-transform-debug');
+    syncControlsFromLayer();
+    draw();
+  });
+
+  document.getElementById('copyJson').addEventListener('click', async () => {
+    els.jsonOut.select();
+    await navigator.clipboard?.writeText(els.jsonOut.value).catch(() => {});
+  });
+
+  syncControlsFromLayer();
+  draw();
+}
+
+init();
+</script>
+</body>
+</html>
