@@ -4,6 +4,7 @@
  * Generates NPC classmate posts and comments each game month.
  * Integrates with game.js via initMoments / tickMoments / checkPostable.
  */
+import { unlockAchievement } from './achievements.js';
 
 // Hidden storylines — must match HIDDEN_STORYLINES in game.js
 // Feed is blocked + reactions cleared when player enters one of these
@@ -42,7 +43,7 @@ function _unlockEgg(id) {
   if (eggs.has(id)) return false;
   eggs.add(id);
   _saveEggs(eggs);
-  _showEggToast(id);
+  unlockAchievement('egg_' + id);
   return true;
 }
 function _showEggToast(id) {
@@ -2271,6 +2272,8 @@ function _formatTime(gameState) {
 
 let _momentsPanel = null;
 let _momentsMobilePanel = null;
+let _mobileDrawer = null;
+let _drawerState = 'collapsed'; // 'collapsed' | 'half' | 'full'
 let _momentsVisible = false;
 
 export function getMomentsPanel() { return _momentsPanel; }
@@ -2307,6 +2310,18 @@ function _renderMoments() {
 
   // Bind click delegation for like & comment actions
   _bindPostActions(container);
+
+  // Sync mobile drawer feed
+  _syncDrawerFeed();
+}
+
+function _syncDrawerFeed() {
+  if (!_mobileDrawer || !_momentsPanel) return;
+  const src = _momentsPanel.querySelector('.moments-feed');
+  const dst = _mobileDrawer.querySelector('.moments-drawer-feed');
+  if (!src || !dst) return;
+  dst.innerHTML = src.innerHTML;
+  _bindPostActions(dst);
 }
 
 function _bindPostActions(container) {
@@ -2926,7 +2941,7 @@ function _updateBadge() {
   } else {
     badge.style.display = 'none';
   }
-  // Mobile badge
+  // Mobile badge (legacy strip)
   const mobileBadge = document.getElementById('moments-badge-mobile');
   if (mobileBadge) {
     if (momentsState && momentsState.unreadCount > 0 && !_momentsVisible) {
@@ -2935,6 +2950,20 @@ function _updateBadge() {
     } else {
       mobileBadge.style.display = 'none';
     }
+  }
+  // Drawer badge
+  const drawerBadge = document.getElementById('moments-drawer-badge');
+  if (drawerBadge) {
+    if (momentsState && momentsState.unreadCount > 0 && !_momentsVisible) {
+      drawerBadge.textContent = momentsState.unreadCount > 99 ? '99+' : momentsState.unreadCount;
+      drawerBadge.style.display = '';
+    } else {
+      drawerBadge.style.display = 'none';
+    }
+  }
+  // Bounce drawer on new posts
+  if (momentsState && momentsState.unreadCount > 0 && !_momentsVisible) {
+    drawerBounce();
   }
 }
 
@@ -3074,50 +3103,147 @@ export function showPostPrompt(promptData, gameState, onChoice) {
 }
 
 /**
- * Mobile: show moments as full-screen slide-up overlay
+ * Mobile: show moments as full-screen slide-up overlay (legacy — kept for compat)
  */
 export function mountMobileMoments() {
-  if (_momentsMobilePanel) return;
-
-  _momentsMobilePanel = document.createElement('div');
-  _momentsMobilePanel.id = 'moments-mobile-panel';
-  _momentsMobilePanel.className = 'moments-mobile-panel';
-  _momentsMobilePanel.innerHTML = `
-    <div class="moments-mobile-header">
-      <button class="moments-mobile-close">✕</button>
-      <span class="moments-mobile-title">朋友圈</span>
-    </div>
-    <div class="moments-feed"></div>
-  `;
-  document.body.appendChild(_momentsMobilePanel);
-
-  _momentsMobilePanel.querySelector('.moments-mobile-close').addEventListener('click', () => {
-    _momentsMobilePanel.classList.remove('open');
-    _momentsVisible = false;
-    if (_onResumeAuto && _savedAutoMode) {
-      _onResumeAuto(_savedAutoMode);
-      _savedAutoMode = 0;
-    }
-  });
+  // Legacy — drawer replaces this
 }
 
 export function openMobileMoments() {
-  if (!_momentsMobilePanel) mountMobileMoments();
+  // Legacy — drawer replaces this
+  if (_mobileDrawer) _setDrawerState('half');
+}
 
-  // Copy feed content from desktop panel
-  const desktopFeed = _momentsPanel?.querySelector('.moments-feed');
-  const mobileFeed = _momentsMobilePanel.querySelector('.moments-feed');
-  if (desktopFeed && mobileFeed) {
-    mobileFeed.innerHTML = desktopFeed.innerHTML;
+// ══════════════════════════════════════════════════════════════
+//  MOBILE BOTTOM DRAWER
+// ══════════════════════════════════════════════════════════════
+
+const DRAWER_COLLAPSED = 44;
+const DRAWER_SNAP_THRESHOLDS = { half: 0.45, full: 0.85 };
+
+export function mountMobileDrawer() {
+  if (_mobileDrawer) return;
+
+  _mobileDrawer = document.createElement('div');
+  _mobileDrawer.id = 'moments-drawer';
+  _mobileDrawer.className = 'moments-drawer';
+  _mobileDrawer.innerHTML = `
+    <div class="moments-drawer-handle" id="moments-drawer-handle">
+      <div class="moments-drawer-handle-bar"></div>
+      <div class="moments-drawer-handle-row">
+        <span class="moments-drawer-label">朋友圈</span>
+        <span id="moments-drawer-badge" class="moments-drawer-badge" style="display:none">0</span>
+      </div>
+    </div>
+    <div class="moments-drawer-feed"></div>
+  `;
+
+  // Insert into game-layout flex flow (after right-panel)
+  const gameLayout = document.querySelector('.game-layout');
+  if (gameLayout) {
+    gameLayout.appendChild(_mobileDrawer);
+  } else {
+    document.body.appendChild(_mobileDrawer);
   }
 
-  _momentsMobilePanel.classList.add('open');
-  _momentsVisible = true;
+  _drawerState = 'collapsed';
 
-  if (momentsState) momentsState.unreadCount = 0;
-  _updateBadge();
+  // Tap handle to toggle
+  const handle = _mobileDrawer.querySelector('#moments-drawer-handle');
+  handle.addEventListener('click', () => {
+    if (_drawerState === 'collapsed') _setDrawerState('half');
+    else _setDrawerState('collapsed');
+  });
 
-  if (_onPauseAuto) _savedAutoMode = _onPauseAuto();
+  // Touch drag on handle
+  _initDrawerDrag(handle);
+
+  // Stop propagation inside drawer so game doesn't advance
+  _mobileDrawer.addEventListener('click', e => e.stopPropagation());
+
+  // Initial sync
+  _syncDrawerFeed();
+}
+
+function _setDrawerState(newState) {
+  if (!_mobileDrawer) return;
+  const gameLayout = _mobileDrawer.closest('.game-layout');
+
+  _drawerState = newState;
+  _mobileDrawer.classList.remove('expanded', 'full');
+  if (gameLayout) gameLayout.classList.remove('drawer-open');
+
+  if (newState === 'collapsed') {
+    _momentsVisible = false;
+    _mobileDrawer.style.flex = '';
+  } else if (newState === 'half') {
+    _momentsVisible = true;
+    _mobileDrawer.classList.add('expanded');
+    _mobileDrawer.style.flex = '1';
+    if (gameLayout) gameLayout.classList.add('drawer-open');
+  } else {
+    _momentsVisible = true;
+    _mobileDrawer.classList.add('expanded', 'full');
+    _mobileDrawer.style.flex = '2.5';
+    if (gameLayout) gameLayout.classList.add('drawer-open');
+  }
+
+  if (newState !== 'collapsed') {
+    if (momentsState) momentsState.unreadCount = 0;
+    _updateBadge();
+    _syncDrawerFeed();
+  }
+}
+
+function _initDrawerDrag(handle) {
+  let startY = 0;
+  let dragging = false;
+  let didDrag = false;
+  let cumDY = 0;
+
+  const onStart = (e) => {
+    const t = e.touches ? e.touches[0] : e;
+    startY = t.clientY;
+    dragging = true;
+    didDrag = false;
+    cumDY = 0;
+  };
+
+  const onMove = (e) => {
+    if (!dragging) return;
+    const t = e.touches ? e.touches[0] : e;
+    cumDY = startY - t.clientY; // positive = swipe up
+    if (Math.abs(cumDY) > 8) didDrag = true;
+    if (didDrag) e.preventDefault();
+  };
+
+  const onEnd = () => {
+    if (!dragging) return;
+    dragging = false;
+    if (!didDrag) return; // let click handler deal with taps
+
+    // Swipe up → expand, swipe down → collapse
+    if (cumDY > 30) {
+      if (_drawerState === 'collapsed') _setDrawerState('half');
+      else if (_drawerState === 'half') _setDrawerState('full');
+    } else if (cumDY < -30) {
+      if (_drawerState === 'full') _setDrawerState('half');
+      else if (_drawerState === 'half') _setDrawerState('collapsed');
+    }
+  };
+
+  handle.addEventListener('touchstart', onStart, { passive: true });
+  document.addEventListener('touchmove', onMove, { passive: false });
+  document.addEventListener('touchend', onEnd);
+  handle.addEventListener('mousedown', onStart);
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onEnd);
+}
+
+export function drawerBounce() {
+  if (!_mobileDrawer || _drawerState !== 'collapsed') return;
+  _mobileDrawer.classList.add('bounce');
+  setTimeout(() => _mobileDrawer.classList.remove('bounce'), 600);
 }
 
 /**
@@ -3130,6 +3256,11 @@ export function resetMoments() {
   if (_momentsPanel) {
     const feed = _momentsPanel.querySelector('.moments-feed');
     if (feed) feed.innerHTML = '';
+  }
+  if (_mobileDrawer) {
+    const feed = _mobileDrawer.querySelector('.moments-drawer-feed');
+    if (feed) feed.innerHTML = '';
+    _setDrawerState('collapsed');
   }
   _updateBadge();
 }

@@ -1,6 +1,6 @@
 // Service Worker for 留学重开模拟器 PWA
 // Bump CACHE_VER to force re-cache after content updates
-const CACHE_VER = 'sasr-1.0';
+const CACHE_VER = 'sasr-1.2';
 
 const CORE_ASSETS = [
   './',
@@ -245,24 +245,19 @@ self.addEventListener('activate', e => {
   );
 });
 
-// Fetch: cache-first, fallback to network
+// Fetch: network-first, fallback to cache (instant updates, offline resilient)
 self.addEventListener('fetch', e => {
-  // Skip non-GET and cross-origin (e.g. CDN html2canvas, QR code API)
   if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
   if (url.origin !== location.origin) return;
 
   e.respondWith(
-    caches.match(e.request).then(cached => {
-      if (cached) return cached;
-      return fetch(e.request).then(resp => {
-        // Cache new same-origin requests on the fly
-        if (resp.ok) {
-          const clone = resp.clone();
-          caches.open(CACHE_VER).then(cache => cache.put(e.request, clone));
-        }
-        return resp;
-      });
-    })
+    fetch(e.request).then(resp => {
+      if (resp.ok) {
+        const clone = resp.clone();
+        caches.open(CACHE_VER).then(cache => cache.put(e.request, clone));
+      }
+      return resp;
+    }).catch(() => caches.match(e.request))
   );
 });

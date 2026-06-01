@@ -4,7 +4,7 @@ import { playStorylineIntro, playStorylineExit } from './cinematic.js';
 import { initAchievements, unlockAchievement, setOnUnlock, getAchievementBonuses } from './achievements.js';
 import { initFlowchart, openFlowchart, unlockFlowchartNode, setFlowchartSfx, resetSessionUnlocks, getSessionUnlocks } from './flowchart.js';
 import { initMemoryUI, renderMemoryPanel, recordPlaythrough, showNewCardToast } from './memory.js';
-import { initMoments, tickMoments, checkPostable, playerPost, mountMomentsUI, mountMobileMoments, openMobileMoments, resetMoments, showPostPrompt, isMomentsVisible, getClassReunion, reactToPlayerEvent, setMomentsActionHandler, setMomentsDramaHandler, addMomLastPost, getDiscoveredEggs, setMomentsHiddenEntryHandler } from './moments.js';
+import { initMoments, tickMoments, checkPostable, playerPost, mountMomentsUI, mountMobileMoments, openMobileMoments, mountMobileDrawer, resetMoments, showPostPrompt, isMomentsVisible, getClassReunion, reactToPlayerEvent, setMomentsActionHandler, setMomentsDramaHandler, addMomLastPost, setMomentsHiddenEntryHandler } from './moments.js';
 import * as SFX from './audio.js';
 // Multiplayer — loaded dynamically so single-player works even if it fails
 let mp = { enabled: false, connected: false, cards: [], opponent: {} };
@@ -4944,26 +4944,6 @@ function renderSummary() {
     }
   }
 
-  // 🥚 朋友圈彩蛋
-  const eggsEl = $('summary-eggs');
-  if (eggsEl) {
-    const eggs = getDiscoveredEggs();
-    const found = eggs.filter(e => e.discovered);
-    if (found.length === 0) {
-      eggsEl.innerHTML = `<div class="empty-hint">还没发现任何朋友圈彩蛋。<br/>下次玩仔细看看每个 NPC 的帖子吧 👀</div>`;
-    } else {
-      eggsEl.innerHTML = `<div class="eggs-list">
-        <div class="eggs-count">已发现 ${found.length} / ${eggs.length}</div>
-        ${eggs.map(e => `
-          <div class="egg-row${e.discovered ? ' found' : ' locked'}">
-            <span class="egg-icon">${e.discovered ? '🥚' : '🔒'}</span>
-            <span class="egg-name">${e.discovered ? e.name : '???'}</span>
-            <span class="egg-hint">${e.discovered ? e.hint : '未发现'}</span>
-          </div>
-        `).join('')}
-      </div>`;
-    }
-  }
 
   // 人生数据
   const metaEl = $('summary-meta');
@@ -5840,16 +5820,9 @@ function rearrangeMobileLayout(entering) {
       const timeChip = document.createElement('div');
       timeChip.className = 'mp-strip-time';
       strip.appendChild(timeChip);
-      // 朋友圈按钮
-      const momBtn = document.createElement('button');
-      momBtn.className = 'moments-strip-btn';
-      momBtn.innerHTML = '朋友圈<span id="moments-badge-mobile" class="moments-badge-mobile" style="display:none">0</span>';
-      momBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        openMobileMoments();
-      });
-      strip.appendChild(momBtn);
       strip.appendChild(rightHead);   // 按钮区在时间右边
+      // Mount bottom drawer for moments (replaces old strip button)
+      mountMobileDrawer();
       initStripDrag(strip);
       _mobileStatsStripUpdate = () => updateMobileStatsStrip(strip);
       _mobileStatsStripUpdate();

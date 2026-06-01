@@ -3375,7 +3375,7 @@ body.in-summary {
   /* ── Mobile stats strip: 时间 + 按钮区，grid 布局强制按钮区铺满 ── */
   body.in-game .mobile-stats-strip {
     display: grid;
-    grid-template-columns: auto 1fr;  /* 时间(intrinsic) | 按钮区(剩余全占) */
+    grid-template-columns: auto 1fr;  /* 时间 | 按钮区 */
     align-items: center;
     gap: 6px;
     padding: 8px 6px;
@@ -8725,93 +8725,141 @@ body:has(.moments-rfloat:not(.collapsed)) .mute-btn {
 }
 
 /* ── Mobile Moments Panel ─────────────────────────────────── */
-.moments-mobile-panel {
-  position: fixed;
-  inset: 0;
-  z-index: 8000;
-  background: #0c1018;
-  transform: translateY(100%);
-  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-  display: flex;
-  flex-direction: column;
-}
-.moments-mobile-panel.open {
-  transform: translateY(0);
-}
-.moments-mobile-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  background: rgba(12, 16, 24, 0.95);
-  flex-shrink: 0;
-}
-.moments-mobile-close {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(255,255,255,0.06);
-  color: var(--ink-soft);
-  font-size: 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.moments-mobile-title {
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--ink);
-}
-.moments-mobile-panel .moments-feed {
-  flex: 1;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-}
+/* ── Legacy mobile panel (replaced by drawer) ── */
+.moments-mobile-panel { display: none; }
 
-/* ── Mobile: Moments button in strip ──────────────────────── */
-.moments-strip-btn {
-  display: none;
-}
+/* ── Mobile: hide strip button (replaced by drawer) ── */
+.moments-strip-btn { display: none; }
+
 @media (max-width: 760px) {
-  .moments-strip-btn {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 10px;
-    border-radius: 6px;
-    border: 1px solid rgba(255,255,255,0.08);
-    background: rgba(245, 182, 66, 0.08);
-    color: #f5b642;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    position: relative;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-  .moments-strip-btn .moments-badge-mobile {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    min-width: 14px;
-    height: 14px;
-    padding: 0 3px;
-    border-radius: 7px;
-    background: #e74c3c;
-    color: #fff;
-    font-size: 9px;
-    font-weight: 700;
-    line-height: 14px;
-    text-align: center;
-  }
-
-  /* Hide desktop float on mobile (even in-game) */
+  /* Hide desktop float on mobile */
   body.in-game .moments-rfloat,
   body.in-game .moments-rfloat-strip {
     display: none;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Mobile Bottom Drawer — 朋友圈 (flex child of .game-layout)
+   ══════════════════════════════════════════════════════════════ */
+.moments-drawer {
+  display: none;
+}
+@media (max-width: 760px) {
+  .moments-drawer {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 44px;
+    min-height: 44px;
+    width: 100%;
+    align-self: stretch;
+    background: var(--card, #141a26);
+    border-top: 1px solid rgba(255,255,255,0.12);
+    overflow: hidden;
+    transition: flex 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Collapsed: only handle visible, feed hidden */
+  .moments-drawer:not(.expanded) .moments-drawer-feed {
+    display: none;
+  }
+
+  /* Expanded half: flex:1, same weight as right-panel */
+  .moments-drawer.expanded {
+    min-height: 120px;
+    border-top: 2px solid rgba(245, 182, 66, 0.3);
+  }
+
+  /* When drawer is open: hide avatar/stats, keep strip + right-panel */
+  body.in-game .game-layout.drawer-open .left-panel {
+    max-height: 0 !important;
+    opacity: 0;
+    padding: 0 !important;
+    border-bottom: none;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  /* right-panel keeps flex:1 so it and drawer share the remaining space */
+  body.in-game .game-layout.drawer-open .right-panel {
+    flex: 1;
+    min-height: 80px;
+  }
+
+  /* Bounce animation on new post */
+  .moments-drawer.bounce {
+    animation: drawer-bounce 0.5s ease;
+  }
+  @keyframes drawer-bounce {
+    0%   { transform: translateY(0); }
+    30%  { transform: translateY(-6px); }
+    50%  { transform: translateY(1px); }
+    70%  { transform: translateY(-2px); }
+    100% { transform: translateY(0); }
+  }
+
+  /* ── Handle (always visible, 44px) ── */
+  .moments-drawer-handle {
+    flex-shrink: 0;
+    height: 44px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 16px;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+  }
+  .moments-drawer-handle:active { cursor: grabbing; }
+
+  .moments-drawer-handle-bar {
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.2);
+    margin-bottom: 4px;
+  }
+  .moments-drawer.expanded .moments-drawer-handle-bar {
+    background: rgba(255,255,255,0.35);
+  }
+
+  .moments-drawer-handle-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .moments-drawer-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #f5b642;
+    letter-spacing: 0.04em;
+  }
+
+  .moments-drawer-badge {
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 8px;
+    background: #e74c3c;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 16px;
+    text-align: center;
+  }
+
+  /* ── Feed area ── */
+  .moments-drawer-feed {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 4px 16px;
+    min-height: 0;
   }
 }

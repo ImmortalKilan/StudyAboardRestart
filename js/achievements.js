@@ -94,6 +94,18 @@ export const ACHIEVEMENTS = [
   { id: 'influencer_mcn',         name: 'MCN签约',     icon: '📝', rarity: 'epic',      cat: '剧情',   desc: '签约顶级MCN，成为头部博主' },
   { id: 'end_influencer_top',     name: '全网顶流',    icon: '👑', rarity: 'legendary', cat: '终局',   desc: '登上福布斯30U30，从留学生到顶流网红' },
   { id: 'end_influencer_comeback', name: '咸鱼翻身',   icon: '🐟', rarity: 'legendary', cat: '终局',   desc: '所有人都以为你过气了——你用一条素颜视频打了所有人的脸' },
+
+  // ── 朋友圈彩蛋 ──────────────────────────────────────────────────────────
+  { id: 'egg_mom_last_post',  name: '妈妈的最后一条朋友圈', icon: '💌', rarity: 'epic',   cat: '朋友圈', desc: '结局之后那条没说完的话' },
+  { id: 'egg_fourth_wall',    name: '第四面墙裂痕',         icon: '🪞', rarity: 'epic',   cat: '朋友圈', desc: '有人在透过屏幕看你' },
+  { id: 'egg_hidden_npc',     name: '???的踪迹',           icon: '👤', rarity: 'epic',   cat: '朋友圈', desc: '名单上多出来的那位' },
+  { id: 'egg_midnight_3am',   name: '凌晨三点的朋友圈',     icon: '🌃', rarity: 'rare',   cat: '朋友圈', desc: '正常人都该睡了' },
+  { id: 'egg_festival',       name: '节日彩蛋',             icon: '🎊', rarity: 'rare',   cat: '朋友圈', desc: '现实世界的某一天' },
+  { id: 'egg_group_screenshot', name: '群聊截图',           icon: '🗣️', rarity: 'epic',   cat: '朋友圈', desc: '原来朋友圈外还有世界' },
+  { id: 'egg_cipher',         name: '藏字游戏',             icon: '🧩', rarity: 'epic',   cat: '朋友圈', desc: '每句的第一个字' },
+  { id: 'egg_dejavu',         name: '前世的回响',           icon: '🫧', rarity: 'epic',   cat: '朋友圈', desc: '重开够多次才能解锁' },
+  { id: 'egg_npc_shade',      name: 'NPC 暗讽',             icon: '🎭', rarity: 'rare',   cat: '朋友圈', desc: '他们其实都知道' },
+  { id: 'egg_hidden_entry',   name: '朋友圈里的暗号',       icon: '🔑', rarity: 'legendary', cat: '朋友圈', desc: '用对的暗号回复对的人' },
 ];
 
 let _unlocked = new Set();
@@ -154,7 +166,8 @@ const ACH_MILESTONES = [
   { threshold: 42, pts: 1 },   // Lv.7  — total +7
   { threshold: 52, pts: 2 },   // Lv.8  — total +9
   { threshold: 62, pts: 2 },   // Lv.9  — total +11
-  { threshold: 67, pts: 2 },   // Lv.10 — total +13
+  { threshold: 72, pts: 2 },   // Lv.10 — total +13
+  { threshold: 80, pts: 3 },   // Lv.11 — total +16
 ];
 
 // Specific achievements → fixed stat boosts (applied automatically, not distributable)
@@ -316,7 +329,7 @@ function _renderWall() {
   const countEl = document.getElementById('ach-wall-count');
   if (countEl) countEl.textContent = `${_unlocked.size} / ${ACHIEVEMENTS.length}`;
 
-  const cats = ['里程碑', '感情', '剧情', '终局', '彩蛋'];
+  const cats = ['里程碑', '感情', '剧情', '终局', '彩蛋', '朋友圈'];
   for (const cat of cats) {
     const items = ACHIEVEMENTS.filter(a => a.cat === cat);
     if (!items.length) continue;
