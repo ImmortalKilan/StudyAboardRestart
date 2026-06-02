@@ -6972,6 +6972,13 @@ async function main() {
     },
     {
       phase: 'alloc',
+      target: '#relic-slot',
+      title: '🏺 前世遗物',
+      body: '通关后会获得遗物，下一局可以在这里<strong>选 1 个带入</strong>获得属性加成。\n选中的遗物本局结束后轮回次数 -1，也可以「空手而来」。',
+      arrow: 'top',
+    },
+    {
+      phase: 'alloc',
       target: '#alloc-start',
       title: '🚀 开始人生',
       body: '属性分配好后，点击这个按钮正式开始你的留学人生！',
@@ -7020,6 +7027,13 @@ async function main() {
       _guideStep++;
       setTimeout(() => _guideShow(_guideStep), 100);
       return;
+    }
+
+    // Scroll target into view if needed (e.g. mobile alloc page scrolls)
+    const _rect0 = targetEl.getBoundingClientRect();
+    const _needsScroll = _rect0.bottom > window.innerHeight || _rect0.top < 0;
+    if (_needsScroll) {
+      targetEl.scrollIntoView({ behavior: 'instant', block: 'nearest' });
     }
 
     overlay.style.display = '';

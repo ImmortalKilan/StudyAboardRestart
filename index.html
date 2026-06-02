@@ -30,20 +30,20 @@
         </div>
       </div>
 
-      <div style="position: absolute; top: 20px; right: 24px; z-index: 100; display:flex; align-items:center; gap:12px;">
-        <button id="relic-vault-btn" class="ghost" title="遗物库" style="display:flex; align-items:center; gap:6px; font-size:15px;">
-          🏺 <span style="font-size:13px;">遗物库</span>
-          <span id="relic-vault-count" style="font-weight:bold; font-size:12px; color:#c9a978; font-family:var(--mono);">0/5</span>
+      <div class="start-top-bar">
+        <button id="relic-vault-btn" class="ghost start-top-btn" title="遗物库">
+          🏺 <span class="start-top-label">遗物库</span>
+          <span id="relic-vault-count" class="start-top-badge">0/5</span>
         </button>
-        <button id="memory-btn" class="ghost" title="前世记忆" style="display:flex; align-items:center; gap:6px; font-size:15px;">
-          🃏 <span style="font-size:13px;">前世记忆</span>
-          <span id="memory-btn-count" style="font-weight:bold; font-size:12px; color:#c9a978; font-family:var(--mono);">0</span>
+        <button id="memory-btn" class="ghost start-top-btn" title="前世记忆">
+          🃏 <span class="start-top-label">前世记忆</span>
+          <span id="memory-btn-count" class="start-top-badge">0</span>
         </button>
-        <button id="fc-open-start-btn" class="ghost" title="命运图谱" style="display:flex; align-items:center; gap:4px; font-size:15px;">
-          🗺️ <span style="font-size:13px;">命运图谱</span>
+        <button id="fc-open-start-btn" class="ghost start-top-btn" title="命运图谱">
+          🗺️ <span class="start-top-label">命运图谱</span>
         </button>
-        <button id="ach-trophy-start-btn" class="ghost" title="成就墙" style="display:flex; align-items:center; gap:6px;">
-          🏆 <span id="ach-trophy-start-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/81</span>
+        <button id="ach-trophy-start-btn" class="ghost start-top-btn" title="成就墙">
+          🏆 <span id="ach-trophy-start-badge" class="start-top-badge" style="color:#f1c40f;">0/81</span>
           <span id="ach-start-level" class="ach-start-level">Lv.0</span>
         </button>
       </div>
@@ -233,7 +233,21 @@
             <p class="tut-text">高等级天赋加成更强，但也可能带来意想不到的副作用。每次抽卡保底至少一个紫色或橙色天赋。</p>
           </section>
 
-          <!-- Section 4: 事件与选择 -->
+          <!-- Section 4: 转世遗物 -->
+          <section class="tut-section">
+            <h2 class="tut-heading">🏺 转世遗物</h2>
+            <p class="tut-text">每局通关后，你的一生会化为一件<strong>遗物</strong>，收入遗物库（最多 5 个）。下一局开始时可以选 1 件带入，获得属性加成。</p>
+            <div class="tut-grade-row">
+              <span class="tut-grade g0">凡物</span>
+              <span class="tut-grade g1">遗珍</span>
+              <span class="tut-grade g2">宿命</span>
+              <span class="tut-grade g3">传说</span>
+            </div>
+            <p class="tut-text">等级越高加成越强，轮回次数也越多。选中的遗物本局结束后轮回次数 -1，用完就消散。遗物还可能在轮回中发生<strong>变异</strong>。</p>
+            <div class="tut-tip">💡 紫色遗物对应特定剧情线，带着它再次进入同一条线会触发「遗物共鸣」获得额外加成。遗物也可以通过分享码送给朋友。</div>
+          </section>
+
+          <!-- Section 5: 事件与选择 -->
           <section class="tut-section">
             <h2 class="tut-heading">📜 事件与选择</h2>
             <p class="tut-text">游戏按月推进，每月触发一个事件。有些事件会给你<strong>选择</strong>——不同的选项可能需要满足属性条件。</p>
@@ -267,6 +281,8 @@
               <div class="tut-feature">😢 快乐过低也有危险，别让自己太惨</div>
               <div class="tut-feature">📖 每局结束可以查看「命运抉择」回顾你做过的选择</div>
               <div class="tut-feature">🏆 收集成就解锁更多挑战</div>
+              <div class="tut-feature">🏺 遗物可以通过「分享码」送给朋友，但每个码只能用一次</div>
+              <div class="tut-feature">🃏 「前世记忆」卡会提示隐藏剧情线的触发条件，多重开几次收集线索</div>
               <div class="tut-feature">🔁 每一局都不一样，多玩几次探索不同结局</div>
             </div>
           </section>

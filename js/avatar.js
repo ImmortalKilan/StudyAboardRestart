@@ -2214,8 +2214,7 @@ export function renderAvatar(canvas, state) {
   } else {
     paintModular(ctx, canvas, avatarState);
   }
-  // Idle bobbing via CSS animation (no JS rAF loop needed)
-  canvas.style.animation = 'avatarBob 2.6s ease-in-out infinite';
+  // No idle animation — keep avatar static
 }
 
 export function createStandaloneAvatar(state) {
