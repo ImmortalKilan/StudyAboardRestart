@@ -1,6 +1,6 @@
 // Service Worker for 留学重开模拟器 PWA
 // Bump CACHE_VER to force re-cache after content updates
-const CACHE_VER = 'sasr-1.6';
+const CACHE_VER = 'sasr-1.7';
 
 const CORE_ASSETS = [
   './',
@@ -32,7 +32,7 @@ const CORE_ASSETS = [
   // Icons & UI
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
-  './assets/ui/memory-mirror.png',
+  './assets/ui/memory-fragment.svg',
   // SFX
   './assets/sfx/click1.ogg',
   './assets/sfx/click2.ogg',
@@ -94,7 +94,7 @@ const CORE_ASSETS = [
   './assets/avatars/modular_v1_calibrated/body_full/female_party_top.png',
   './assets/avatars/modular_v1_calibrated/body_full/female_preppy_blazer.png',
   './assets/avatars/modular_v1_calibrated/body_full/female_suit.png',
-  './assets/avatars/modular_v1_calibrated/body_full/female_teal_crop_hoodie.png',
+  './assets/avatars/modular_v1_calibrated/body_full/female_hoodie.png',
   './assets/avatars/modular_v1_calibrated/body_full/female_white_blouse.png',
   './assets/avatars/modular_v1_calibrated/body_full/female_wizard_robe.png',
   './assets/avatars/modular_v1_calibrated/body_full/female_worn_sweater.png',
@@ -106,10 +106,10 @@ const CORE_ASSETS = [
   './assets/avatars/modular_v1_calibrated/body_full/party_shirt.png',
   './assets/avatars/modular_v1_calibrated/body_full/school_uniform.png',
   './assets/avatars/modular_v1_calibrated/body_full/suit.png',
-  './assets/avatars/modular_v1_calibrated/body_full/teal_student_hoodie.png',
+  './assets/avatars/modular_v1_calibrated/body_full/male_hoodie.png',
   './assets/avatars/modular_v1_calibrated/body_full/tracksuit.png',
   './assets/avatars/modular_v1_calibrated/body_full/wizard_robe.png',
-  './assets/avatars/modular_v1_calibrated/body_full/worn_hoodie.png',
+  './assets/avatars/modular_v1_calibrated/body_full/male_worn_hoodie.png',
   './assets/avatars/modular_v1_calibrated/body_full/xianxia_robe.png',
   // -- head
   './assets/avatars/modular_v1_calibrated/head/female_happy.png',
@@ -133,7 +133,6 @@ const CORE_ASSETS = [
   './assets/avatars/modular_v1_calibrated/hair/male_short_dark_brown.png',
   './assets/avatars/modular_v1_calibrated/hair/male_short_fluffy_black.png',
   './assets/avatars/modular_v1_calibrated/hair/male_short_fluffy_chestnut.png',
-  './assets/avatars/modular_v1_calibrated/hair/male_short_fluffy_dark_brown.png',
   './assets/avatars/modular_v1_calibrated/hair/male_short_fluffy_silver.png',
   './assets/avatars/modular_v1_calibrated/hair/male_short_neat_black.png',
   './assets/avatars/modular_v1_calibrated/hair/male_short_neat_chestnut.png',
@@ -189,7 +188,7 @@ const CORE_ASSETS = [
   './assets/avatars/modular_v1_calibrated/torso_clothes/female_party_top.png',
   './assets/avatars/modular_v1_calibrated/torso_clothes/female_preppy_blazer.png',
   './assets/avatars/modular_v1_calibrated/torso_clothes/female_suit.png',
-  './assets/avatars/modular_v1_calibrated/torso_clothes/female_teal_crop_hoodie.png',
+  './assets/avatars/modular_v1_calibrated/torso_clothes/female_hoodie.png',
   './assets/avatars/modular_v1_calibrated/torso_clothes/female_white_blouse.png',
   './assets/avatars/modular_v1_calibrated/torso_clothes/female_wizard_robe.png',
   './assets/avatars/modular_v1_calibrated/torso_clothes/female_worn_sweater.png',
@@ -201,10 +200,10 @@ const CORE_ASSETS = [
   './assets/avatars/modular_v1_calibrated/torso_clothes/party_shirt.png',
   './assets/avatars/modular_v1_calibrated/torso_clothes/school_uniform.png',
   './assets/avatars/modular_v1_calibrated/torso_clothes/suit.png',
-  './assets/avatars/modular_v1_calibrated/torso_clothes/teal_student_hoodie.png',
+  './assets/avatars/modular_v1_calibrated/torso_clothes/male_hoodie.png',
   './assets/avatars/modular_v1_calibrated/torso_clothes/tracksuit.png',
   './assets/avatars/modular_v1_calibrated/torso_clothes/wizard_robe.png',
-  './assets/avatars/modular_v1_calibrated/torso_clothes/worn_hoodie.png',
+  './assets/avatars/modular_v1_calibrated/torso_clothes/male_worn_hoodie.png',
   './assets/avatars/modular_v1_calibrated/torso_clothes/xianxia_robe.png',
   // -- accessory
   './assets/avatars/modular_v1_calibrated/accessory/backpack_strap.png',
