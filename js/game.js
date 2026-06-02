@@ -4,6 +4,7 @@ import { playStorylineIntro, playStorylineExit } from './cinematic.js';
 import { initAchievements, unlockAchievement, setOnUnlock, getAchievementBonuses } from './achievements.js';
 import { initFlowchart, openFlowchart, unlockFlowchartNode, setFlowchartSfx, resetSessionUnlocks, getSessionUnlocks } from './flowchart.js';
 import { initMemoryUI, renderMemoryPanel, recordPlaythrough, showNewCardToast } from './memory.js';
+import { initRelicUI, updateVaultButton, openVaultModal, renderRelicSlot, initRelicSlot, finalizeRelicChoice, generateRelicChoices, showRelicReward, getActiveRelic, clearActiveRelic, consumeActiveRelic, showMutationToast, checkGiftLink, redeemRelicCode, formatEffect as relicFormatEffect, addRelic, getRelicVault, checkBlueTrigger, checkPurpleTrigger } from './relic.js';
 import { initMoments, tickMoments, checkPostable, playerPost, mountMomentsUI, mountMobileMoments, openMobileMoments, mountMobileDrawer, resetMoments, showPostPrompt, isMomentsVisible, getClassReunion, reactToPlayerEvent, setMomentsActionHandler, setMomentsDramaHandler, addMomLastPost, setMomentsHiddenEntryHandler } from './moments.js';
 import * as SFX from './audio.js';
 // Multiplayer — loaded dynamically so single-player works even if it fails
@@ -1897,6 +1898,15 @@ function clampStats() {
   if (STAT_KEYS.some(k => (state[k] || 0) >= 10)) unlockAchievement('stat_max');
   // Achievement: any base stat goes negative
   if (STAT_KEYS.some(k => (state[k] || 0) < 0)) unlockAchievement('stat_negative');
+
+  // Blue relic trigger check (one-time flavor event per playthrough)
+  if (state._inheritedRelic && state.phase === 'game') {
+    const blueResult = checkBlueTrigger(state);
+    if (blueResult) {
+      pushLog(blueResult.log);
+      pushLog(`[遗物共鸣] ${blueResult.effectDesc}`);
+    }
+  }
 }
 
 function syncProfessionByAge() {
@@ -2184,6 +2194,15 @@ function applyEvent(ev) {
       if (ev.set.storyline === 'band') initBandStage();
       if (ev.set.storyline === 'influencer') initInfluencerStage();
     }
+    // Purple relic trigger: boost storyline stat when re-entering matching storyline
+    if (ev.set.storyline && state._inheritedRelic) {
+      const purpleResult = checkPurpleTrigger(state, ev.set.storyline);
+      if (purpleResult) {
+        const statName = STAT_LABELS[purpleResult.boostStat] || purpleResult.boostStat;
+        pushLog(purpleResult.log);
+        pushLog(`[遗物共鸣] ${statName} +${purpleResult.boostAmount}`);
+      }
+    }
     // Reveal the career stat for this storyline in both desktop and mobile panels
     const _unlockStat = STORYLINE_UNLOCK_STAT[ev.set.storyline];
     if (_unlockStat) state['show' + _unlockStat] = true;
@@ -2314,6 +2333,19 @@ function applyEvent(ev) {
       setTimeout(() => showNewCardToast(), 1500);
     }
     renderMemoryPanel();
+
+    // Consume inherited relic (lives -1, mutation check)
+    const relicResult = consumeActiveRelic();
+    if (relicResult) {
+      setTimeout(() => showMutationToast(relicResult), 2500);
+    }
+
+    // Pre-generate 3 relic choices for this playthrough
+    const _endScore = calculateScore();
+    const _endIsLeg = LEGENDARY_ENDINGS.has(ev.id);
+    const _endIsGood = GOOD_ENDINGS.has(ev.id);
+    state._relicChoices = generateRelicChoices(state, _endScore, _endIsLeg, _endIsGood, STORYLINE_NAMES);
+    state._relicRewardShown = false;
   }
 
   // Cinematic intro when entering a special/hidden storyline
@@ -4464,6 +4496,23 @@ function initGame() {
   state.cardHistory = [];
   _endCinematicShown = false;
   applyTalentEffects();
+
+  // Finalize relic choice from the slot widget
+  state._inheritedRelic = finalizeRelicChoice();
+  state._relicTriggered = new Set();
+  const _relic = state._inheritedRelic || null;
+  if (_relic && _relic.effect) {
+    for (const [k, v] of Object.entries(_relic.effect)) {
+      if (STAT_KEYS.includes(k)) {
+        state[k] = (state[k] || 0) + v;
+      } else if (k === 'HAP') {
+        state.HAP = (state.HAP || 0) + v;
+      } else if (EFFECT_KEYS.has(k)) {
+        state[k] = (state[k] || 0) + v;
+      }
+    }
+  }
+
   clampStats();
   state.phase = 'game';
   state.age = 15;
@@ -4485,6 +4534,10 @@ function initGame() {
     pushLog('你重生了，重生在15岁的冬天。');
   } else {
     pushLog('你又重生了，重生在15岁的冬天。');
+  }
+  if (_relic) {
+    pushLog(`你的口袋里多了一样东西——${_relic.name}。${_relic.description}`);
+    pushLog(`[${['白·凡物','蓝·遗珍','紫·宿命','金·传说'][_relic.grade]}] ${_relic.name}：${relicFormatEffect(_relic.effect)}`);
   }
   unlockAchievement('first_play');
   const plan = state.yearlyPlan.get(15);
@@ -4794,6 +4847,16 @@ function _renderTitles(titles) {
     badge.style.animationDelay = `${0.5 + i * 0.2}s`;
     el.appendChild(badge);
   });
+}
+
+function _autoShowRelicReward() {
+  if (!state._relicChoices || state._relicRewardShown) return;
+  state._relicRewardShown = true;
+  setTimeout(() => {
+    showRelicReward(state._relicChoices).then(() => {
+      updateVaultButton();
+    });
+  }, 800);
 }
 
 function renderSummary() {
@@ -6657,6 +6720,7 @@ async function main() {
     dismissEndOverlay();
     showScreen('summary-screen');
     renderSummary();
+    _autoShowRelicReward();
   });
 
   $('btn-end-summary').addEventListener('click', () => {
@@ -6664,6 +6728,7 @@ async function main() {
     dismissEndOverlay();
     showScreen('summary-screen');
     renderSummary();
+    _autoShowRelicReward();
   });
 
   $('btn-end-restart').addEventListener('click', () => {
@@ -6881,7 +6946,7 @@ async function main() {
     $('poster-modal').style.display = 'none';
   });
 
-  $('btn-start').addEventListener('click', () => {
+  $('btn-start').addEventListener('click', async () => {
     SFX.preloadSounds();
     SFX.sfxConfirm();
     resetSessionUnlocks();
@@ -6899,17 +6964,39 @@ async function main() {
     $('sex-male').classList.add('active');
     $('sex-female').classList.remove('active');
 
+    // Render relic slot (persistent widget, shown if vault has relics)
+    renderRelicSlot();
+    $('step-talents').style.display = '';
+    state._inheritedRelic = null;
+
     showScreen('creation-screen');
 
-    // Always start at step-talents (first step)
     const scrollArea = $('creation-scroll-area');
     if (scrollArea) scrollArea.scrollTop = 0;
-    // Avatar is in the last step — no need to render on start-screen click
   });
 
   renderTalentSelect(talents);
   updateCreationAvatar();
   initMemoryUI();
+  initRelicUI();
+  initRelicSlot();
+  $('relic-vault-btn').addEventListener('click', () => { SFX.sfxNav(); openVaultModal(); });
+
+  // Check for gift relic link
+  const giftRelic = checkGiftLink();
+  if (giftRelic) {
+    setTimeout(() => {
+      if (confirm(`你收到了一份转世遗物：「${giftRelic.name}」\n${giftRelic.description}\n\n是否收入遗物库？`)) {
+        if (addRelic(giftRelic)) {
+          redeemRelicCode(giftRelic.sid);
+        } else {
+          alert('遗物库已满，请先丢弃一个遗物。');
+        }
+        updateVaultButton();
+      }
+    }, 500);
+  }
+
   showScreen('start-screen');
 
   // ── Tutorial system ──────────────────────────────────────────────
@@ -8291,6 +8378,9 @@ function _resetGameState() {
   state.cardHistory = [];
   state._frenemyDraftPool = null;
   state._frenemyDraftPicked = [];
+  state._inheritedRelic = null;
+  state._relicChoices = null;
+  state._relicRewardShown = false;
   // 清除各种 flag
   for (const flag of ['match_fixing', 'japan_path', 'jp_fluent', 'kohaku', 'scandal',
     'party_clean', 'party_dirty', 'academic_dishonesty', 'late_dropout', 'hobby',

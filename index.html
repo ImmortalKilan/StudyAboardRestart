@@ -31,6 +31,14 @@
       </div>
 
       <div style="position: absolute; top: 20px; right: 24px; z-index: 100; display:flex; align-items:center; gap:12px;">
+        <button id="relic-vault-btn" class="ghost" title="遗物库" style="display:flex; align-items:center; gap:6px; font-size:15px;">
+          🏺 <span style="font-size:13px;">遗物库</span>
+          <span id="relic-vault-count" style="font-weight:bold; font-size:12px; color:#c9a978; font-family:var(--mono);">0/5</span>
+        </button>
+        <button id="memory-btn" class="ghost" title="前世记忆" style="display:flex; align-items:center; gap:6px; font-size:15px;">
+          🃏 <span style="font-size:13px;">前世记忆</span>
+          <span id="memory-btn-count" style="font-weight:bold; font-size:12px; color:#c9a978; font-family:var(--mono);">0</span>
+        </button>
         <button id="fc-open-start-btn" class="ghost" title="命运图谱" style="display:flex; align-items:center; gap:4px; font-size:15px;">
           🗺️ <span style="font-size:13px;">命运图谱</span>
         </button>
@@ -50,32 +58,9 @@
         <button id="btn-tutorial" class="start-btn start-btn-tutorial">📖 新手教程</button>
       </div>
 
-      <!-- Memory Card Panel (left sidebar) -->
-      <div id="memory-panel" class="memory-panel">
-        <div class="memory-panel-inner">
-          <div class="memory-panel-mirror">
-            <img src="assets/ui/memory-mirror.png" alt="前世记忆" class="memory-mirror-img" />
-            <div class="memory-mirror-glow"></div>
-          </div>
-          <div class="memory-panel-content">
-            <div class="memory-panel-title">前世记忆</div>
-            <div class="memory-panel-subtitle">解锁前世的记忆碎片</div>
-            <div class="memory-panel-card-row">
-              <span class="memory-card-label">记忆卡</span>
-              <span class="memory-card-count">0</span>
-            </div>
-            <div class="memory-progress">再重开 3 次可获得记忆卡</div>
-            <div class="memory-stats">0次重开 · 0/18条线索</div>
-            <div class="memory-panel-cta">
-              <span class="memory-cta-text">查看全部线索</span>
-              <span class="memory-cta-arrow">→</span>
-            </div>
-          </div>
-        </div>
-      </div>
     </section>
 
-    <!-- Memory Card Carousel Modal -->
+    <!-- Memory Card Collection Modal -->
     <div id="memory-modal" class="memory-modal">
       <div class="mm-backdrop"></div>
       <div class="mm-container">
@@ -90,14 +75,61 @@
           </div>
           <button class="mm-close" aria-label="关闭">&times;</button>
         </header>
-        <div class="mm-viewport">
-          <button class="mm-nav mm-nav-prev" aria-label="上一个">‹</button>
-          <div class="mm-track-wrapper">
-            <div id="mm-track" class="mm-track"></div>
+        <div class="mm-body">
+          <div class="mm-section">
+            <div class="mm-section-title"><span class="mm-section-dot mm-dot-hidden"></span>隐藏剧情</div>
+            <div id="mm-grid-hidden" class="mm-grid"></div>
           </div>
-          <button class="mm-nav mm-nav-next" aria-label="下一个">›</button>
+          <div class="mm-section">
+            <div class="mm-section-title"><span class="mm-section-dot mm-dot-special"></span>特殊剧情</div>
+            <div id="mm-grid-special" class="mm-grid"></div>
+          </div>
         </div>
-        <div id="mm-indicator" class="mm-indicator"></div>
+      </div>
+      <!-- Expanded card detail overlay -->
+      <div id="mm-detail" class="mm-detail">
+        <div class="mm-detail-backdrop"></div>
+        <div id="mm-detail-card" class="mm-detail-card"></div>
+      </div>
+    </div>
+
+    <!-- ── Relic Vault Modal ─────────────────────────────────────────── -->
+    <div id="relic-vault-modal" class="relic-modal">
+      <div class="rv-backdrop"></div>
+      <div class="rv-container">
+        <header class="rv-header">
+          <div class="rv-header-left">
+            <span class="rv-header-title">遗物库</span>
+          </div>
+          <div class="rv-header-right">
+            <span class="rv-capacity-label">容量</span>
+            <span id="rv-capacity" class="rv-capacity">0/5</span>
+          </div>
+          <button class="rv-close" aria-label="关闭">&times;</button>
+        </header>
+        <div class="rv-body">
+          <div id="rv-grid" class="rv-grid"></div>
+        </div>
+        <div class="rv-import-bar">
+          <input id="rv-import-input" class="rv-import-input" type="text" placeholder="粘贴遗物码导入..." autocomplete="off" />
+          <button id="rv-import-btn" class="rv-import-btn">导入</button>
+        </div>
+        <div id="rv-import-msg" class="rv-import-msg" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- ── Relic Reward Modal (post-game, pick 1 of 3) ──────────────── -->
+    <div id="relic-reward-modal" class="relic-modal">
+      <div class="rv-backdrop"></div>
+      <div class="rv-container reward-container">
+        <div class="altar-title">转世遗产</div>
+        <div class="gen-subtitle">你的一生化为遗物，选择留下一件...</div>
+        <div id="relic-reward-grid" class="relic-reward-grid"></div>
+        <div id="relic-reward-full" class="gen-replace" style="display:none;"></div>
+        <div class="gen-actions">
+          <button id="relic-reward-keep" class="primary" disabled>收入遗物库</button>
+          <button id="relic-reward-skip" class="ghost">全部放弃</button>
+        </div>
       </div>
     </div>
 
@@ -393,14 +425,12 @@
                   </div>
                   <div id="preset-list" class="alloc-preset-list"></div>
                 </div>
+                <!-- Relic selection (shown if vault has relics) -->
+                <div id="relic-slot" class="relic-slot" style="display:none;"></div>
                 <div class="footer-actions">
                   <button id="alloc-back-to-talent" class="ghost">← 返回天赋</button>
                   <button id="alloc-random" class="ghost">随机分配</button>
                   <button id="alloc-start" class="primary" disabled>↻ 立即重开</button>
-                </div>
-                <!-- Stat radar chart -->
-                <div class="alloc-radar-wrap">
-                  <svg id="alloc-radar" class="alloc-radar" viewBox="0 0 200 200"></svg>
                 </div>
               </div>
             </div>
