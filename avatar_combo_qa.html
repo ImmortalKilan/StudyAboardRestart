@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Avatar Combo QA</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #12151c;
+    --panel: #1b202a;
+    --line: #303848;
+    --text: #eef2f8;
+    --muted: #9da8b8;
+    --accent: #6ec6b8;
+    --warn: #f0bc5e;
+    --canvas: #293240;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 13px/1.45 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(18, 21, 28, 0.96);
+    backdrop-filter: blur(10px);
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: end;
+  }
+
+  label {
+    display: grid;
+    gap: 4px;
+    min-width: 132px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  select,
+  button {
+    min-height: 34px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #202634;
+    color: var(--text);
+    font: inherit;
+  }
+
+  select {
+    padding: 0 30px 0 10px;
+  }
+
+  button {
+    padding: 0 12px;
+    cursor: pointer;
+  }
+
+  button[aria-pressed="true"] {
+    border-color: var(--accent);
+    background: #203a3a;
+    color: #dffff9;
+  }
+
+  .segmented {
+    display: flex;
+    gap: 6px;
+  }
+
+  main {
+    display: grid;
+    gap: 22px;
+    padding: 18px 16px 28px;
+  }
+
+  section {
+    display: grid;
+    gap: 10px;
+  }
+
+  .section-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 15px;
+  }
+
+  .meta {
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+    gap: 10px;
+  }
+
+  .cell {
+    display: grid;
+    gap: 6px;
+    justify-items: center;
+    min-width: 0;
+    padding: 8px 6px 7px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--panel);
+  }
+
+  .avatar-frame {
+    width: 88px;
+    height: 88px;
+    display: grid;
+    place-items: center;
+    background: var(--canvas);
+    border: 1px solid #3a4352;
+    border-radius: 6px;
+  }
+
+  canvas {
+    width: 80px;
+    height: 80px;
+    image-rendering: pixelated;
+  }
+
+  .name {
+    width: 100%;
+    min-height: 30px;
+    display: grid;
+    place-items: center;
+    color: #d9e1ec;
+    font: 11px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  .matrix {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(156px, 1fr));
+    gap: 10px;
+  }
+
+  .combo .avatar-frame {
+    width: 104px;
+    height: 104px;
+  }
+
+  .combo canvas {
+    width: 96px;
+    height: 96px;
+  }
+
+  .combo .name {
+    min-height: 44px;
+  }
+
+  .flag {
+    color: var(--warn);
+  }
+
+  @media (max-width: 720px) {
+    header,
+    main {
+      padding-inline: 12px;
+    }
+
+    label {
+      flex: 1 1 140px;
+    }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Avatar Combo QA</h1>
+  <div class="toolbar">
+    <div>
+      <div class="meta">性别</div>
+      <div class="segmented" id="sexButtons">
+        <button type="button" data-sex="0" aria-pressed="true">男</button>
+        <button type="button" data-sex="1" aria-pressed="false">女</button>
+      </div>
+    </div>
+    <label>脸模
+      <select id="faceSelect"></select>
+    </label>
+    <label>发型
+      <select id="hairStyleSelect"></select>
+    </label>
+    <label>发色
+      <select id="hairColorSelect"></select>
+    </label>
+    <label>衣服分组
+      <select id="groupSelect"></select>
+    </label>
+    <label>压力场景
+      <select id="scenarioSelect"></select>
+    </label>
+    <label>矩阵衣服
+      <select id="matrixOutfitSelect"></select>
+    </label>
+  </div>
+</header>
+
+<main>
+  <section>
+    <div class="section-head">
+      <h2>衣服扫图</h2>
+      <span class="meta" id="outfitMeta"></span>
+    </div>
+    <div id="outfitGrid" class="grid"></div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>特殊剧情实际展示</h2>
+      <span class="meta" id="storylineMeta"></span>
+    </div>
+    <div id="storylineGrid" class="grid"></div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>发型 x 发色 x 脸模</h2>
+      <span class="meta" id="hairMeta"></span>
+    </div>
+    <div id="hairMatrix" class="matrix"></div>
+  </section>
+</main>
+
+<script type="module">
+import { renderAvatar } from './js/avatar.js';
+
+const HAIR = {
+  male: {
+    styles: [
+      ['short_fluffy', 0],
+      ['side_swept', 1],
+    ],
+    colors: [
+      ['black', 0],
+      ['chestnut', 1],
+      ['dark_brown', 2],
+      ['silver', 3],
+    ],
+  },
+  female: {
+    styles: [
+      ['bob', 0],
+      ['long_straight', 1],
+      ['side_ponytail', 2],
+    ],
+    colors: [
+      ['black', 0],
+      ['chestnut', 1],
+      ['blonde', 2],
+      ['rose_pink', 3],
+    ],
+  },
+};
+
+const FACES = [
+  ['neutral', { HAP: 6 }],
+  ['happy', { HAP: 9 }],
+  ['tired', { HAP: 1 }],
+];
+
+const GROUPS = [
+  ['all', '全部', [
+    'school', 'school_blazer', 'school_pe',
+    'suit', 'premium_suit', 'tuxedo', 'cheap_suit', 'shirt_tie', 'blazer',
+    'hoodie', 'cs_hoodie', 'grad_hoodie',
+    'hanfu', 'daoist_robe', 'sect_uniform',
+    'idol', 'idol_dress', 'idol_jacket',
+    'labcoat', 'chef',
+    'tracksuit', 'tank', 'jersey', 'gaming_jersey',
+    'robe', 'house_robe',
+    'tee', 'polo', 'flannel', 'cardigan', 'sweater_v', 'turtleneck',
+    'denim_jacket', 'varsity', 'jacket', 'striped_tee', 'hawaiian',
+    'tactical', 'trench', 'naval', 'politician', 'thief', 'poker_vest',
+    'winter_coat', 'puffer', 'art_smock', 'beret_top', 'photo_vest',
+    'ragged', 'patched_tee', 'pajamas',
+  ]],
+  ['school', '校园', ['school', 'school_blazer', 'school_pe', 'hoodie', 'cs_hoodie', 'grad_hoodie', 'tee', 'cardigan', 'sweater_v']],
+  ['career', '职业', ['suit', 'premium_suit', 'tuxedo', 'cheap_suit', 'shirt_tie', 'blazer', 'labcoat', 'chef', 'polo']],
+  ['story', '剧情', ['hanfu', 'daoist_robe', 'sect_uniform', 'idol', 'idol_dress', 'idol_jacket', 'robe', 'house_robe']],
+  ['sport', '运动电竞', ['tracksuit', 'tank', 'jersey', 'gaming_jersey']],
+  ['casual', '日常', ['hoodie', 'tee', 'polo', 'flannel', 'cardigan', 'sweater_v', 'turtleneck', 'denim_jacket', 'varsity', 'jacket', 'striped_tee', 'hawaiian']],
+  ['edge', '压力边界', ['tactical', 'trench', 'naval', 'politician', 'thief', 'poker_vest', 'winter_coat', 'puffer', 'art_smock', 'beret_top', 'photo_vest', 'ragged', 'patched_tee', 'pajamas']],
+];
+
+const SCENARIOS = [
+  ['plain', '无配饰', {}],
+  ['glasses', '眼镜', { INT: 9 }],
+  ['headphones', '耳机', { storyline: 'esports' }],
+  ['xianxia', '仙侠气泡', { storyline: 'xianxia' }],
+  ['sick', '低健康气泡', { HLT: -5 }],
+  ['stress', '低快乐气泡', { HAP: 1 }],
+  ['love', '恋爱气泡', { relationship: '恋爱中' }],
+  ['rich', '有钱气泡', { MNY: 10 }],
+];
+
+const STORYLINE_CASES = [
+  ['idol', 'idol'],
+  ['superstar', 'superstar'],
+  ['streamer', 'streamer'],
+  ['ceo', 'ceo'],
+  ['party', 'party'],
+  ['poker', 'poker'],
+  ['local_shark', 'local_shark'],
+  ['spy', 'spy'],
+  ['triton', 'triton'],
+  ['academic', 'academic'],
+  ['chef', 'chef'],
+  ['fitness', 'fitness'],
+  ['athlete', 'athlete'],
+  ['esports', 'esports'],
+  ['worlds', 'worlds'],
+  ['minor_league', 'minor_league'],
+  ['band', 'band'],
+  ['influencer', 'influencer'],
+  ['mcn', 'mcn'],
+  ['wasted', 'wasted'],
+  ['washed', 'washed'],
+  ['xianxia', 'xianxia'],
+  ['hogwarts', 'hogwarts'],
+  ['abyss', 'abyss'],
+  ['thief', 'thief'],
+  ['meta', 'meta'],
+  ['timeloop', 'timeloop'],
+];
+
+const state = {
+  sex: 0,
+  faceIndex: 0,
+  hairStyleIndex: 0,
+  hairColorIndex: 0,
+  groupId: 'school',
+  scenarioIndex: 0,
+  matrixOutfit: 'hoodie',
+};
+
+const $ = id => document.getElementById(id);
+
+function option(select, value, text) {
+  const item = document.createElement('option');
+  item.value = value;
+  item.textContent = text;
+  select.appendChild(item);
+}
+
+function resetSelect(select) {
+  while (select.firstChild) select.removeChild(select.firstChild);
+}
+
+function sexKey() {
+  return state.sex === 1 ? 'female' : 'male';
+}
+
+function baseState(extra = {}) {
+  const hair = HAIR[sexKey()];
+  const face = FACES[state.faceIndex][1];
+  const scenario = SCENARIOS[state.scenarioIndex][2];
+  return {
+    sex: state.sex,
+    HLT: 6,
+    INT: 6,
+    APP: 6,
+    MNY: 6,
+    PER: 6,
+    SOC: 6,
+    HAP: 6,
+    skinTone: 1,
+    topVariant: hair.styles[state.hairStyleIndex][1],
+    outfitColorId: hair.colors[state.hairColorIndex][1],
+    faceVariant: 0,
+    bottomVariant: 0,
+    ...face,
+    ...scenario,
+    ...extra,
+  };
+}
+
+function renderCell(parent, label, avatarState, className = '') {
+  const cell = document.createElement('div');
+  cell.className = `cell ${className}`.trim();
+  const frame = document.createElement('div');
+  frame.className = 'avatar-frame';
+  const canvas = document.createElement('canvas');
+  frame.appendChild(canvas);
+  const name = document.createElement('div');
+  name.className = 'name';
+  name.textContent = label;
+  cell.append(frame, name);
+  parent.appendChild(cell);
+  renderAvatar(canvas, avatarState);
+}
+
+function currentOutfits() {
+  const group = GROUPS.find(([id]) => id === state.groupId) || GROUPS[0];
+  return group[2];
+}
+
+function rebuildHairSelects() {
+  const hair = HAIR[sexKey()];
+  state.hairStyleIndex = Math.min(state.hairStyleIndex, hair.styles.length - 1);
+  state.hairColorIndex = Math.min(state.hairColorIndex, hair.colors.length - 1);
+
+  resetSelect($('hairStyleSelect'));
+  hair.styles.forEach(([name], index) => option($('hairStyleSelect'), index, name));
+  $('hairStyleSelect').value = state.hairStyleIndex;
+
+  resetSelect($('hairColorSelect'));
+  hair.colors.forEach(([name], index) => option($('hairColorSelect'), index, name));
+  $('hairColorSelect').value = state.hairColorIndex;
+}
+
+function rebuildMatrixOutfits() {
+  const options = currentOutfits();
+  if (!options.includes(state.matrixOutfit)) state.matrixOutfit = options[0];
+  resetSelect($('matrixOutfitSelect'));
+  options.forEach(id => option($('matrixOutfitSelect'), id, id));
+  $('matrixOutfitSelect').value = state.matrixOutfit;
+}
+
+function renderOutfits() {
+  const grid = $('outfitGrid');
+  grid.replaceChildren();
+  const hair = HAIR[sexKey()];
+  const outfits = currentOutfits();
+  const faceName = FACES[state.faceIndex][0];
+  const styleName = hair.styles[state.hairStyleIndex][0];
+  const colorName = hair.colors[state.hairColorIndex][0];
+  $('outfitMeta').textContent = `${state.sex === 1 ? 'female' : 'male'} / ${faceName} / ${styleName} / ${colorName} / ${outfits.length} outfits`;
+  outfits.forEach(id => {
+    renderCell(grid, id, baseState({ _forceOutfit: id }));
+  });
+}
+
+function renderStorylines() {
+  const grid = $('storylineGrid');
+  grid.replaceChildren();
+  $('storylineMeta').textContent = `${STORYLINE_CASES.length} storylines / 3 variants each`;
+  STORYLINE_CASES.forEach(([storyline, label]) => {
+    for (let variant = 0; variant < 3; variant++) {
+      renderCell(
+        grid,
+        `${label} / v${variant + 1}`,
+        baseState({
+          storyline,
+          monthTotal: variant,
+          MNY: 8,
+          INT: 8,
+          HAP: 6,
+          HLT: 6,
+        }),
+      );
+    }
+  });
+}
+
+function renderHairMatrix() {
+  const grid = $('hairMatrix');
+  grid.replaceChildren();
+  const hair = HAIR[sexKey()];
+  $('hairMeta').textContent = `${state.matrixOutfit} / ${hair.styles.length * hair.colors.length * FACES.length} combos`;
+  for (const [styleName, topVariant] of hair.styles) {
+    for (const [colorName, outfitColorId] of hair.colors) {
+      for (let faceIndex = 0; faceIndex < FACES.length; faceIndex++) {
+        const [faceName, facePatch] = FACES[faceIndex];
+        renderCell(
+          grid,
+          `${styleName} / ${colorName} / ${faceName}`,
+          baseState({
+            topVariant,
+            outfitColorId,
+            _forceOutfit: state.matrixOutfit,
+            ...facePatch,
+          }),
+          'combo',
+        );
+      }
+    }
+  }
+}
+
+function renderAll() {
+  rebuildHairSelects();
+  rebuildMatrixOutfits();
+  renderOutfits();
+  renderStorylines();
+  renderHairMatrix();
+}
+
+function init() {
+  FACES.forEach(([name], index) => option($('faceSelect'), index, name));
+  GROUPS.forEach(([id, name]) => option($('groupSelect'), id, name));
+  SCENARIOS.forEach(([, name], index) => option($('scenarioSelect'), index, name));
+  $('groupSelect').value = state.groupId;
+
+  $('sexButtons').addEventListener('click', event => {
+    const button = event.target.closest('button[data-sex]');
+    if (!button) return;
+    state.sex = Number(button.dataset.sex);
+    for (const item of $('sexButtons').querySelectorAll('button')) {
+      item.setAttribute('aria-pressed', String(item === button));
+    }
+    renderAll();
+  });
+
+  $('faceSelect').addEventListener('change', event => {
+    state.faceIndex = Number(event.target.value);
+    renderAll();
+  });
+
+  $('hairStyleSelect').addEventListener('change', event => {
+    state.hairStyleIndex = Number(event.target.value);
+    renderAll();
+  });
+
+  $('hairColorSelect').addEventListener('change', event => {
+    state.hairColorIndex = Number(event.target.value);
+    renderAll();
+  });
+
+  $('groupSelect').addEventListener('change', event => {
+    state.groupId = event.target.value;
+    renderAll();
+  });
+
+  $('scenarioSelect').addEventListener('change', event => {
+    state.scenarioIndex = Number(event.target.value);
+    renderAll();
+  });
+
+  $('matrixOutfitSelect').addEventListener('change', event => {
+    state.matrixOutfit = event.target.value;
+    renderAll();
+  });
+
+  renderAll();
+}
+
+init();
+</script>
+</body>
+</html>

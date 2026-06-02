@@ -81,14 +81,27 @@ function hairStyleOf(s) {
   const pool = s.sex === 0 ? male : female;
   return pool[(s.topVariant ?? 0) % pool.length];
 }
+function outfitIndexOf(s) {
+  const value =
+    Number.isFinite(s.outfitVariant) ? s.outfitVariant :
+    Number.isFinite(s.monthTotal) ? s.monthTotal :
+    Number.isFinite(s.age) ? s.age :
+    Number.isFinite(s.bottomVariant) ? s.bottomVariant :
+    (s.topVariant ?? 0);
+  return Math.trunc(value);
+}
+
+function isStudentProfession(prof) {
+  return prof === '高中生' || prof === '本科生' || prof === '研究生' || prof === '博士';
+}
+
 function outfitOf(s) {
   if (s._forceOutfit) return s._forceOutfit;
-  const sl = s.storyline;
-  const v = s.topVariant ?? 0;
-  const pick = pool => pool[v % pool.length];
+  const sl = s.storyline || '';
+  const pick = pool => pool[((outfitIndexOf(s) % pool.length) + pool.length) % pool.length];
 
-  // ── 1. Storyline-locked outfits (highest priority) ──
-  if (sl === 'idol' || sl === 'superstar') return pick(['idol', 'idol_dress', 'idol_jacket']);
+  // Storylines always win so their bespoke clothes do not get hidden by low stats.
+  if (sl === 'idol' || sl === 'superstar' || sl === 'streamer') return pick(['idol', 'idol_dress', 'idol_jacket']);
   if (sl === 'xianxia') return pick(['hanfu', 'daoist_robe', 'sect_uniform']);
   if (sl === 'chef') return 'chef';
   if (sl === 'hogwarts') return pick(['robe', 'house_robe']);
@@ -98,39 +111,40 @@ function outfitOf(s) {
   if (sl === 'fitness' || sl === 'athlete') return pick(['tank', 'tracksuit', 'jersey']);
   if (sl === 'thief') return 'thief';
   if (sl === 'esports' || sl === 'worlds' || sl === 'minor_league') return pick(['gaming_jersey', 'hoodie', 'tracksuit']);
-  if (sl === 'poker') return pick(['poker_vest', 'suit', 'hoodie']);
-  if (sl === 'party') return pick(['politician', 'suit', 'sweater_v']);
-  if (sl === 'academic') return pick(['hoodie', 'tee', 'tracksuit']);
-  if (sl === 'band') return pick(['tee', 'hoodie', 'tracksuit']);
-  if (sl === 'triton') return pick(['naval', 'tactical']);
-  if (sl === 'meta') return pick(['hoodie', 'tracksuit', 'tee']);
+  if (sl === 'poker' || sl === 'local_shark') return pick(['poker_vest', 'suit', 'premium_suit']);
+  if (sl === 'party') return pick(['politician', 'suit', 'premium_suit']);
+  if (sl === 'academic') return pick(['labcoat', 'business_blazer', 'cardigan']);
+  if (sl === 'band') return pick(['party_shirt', 'hoodie', 'tracksuit']);
+  if (sl === 'triton') return pick(['naval', 'tactical', 'suit']);
+  if (sl === 'influencer' || sl === 'mcn') return pick(['premium_suit', 'suit', 'idol_jacket', 'party_shirt']);
+  if (sl === 'wasted' || sl === 'washed') return pick(['worn_hoodie', 'party_shirt', 'cheap_suit']);
+  if (sl === 'meta' || sl === 'timeloop') return pick(['hoodie', 'tracksuit', 'tee']);
 
-  // ── 2. Low-stat distress wear (overrides money/profession) ──
   const mny = s.MNY ?? 5;
   const hap = s.HAP ?? 5;
-  if (mny <= 1 && hap <= 2) return 'ragged';
-  if (mny <= 1) return pick(['ragged', 'patched_tee']);
-  if (hap <= 1) return 'pajamas';
-
-  // ── 3. Profession + stage-aware pool ──
   const prof = s.profession || '';
   const major = s.major || '';
   const hobby = s.hobby || '';
   const month = s.month ?? 6;
   const isWinter = month <= 2 || month >= 11;
   const isSummer = month >= 6 && month <= 8;
+  const isStudent = isStudentProfession(prof);
 
-  // High schooler — uniform variants + PE
+  // Poor family + school phase: keep them in hoodie instead of ragged clothes.
+  if (isStudent && mny < 3) return 'hoodie';
+
   if (prof === '高中生') {
+    if (mny >= 7) return pick(['school_blazer', 'cardigan', 'school']);
     if (s.hsType === '国际') return pick(['school_blazer', 'school', 'cardigan']);
     return pick(['school', 'school_pe', 'school_blazer']);
   }
 
-  // Undergrad — many casual pools, biased by major / hobby / season
   if (prof === '本科生') {
-    const pool = ['tee', 'hoodie', 'denim_jacket', 'varsity', 'sweater_v', 'cardigan', 'flannel', 'polo'];
+    const pool = mny >= 6
+      ? ['blazer', 'cardigan', 'polo', 'denim_jacket', 'varsity', 'sweater_v']
+      : ['tee', 'hoodie', 'denim_jacket', 'varsity', 'sweater_v', 'cardigan', 'flannel', 'polo'];
     if (major === 'CS') pool.unshift('cs_hoodie', 'hoodie');
-    if (major === '商科') pool.unshift('blazer', 'polo');
+    if (major === '商科') pool.unshift('blazer', 'polo', 'suit');
     if (major === '理科') pool.unshift('polo', 'sweater_v');
     if (major === '文科') pool.unshift('turtleneck', 'cardigan');
     if (major === '文艺') pool.unshift('art_smock', 'beret_top', 'striped_tee');
@@ -142,30 +156,26 @@ function outfitOf(s) {
     return pick(pool);
   }
 
-  // Grad student — academic vibe
   if (prof === '研究生' || prof === '博士') {
-    return pick(['grad_hoodie', 'cardigan', 'turtleneck', 'flannel', 'sweater_v', 'cs_hoodie']);
+    return mny >= 6
+      ? pick(['labcoat', 'business_blazer', 'cardigan', 'suit'])
+      : pick(['grad_hoodie', 'cardigan', 'turtleneck', 'flannel', 'sweater_v', 'cs_hoodie']);
   }
 
-  // Job hunting — sad cheap suit pool
-  if (prof === '求职中') return pick(['cheap_suit', 'shirt_tie', 'sweater_v']);
+  if (prof === '求职中') return pick(['cheap_suit', 'shirt_tie', 'sweater_v', 'suit']);
 
-  // Working — by MNY tier
   if (prof === '工作' || prof === '职场人') {
     if (mny >= 9) return pick(['tuxedo', 'premium_suit', 'suit']);
-    if (mny >= 7) return pick(['suit', 'shirt_tie', 'blazer']);
-    if (mny >= 4) return pick(['shirt_tie', 'polo', 'sweater_v', 'blazer']);
-    return pick(['shirt_tie', 'flannel', 'tee']);
+    if (mny >= 6) return pick(['suit', 'shirt_tie', 'blazer', 'business_blazer']);
+    return pick(['shirt_tie', 'polo', 'sweater_v', 'blazer']);
   }
 
-  // Retired
   if (prof === '退休' || prof === '老年') return pick(['cardigan', 'sweater_v', 'flannel', 'pajamas']);
 
-  // ── 4. Money tier fallback (general) ──
-  if (mny >= 10) return pick(['tuxedo', 'premium_suit']);
-  if (mny >= 8) return pick(['suit', 'premium_suit', 'blazer']);
+  if (mny >= 9) return pick(['tuxedo', 'premium_suit', 'suit']);
+  if (mny >= 6) return pick(['suit', 'premium_suit', 'blazer', 'business_blazer']);
+  if (hap <= 1) return 'pajamas';
 
-  // ── 5. Default casual pool, season-biased ──
   const casual = ['tee', 'hoodie', 'jacket', 'flannel', 'polo', 'sweater_v', 'denim_jacket'];
   if (isWinter) casual.unshift('winter_coat', 'puffer');
   if (isSummer) casual.unshift('tank', 'hawaiian');
@@ -1978,6 +1988,7 @@ const BODY_ASSET_BY_OUTFIT = {
     suit: 'suit', premium_suit: 'business_blazer', tuxedo: 'suit', cheap_suit: 'office_shirt',
     shirt_tie: 'office_shirt', blazer: 'business_blazer',
     hoodie: 'teal_student_hoodie', cs_hoodie: 'teal_student_hoodie', grad_hoodie: 'teal_student_hoodie',
+    worn_hoodie: 'worn_hoodie',
     hanfu: 'xianxia_robe', daoist_robe: 'xianxia_robe', sect_uniform: 'xianxia_robe',
     robe: 'wizard_robe', house_robe: 'wizard_robe', labcoat: 'labcoat', chef: 'chef_coat',
     idol: 'idol_jacket', idol_dress: 'idol_jacket', idol_jacket: 'idol_jacket',
@@ -2001,28 +2012,36 @@ const BODY_ASSET_BY_OUTFIT = {
     chef: 'female_chef_coat', idol: 'female_idol_stage', idol_dress: 'female_idol_stage',
     idol_jacket: 'female_idol_stage', tracksuit: 'female_gym_jacket', tank: 'female_gym_jacket',
     jersey: 'female_esports_jersey', gaming_jersey: 'female_esports_jersey',
-    poker_vest: 'female_business_blazer', thief: 'female_worn_sweater', tactical: 'female_gym_jacket',
+    poker_vest: 'female_business_blazer', thief: 'female_worn_hoodie', tactical: 'female_gym_jacket',
     trench: 'female_business_blazer', naval: 'female_business_blazer', politician: 'female_business_blazer',
     tee: 'female_white_blouse', polo: 'female_white_blouse', cardigan: 'female_cardigan_cream',
     sweater_v: 'female_worn_sweater', turtleneck: 'female_worn_sweater',
     denim_jacket: 'female_teal_crop_hoodie', varsity: 'female_teal_crop_hoodie',
     jacket: 'female_teal_crop_hoodie', flannel: 'female_party_top', hawaiian: 'female_party_top',
-    striped_tee: 'female_white_blouse', winter_coat: 'female_worn_sweater', puffer: 'female_worn_sweater',
+    striped_tee: 'female_white_blouse', winter_coat: 'female_worn_hoodie', puffer: 'female_worn_hoodie',
     art_smock: 'female_white_blouse', beret_top: 'female_cardigan_cream', photo_vest: 'female_party_top',
-    ragged: 'female_worn_sweater', patched_tee: 'female_worn_sweater', pajamas: 'female_worn_sweater',
+    ragged: 'female_worn_hoodie', patched_tee: 'female_worn_hoodie', pajamas: 'female_worn_hoodie',
+    worn_hoodie: 'female_worn_hoodie',
   },
 };
 
 const MODULAR_LAYER_TRANSFORMS = {
   body_full: {
+    female_worn_sweater: { y: 2 },
     gym_top: { y: -3 },
     teal_student_hoodie: { y: 0 },
+    worn_hoodie: { x: 1, y: 5, scale: 1 },
   },
   hair: {
+    female_bob_black: { x: 1, y: 1, scale: 1.08 },
+    female_side_ponytail_black: { x: 4, y: -3, scale: 1.01 },
+    female_side_ponytail_blonde: { x: 3, y: -1, scale: 0.96 },
+    female_side_ponytail_chestnut: { x: 3, y: -1, scale: 0.96 },
+    female_side_ponytail_rose_pink: { x: 3, y: -1, scale: 0.96 },
     male_short_fluffy_black: { x: -1, y: -1, scale: 1.13 },
     male_short_fluffy_chestnut: { x: -1, y: -1, scale: 1.13 },
     male_short_fluffy_dark_brown: { x: -1, y: -1, scale: 1.16 },
-    male_short_fluffy_silver: { x: -2, y: -2, scale: 0.94 },
+    male_short_fluffy_silver: { x: 0, y: -2, scale: 1.06 },
   },
 };
 
@@ -2110,9 +2129,6 @@ function modularHairId(state) {
 
 function modularBodyId(state) {
   const sex = state.sex === 1 ? 'female' : 'male';
-  if ((state.HLT ?? 5) <= -2 && (state.MNY ?? 5) <= 3) {
-    return sex === 'female' ? 'female_worn_sweater' : 'worn_hoodie';
-  }
   const outfit = outfitOf(state);
   return BODY_ASSET_BY_OUTFIT[sex][outfit] || (sex === 'female' ? 'female_teal_crop_hoodie' : 'teal_student_hoodie');
 }
