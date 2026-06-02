@@ -4828,6 +4828,9 @@ body.in-summary {
   }
   /* Keep overlay controls absolute on mobile too */
   #step-alloc .avatar-overlay-controls {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     padding: 6px 8px;
   }
   #step-alloc .avatar-ov-hint {
@@ -4929,6 +4932,69 @@ body.in-summary {
 
 /* ── Mobile talent grid: 2-col compact ── */
 @media (max-width: 760px) {
+  #step-talents {
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    align-items: stretch;
+    gap: 8px;
+    overflow: hidden;
+    padding-bottom: max(18px, env(safe-area-inset-bottom));
+  }
+
+  #step-talents .screen-head {
+    text-align: left;
+  }
+
+  #step-talents .screen-head h1 {
+    margin-bottom: 2px;
+  }
+
+  #step-talents .screen-head .sub {
+    margin-bottom: 0;
+  }
+
+  #step-talents .section-title {
+    margin: 2px 0 0;
+  }
+
+  #step-talents .talent-grid {
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+    align-content: stretch;
+    grid-template-rows: repeat(5, minmax(0, 1fr));
+  }
+
+  #step-talents .talent-card {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  #step-talents .t-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #step-talents .t-desc {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  #step-talents .footer-actions {
+    margin-top: 2px;
+  }
+
+  #step-talents .footer-actions button {
+    width: 100%;
+    min-height: 46px;
+  }
+
   .talent-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;

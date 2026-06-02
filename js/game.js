@@ -3516,29 +3516,8 @@ function renderAlloc() {
 
   const banner = $('talent-bonus-banner');
   if (banner) {
-    const picks = state.talentsPicked || [];
-    if (picks.length === 0) {
-      banner.style.display = 'none';
-      banner.innerHTML = '';
-    } else {
-      banner.style.display = '';
-      const chips = picks.map(t => {
-        const parts = [];
-        if (t.effect) {
-          for (const [k, v] of Object.entries(t.effect)) {
-            const label = STAT_LABELS[k];
-            if (!label) continue;
-            parts.push(`<span class="tb-eff ${v > 0 ? 'pos' : 'neg'}">${v > 0 ? '+' : ''}${v}${label}</span>`);
-          }
-        }
-        if (typeof t.happyDelta === 'number' && t.happyDelta) {
-          parts.push(`<span class="tb-eff ${t.happyDelta > 0 ? 'pos' : 'neg'}">${t.happyDelta > 0 ? '+' : ''}${t.happyDelta}快乐</span>`);
-        }
-        const effHtml = parts.length ? parts.join('') : '<span class="tb-eff none">无属性加成</span>';
-        return `<span class="tb-chip grade-${t.grade}"><span class="tb-name">${t.name}</span>${effHtml}</span>`;
-      }).join('');
-      banner.innerHTML = `<span class="tb-label">已选天赋</span><div class="tb-chips">${chips}</div>`;
-    }
+    banner.style.display = 'none';
+    banner.innerHTML = '';
   }
 
   $('alloc-start').disabled = remaining !== 0;
