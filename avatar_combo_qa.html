@@ -288,6 +288,10 @@ const HAIR = {
   },
 };
 
+function isDisabledHairCombo(sex, styleName, colorName) {
+  return sex === 'male' && styleName === 'short_fluffy' && colorName === 'dark_brown';
+}
+
 const FACES = [
   ['neutral', { HAP: 6 }],
   ['happy', { HAP: 9 }],
@@ -492,9 +496,13 @@ function renderHairMatrix() {
   const grid = $('hairMatrix');
   grid.replaceChildren();
   const hair = HAIR[sexKey()];
-  $('hairMeta').textContent = `${state.matrixOutfit} / ${hair.styles.length * hair.colors.length * FACES.length} combos`;
+  const comboCount = hair.styles.reduce((count, [styleName]) => (
+    count + hair.colors.filter(([colorName]) => !isDisabledHairCombo(sexKey(), styleName, colorName)).length
+  ), 0) * FACES.length;
+  $('hairMeta').textContent = `${state.matrixOutfit} / ${comboCount} combos`;
   for (const [styleName, topVariant] of hair.styles) {
     for (const [colorName, outfitColorId] of hair.colors) {
+      if (isDisabledHairCombo(sexKey(), styleName, colorName)) continue;
       for (let faceIndex = 0; faceIndex < FACES.length; faceIndex++) {
         const [faceName, facePatch] = FACES[faceIndex];
         renderCell(

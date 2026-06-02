@@ -51,10 +51,13 @@
       </div>
 
       <!-- Memory Card Panel (left sidebar) -->
-      <div id="memory-panel" class="memory-panel">
+      <div id="memory-panel" class="memory-panel" hidden>
         <div class="memory-panel-inner">
           <div class="memory-panel-mirror">
-            <img src="assets/ui/memory-mirror.png" alt="前世记忆" class="memory-mirror-img" />
+            <div class="memory-avatar-card" aria-label="上一世形象">
+              <canvas id="memory-last-avatar" class="memory-last-avatar" width="64" height="80"></canvas>
+              <img src="assets/ui/memory-fragment.svg" alt="" class="memory-mirror-img" />
+            </div>
             <div class="memory-mirror-glow"></div>
           </div>
           <div class="memory-panel-content">
@@ -331,11 +334,6 @@
                       <button id="sex-female" class="avatar-ov-btn" title="女">♀</button>
                     </div>
                     <button id="btn-random-appearance" class="avatar-ov-btn avatar-ov-dice" title="随机发型/服装">🎲</button>
-                    <div class="avatar-ov-group avatar-ov-skin">
-                      <button id="skin-0" class="avatar-ov-skin-dot skin-dot-dark" title="小麦色"></button>
-                      <button id="skin-1" class="avatar-ov-skin-dot skin-dot-mid active" title="自然色"></button>
-                      <button id="skin-2" class="avatar-ov-skin-dot skin-dot-light" title="白皙"></button>
-                    </div>
                   </div>
                   <div class="avatar-ov-hint">属性会实时影响外貌</div>
                 </div>
@@ -397,10 +395,6 @@
                   <button id="alloc-back-to-talent" class="ghost">← 返回天赋</button>
                   <button id="alloc-random" class="ghost">随机分配</button>
                   <button id="alloc-start" class="primary" disabled>↻ 立即重开</button>
-                </div>
-                <!-- Stat radar chart -->
-                <div class="alloc-radar-wrap">
-                  <svg id="alloc-radar" class="alloc-radar" viewBox="0 0 200 200"></svg>
                 </div>
               </div>
             </div>

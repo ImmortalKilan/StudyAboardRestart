@@ -2309,7 +2309,7 @@ function applyEvent(ev) {
       addMomLastPost(state, tone);
     } catch (e) { console.warn('mom last post failed', e); }
     // Record playthrough for memory card system
-    const memResult = recordPlaythrough();
+    const memResult = recordPlaythrough(state);
     if (memResult.newCard) {
       setTimeout(() => showNewCardToast(), 1500);
     }
@@ -2881,7 +2881,7 @@ function advanceMonth() {
       unlockAchievement('end_health');
       if (mp._reunionTimeout) { clearTimeout(mp._reunionTimeout); mp._reunionTimeout = null; }
       mp.isWaiting = false;
-      const memR1 = recordPlaythrough(); if (memR1.newCard) setTimeout(() => showNewCardToast(), 1500); renderMemoryPanel();
+      const memR1 = recordPlaythrough(state); if (memR1.newCard) setTimeout(() => showNewCardToast(), 1500); renderMemoryPanel();
     }
     if (state.age >= 60) {
       pushLog('你退休了。回首这一生，百感交集。', 'ending');
@@ -2889,7 +2889,7 @@ function advanceMonth() {
       unlockAchievement('end_retire');
       if (mp._reunionTimeout) { clearTimeout(mp._reunionTimeout); mp._reunionTimeout = null; }
       mp.isWaiting = false;
-      const memR2 = recordPlaythrough(); if (memR2.newCard) setTimeout(() => showNewCardToast(), 1500); renderMemoryPanel();
+      const memR2 = recordPlaythrough(state); if (memR2.newCard) setTimeout(() => showNewCardToast(), 1500); renderMemoryPanel();
     }
   }
 
@@ -3547,7 +3547,6 @@ function renderAlloc() {
   _renderAchPanel(achData);
 
   // ── Radar chart ──
-  _renderAllocRadar();
 }
 
 function _renderAchPanel(achData) {
@@ -3650,64 +3649,6 @@ function _fillAchPopover() {
       </div>`;
     }).join('');
   }
-}
-
-function _renderAllocRadar() {
-  const svg = $('alloc-radar');
-  if (!svg) return;
-  const cx = 100, cy = 100, R = 72;
-  const keys = STAT_KEYS; // SOC, INT, MNY, PER, HLT, APP
-  const labels = keys.map(k => STAT_LABELS[k]);
-  const n = 6;
-  const maxVal = MAX_PER_STAT; // 10
-
-  // Compute vertices for each stat
-  const pts = keys.map((k, i) => {
-    const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
-    const val = (state.alloc[k] || 0) / maxVal;
-    return {
-      x: cx + R * val * Math.cos(angle),
-      y: cy + R * val * Math.sin(angle),
-      lx: cx + (R + 16) * Math.cos(angle),
-      ly: cy + (R + 16) * Math.sin(angle),
-    };
-  });
-
-  // Build SVG content
-  let html = '';
-
-  // Grid rings (3 levels)
-  for (let level = 1; level <= 3; level++) {
-    const r = (R * level) / 3;
-    const ringPts = [];
-    for (let i = 0; i < n; i++) {
-      const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
-      ringPts.push(`${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`);
-    }
-    html += `<polygon class="radar-grid" points="${ringPts.join(' ')}" />`;
-  }
-
-  // Axis lines
-  for (let i = 0; i < n; i++) {
-    const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
-    html += `<line class="radar-axis" x1="${cx}" y1="${cy}" x2="${cx + R * Math.cos(angle)}" y2="${cy + R * Math.sin(angle)}" />`;
-  }
-
-  // Data polygon
-  const dataPts = pts.map(p => `${p.x},${p.y}`).join(' ');
-  html += `<polygon class="radar-fill" points="${dataPts}" />`;
-
-  // Data dots
-  pts.forEach(p => {
-    html += `<circle class="radar-dot" cx="${p.x}" cy="${p.y}" r="3" />`;
-  });
-
-  // Labels
-  labels.forEach((label, i) => {
-    html += `<text class="radar-label" x="${pts[i].lx}" y="${pts[i].ly}">${label}</text>`;
-  });
-
-  svg.innerHTML = html;
 }
 
 function render() {
@@ -6072,18 +6013,6 @@ async function main() {
     updateCreationAvatar();
   });
 
-  // Skin tone picker (0=dark, 1=mid, 2=light)
-  for (let tone = 0; tone < 3; tone++) {
-    const btn = $(`skin-${tone}`);
-    if (!btn) continue;
-    btn.addEventListener('click', () => {
-      SFX.sfxToggleOption();
-      state.skinTone = tone;
-      for (let t = 0; t < 3; t++) $(`skin-${t}`).classList.toggle('active', t === tone);
-      updateCreationAvatar();
-    });
-  }
-
   let _scrollToAlloc = function() {
     for (const k of STAT_KEYS) {
       state.alloc[k] = 0;
@@ -6891,10 +6820,6 @@ async function main() {
     state.bottomVariant = Math.floor(Math.random() * 8);
     state.outfitColorId = Math.floor(Math.random() * 16);
     if (typeof state.skinTone !== 'number') state.skinTone = 1;
-    for (let t = 0; t < 3; t++) {
-      const el = $(`skin-${t}`);
-      if (el) el.classList.toggle('active', t === state.skinTone);
-    }
     state.sex = 0;
     $('sex-male').classList.add('active');
     $('sex-female').classList.remove('active');
@@ -8362,10 +8287,6 @@ function _enterMpCreation() {
   state.bottomVariant = Math.floor(Math.random() * 8);
   state.outfitColorId = Math.floor(Math.random() * 16);
   if (typeof state.skinTone !== 'number') state.skinTone = 1;
-  for (let t = 0; t < 3; t++) {
-    const el = $(`skin-${t}`);
-    if (el) el.classList.toggle('active', t === state.skinTone);
-  }
   state.sex = 0;
   $('sex-male').classList.add('active');
   $('sex-female').classList.remove('active');

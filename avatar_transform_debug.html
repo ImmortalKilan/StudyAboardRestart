@@ -236,28 +236,28 @@ const H = 72;
 
 const ASSETS = {
   bg: ['dorm_day', 'dorm_night', 'campus', 'cafe_date', 'casino_party', 'esports_room', 'gym', 'kitchen', 'library', 'magic_corridor', 'office', 'xianxia_temple'],
-  body_full: ['business_blazer', 'cardigan', 'chef_coat', 'esports_jersey', 'female_business_blazer', 'female_cardigan_cream', 'female_chef_coat', 'female_esports_jersey', 'female_gym_jacket', 'female_idol_stage', 'female_labcoat', 'female_office_shirt', 'female_party_top', 'female_preppy_blazer', 'female_suit', 'female_teal_crop_hoodie', 'female_white_blouse', 'female_wizard_robe', 'female_worn_hoodie', 'female_worn_sweater', 'female_xianxia_hanfu', 'gym_top', 'idol_jacket', 'labcoat', 'office_shirt', 'party_shirt', 'school_uniform', 'suit', 'teal_student_hoodie', 'tracksuit', 'wizard_robe', 'worn_hoodie', 'xianxia_robe'],
+  body_full: ['business_blazer', 'cardigan', 'chef_coat', 'esports_jersey', 'female_business_blazer', 'female_cardigan_cream', 'female_chef_coat', 'female_esports_jersey', 'female_gym_jacket', 'female_idol_stage', 'female_labcoat', 'female_office_shirt', 'female_party_top', 'female_preppy_blazer', 'female_suit', 'female_hoodie', 'female_white_blouse', 'female_wizard_robe', 'female_worn_hoodie', 'female_worn_sweater', 'female_xianxia_hanfu', 'gym_top', 'idol_jacket', 'labcoat', 'office_shirt', 'party_shirt', 'school_uniform', 'suit', 'male_hoodie', 'tracksuit', 'wizard_robe', 'male_worn_hoodie', 'xianxia_robe'],
   head: ['male_neutral', 'male_happy', 'male_tired', 'female_neutral', 'female_happy', 'female_tired'],
   accessory_under: ['', 'headphones'],
-  hair: ['female_bob_black', 'female_bob_blonde', 'female_bob_chestnut', 'female_bob_rose_pink', 'female_long_straight_black', 'female_long_straight_blonde', 'female_long_straight_chestnut', 'female_long_straight_rose_pink', 'female_side_ponytail_black', 'female_side_ponytail_blonde', 'female_side_ponytail_chestnut', 'female_side_ponytail_rose_pink', 'male_short_fluffy_black', 'male_short_fluffy_chestnut', 'male_short_fluffy_dark_brown', 'male_short_fluffy_silver', 'male_side_swept_black', 'male_side_swept_chestnut', 'male_side_swept_dark_brown', 'male_side_swept_silver'],
+  hair: ['female_bob_black', 'female_bob_blonde', 'female_bob_chestnut', 'female_bob_rose_pink', 'female_long_straight_black', 'female_long_straight_blonde', 'female_long_straight_chestnut', 'female_long_straight_rose_pink', 'female_side_ponytail_black', 'female_side_ponytail_blonde', 'female_side_ponytail_chestnut', 'female_side_ponytail_rose_pink', 'male_short_fluffy_black', 'male_short_fluffy_chestnut', 'male_short_fluffy_silver', 'male_side_swept_black', 'male_side_swept_chestnut', 'male_side_swept_dark_brown', 'male_side_swept_silver'],
   accessory: ['', 'glasses', 'headphones', 'spirit_beads'],
   bubble: ['', 'academic', 'chef', 'esports', 'happy', 'love', 'magic', 'rich', 'sick', 'stress', 'tired', 'xianxia'],
 };
 
 const DEFAULT_TRANSFORMS = {
   'body_full:female_worn_sweater': { x: 0, y: 2, scale: 1 },
-  'body_full:gym_top': { x: 0, y: -3, scale: 1 },
-  'body_full:teal_student_hoodie': { x: 0, y: 0, scale: 1 },
-  'body_full:worn_hoodie': { x: 1, y: 5, scale: 1 },
+  'body_full:female_party_top': { x: 0, y: 2, scale: 1 },
+  'body_full:gym_top': { x: 0, y: -2, scale: 1 },
+  'body_full:male_hoodie': { x: 0, y: 0, scale: 1 },
+  'body_full:male_worn_hoodie': { x: 1, y: -1, scale: 1 },
   'hair:female_bob_black': { x: 1, y: 1, scale: 1.08 },
   'hair:female_side_ponytail_black': { x: 4, y: -3, scale: 1.01 },
   'hair:female_side_ponytail_blonde': { x: 3, y: -1, scale: 0.96 },
   'hair:female_side_ponytail_chestnut': { x: 3, y: -1, scale: 0.96 },
   'hair:female_side_ponytail_rose_pink': { x: 3, y: -1, scale: 0.96 },
-  'hair:male_short_fluffy_black': { x: -1, y: -1, scale: 1.13 },
-  'hair:male_short_fluffy_chestnut': { x: -1, y: -1, scale: 1.13 },
-  'hair:male_short_fluffy_dark_brown': { x: -1, y: -1, scale: 1.16 },
-  'hair:male_short_fluffy_silver': { x: 0, y: -2, scale: 1.06 },
+  'hair:male_short_fluffy_black': { x: 0, y: -1, scale: 1.1 },
+  'hair:male_short_fluffy_chestnut': { x: 0, y: -1, scale: 1.1 },
+  'hair:male_short_fluffy_silver': { x: 0, y: -1, scale: 1.1 },
 };
 
 const LAYERS = ['bg', 'body_full', 'head', 'accessory_under', 'hair', 'accessory', 'bubble'];
@@ -387,7 +387,7 @@ function init() {
   });
 
   els.bg.value = 'dorm_day';
-  els.body_full.value = 'female_teal_crop_hoodie';
+  els.body_full.value = 'female_hoodie';
   els.head.value = 'female_neutral';
   els.hair.value = 'female_side_ponytail_black';
   els.bubble.value = 'rich';

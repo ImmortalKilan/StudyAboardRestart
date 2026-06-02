@@ -130,7 +130,8 @@ function outfitOf(s) {
   const isSummer = month >= 6 && month <= 8;
   const isStudent = isStudentProfession(prof);
 
-  // Poor family + school phase: keep them in hoodie instead of ragged clothes.
+  // Poor family + school phase: use worn hoodie only at the very bottom.
+  if (isStudent && mny <= 0) return 'worn_hoodie';
   if (isStudent && mny < 3) return 'hoodie';
 
   if (prof === '高中生') {
@@ -1981,32 +1982,33 @@ const MALE_HAIR_STYLES = ['short_fluffy', 'side_swept'];
 const MALE_HAIR_COLORS = ['black', 'chestnut', 'dark_brown', 'silver'];
 const FEMALE_HAIR_STYLES = ['bob', 'long_straight', 'side_ponytail'];
 const FEMALE_HAIR_COLORS = ['black', 'chestnut', 'blonde', 'rose_pink'];
+const DISABLED_MODULAR_HAIR = new Set(['male_short_fluffy_dark_brown']);
 
 const BODY_ASSET_BY_OUTFIT = {
   male: {
     school: 'school_uniform', school_blazer: 'school_uniform', school_pe: 'gym_top',
     suit: 'suit', premium_suit: 'business_blazer', tuxedo: 'suit', cheap_suit: 'office_shirt',
     shirt_tie: 'office_shirt', blazer: 'business_blazer',
-    hoodie: 'teal_student_hoodie', cs_hoodie: 'teal_student_hoodie', grad_hoodie: 'teal_student_hoodie',
-    worn_hoodie: 'worn_hoodie',
+    hoodie: 'male_hoodie', cs_hoodie: 'male_hoodie', grad_hoodie: 'male_hoodie',
+    worn_hoodie: 'male_worn_hoodie',
     hanfu: 'xianxia_robe', daoist_robe: 'xianxia_robe', sect_uniform: 'xianxia_robe',
     robe: 'wizard_robe', house_robe: 'wizard_robe', labcoat: 'labcoat', chef: 'chef_coat',
     idol: 'idol_jacket', idol_dress: 'idol_jacket', idol_jacket: 'idol_jacket',
     tracksuit: 'tracksuit', tank: 'gym_top', jersey: 'esports_jersey', gaming_jersey: 'esports_jersey',
-    poker_vest: 'business_blazer', thief: 'worn_hoodie', tactical: 'tracksuit',
+    poker_vest: 'business_blazer', thief: 'male_worn_hoodie', tactical: 'tracksuit',
     trench: 'business_blazer', naval: 'business_blazer', politician: 'business_blazer',
-    tee: 'teal_student_hoodie', polo: 'office_shirt', cardigan: 'cardigan',
-    sweater_v: 'cardigan', turtleneck: 'cardigan', denim_jacket: 'teal_student_hoodie',
-    varsity: 'teal_student_hoodie', jacket: 'teal_student_hoodie', flannel: 'party_shirt',
-    hawaiian: 'party_shirt', striped_tee: 'teal_student_hoodie', winter_coat: 'worn_hoodie',
-    puffer: 'worn_hoodie', art_smock: 'office_shirt', beret_top: 'cardigan',
-    photo_vest: 'party_shirt', ragged: 'worn_hoodie', patched_tee: 'worn_hoodie', pajamas: 'worn_hoodie',
+    tee: 'male_hoodie', polo: 'office_shirt', cardigan: 'cardigan',
+    sweater_v: 'cardigan', turtleneck: 'cardigan', denim_jacket: 'male_hoodie',
+    varsity: 'male_hoodie', jacket: 'male_hoodie', flannel: 'party_shirt',
+    hawaiian: 'party_shirt', striped_tee: 'male_hoodie', winter_coat: 'male_worn_hoodie',
+    puffer: 'male_worn_hoodie', art_smock: 'office_shirt', beret_top: 'cardigan',
+    photo_vest: 'party_shirt', ragged: 'male_worn_hoodie', patched_tee: 'male_worn_hoodie', pajamas: 'male_worn_hoodie',
   },
   female: {
     school: 'female_preppy_blazer', school_blazer: 'female_preppy_blazer', school_pe: 'female_gym_jacket',
     suit: 'female_suit', premium_suit: 'female_business_blazer', tuxedo: 'female_suit',
     cheap_suit: 'female_office_shirt', shirt_tie: 'female_office_shirt', blazer: 'female_business_blazer',
-    hoodie: 'female_teal_crop_hoodie', cs_hoodie: 'female_teal_crop_hoodie', grad_hoodie: 'female_teal_crop_hoodie',
+    hoodie: 'female_hoodie', cs_hoodie: 'female_hoodie', grad_hoodie: 'female_hoodie',
     hanfu: 'female_xianxia_hanfu', daoist_robe: 'female_xianxia_hanfu', sect_uniform: 'female_xianxia_hanfu',
     robe: 'female_wizard_robe', house_robe: 'female_wizard_robe', labcoat: 'female_labcoat',
     chef: 'female_chef_coat', idol: 'female_idol_stage', idol_dress: 'female_idol_stage',
@@ -2016,8 +2018,8 @@ const BODY_ASSET_BY_OUTFIT = {
     trench: 'female_business_blazer', naval: 'female_business_blazer', politician: 'female_business_blazer',
     tee: 'female_white_blouse', polo: 'female_white_blouse', cardigan: 'female_cardigan_cream',
     sweater_v: 'female_worn_sweater', turtleneck: 'female_worn_sweater',
-    denim_jacket: 'female_teal_crop_hoodie', varsity: 'female_teal_crop_hoodie',
-    jacket: 'female_teal_crop_hoodie', flannel: 'female_party_top', hawaiian: 'female_party_top',
+    denim_jacket: 'female_hoodie', varsity: 'female_hoodie',
+    jacket: 'female_hoodie', flannel: 'female_party_top', hawaiian: 'female_party_top',
     striped_tee: 'female_white_blouse', winter_coat: 'female_worn_hoodie', puffer: 'female_worn_hoodie',
     art_smock: 'female_white_blouse', beret_top: 'female_cardigan_cream', photo_vest: 'female_party_top',
     ragged: 'female_worn_hoodie', patched_tee: 'female_worn_hoodie', pajamas: 'female_worn_hoodie',
@@ -2028,9 +2030,10 @@ const BODY_ASSET_BY_OUTFIT = {
 const MODULAR_LAYER_TRANSFORMS = {
   body_full: {
     female_worn_sweater: { y: 2 },
-    gym_top: { y: -3 },
-    teal_student_hoodie: { y: 0 },
-    worn_hoodie: { x: 1, y: 5, scale: 1 },
+    female_party_top: { x: 0, y: 2, scale: 1 },
+    gym_top: { x: 0, y: -2, scale: 1 },
+    male_hoodie: { y: 0 },
+    male_worn_hoodie: { x: 1, y: -1, scale: 1 },
   },
   hair: {
     female_bob_black: { x: 1, y: 1, scale: 1.08 },
@@ -2038,10 +2041,9 @@ const MODULAR_LAYER_TRANSFORMS = {
     female_side_ponytail_blonde: { x: 3, y: -1, scale: 0.96 },
     female_side_ponytail_chestnut: { x: 3, y: -1, scale: 0.96 },
     female_side_ponytail_rose_pink: { x: 3, y: -1, scale: 0.96 },
-    male_short_fluffy_black: { x: -1, y: -1, scale: 1.13 },
-    male_short_fluffy_chestnut: { x: -1, y: -1, scale: 1.13 },
-    male_short_fluffy_dark_brown: { x: -1, y: -1, scale: 1.16 },
-    male_short_fluffy_silver: { x: 0, y: -2, scale: 1.06 },
+    male_short_fluffy_black: { x: 0, y: -1, scale: 1.1 },
+    male_short_fluffy_chestnut: { x: 0, y: -1, scale: 1.1 },
+    male_short_fluffy_silver: { x: 0, y: -1, scale: 1.1 },
   },
 };
 
@@ -2124,13 +2126,15 @@ function modularHairId(state) {
   const sex = female ? 'female' : 'male';
   const style = styles[normIndex(state.topVariant ?? 0, styles.length)];
   const color = colors[normIndex(state.outfitColorId ?? 0, colors.length)];
-  return `${sex}_${style}_${color}`;
+  const id = `${sex}_${style}_${color}`;
+  if (DISABLED_MODULAR_HAIR.has(id)) return 'male_short_fluffy_chestnut';
+  return id;
 }
 
 function modularBodyId(state) {
   const sex = state.sex === 1 ? 'female' : 'male';
   const outfit = outfitOf(state);
-  return BODY_ASSET_BY_OUTFIT[sex][outfit] || (sex === 'female' ? 'female_teal_crop_hoodie' : 'teal_student_hoodie');
+  return BODY_ASSET_BY_OUTFIT[sex][outfit] || (sex === 'female' ? 'female_hoodie' : 'male_hoodie');
 }
 
 function modularBgId(state) {

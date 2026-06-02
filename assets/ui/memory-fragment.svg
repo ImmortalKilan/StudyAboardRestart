@@ -1,0 +1,20 @@
+<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Memory card frame">
+  <defs>
+    <linearGradient id="edge" x1="34" y1="22" x2="128" y2="138" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D8E3F0"/>
+      <stop offset=".54" stop-color="#7F99B4"/>
+      <stop offset="1" stop-color="#C5A15D"/>
+    </linearGradient>
+    <linearGradient id="wash" x1="42" y1="30" x2="112" y2="132" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#AFC5DC" stop-opacity=".18"/>
+      <stop offset="1" stop-color="#111927" stop-opacity=".08"/>
+    </linearGradient>
+  </defs>
+  <rect x="35" y="18" width="90" height="124" rx="14" fill="#101724" fill-opacity=".42" stroke="#263548" stroke-width="2"/>
+  <rect x="44" y="29" width="72" height="102" rx="9" fill="url(#wash)" stroke="url(#edge)" stroke-width="2"/>
+  <path d="M58 43h20M58 119h26M101 43h-14M102 119h-10" stroke="#D8E3F0" stroke-width="3" stroke-linecap="round" opacity=".62"/>
+  <path d="M80 34l4 7 8 1-6 6 2 8-8-4-8 4 2-8-6-6 8-1 4-7Z" fill="#7FD1C7" fill-opacity=".2" stroke="#7FD1C7" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M101 104c8-7 19-7 27 0-8 7-19 7-27 0Z" fill="#111A28" fill-opacity=".84" stroke="#C5A15D" stroke-width="3" stroke-linejoin="round"/>
+  <circle cx="114" cy="104" r="4" fill="#C5A15D"/>
+  <path d="M35 116 25 126M125 42l10-11M126 125l9 10M34 44 25 35" stroke="#526B86" stroke-width="3" stroke-linecap="round" opacity=".4"/>
+</svg>

@@ -11,6 +11,8 @@
  * for selecting which storyline to spend a card on.
  */
 
+import { renderAvatar } from './avatar.js';
+
 const LS_KEY = 'sasr_memory_v1';
 
 // ── Card earn schedule: plays required to earn each card ──
@@ -255,12 +257,37 @@ function _save(data) {
   try { localStorage.setItem(LS_KEY, JSON.stringify(data)); } catch {}
 }
 
+function _snapshotAvatarState(state) {
+  if (!state || typeof state !== 'object') return null;
+  const keys = [
+    'sex', 'age', 'month', 'monthOfYear', 'HAP', 'HLT', 'MNY', 'INT', 'CHR',
+    'profession', 'major', 'hobby', 'storyline', 'relationship', 'hsType',
+    '_forceOutfit', 'avatarHairStyle', 'avatarHairColor', 'avatarFace',
+  ];
+  const snap = {};
+  for (const key of keys) {
+    const value = state[key];
+    if (value !== undefined && value !== null && typeof value !== 'object') snap[key] = value;
+  }
+  return snap;
+}
+
+function _renderLastAvatar(container, avatarState) {
+  const canvas = container.querySelector('#memory-last-avatar');
+  if (!canvas) return;
+  const state = avatarState || { sex: 0, age: 18, HAP: 5, HLT: 5, MNY: 2, profession: '本科生' };
+  renderAvatar(canvas, state);
+  requestAnimationFrame(() => renderAvatar(canvas, state));
+}
+
 // ── Public API ──
 
 /** Call when a game ends (state.phase = 'ended'). Increments play count and awards cards. */
-export function recordPlaythrough() {
+export function recordPlaythrough(finalState = null) {
   const data = _load();
   data.totalPlays++;
+  const avatarState = _snapshotAvatarState(finalState);
+  if (avatarState) data.lastAvatar = avatarState;
 
   // Check if a new card is earned
   const nextThreshold = CARD_SCHEDULE[data.cardsEarned] || Infinity;
@@ -338,6 +365,13 @@ export function renderMemoryPanel() {
   const info = getNextCardInfo();
   const cards = getStorylineCards();
   const revealedCount = Object.keys(info.revealed).length;
+
+  if (info.totalPlays <= 0) {
+    container.hidden = true;
+    return;
+  }
+  container.hidden = false;
+  _renderLastAvatar(container, _load().lastAvatar);
 
   // Card count display
   const cardCountEl = container.querySelector('.memory-card-count');

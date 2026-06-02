@@ -509,27 +509,6 @@
         "background_removed": "chroma #00ff00",
         "generation": "hair_v2_for_regen_face_v2"
       },
-      "male_short_fluffy_dark_brown": {
-        "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_male_sheet_v2.png",
-        "source_box": [
-          314,
-          627,
-          627,
-          940
-        ],
-        "canvas": [
-          72,
-          72
-        ],
-        "layer": "hair",
-        "style": "short_fluffy",
-        "color": "dark_brown",
-        "target_height": 27,
-        "center_x": 34,
-        "top_y": 1,
-        "background_removed": "chroma #00ff00",
-        "generation": "hair_v2_for_regen_face_v2"
-      },
       "male_messy_tousled_dark_brown": {
         "source_sheet": "assets/avatars/modular_v1/_sheets/regen_hair_male_sheet_v2.png",
         "source_box": [
@@ -994,7 +973,7 @@
       }
     },
     "torso_clothes": {
-      "teal_student_hoodie": {
+      "male_hoodie": {
         "canvas": [
           72,
           72
@@ -1189,7 +1168,7 @@
         ],
         "source_grid": "strict_4x4_main_component"
       },
-      "worn_hoodie": {
+      "male_worn_hoodie": {
         "canvas": [
           72,
           72
@@ -1234,7 +1213,7 @@
         ],
         "source_grid": "strict_4x4_main_component"
       },
-      "female_teal_crop_hoodie": {
+      "female_hoodie": {
         "canvas": [
           72,
           72
@@ -1692,7 +1671,7 @@
       }
     },
     "torso_clothes_back": {
-      "teal_student_hoodie": {
+      "male_hoodie": {
         "canvas": [
           72,
           72
@@ -1705,7 +1684,7 @@
         ],
         "priority": "after body_base, before torso_clothes"
       },
-      "worn_hoodie": {
+      "male_worn_hoodie": {
         "canvas": [
           72,
           72
@@ -1718,7 +1697,7 @@
         ],
         "priority": "after body_base, before torso_clothes"
       },
-      "female_teal_crop_hoodie": {
+      "female_hoodie": {
         "canvas": [
           72,
           72
@@ -1802,7 +1781,7 @@
       }
     },
     "body_full": {
-      "teal_student_hoodie": {
+      "male_hoodie": {
         "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_male_sheet.png",
         "grid_cell": [
           0,
@@ -2236,7 +2215,7 @@
         "green_despill_passes": 3,
         "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
       },
-      "worn_hoodie": {
+      "male_worn_hoodie": {
         "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_male_sheet.png",
         "grid_cell": [
           384,
@@ -2338,7 +2317,7 @@
         "green_despill_passes": 3,
         "green_edge_cleanup": "edge_only_low_red_low_blue_key_pixels_removed_or_despilled"
       },
-      "female_teal_crop_hoodie": {
+      "female_hoodie": {
         "source_sheet": "assets/avatars/modular_v1/_sheets/regen_body_full_female_sheet.png",
         "grid_cell": [
           0,

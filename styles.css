@@ -658,19 +658,19 @@ body.in-creation .app {
     padding: 0 4px;
   }
   .talent-card {
-    padding: 8px 10px;
+    padding: 11px 12px;
     border-left-width: 3px;
     border-radius: 8px;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }
   .t-name {
-    font-size: 12px;
-    margin-bottom: 2px;
+    font-size: 14px;
+    margin-bottom: 3px;
   }
   .t-desc {
-    font-size: 10px;
-    line-height: 1.3;
+    font-size: 12px;
+    line-height: 1.38;
   }
   .screen-head h1 {
     font-size: 24px !important;
@@ -1060,37 +1060,6 @@ button.ghost:active {
   100% { transform: scale(1) rotate(360deg); }
 }
 
-/* ── Skin tone dots ── */
-.avatar-ov-skin-dot {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.12);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  padding: 0;
-}
-
-.avatar-ov-skin-dot:hover {
-  transform: scale(1.15);
-  border-color: rgba(255, 255, 255, 0.35);
-}
-
-.avatar-ov-skin-dot:active {
-  transform: scale(0.9);
-  transition-duration: 0.08s;
-}
-
-.avatar-ov-skin-dot.active {
-  border-color: rgba(255, 255, 255, 0.7);
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
-  transform: scale(1.1);
-}
-
-.skin-dot-dark  { background: #693a1f; }
-.skin-dot-mid   { background: #c48a5a; }
-.skin-dot-light { background: #f4caa4; }
-
 /* Legacy customize row — hidden now, controls are in overlay */
 .alloc-customize-row { display: none; }
 .alloc-avatar-hint { display: none; }
@@ -1347,16 +1316,191 @@ button.ghost:active {
   .footer-actions {
     margin-top: 8px;
   }
-  .alloc-radar {
-    width: 140px;
-    height: 140px;
-  }
   .alloc-ach-panel {
     padding: 8px 10px;
   }
 }
 
 /* ── Achievement bonus panel (compact) ── */
+/* Desktop allocation page: stronger avatar focus + balanced right column */
+@media (min-width: 761px) {
+  #step-alloc {
+    padding: clamp(24px, 3vw, 42px) clamp(24px, 3.4vw, 46px);
+  }
+
+  #step-alloc .alloc-split {
+    display: grid;
+    grid-template-columns: minmax(430px, 42%) minmax(0, 1fr);
+    gap: clamp(28px, 3vw, 48px);
+    height: 100%;
+    align-items: stretch;
+    overflow: hidden;
+  }
+
+  #step-alloc .alloc-left {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    flex: initial;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 24px 20px 20px;
+    border-radius: 18px;
+  }
+
+  #step-alloc .alloc-avatar-wrap-lg {
+    width: 100%;
+    max-width: none;
+    min-height: 360px;
+    flex: 1 1 auto;
+  }
+
+  #step-alloc .alloc-avatar-wrap-lg canvas {
+    width: min(100%, 640px);
+    height: min(100%, 640px);
+    max-height: calc(100vh - 260px);
+  }
+
+  #step-alloc .avatar-ov-hint {
+    top: 16px;
+    font-size: 12px;
+  }
+
+  #step-alloc .avatar-overlay-controls {
+    padding: 12px 16px;
+  }
+
+  #step-alloc .avatar-ov-group {
+    gap: 8px;
+  }
+
+  #step-alloc .avatar-ov-btn {
+    width: 42px;
+    height: 42px;
+    font-size: 18px;
+  }
+
+  #step-alloc .avatar-ov-dice {
+    width: 48px;
+    height: 48px;
+    font-size: 21px;
+  }
+
+  #step-alloc .alloc-ach-panel {
+    width: 100%;
+    flex-shrink: 0;
+  }
+
+  #step-alloc .alloc-right {
+    gap: 12px;
+    overflow: hidden;
+  }
+
+  #step-alloc .alloc-right .screen-head {
+    margin-bottom: 4px;
+    flex-shrink: 0;
+  }
+
+  #step-alloc .alloc-right .screen-head h1 {
+    font-size: clamp(28px, 2.1vw, 34px);
+  }
+
+  #step-alloc .alloc-right .screen-head .sub {
+    font-size: 14px;
+    line-height: 1.45;
+    margin-bottom: 0;
+  }
+
+  #step-alloc .alloc-banner {
+    min-height: 56px;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    font-size: 15px;
+  }
+
+  #step-alloc .talent-bonus-banner {
+    min-height: 56px;
+    margin-bottom: 0;
+    padding: 11px 16px;
+    align-items: center;
+  }
+
+  #step-alloc .alloc-list {
+    flex: 1 1 260px;
+    min-height: 230px;
+    gap: 12px;
+    grid-auto-rows: minmax(64px, 1fr);
+    align-content: stretch;
+  }
+
+  #step-alloc .alloc-row {
+    grid-template-columns: 54px 40px 44px 40px minmax(56px, 1fr);
+    gap: 10px;
+    padding: 14px 20px;
+    font-size: 16px;
+  }
+
+  #step-alloc .alloc-row > span:first-child {
+    width: 54px;
+    font-size: 16px;
+  }
+
+  #step-alloc .alloc-row .step {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+
+  #step-alloc .alloc-val {
+    font-size: 18px;
+  }
+
+  #step-alloc .alloc-preset-section {
+    margin-top: 0;
+    min-height: 122px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  #step-alloc .alloc-preset-header {
+    margin-bottom: 12px;
+  }
+
+  #step-alloc .alloc-preset-list {
+    gap: 9px;
+  }
+
+  #step-alloc .preset-chip {
+    padding: 7px 13px;
+    font-size: 13px;
+  }
+
+  #step-alloc .alloc-preset-actions {
+    gap: 8px;
+  }
+
+  #step-alloc .alloc-preset-actions .preset-btn {
+    padding: 7px 12px !important;
+    font-size: 12px !important;
+  }
+
+  #step-alloc .footer-actions {
+    margin-top: auto;
+    padding-top: 4px;
+    gap: 12px;
+  }
+
+  #step-alloc .footer-actions button {
+    min-height: 54px;
+    padding: 14px 28px;
+    font-size: 16px;
+  }
+}
+
 .alloc-ach-panel {
   width: 100%;
   margin-top: auto;
@@ -1573,82 +1717,13 @@ button.ghost:active {
   margin-left: 2px;
 }
 
-/* === Stat radar chart (alloc right) === */
-.alloc-radar-wrap {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: auto; /* push to bottom */
-  padding: 8px 0;
-  flex-shrink: 0;
-}
-.alloc-radar {
-  width: 180px;
-  height: 180px;
-  opacity: 0.85;
-}
-.radar-grid {
-  fill: none;
-  stroke: var(--line);
-  stroke-width: 0.5;
-}
-.radar-axis {
-  stroke: var(--line);
-  stroke-width: 0.3;
-}
-.radar-fill {
-  fill: rgba(111,143,184,0.15);
-  stroke: var(--accent);
-  stroke-width: 1.5;
-  transition: d 0.3s ease;
-}
-.radar-dot {
-  fill: var(--accent);
-  r: 3;
-  transition: cx 0.3s ease, cy 0.3s ease;
-}
-.radar-label {
-  font-size: 9px;
-  fill: var(--ink-faint);
-  text-anchor: middle;
-  dominant-baseline: central;
-  font-family: var(--sans);
-}
-
 @media (max-width: 760px) {
   .alloc-ach-panel {
     margin-top: 8px;
     padding: 8px 10px;
   }
-  .alloc-radar-wrap {
-    margin-top: 6px;
-    padding: 4px 0;
-  }
-  .alloc-radar {
-    width: 120px;
-    height: 120px;
-  }
 }
 
-/* === Skin tone picker === */
-.skin-row {
-  display: flex;
-  gap: 10px;
-}
-.skin-chip {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  padding: 0;
-  border: 2px solid var(--line);
-  cursor: pointer;
-  transition: transform 0.12s ease, border-color 0.12s ease;
-}
-.skin-chip:hover { transform: scale(1.08); }
-.skin-chip.active { border-color: var(--accent); transform: scale(1.1); box-shadow: 0 0 0 2px rgba(255,255,255,0.08); }
-.skin-chip-dark  { background: #8a5a3b; }
-.skin-chip-mid   { background: #d9a87a; }
-.skin-chip-light { background: #f3d2b3; }
 .alloc-row {
   display: grid;
   grid-template-columns: 42px 30px 36px 30px 1fr;
@@ -4689,49 +4764,50 @@ body.in-summary {
 /* ── Mobile alloc page: compact one-screen layout ── */
 @media (max-width: 760px) {
   #step-alloc {
-    padding: 10px 10px 14px;
+    padding: 12px 12px 16px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
   #step-alloc .alloc-split {
     flex-direction: column;
-    gap: 8px;
+    gap: 14px;
   }
   #step-alloc .screen-head h1 {
-    font-size: 20px;
+    font-size: 22px;
     margin-bottom: 2px;
   }
   #step-alloc .screen-head .sub {
-    font-size: 11px;
-    margin-bottom: 6px;
-  }
-  #step-alloc .screen-head {
+    font-size: 13px;
+    line-height: 1.35;
     margin-bottom: 0;
   }
+  #step-alloc .screen-head {
+    margin-bottom: 10px;
+  }
   #step-alloc .alloc-banner {
-    padding: 6px 12px;
-    margin-bottom: 6px;
-    font-size: 13px;
+    padding: 9px 13px;
+    margin-bottom: 10px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--ink);
     background: linear-gradient(135deg, rgba(74,157,229,0.12), rgba(74,157,229,0.04));
     border-color: rgba(74,157,229,0.3);
   }
   #step-alloc .alloc-banner span {
-    font-size: 18px;
+    font-size: 20px;
   }
   #step-alloc .talent-bonus-banner {
-    padding: 5px 8px;
-    margin-bottom: 5px;
-    gap: 4px;
+    padding: 7px 9px;
+    margin-bottom: 10px;
+    gap: 5px;
   }
   #step-alloc .talent-bonus-banner .tb-label {
-    font-size: 10px;
+    font-size: 12px;
     padding-top: 2px;
   }
   #step-alloc .talent-bonus-banner .tb-chip {
-    font-size: 10px;
-    padding: 2px 6px;
+    font-size: 12px;
+    padding: 3px 7px;
   }
   /* Avatar: full-width on mobile, controls stay as overlay */
   #step-alloc .alloc-left {
@@ -4755,22 +4831,18 @@ body.in-summary {
     padding: 6px 8px;
   }
   #step-alloc .avatar-ov-hint {
-    font-size: 9px;
+    font-size: 11px;
   }
   #step-alloc .avatar-ov-btn {
-    width: 30px;
-    height: 30px;
-    font-size: 13px;
+    width: 34px;
+    height: 34px;
+    font-size: 15px;
     border-radius: 7px;
   }
   #step-alloc .avatar-ov-dice {
-    width: 32px;
-    height: 32px;
-    font-size: 15px;
-  }
-  #step-alloc .avatar-ov-skin-dot {
-    width: 18px;
-    height: 18px;
+    width: 36px;
+    height: 36px;
+    font-size: 17px;
   }
   /* Hide achievement panel detail on mobile to save space */
   #step-alloc .alloc-ach-panel {
@@ -4779,85 +4851,79 @@ body.in-summary {
   /* Stats: 2-col compact */
   #step-alloc .alloc-list {
     grid-template-columns: repeat(2, 1fr);
-    gap: 4px;
+    gap: 10px;
   }
   #step-alloc .alloc-row {
-    grid-template-columns: 32px 26px 30px 26px 1fr;
-    gap: 2px;
-    padding: 6px 6px;
-    font-size: 12px;
+    grid-template-columns: 38px 32px 34px 32px minmax(0, 1fr);
+    gap: 5px;
+    min-height: 48px;
+    padding: 10px 8px;
+    font-size: 14px;
     justify-items: center;
   }
   #step-alloc .alloc-row > span:first-child {
-    width: 32px;
+    width: 38px;
     text-align: center;
     padding-right: 0;
-    font-size: 12px;
+    font-size: 14px;
   }
   #step-alloc .alloc-row .step {
-    width: 24px;
-    height: 24px;
-    min-width: 24px;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
     padding: 0;
-    font-size: 12px;
+    font-size: 17px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 5px;
+    border-radius: 7px;
   }
   #step-alloc .alloc-val {
-    font-size: 14px;
+    font-size: 16px;
     text-align: center;
   }
   #step-alloc .alloc-bonus {
-    font-size: 11px;
+    font-size: 12px;
     padding-left: 2px;
     text-align: left;
   }
   /* Presets: compact */
   #step-alloc .alloc-preset-section {
-    margin-top: 6px;
-    padding: 7px 8px;
+    margin-top: 12px;
+    padding: 11px 12px;
   }
   #step-alloc .alloc-preset-header {
-    margin-bottom: 5px;
+    margin-bottom: 8px;
   }
   #step-alloc .alloc-preset-list {
-    gap: 4px;
+    gap: 6px;
   }
   #step-alloc .alloc-preset-list .preset-chip {
-    padding: 3px 8px;
-    font-size: 10px;
+    padding: 5px 9px;
+    font-size: 12px;
   }
   #step-alloc .alloc-preset-actions {
-    gap: 3px;
+    gap: 5px;
   }
   #step-alloc .alloc-preset-actions .preset-btn {
-    padding: 2px 6px !important;
-    font-size: 10px !important;
+    padding: 5px 8px !important;
+    font-size: 12px !important;
   }
   /* Footer */
   #step-alloc .footer-actions {
-    margin-top: 8px;
-    gap: 6px;
+    margin-top: 14px;
+    gap: 10px;
     justify-content: center;
+    flex-wrap: wrap;
   }
   #step-alloc .footer-actions button {
-    padding: 9px 16px;
-    font-size: 13px;
+    min-height: 42px;
+    padding: 11px 16px;
+    font-size: 15px;
   }
   /* Hide achievement panel on mobile to save space (show in game screen instead) */
   #step-alloc .alloc-ach-panel {
     display: none;
-  }
-  /* Smaller radar on mobile */
-  #step-alloc .alloc-radar-wrap {
-    margin-top: 6px;
-    padding: 2px 0;
-  }
-  #step-alloc .alloc-radar {
-    width: 110px;
-    height: 110px;
   }
 }
 
@@ -4865,19 +4931,19 @@ body.in-summary {
 @media (max-width: 760px) {
   .talent-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 6px;
+    gap: 8px;
   }
   .talent-card {
-    padding: 8px 10px;
+    padding: 11px 12px;
     border-left-width: 3px;
   }
   .t-name {
     font-size: 14px;
-    margin-bottom: 2px;
+    margin-bottom: 3px;
   }
   .t-desc {
     font-size: 12px;
-    line-height: 1.4;
+    line-height: 1.38;
   }
 }
 
@@ -6879,6 +6945,10 @@ body.in-summary {
   animation: memPanel-slideIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both;
 }
 
+.memory-panel[hidden] {
+  display: none !important;
+}
+
 @keyframes memPanel-slideIn {
   from { opacity: 0; transform: translateY(-50%) translateX(-24px); }
   to   { opacity: 1; transform: translateY(-50%) translateX(0); }
@@ -6929,24 +6999,46 @@ body.in-summary {
   justify-content: center;
 }
 
-.memory-mirror-img {
+.memory-avatar-card {
+  position: relative;
   width: 120px;
   height: 120px;
-  object-fit: contain;
-  image-rendering: pixelated;
-  filter: drop-shadow(0 4px 16px rgba(60, 140, 255, 0.25));
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.4s ease;
   animation: mirror-breathe 4s ease-in-out infinite;
 }
 
-@keyframes mirror-breathe {
-  0%, 100% { filter: drop-shadow(0 4px 16px rgba(60, 140, 255, 0.2)); transform: scale(1); }
-  50%      { filter: drop-shadow(0 6px 24px rgba(60, 140, 255, 0.4)); transform: scale(1.03); }
+.memory-last-avatar {
+  position: absolute;
+  width: 82px;
+  height: 102px;
+  left: 50%;
+  top: 58%;
+  transform: translate(-50%, -50%);
+  image-rendering: pixelated;
+  z-index: 1;
 }
 
-.memory-panel-inner:hover .memory-mirror-img {
-  filter: drop-shadow(0 6px 28px rgba(60, 160, 255, 0.45));
-  transform: scale(1.06);
+.memory-mirror-img {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 16px rgba(60, 140, 255, 0.22));
+  z-index: 2;
+  pointer-events: none;
+}
+
+@keyframes mirror-breathe {
+  0%, 100% { filter: drop-shadow(0 4px 16px rgba(60, 140, 255, 0.18)); transform: scale(1); }
+  50%      { filter: drop-shadow(0 6px 22px rgba(60, 140, 255, 0.3)); transform: scale(1.015); }
+}
+
+.memory-panel-inner:hover .memory-avatar-card {
+  filter: drop-shadow(0 6px 26px rgba(60, 160, 255, 0.34));
+  transform: scale(1.04);
 }
 
 .memory-mirror-glow {
@@ -7118,9 +7210,16 @@ body.in-summary {
     flex-shrink: 0;
   }
 
+  .memory-avatar-card,
   .memory-mirror-img {
     width: 48px;
     height: 48px;
+  }
+
+  .memory-last-avatar {
+    width: 32px;
+    height: 40px;
+    top: 58%;
   }
 
   .memory-mirror-glow {
