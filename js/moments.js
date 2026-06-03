@@ -17,14 +17,8 @@ const EGG_STORAGE_KEY = 'sasr_moments_eggs_v1';
 const EGG_DEFS = {
   // ID: { name, hint }
   mom_last_post:  { name: '妈妈的最后一条朋友圈', hint: '结局之后那条没说完的话' },
-  fourth_wall:    { name: '第四面墙裂痕',         hint: '有人在透过屏幕看你' },
   hidden_npc:     { name: '???的踪迹',           hint: '名单上多出来的那位' },
-  midnight_3am:   { name: '凌晨三点的朋友圈',     hint: '正常人都该睡了' },
-  festival:       { name: '节日彩蛋',             hint: '现实世界的某一天' },
-  group_screenshot: { name: '群聊截图',           hint: '原来朋友圈外还有世界' },
-  cipher:         { name: '藏字游戏',             hint: '每句的第一个字' },
   dejavu:         { name: '前世的回响',           hint: '重开够多次才能解锁' },
-  npc_shade:      { name: 'NPC 暗讽',             hint: '他们其实都知道' },
   hidden_entry:   { name: '朋友圈里的暗号',       hint: '用对的暗号回复对的人' },
 };
 
@@ -141,7 +135,6 @@ function _maybeAddEasterEggPost(gameState) {
 
   _addNpcPost(npc, picked.text, 'general', gameState);
   npc._lastPostMonth = monthTotal;
-  _unlockEgg(eggId);
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -302,7 +295,6 @@ function _maybeAddTimeBasedEgg(gameState) {
         const npc = eligible[Math.floor(Math.random() * eligible.length)];
         _addNpcPost(npc, MIDNIGHT_3AM_POSTS[npc.type], 'general', gameState);
         npc._lastPostMonth = gameState.monthTotal;
-        _unlockEgg('midnight_3am');
         return;
       }
     }
@@ -322,7 +314,6 @@ function _maybeAddTimeBasedEgg(gameState) {
       const npc = eligible[Math.floor(Math.random() * eligible.length)];
       _addNpcPost(npc, pool[npc.type], 'general', gameState);
       npc._lastPostMonth = gameState.monthTotal;
-      _unlockEgg('festival');
     }
   }
 }
@@ -2596,21 +2587,17 @@ export function reactToPlayerEvent(ev, gameState) {
   // 玩家挂科 / 学术不端
   if (ev.set.academic_dishonesty || (ev.id && ev.id === 99931) /* INT≤0死 */) {
     reactions.push({ trigger: 'shade_cheating', delay: 1 + Math.floor(Math.random() * 2) });
-    _unlockEgg('npc_shade');
   }
   if (ev.set.failed_exam || /挂科|fail|fail.*course|被劝退/.test(ev.text || ev.event || '')) {
     reactions.push({ trigger: 'shade_failure', delay: 1 + Math.floor(Math.random() * 2) });
-    _unlockEgg('npc_shade');
   }
   // 玩家进入"海王"或"二婚"/"离异" — 暗示感情混乱
   if (['海王', '海后', '二婚', '离异'].includes(ev.set.relationship)) {
     reactions.push({ trigger: 'shade_breakup_cycle', delay: 1 + Math.floor(Math.random() * 2) });
-    _unlockEgg('npc_shade');
   }
   // 玩家 MNY 跌穿底（≤0）— 暗示落魄
   if (gameState.MNY != null && gameState.MNY <= 0 && Math.random() < 0.3) {
     reactions.push({ trigger: 'shade_poor', delay: 1 + Math.floor(Math.random() * 3) });
-    _unlockEgg('npc_shade');
   }
 
   // Schedule reactions

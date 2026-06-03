@@ -9638,3 +9638,44 @@ body:has(.moments-rfloat:not(.collapsed)) .mute-btn {
   color: #e74c3c;
   margin-top: 6px;
 }
+
+/* ── PWA Update Bar ───────────────────────────────────────── */
+.update-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #f1c40f, #e67e22);
+  color: #1a1a1a;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  animation: updateSlideIn 0.4s ease-out;
+}
+.update-bar-text {
+  letter-spacing: 0.5px;
+}
+.update-bar-btn {
+  background: #1a1a1a;
+  color: #f1c40f;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+}
+.update-bar-btn:active {
+  opacity: 0.8;
+}
+@keyframes updateSlideIn {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(0); }
+}

@@ -94,14 +94,8 @@ export const ACHIEVEMENTS = [
 
   // ── 朋友圈彩蛋 ──────────────────────────────────────────────────────────
   { id: 'egg_mom_last_post',  name: '妈妈的最后一条朋友圈', icon: '💌', rarity: 'epic',   cat: '朋友圈', desc: '结局之后那条没说完的话' },
-  { id: 'egg_fourth_wall',    name: '第四面墙裂痕',         icon: '🪞', rarity: 'epic',   cat: '朋友圈', desc: '有人在透过屏幕看你' },
   { id: 'egg_hidden_npc',     name: '???的踪迹',           icon: '👤', rarity: 'epic',   cat: '朋友圈', desc: '名单上多出来的那位' },
-  { id: 'egg_midnight_3am',   name: '凌晨三点的朋友圈',     icon: '🌃', rarity: 'rare',   cat: '朋友圈', desc: '正常人都该睡了' },
-  { id: 'egg_festival',       name: '节日彩蛋',             icon: '🎊', rarity: 'rare',   cat: '朋友圈', desc: '现实世界的某一天' },
-  { id: 'egg_group_screenshot', name: '群聊截图',           icon: '🗣️', rarity: 'epic',   cat: '朋友圈', desc: '原来朋友圈外还有世界' },
-  { id: 'egg_cipher',         name: '藏字游戏',             icon: '🧩', rarity: 'epic',   cat: '朋友圈', desc: '每句的第一个字' },
   { id: 'egg_dejavu',         name: '前世的回响',           icon: '🫧', rarity: 'epic',   cat: '朋友圈', desc: '重开够多次才能解锁' },
-  { id: 'egg_npc_shade',      name: 'NPC 暗讽',             icon: '🎭', rarity: 'rare',   cat: '朋友圈', desc: '他们其实都知道' },
   { id: 'egg_hidden_entry',   name: '朋友圈里的暗号',       icon: '🔑', rarity: 'legendary', cat: '朋友圈', desc: '用对的暗号回复对的人' },
 ];
 

@@ -14,6 +14,11 @@
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
+  <!-- PWA update banner -->
+  <div id="update-bar" class="update-bar" style="display:none;">
+    <span class="update-bar-text">发现新版本</span>
+    <button id="btn-update" class="update-bar-btn">立即更新</button>
+  </div>
   <button id="btn-mute" class="mute-btn" title="开关音效">🔊</button>
   <main class="app">
 
@@ -43,7 +48,7 @@
           🗺️ <span class="start-top-label">命运图谱</span>
         </button>
         <button id="ach-trophy-start-btn" class="ghost start-top-btn" title="成就墙">
-          🏆 <span id="ach-trophy-start-badge" class="start-top-badge" style="color:#f1c40f;">0/81</span>
+          🏆 <span id="ach-trophy-start-badge" class="start-top-badge" style="color:#f1c40f;">0/75</span>
           <span id="ach-start-level" class="ach-start-level">Lv.0</span>
         </button>
       </div>
@@ -547,7 +552,7 @@
               <button id="btn-summary" class="ghost" style="display:none;">查看总结</button>
               <button id="btn-restart" class="ghost">重开</button>
               <button id="ach-trophy-btn" class="ghost" title="成就墙" style="display:flex; align-items:center; gap:6px;">
-                🏆 <span id="ach-trophy-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/81</span>
+                🏆 <span id="ach-trophy-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/75</span>
               </button>
             </div>
           </div>
@@ -879,7 +884,7 @@
             <div class="poster-subtitle">STUDY ABROAD SIMULATOR</div>
           </div>
           <div class="poster-qr">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://immortalkilan.github.io/StudyAboardRestart" alt="QR Code">
+            <img src="assets/ui/qr-code.png" alt="QR Code">
             <span class="poster-qr-hint">快来扫码玩！</span>
           </div>
         </div>
@@ -929,10 +934,18 @@
   </main>
 
   <div id="poster-modal" class="overlay" style="display:none; z-index: 10000; align-items:center; justify-content:center; background: rgba(0,0,0,0.85); flex-direction:column;">
-    <div class="poster-modal-content" style="position:relative; display:flex; flex-direction:column; align-items:center;">
-      <button id="btn-close-poster" style="position:absolute; right:-40px; top:-40px; background:none; border:none; color:#fff; font-size:32px; cursor:pointer;">&times;</button>
-      <div id="poster-img-wrap" style="max-height:80vh; max-width:90vw; overflow-y:auto; border-radius:12px; border:2px solid #333; box-shadow:0 10px 40px rgba(0,0,0,0.8);"></div>
-      <div style="color:#aaa; margin-top:16px; font-size:14px; letter-spacing:1px;">长按图片或右键保存分享</div>
+    <div class="poster-modal-content" style="position:relative; display:flex; flex-direction:column; align-items:center; max-width:90vw;">
+      <button id="btn-close-poster" style="position:absolute; right:-12px; top:-44px; background:none; border:none; color:#fff; font-size:32px; cursor:pointer; z-index:1;">&times;</button>
+      <div id="poster-img-wrap" style="max-height:65vh; max-width:90vw; overflow-y:auto; border-radius:12px; border:2px solid #333; box-shadow:0 10px 40px rgba(0,0,0,0.8);"></div>
+      <div class="poster-modal-actions" style="display:flex; gap:12px; margin-top:16px; width:100%; justify-content:center; flex-wrap:wrap;">
+        <button id="btn-poster-share" class="primary" style="background:linear-gradient(135deg,#25d366,#128c7e); border:none; color:#fff; padding:10px 20px; border-radius:8px; font-size:15px; cursor:pointer; display:flex; align-items:center; gap:6px;">
+          <span>📤</span> 分享给好友
+        </button>
+        <button id="btn-poster-download" class="ghost" style="border:1px solid #555; color:#ccc; padding:10px 20px; border-radius:8px; font-size:15px; cursor:pointer; display:flex; align-items:center; gap:6px;">
+          <span>💾</span> 保存图片
+        </button>
+      </div>
+      <div style="color:#666; margin-top:10px; font-size:12px;">也可长按图片保存</div>
     </div>
   </div>
 
@@ -942,7 +955,7 @@
     <div class="ach-wall-panel">
       <div class="ach-wall-head">
         <div class="ach-wall-title">🏆&nbsp;&nbsp;成就</div>
-        <span id="ach-wall-count" class="ach-wall-count">0/81</span>
+        <span id="ach-wall-count" class="ach-wall-count">0/75</span>
         <button id="ach-wall-close" class="ach-wall-close" aria-label="关闭成就墙">✕</button>
       </div>
       <div id="ach-wall-grid" class="ach-wall-grid"></div>
@@ -1147,7 +1160,53 @@
   </script>
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js').catch(() => {});
+      navigator.serviceWorker.register('./sw.js').then(reg => {
+        // Check for updates on every visit (don't wait 24h)
+        let lastCheck = 0;
+        function checkUpdate() {
+          const now = Date.now();
+          if (now - lastCheck < 60000) return;
+          lastCheck = now;
+          reg.update().catch(() => {});
+        }
+        checkUpdate();
+
+        // Also re-check when user returns to the app (iOS PWA resume)
+        document.addEventListener('visibilitychange', () => {
+          if (!document.hidden) checkUpdate();
+        });
+
+        // Listen for a new SW that's waiting to activate
+        function onNewSW(worker) {
+          const bar = document.getElementById('update-bar');
+          if (!bar) return;
+          bar.style.display = 'flex';
+          document.getElementById('btn-update').onclick = () => {
+            bar.style.display = 'none';
+            worker.postMessage({ type: 'SKIP_WAITING' });
+          };
+        }
+
+        if (reg.waiting) {
+          onNewSW(reg.waiting);
+        }
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              onNewSW(newWorker);
+            }
+          });
+        });
+
+        // When the new SW takes over, reload the page
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (refreshing) return;
+          refreshing = true;
+          window.location.reload();
+        });
+      }).catch(() => {});
     }
   </script>
 

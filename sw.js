@@ -1,6 +1,6 @@
 // Service Worker for 留学重开模拟器 PWA
 // Bump CACHE_VER to force re-cache after content updates
-const CACHE_VER = 'sasr-2.1';
+const CACHE_VER = 'sasr-2.2';
 
 const CORE_ASSETS = [
   './',
@@ -33,6 +33,7 @@ const CORE_ASSETS = [
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
   './assets/ui/memory-fragment.svg',
+  './assets/ui/qr-code.png',
   // SFX
   './assets/sfx/click1.ogg',
   './assets/sfx/click2.ogg',
@@ -243,6 +244,11 @@ self.addEventListener('activate', e => {
       Promise.all(keys.filter(k => k !== CACHE_VER).map(k => caches.delete(k)))
     ).then(() => self.clients.claim())
   );
+});
+
+// Allow the page to trigger skipWaiting via postMessage
+self.addEventListener('message', e => {
+  if (e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 // Fetch: network-first, fallback to cache (instant updates, offline resilient)

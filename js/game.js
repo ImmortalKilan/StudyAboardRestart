@@ -6816,9 +6816,17 @@ async function main() {
       });
       
       const dataUrl = canvas.toDataURL('image/png');
+
+      // Store blob for share/download buttons
+      const resp = await fetch(dataUrl);
+      const blob = await resp.blob();
+      window._posterBlob = blob;
+      window._posterDataUrl = dataUrl;
+
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 760;
 
       if (!isMobile) {
+        // Desktop: direct download
         const a = document.createElement('a');
         a.href = dataUrl;
         a.download = '我的留学人生档案.png';
@@ -6826,6 +6834,7 @@ async function main() {
         a.click();
         document.body.removeChild(a);
       } else {
+        // Mobile: show modal with share + download buttons
         const imgWrap = $('poster-img-wrap');
         imgWrap.innerHTML = '';
         const img = document.createElement('img');
@@ -6833,7 +6842,12 @@ async function main() {
         img.style.width = '100%';
         img.style.display = 'block';
         imgWrap.appendChild(img);
-        
+
+        // Show/hide share button based on Web Share API support
+        const shareBtn = $('btn-poster-share');
+        const canShare = navigator.share && navigator.canShare;
+        shareBtn.style.display = canShare ? 'flex' : 'none';
+
         $('poster-modal').style.display = 'flex';
       }
 
@@ -6852,6 +6866,36 @@ async function main() {
   $('btn-close-poster').addEventListener('click', () => {
     SFX.sfxModalClose();
     $('poster-modal').style.display = 'none';
+  });
+
+  // Share via Web Share API (mobile)
+  $('btn-poster-share').addEventListener('click', async () => {
+    try {
+      const blob = window._posterBlob;
+      if (!blob) return;
+      const file = new File([blob], '我的留学人生档案.png', { type: 'image/png' });
+      const shareData = { files: [file], title: '留学重开模拟器 — 我的人生档案', text: '我玩出了这样的人生，你也快来试试！' };
+      if (navigator.canShare && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+      } else {
+        // Fallback: share without file
+        await navigator.share({ title: '留学重开模拟器', text: '我玩出了这样的人生，你也快来试试！', url: 'https://immortalkilan.github.io/StudyAboardRestart' });
+      }
+    } catch (e) {
+      if (e.name !== 'AbortError') console.error('Share failed:', e);
+    }
+  });
+
+  // Download poster (mobile fallback)
+  $('btn-poster-download').addEventListener('click', () => {
+    const dataUrl = window._posterDataUrl;
+    if (!dataUrl) return;
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = '我的留学人生档案.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   });
 
   $('btn-start').addEventListener('click', async () => {
