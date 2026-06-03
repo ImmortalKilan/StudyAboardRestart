@@ -31435,5 +31435,1184 @@
       "HAP": 1,
       "PER": 1
     }
+  },
+  {
+    "id": 88100,
+    "event": "一个学长神秘兮兮地找到你：「兄弟，帮个忙。一门Econ期中，报酬2000刀。以你的脑子简直是白送。」他把一张写着考试时间和地点的纸条推过来。",
+    "include": "(INT>=8)&(SOC>=6)&(overseas==1)&(AGE>=18)&(AGE<=24)",
+    "weight": 60,
+    "choices": [
+      {
+        "text": "口袋里的2000刀真香",
+        "next": 88101
+      },
+      {
+        "text": "这种事我不干",
+        "next": 88102
+      }
+    ]
+  },
+  {
+    "id": 88101,
+    "event": "你帮学长搞定了那门经济学考试——全程不超过四十分钟。拿到钱的瞬间你觉得，这也太轻松了。消息不胫而走，一周之内又有三个人找上门来。你意识到这可能不只是一次性的事。",
+    "noRandom": true,
+    "logType": "special",
+    "effect": {
+      "MNY": 3
+    },
+    "set": {
+      "storyline": "cheater",
+      "showNET": true,
+      "profession": "代考新手"
+    },
+    "branch": [
+      "?88103"
+    ]
+  },
+  {
+    "id": 88102,
+    "event": "你礼貌地拒绝了。学长有些失望，但也没再纠缠。有些钱，不是你的就不是你的。",
+    "noRandom": true
+  },
+  {
+    "id": 88103,
+    "event": "订单越来越多，一个人忙不过来了。你需要决定——是走人脉路线建团队，还是走技术路线搞自动化。两条路，两种命运。",
+    "noRandom": true,
+    "logType": "special",
+    "choices": [
+      {
+        "text": "传统派：时差+替身+耳机，以人脉织网",
+        "next": 88110
+      },
+      {
+        "text": "维新派：AI代写+黑进考试系统，以技术制胜",
+        "next": 88130
+      }
+    ]
+  },
+  {
+    "id": 88110,
+    "event": "你决定走人脉路线。招募了第一批「枪手」——都是成绩不错但缺钱的留学生。利用中美12小时时差，美国考完的题目3分钟内传到中国备考群。你的地下网络开始运转。",
+    "noRandom": true,
+    "logType": "special",
+    "effect": {
+      "NET": 5,
+      "SOC": 1
+    },
+    "set": {
+      "cheater_route": "trad"
+    }
+  },
+  {
+    "id": 88111,
+    "event": "一个枪手考试时紧张到手抖，差点被监考老师发现。你接到电话，用三分钟编了一个完美的理由让他去medical center开了张证明。危机解除。",
+    "storyline": "cheater",
+    "include": "cheater_route==trad",
+    "weight": 3,
+    "effect": {
+      "NET": 1,
+      "HAP": -1
+    }
+  },
+  {
+    "id": 88112,
+    "event": "你的一个「客户」在朋友圈晒了A+的成绩单，被同学举报了。学校调查了一轮，但没查到你头上——客户嘴很严。不过你做了个新规矩：不准晒成绩。",
+    "storyline": "cheater",
+    "include": "cheater_route==trad",
+    "weight": 3,
+    "effect": {
+      "NET": 1,
+      "HAP": -1
+    }
+  },
+  {
+    "id": 88113,
+    "event": "一个新客户来了——他是你们系教授的TA的室友。接他的单意味着离教学圈子更近一步，风险和回报都很大。",
+    "storyline": "cheater",
+    "include": "cheater_route==trad",
+    "weight": 3,
+    "choices": [
+      {
+        "text": "接，高风险高回报",
+        "effect": {
+          "MNY": 2,
+          "NET": 2,
+          "HAP": -1
+        }
+      },
+      {
+        "text": "太近了，婉拒",
+        "effect": {
+          "HAP": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": 88114,
+    "event": "期末季来了，订单暴涨。你通宵协调六个时区的枪手排班，Google Sheet上密密麻麻的时间表像一张蜘蛛网。三天没睡觉，但银行账户的数字让你清醒。",
+    "storyline": "cheater",
+    "include": "cheater_route==trad",
+    "weight": 3,
+    "effect": {
+      "PER": -1,
+      "MNY": 2,
+      "NET": 2
+    }
+  },
+  {
+    "id": 88115,
+    "event": "一个枪手威胁你：不加钱就把你的事发到留学生论坛上。你看着他发来的截图——聊天记录、转账记录，证据确凿。",
+    "storyline": "cheater",
+    "include": "cheater_route==trad",
+    "weight": 2,
+    "choices": [
+      {
+        "text": "加钱，花钱买平安",
+        "effect": {
+          "MNY": -2
+        }
+      },
+      {
+        "text": "反威胁：你也脱不了干系",
+        "effect": {
+          "NET": -1,
+          "SOC": -1
+        },
+        "requireExpr": "SOC>=6"
+      }
+    ]
+  },
+  {
+    "id": 88116,
+    "event": "你的时差系统越来越成熟。一个WhatsApp群管着二十多人，另一个Telegram群对接客户。有人在小红书上叫你「留学圈地下HR总监」——当然他们不知道是你。",
+    "storyline": "cheater",
+    "include": "cheater_route==trad",
+    "weight": 3,
+    "effect": {
+      "NET": 2
+    }
+  },
+  {
+    "id": 88117,
+    "event": "校园里开始流传「有个中国学生帮人代考」的传闻。Reddit上有人发帖问有没有人知道是谁。评论区吵成一片，但没人指向你。你关掉手机，深呼吸了一口。",
+    "storyline": "cheater",
+    "include": "cheater_route==trad",
+    "weight": 2,
+    "effect": {
+      "HAP": -2
+    }
+  },
+  {
+    "id": 88118,
+    "event": "一个学弟在图书馆认出了你的枪手——「那不是上学期帮我们班考数学的那个人吗？」他看看你，又看看枪手，脸上露出了然的表情。",
+    "storyline": "cheater",
+    "include": "cheater_route==trad",
+    "weight": 2,
+    "choices": [
+      {
+        "text": "把他也拉进来，给他点小钱当下线",
+        "effect": {
+          "NET": 2,
+          "MNY": -1
+        }
+      },
+      {
+        "text": "请他吃顿饭，旁敲侧击让他别声张",
+        "effect": {
+          "SOC": 1,
+          "MNY": -1
+        }
+      },
+      {
+        "text": "换掉这个枪手，以后不用了",
+        "effect": {
+          "NET": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": 88119,
+    "event": "一个客户考完之后打了差评——说你的枪手只考了B-，他要的是A。他威胁要在留学生群里曝光你的「服务质量」。讽刺的是，这种事居然也有售后纠纷。",
+    "storyline": "cheater",
+    "include": "cheater_route==trad",
+    "weight": 3,
+    "choices": [
+      {
+        "text": "免费给他重考一次，当成本控制",
+        "effect": {
+          "MNY": -1,
+          "NET": 1
+        }
+      },
+      {
+        "text": "退一半钱，以后不接他的单",
+        "effect": {
+          "MNY": -1
+        }
+      },
+      {
+        "text": "「你要是敢说出去，我手里也有你的聊天记录」",
+        "effect": {
+          "HAP": -1
+        },
+        "requireExpr": "SOC>=7"
+      }
+    ]
+  },
+  {
+    "id": 88120,
+    "event": "你最信任的枪手突然说他不干了——他拿到了一个大公司的offer，不想冒险了。他占了你三分之一的业务量。",
+    "storyline": "cheater",
+    "include": "cheater_route==trad",
+    "weight": 2,
+    "choices": [
+      {
+        "text": "加钱留人，开出他工资的两倍",
+        "effect": {
+          "MNY": -2,
+          "NET": 1
+        }
+      },
+      {
+        "text": "放人走，连夜培养替补",
+        "effect": {
+          "PER": 1,
+          "NET": -1
+        }
+      },
+      {
+        "text": "让他推荐他的同学来接班",
+        "effect": {
+          "NET": 1
+        },
+        "requireExpr": "SOC>=8"
+      }
+    ]
+  },
+  {
+    "id": 88121,
+    "event": "考场突然换了地点——从教学楼搬到了体育馆，座位完全打散。你的枪手坐到了第一排，正对着三个监考老师。距开考还有十五分钟。",
+    "storyline": "cheater",
+    "include": "cheater_route==trad",
+    "weight": 2,
+    "choices": [
+      {
+        "text": "打电话让他装病退场，这科弃了",
+        "effect": {
+          "MNY": -1
+        }
+      },
+      {
+        "text": "临时换人，让另一个枪手顶上",
+        "effect": {
+          "NET": 1,
+          "HAP": -2
+        }
+      },
+      {
+        "text": "硬上，第一排又怎样",
+        "effect": {
+          "MNY": 2,
+          "HAP": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": 88130,
+    "event": "你决定走技术路线。先花两周逆向工程了学校的Canvas考试系统，发现了一个API漏洞。然后你训练了一个专门做选择题的GPT微调模型。第一次测试——正确率94%。科技改变命运。",
+    "noRandom": true,
+    "logType": "special",
+    "effect": {
+      "NET": 3,
+      "INT": 1,
+      "MNY": -2
+    },
+    "set": {
+      "cheater_route": "tech"
+    }
+  },
+  {
+    "id": 88131,
+    "event": "学校更新了考试系统的安全补丁。你泡了杯咖啡，开始逆向分析新版本。四个小时后，你找到了一个新的注入点。",
+    "storyline": "cheater",
+    "include": "cheater_route==tech",
+    "weight": 3,
+    "effect": {
+      "INT": 1
+    }
+  },
+  {
+    "id": 88132,
+    "event": "你的AI模型在一门文科课上答出了过于完美的essay——遣词造句比教授写的还优雅。教授在课上公开表扬了那个学生，然后说「这不像是本科生写的」。",
+    "storyline": "cheater",
+    "include": "cheater_route==tech",
+    "weight": 3,
+    "choices": [
+      {
+        "text": "紧急给模型加「降智」参数，以后输出B+水平",
+        "effect": {
+          "HAP": -1
+        }
+      },
+      {
+        "text": "无视，教授没证据",
+        "effect": {
+          "NET": 2,
+          "HAP": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": 88133,
+    "event": "暗网上有人在卖ProctorU的漏洞利用工具包。卖家是个俄罗斯人，只收加密货币。价格不菲，但如果是真的，你的AI代考系统就能突破远程监考的最后一道防线。",
+    "storyline": "cheater",
+    "include": "cheater_route==tech",
+    "weight": 2,
+    "choices": [
+      {
+        "text": "买，这是关键拼图",
+        "effect": {
+          "MNY": -3,
+          "INT": 1,
+          "NET": 3
+        }
+      },
+      {
+        "text": "太冒险了，可能是钓鱼",
+        "effect": {}
+      }
+    ]
+  },
+  {
+    "id": 88134,
+    "event": "你的AI代考工具被人泄露到了一个留学生论坛。一半人骂你毁了学术诚信，另一半人私信问你怎么买。你连夜更换了所有接入端口和加密密钥。",
+    "storyline": "cheater",
+    "include": "cheater_route==tech",
+    "weight": 2,
+    "effect": {
+      "NET": 3,
+      "HAP": -1
+    }
+  },
+  {
+    "id": 88135,
+    "event": "学校IT部门开始部署Turnitin的AI检测升级版。你需要给模型加入「人类化」模块——故意写错几个语法，加入口语化表达，偶尔跑题。让AI看起来像一个真正的大学生。",
+    "storyline": "cheater",
+    "include": "cheater_route==tech",
+    "weight": 3,
+    "effect": {
+      "INT": 1
+    }
+  },
+  {
+    "id": 88136,
+    "event": "一个CS教授私下约你喝咖啡：「你在做的那个东西很有意思。」你的心跳到了嗓子眼。他笑了：「别紧张，我只是好奇你的架构设计。不过——如果被学校发现，你知道后果。」",
+    "storyline": "cheater",
+    "include": "cheater_route==tech",
+    "weight": 2,
+    "effect": {
+      "HAP": -1,
+      "INT": 1
+    }
+  },
+  {
+    "id": 88137,
+    "event": "你开发了一个Chrome插件：实时截题→AI生成答案→模拟人类打字节奏→自动提交。全程无人值守。你在宿舍里看着屏幕上的光标自己移动，心里有一种创造者的满足感。",
+    "storyline": "cheater",
+    "include": "cheater_route==tech",
+    "weight": 3,
+    "effect": {
+      "NET": 3,
+      "INT": 1
+    }
+  },
+  {
+    "id": 88138,
+    "event": "你的模型训练数据不小心上传到了公开的GitHub仓库——被一个安全研究员发现了。他在Twitter上发了一条隐晦的推文：「发现了一个有趣的repo，看起来有人在训练考试作弊AI。」还没@学校，但只是时间问题。",
+    "storyline": "cheater",
+    "include": "cheater_route==tech",
+    "weight": 2,
+    "choices": [
+      {
+        "text": "立刻删库，然后给那个研究员发私信说是课程项目",
+        "effect": {
+          "INT": 1
+        }
+      },
+      {
+        "text": "用小号在评论区带节奏，说是AI安全研究的测试数据",
+        "effect": {
+          "SOC": 1,
+          "HAP": -1
+        }
+      },
+      {
+        "text": "删库跑路，换一套全新的代码架构",
+        "effect": {
+          "INT": 1,
+          "HLT": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": 88139,
+    "event": "一个同校的CS PhD找到你，说他研究的方向就是AI生成文本检测。他暗示他知道你在做什么——然后问你愿不愿意「合作」。他手上有你没有的学术资源，但他也可能是想拿你当论文素材。",
+    "storyline": "cheater",
+    "include": "cheater_route==tech",
+    "weight": 2,
+    "choices": [
+      {
+        "text": "合作，他的检测模型反过来能帮你优化对抗",
+        "effect": {
+          "INT": 2,
+          "NET": 1
+        }
+      },
+      {
+        "text": "拒绝，知道你秘密的人越少越好",
+        "effect": {
+          "HAP": -1
+        }
+      },
+      {
+        "text": "假装合作，偷学他的检测思路然后断联",
+        "effect": {
+          "INT": 2,
+          "SOC": -1
+        },
+        "requireExpr": "INT>=9"
+      }
+    ]
+  },
+  {
+    "id": 88144,
+    "event": "你的服务器凌晨三点被DDoS了——不知道是竞争对手、白帽黑客、还是纯粹的倒霉。明天有四个客户要交作业。",
+    "storyline": "cheater",
+    "include": "cheater_route==tech",
+    "weight": 2,
+    "choices": [
+      {
+        "text": "通宵迁移到备用服务器，手动跑完四份作业",
+        "effect": {
+          "HLT": -1,
+          "PER": 1,
+          "MNY": 1
+        }
+      },
+      {
+        "text": "给客户延期，让他们自己去求教授宽限",
+        "effect": {
+          "NET": -1
+        }
+      },
+      {
+        "text": "花钱买云防护，以后不会再有这种事",
+        "effect": {
+          "MNY": -2,
+          "INT": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": 88145,
+    "event": "学校的AI伦理课上，教授放了一段新闻：「某留学生开发AI代写工具被开除」。全班讨论的时候，坐你旁边的同学说：「做这种事的人脑子有病吧？」你微笑着点了点头。",
+    "storyline": "cheater",
+    "include": "cheater_route==tech",
+    "weight": 3,
+    "choices": [
+      {
+        "text": "课后认真写了一篇反对AI作弊的小论文交上去",
+        "effect": {
+          "SOC": 1,
+          "HAP": -2
+        }
+      },
+      {
+        "text": "在课堂讨论里故意替「那种人」辩护了几句",
+        "effect": {
+          "INT": 1,
+          "HAP": 1
+        }
+      },
+      {
+        "text": "什么都没做，但回宿舍后给系统又加了一层加密",
+        "effect": {
+          "INT": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": 88140,
+    "event": "完美配合。枪手顺利完成考试，客户满意付款。你的网络又壮大了一点。",
+    "noRandom": true,
+    "effect": {
+      "MNY": 2,
+      "NET": 2
+    }
+  },
+  {
+    "id": 88141,
+    "event": "枪手临时放鸽子，你不得不亲自上阵。坐在陌生的教室里用别人的名字考试，手心全是汗。好在你脑子够用，交了一份还过得去的卷子。",
+    "noRandom": true,
+    "effect": {
+      "NET": -1,
+      "HAP": -1
+    }
+  },
+  {
+    "id": 88142,
+    "event": "AI完美输出。客户的成绩从C-跳到了B+——不是A，因为你设置了「人类化」上限。客户不知道答案是机器写的，只觉得你是天才。",
+    "noRandom": true,
+    "effect": {
+      "MNY": 2,
+      "NET": 3
+    }
+  },
+  {
+    "id": 88143,
+    "event": "AI检测系统标记了你的output。客户被叫去academic integrity office谈话。他扛住了，没供出你，但你需要紧急升级模型。",
+    "noRandom": true,
+    "effect": {
+      "NET": -2,
+      "HAP": -2
+    }
+  },
+  {
+    "id": 88150,
+    "event": "一个穿Loro Piana的年轻人约你在校外一家私密会所见面。他代表十二个家族的孩子——他们需要在下个月内全部拿到SAT/GRE/GMAT高分。报酬：五十万美金，现金。「你是圈子里传说中的那个人吧？」",
+    "noRandom": true,
+    "logType": "special",
+    "choices": [
+      {
+        "text": "「五十万？成交。」",
+        "branch": [
+          "cheater_route==trad?88200",
+          "?88210"
+        ]
+      },
+      {
+        "text": "「太大了。我要收手了。」",
+        "next": 88160
+      }
+    ]
+  },
+  {
+    "id": 88160,
+    "event": "你见好就收，带着积蓄默默退出了这个行业。没有人知道你做过什么。你重新回到了正常的留学生活。只是偶尔半夜醒来，会梦到有人敲门——然后发现只是室友回来了。",
+    "noRandom": true,
+    "effect": {
+      "HAP": 2,
+      "MNY": 3
+    },
+    "set": {
+      "storyline": "",
+      "profession": "本科生"
+    },
+    "end": true,
+    "logType": "ending"
+  },
+  {
+    "id": 88200,
+    "event": "「毕业季行动」第一阶段：筹备。你需要在一周内组建一支跨时区的枪手网络。十二场考试，分布在三个城市，时间相互交叉。",
+    "noRandom": true,
+    "logType": "special",
+    "choices": [
+      {
+        "text": "只用自己培养的老枪手，五个人轮换",
+        "next": 88201
+      },
+      {
+        "text": "从其他城市借人，凑齐十二个一对一",
+        "next": 88202
+      },
+      {
+        "text": "花大价钱请一个退休的SAT出题老师当顾问",
+        "next": 88203
+      },
+      {
+        "text": "让客户家族的人脉帮你搞定考场安排",
+        "next": 88204,
+        "showExpr": "SOC>=12",
+        "gold": true
+      }
+    ],
+    "set": {
+      "cheater_stage": "bigjob"
+    }
+  },
+  {
+    "id": 88201,
+    "event": "老枪手们虽然可靠，但每人要考两三场，体力和精神都在极限边缘。你看得出他们的疲惫——但这些人至少不会出卖你。",
+    "noRandom": true,
+    "effect": {
+      "cheat_risk": 1
+    },
+    "branch": [
+      "?88220"
+    ]
+  },
+  {
+    "id": 88202,
+    "event": "你从波士顿和芝加哥借到了人。效率高了，但这些外援你不认识——他们的忠诚度是个问号。你只能选择信任。",
+    "noRandom": true,
+    "effect": {
+      "NET": 1,
+      "cheat_risk": 1
+    },
+    "branch": [
+      "?88220"
+    ]
+  },
+  {
+    "id": 88203,
+    "event": "退休出题老师果然名不虚传——他看了一眼今年的题型趋势，就预判了70%的考点。你的枪手们带着「标准答案」上考场。代价是他收走了五万美金的顾问费。",
+    "noRandom": true,
+    "effect": {
+      "MNY": -3,
+      "cheat_risk": 0
+    },
+    "branch": [
+      "?88220"
+    ]
+  },
+  {
+    "id": 88204,
+    "event": "富二代的家族人脉比你想象的更深。考场的座位安排、监考人员的排班表、甚至隔壁教室的备用考卷——一切都提前摆在了你的桌上。你只需要执行。",
+    "noRandom": true,
+    "effect": {
+      "NET": 2,
+      "cheat_risk": 0
+    },
+    "branch": [
+      "?88220"
+    ]
+  },
+  {
+    "id": 88220,
+    "event": "考试周第三天。你接到紧急消息：第七个考场的枪手说监考换人了——新监考会逐一核对证件照。距离开考还有40分钟。",
+    "noRandom": true,
+    "logType": "special",
+    "choices": [
+      {
+        "text": "让枪手装病退场，这一科放弃",
+        "next": 88221
+      },
+      {
+        "text": "紧急换一个长相更像的替身上场",
+        "next": 88222
+      },
+      {
+        "text": "贿赂监考助理，让他「不小心」漏检",
+        "next": 88223
+      },
+      {
+        "text": "黑进考场系统把证件照换了",
+        "next": 88224,
+        "showExpr": "INT>=10",
+        "gold": true
+      }
+    ]
+  },
+  {
+    "id": 88221,
+    "event": "枪手演了一出胃痉挛，被人扶出了考场。这一科作废，客户会少付一份钱，但至少没人被抓。止损是门艺术。",
+    "noRandom": true,
+    "effect": {
+      "MNY": -2,
+      "cheat_risk": 0
+    },
+    "branch": [
+      "?88240"
+    ]
+  },
+  {
+    "id": 88222,
+    "event": "你在通讯录里疯狂翻找，终于找到了一个长相勉强过关的备选。他穿上客户的衣服，深呼吸，走进了考场。整场考试你的心都悬在嗓子眼。",
+    "noRandom": true,
+    "effect": {
+      "cheat_risk": 2
+    },
+    "branch": [
+      "?88240"
+    ]
+  },
+  {
+    "id": 88223,
+    "event": "监考助理是个缺钱的研究生。500刀现金加上一句「就当你没看见」，他很配合地在关键时刻去了趟厕所。事情解决了——但现在多了一个知道你秘密的人。",
+    "noRandom": true,
+    "effect": {
+      "MNY": -2,
+      "cheat_risk": 1
+    },
+    "branch": [
+      "?88240"
+    ]
+  },
+  {
+    "id": 88224,
+    "event": "你远程登录了考场管理系统，用30秒替换了证件照。监考拿着名单逐一核对，看了一眼枪手，又看了一眼屏幕——完美匹配。你关掉笔记本，喝了口咖啡。",
+    "noRandom": true,
+    "effect": {
+      "cheat_risk": 0
+    },
+    "branch": [
+      "?88240"
+    ]
+  },
+  {
+    "id": 88240,
+    "event": "最后一科结束了。成绩全部达标。五十万美金已经准备好。现在你需要安全地收钱、清理痕迹、全身而退。",
+    "noRandom": true,
+    "logType": "special",
+    "choices": [
+      {
+        "text": "加密货币分批转账，绕过银行监管",
+        "next": 88241
+      },
+      {
+        "text": "面交现金，一手交钱一手交成绩单",
+        "next": 88242
+      },
+      {
+        "text": "让客户把钱投到你的空壳公司，伪装成「咨询费」",
+        "next": 88243
+      },
+      {
+        "text": "通过地下网络层层转手，过五道手后到海外账户",
+        "next": 88244,
+        "showExpr": "NET>=20",
+        "gold": true
+      }
+    ]
+  },
+  {
+    "id": 88241,
+    "event": "USDT分六笔到账，每笔间隔48小时。慢，但链上追踪几乎不可能。你看着钱包余额一点点涨上去，第一次理解了什么叫「延迟满足」。",
+    "noRandom": true,
+    "effect": {
+      "MNY": 3,
+      "cheat_risk": 0
+    },
+    "branch": [
+      "?88260"
+    ]
+  },
+  {
+    "id": 88242,
+    "event": "在一个酒店房间里，富二代打开了一个LV行李箱——里面整整齐齐码着五十捆现金。你装进背包，坐Uber回了宿舍。一路上你觉得每个路人都在看你。",
+    "noRandom": true,
+    "effect": {
+      "MNY": 5,
+      "cheat_risk": 1
+    },
+    "branch": [
+      "?88260"
+    ]
+  },
+  {
+    "id": 88243,
+    "event": "「GeniusEd Consulting LLC」——你三天前注册的公司收到了第一笔「咨询费」。开了正规发票，交了税。完美的白手套。唯一的问题是：如果有人查账，这张发票就是铁证。",
+    "noRandom": true,
+    "effect": {
+      "MNY": 5,
+      "cheat_risk": 1
+    },
+    "branch": [
+      "?88260"
+    ]
+  },
+  {
+    "id": 88244,
+    "event": "钱从富二代的账户出发，经过新加坡、迪拜、开曼群岛，最后落进你在瑞士的离岸账户。整个过程用了十二天，但每一道手都合法合规。你的地下网络证明了自己的价值。",
+    "noRandom": true,
+    "effect": {
+      "MNY": 5,
+      "NET": 2,
+      "cheat_risk": 0
+    },
+    "branch": [
+      "?88260"
+    ]
+  },
+  {
+    "id": 88210,
+    "event": "「天才枪手v2.0」行动第一阶段：筹备。十二场考试，四种考试类型——SAT、GRE、GMAT、TOEFL。你需要为每种部署不同的AI攻击向量。时间只有一周。",
+    "noRandom": true,
+    "logType": "special",
+    "choices": [
+      {
+        "text": "统一用你最成熟的模型，四种考试共用",
+        "next": 88211
+      },
+      {
+        "text": "每种考试训练独立模型，模拟不同写作风格",
+        "next": 88212
+      },
+      {
+        "text": "买下竞争对手的模型库，四套现成方案",
+        "next": 88213
+      },
+      {
+        "text": "写一个元模型：输入学生历史作业，自动匹配风格",
+        "next": 88214,
+        "showExpr": "INT>=12",
+        "gold": true
+      }
+    ],
+    "set": {
+      "cheater_stage": "bigjob"
+    }
+  },
+  {
+    "id": 88211,
+    "event": "一套模型打天下，效率很高。但你心里清楚——如果ETS把十二份答案放在一起做相似度分析，统一的AI指纹会像霓虹灯一样亮眼。",
+    "noRandom": true,
+    "effect": {
+      "cheat_risk": 1
+    },
+    "branch": [
+      "?88230"
+    ]
+  },
+  {
+    "id": 88212,
+    "event": "四个独立模型，每个都用不同的训练数据和temperature。最后两天你通宵调参，眼睛布满血丝。但输出的十二份答案风格迥异，像是十二个不同的人写的。",
+    "noRandom": true,
+    "effect": {
+      "HLT": -1,
+      "cheat_risk": 1
+    },
+    "branch": [
+      "?88230"
+    ]
+  },
+  {
+    "id": 88213,
+    "event": "花了三个以太坊买下了一个乌克兰团队的模型库。东西是好东西，但你没法审计别人的代码——里面有没有后门，只有天知道。",
+    "noRandom": true,
+    "effect": {
+      "MNY": -3,
+      "cheat_risk": 1
+    },
+    "branch": [
+      "?88230"
+    ]
+  },
+  {
+    "id": 88214,
+    "event": "你写了一个元模型：输入任何学生的历史作业，自动提取其词汇偏好、句式习惯和论证逻辑，然后生成风格完全匹配的新答案。这是你写过的最优雅的代码。",
+    "noRandom": true,
+    "effect": {
+      "INT": 1,
+      "cheat_risk": 0
+    },
+    "branch": [
+      "?88230"
+    ]
+  },
+  {
+    "id": 88230,
+    "event": "第五场考试时，ETS的AI检测系统突然更新了。你的三个客户的essay被标记为「高度相似」，系统发出了预警。距离下一场考试还有48小时。",
+    "noRandom": true,
+    "logType": "special",
+    "choices": [
+      {
+        "text": "紧急加噪声层——拼写错误、口语化、甚至故意跑题",
+        "next": 88231
+      },
+      {
+        "text": "切换到备用服务器和全新IP段",
+        "next": 88232
+      },
+      {
+        "text": "这三份essay手动重写，用人工替代AI",
+        "next": 88233
+      },
+      {
+        "text": "反向攻击：注入干扰数据让检测系统误报爆表",
+        "next": 88234,
+        "showExpr": "(INT>=12)&(NET>=15)",
+        "gold": true
+      }
+    ]
+  },
+  {
+    "id": 88231,
+    "event": "加了噪声之后，AI输出质量下降了不少。有两个客户的成绩可能达不到目标分数。但至少不会被检测系统标记了——活着比什么都重要。",
+    "noRandom": true,
+    "effect": {
+      "NET": -1,
+      "cheat_risk": 0
+    },
+    "branch": [
+      "?88250"
+    ]
+  },
+  {
+    "id": 88232,
+    "event": "切换到备用服务器后一切恢复正常——但这台服务器是你两天前才部署的，没经过充分测试。你只能祈祷它不会在关键时刻崩溃。",
+    "noRandom": true,
+    "effect": {
+      "cheat_risk": 2
+    },
+    "branch": [
+      "?88250"
+    ]
+  },
+  {
+    "id": 88233,
+    "event": "你连续通宵48小时，手动重写了三篇essay。每一篇都模仿对应学生的风格，带着恰到好处的语法错误和思维跳跃。写完的时候你的手在抖，但作品是完美的。",
+    "noRandom": true,
+    "effect": {
+      "HLT": -2,
+      "PER": 1,
+      "cheat_risk": 0
+    },
+    "branch": [
+      "?88250"
+    ]
+  },
+  {
+    "id": 88234,
+    "event": "你往检测系统里注入了十万条干扰数据，让它在一小时内产生了三千条误报。ETS不得不紧急关闭了AI检测模块进行排查。你的客户的essay安全了——整个考试系统的essay都「安全」了。",
+    "noRandom": true,
+    "effect": {
+      "NET": 3,
+      "cheat_risk": 0
+    },
+    "branch": [
+      "?88250"
+    ]
+  },
+  {
+    "id": 88250,
+    "event": "全部完成。但你的服务器上还留着所有作案证据——AI训练数据、客户信息、考试题库、交易记录。数字世界不会自动遗忘。",
+    "noRandom": true,
+    "logType": "special",
+    "choices": [
+      {
+        "text": "远程执行全盘擦除脚本",
+        "next": 88251
+      },
+      {
+        "text": "物理销毁：把硬盘丢进学校实验室的工业碎纸机",
+        "next": 88252
+      },
+      {
+        "text": "保留数据但加密，以后可以当筹码或重新开张",
+        "next": 88253
+      },
+      {
+        "text": "数据迁移到去中心化存储，密钥碎片化分散到五个国家",
+        "next": 88254,
+        "showExpr": "INT>=10",
+        "gold": true
+      }
+    ]
+  },
+  {
+    "id": 88251,
+    "event": "rm -rf。三十秒内一切归零。你看着终端上的进度条走完，长舒一口气。干净了——前提是没有备份被你遗漏。",
+    "noRandom": true,
+    "effect": {
+      "cheat_risk": 1
+    },
+    "branch": [
+      "?88260"
+    ]
+  },
+  {
+    "id": 88252,
+    "event": "你把三块硬盘装进背包，走进材料科学实验室。工业碎纸机的声音盖过了你的心跳。出来的时候你的手上沾着金属碎屑，但心里踏实了。唯一的问题是——实验室有监控。",
+    "noRandom": true,
+    "effect": {
+      "cheat_risk": 1
+    },
+    "branch": [
+      "?88260"
+    ]
+  },
+  {
+    "id": 88253,
+    "event": "AES-256加密，密钥只存在你的脑子里。这些数据本身就值一座金矿——客户信息、AI模型、漏洞利用代码。贪心是人类的本能，你告诉自己这叫「战略储备」。",
+    "noRandom": true,
+    "effect": {
+      "NET": 3,
+      "cheat_risk": 2
+    },
+    "branch": [
+      "?88260"
+    ]
+  },
+  {
+    "id": 88254,
+    "event": "数据被切成碎片，分散在IPFS节点上。密钥拆成五份，分别存在新加坡、冰岛、巴拿马、瑞士和你的脑子里。即使FBI查获其中四个节点，也无法还原完整数据。",
+    "noRandom": true,
+    "effect": {
+      "NET": 3,
+      "cheat_risk": 0
+    },
+    "branch": [
+      "?88260"
+    ]
+  },
+  {
+    "id": 88260,
+    "event": "行动结束后的日子里，你每天刷新闻，搜「考试作弊」「SAT fraud」。一天过去了，一周过去了，一个月过去了……",
+    "noRandom": true,
+    "logType": "special",
+    "branch": [
+      "cheat_risk_final<=1&cheater_route==trad?88261",
+      "cheat_risk_final<=1&cheater_route==tech?88267",
+      "cheat_risk_final<=3?88262",
+      "cheater_route==trad?88263",
+      "?88265"
+    ]
+  },
+  {
+    "id": 88261,
+    "event": "什么都没发生。没有新闻，没有调查，没有敲门声。你拿到了五十万美金，成为留学圈地下传说——一个从未被证实存在过的都市传说。圈内人叫你「考神」。你建立了一个遍布三大洲的枪手网络，没有任何一个环节能追溯到你。你终于理解了那句话：知识就是力量，而你把力量变成了生意。毕业典礼那天，你穿着学士服站在人群里，和所有人一样微笑。没有人知道，这个看起来最普通的留学生，是整个北美代考产业链的幕后操盘手。",
+    "noRandom": true,
+    "logType": "ending",
+    "effect": {
+      "MNY": 10,
+      "NET": 5
+    },
+    "set": {
+      "cheater_stage": "completed"
+    },
+    "end": true
+  },
+  {
+    "id": 88262,
+    "event": "ETS发了一份内部调查报告，说「检测到统计异常」，但最终归因于系统误判。你虚惊一场。钱到手了，但你决定低调一阵——至少半年内不接任何单。只是走在校园里的时候，你总觉得有人在看你。",
+    "noRandom": true,
+    "effect": {
+      "MNY": 5,
+      "HAP": -1
+    },
+    "end": true,
+    "logType": "ending",
+    "set": {
+      "cheater_stage": "completed"
+    }
+  },
+  {
+    "id": 88263,
+    "event": "一个枪手在另一起案件中被捕，为了减刑供出了你的名字。FBI搜查了你的宿舍。你看着两个穿西装的人翻你的抽屉，大脑飞速运转。",
+    "noRandom": true,
+    "logType": "special",
+    "branch": [
+      "SOC>=8?88264",
+      "?88266"
+    ],
+    "set": {
+      "cheater_stage": "completed"
+    }
+  },
+  {
+    "id": 88264,
+    "event": "审讯室里你表现得滴水不漏——你知道该说什么、不该说什么，什么时候沉默，什么时候配合。最终以「证据不足」释放。但你的F-1签证被取消了。你带着最后一笔钱，消失在洛杉矶国际机场的人流里。你不知道自己是赢了还是输了。",
+    "noRandom": true,
+    "effect": {
+      "MNY": -3,
+      "SOC": -2
+    },
+    "end": true,
+    "logType": "ending",
+    "set": {
+      "cheater_stage": "completed"
+    }
+  },
+  {
+    "id": 88265,
+    "event": "考试系统的异常流量被溯源到了你的服务器IP。学校IT联合ETS的安全团队追踪了整条数据链路。你看着邮箱里的告警邮件，手指开始发抖——Academic Dismissal Notice和F-1 Termination Letter，同一天到达。",
+    "noRandom": true,
+    "effect": {
+      "HAP": -5,
+      "MNY": -5
+    },
+    "end": true,
+    "logType": "ending",
+    "set": {
+      "cheater_stage": "completed"
+    }
+  },
+  {
+    "id": 88266,
+    "event": "FBI的审讯你扛不住了。他们掌握的证据比你想象的多得多——转账记录、聊天截图、枪手的证词。你被以Wire Fraud和Identity Fraud两项联邦重罪起诉。律师说，认罪协议是最好的结果——18个月联邦监狱，之后遣返。",
+    "noRandom": true,
+    "effect": {
+      "HAP": -8,
+      "MNY": -10
+    },
+    "end": true,
+    "logType": "ending",
+    "set": {
+      "cheater_stage": "completed"
+    }
+  },
+  {
+    "id": 88267,
+    "event": "什么都没发生。没有新闻，没有调查，没有数字痕迹。你的AI系统完美地通过了所有反作弊检测，五十万美金通过七层加密钱包悄无声息地到账。你成为了暗网上的传说——一个被称为「幽灵」的存在。你写的代码骗过了ETS、Turnitin、ProctorU的联合检测，没有留下一个字节的证据。在GitHub上，你是一个默默无闻的开源贡献者；在暗网上，你是让所有考试系统颤抖的名字。你关掉了所有后门，格式化了所有硬盘，删除了所有痕迹。然后打开IDE，开始写下一个项目——这次是合法的。",
+    "noRandom": true,
+    "logType": "ending",
+    "effect": {
+      "MNY": 10,
+      "NET": 5
+    },
+    "set": {
+      "cheater_stage": "completed"
+    },
+    "end": true
+  },
+  {
+    "id": 88190,
+    "event": "你在一次代考中犯了不可原谅的低级错误——把答案写成了另一门课的内容。客户暴怒，直接把你的真名发到了学校的匿名举报信箱。你的代考帝国，毁于一次愚蠢。",
+    "noRandom": true,
+    "effect": {
+      "HAP": -5,
+      "MNY": -5
+    },
+    "end": true,
+    "logType": "ending",
+    "set": {
+      "cheater_stage": "completed"
+    }
+  },
+  {
+    "id": 88191,
+    "event": "你把所有人都得罪光了。最信任的下线在留学生论坛上发了一篇万字长文，详细描述了你的代考网络——时间、地点、金额、参与者名单，一个不少。第二天学校约谈了你，你知道一切都结束了。",
+    "noRandom": true,
+    "effect": {
+      "HAP": -5,
+      "SOC": -3
+    },
+    "end": true,
+    "logType": "ending",
+    "set": {
+      "cheater_stage": "completed"
+    }
+  },
+  {
+    "id": 88192,
+    "event": "你负债累累——买设备、租安全屋、给枪手发工资，收入远跟不上支出。最后一个客户拿了成绩单却赖账不付钱。你甚至连下个月的房租都交不起。帝国大厦不是倒在FBI手里，而是倒在了现金流上。",
+    "noRandom": true,
+    "effect": {
+      "HAP": -3,
+      "MNY": -3
+    },
+    "end": true,
+    "logType": "ending",
+    "set": {
+      "cheater_stage": "completed"
+    }
   }
 ]

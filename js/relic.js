@@ -165,6 +165,7 @@ const PURPLE_TRIGGERS = [
   { relicName: '停摆的怀表', storylines: ['timeloop'], boostStat: 'PER', boostAmount: 2, log: '怀表突然开始走动，你感觉时间在你手中。' },
   { relicName: '锈迹斑斑的哑铃', storylines: ['fitness'], boostStat: 'FIT', boostAmount: 3, log: '举起哑铃的那一刻，前世的肌肉记忆全部回来了。' },
   { relicName: '破碎的手机屏', storylines: ['influencer', 'mcn', 'streamer'], boostStat: 'FAN', boostAmount: 3, log: '碎屏亮起，粉丝数从0开始疯涨。' },
+  { relicName: '一叠假身份证', storylines: ['cheater'], boostStat: 'NET', boostAmount: 3, log: '翻开假证的瞬间，那些代号和暗语全部回忆起来了。' },
 ];
 
 // ── Trigger check functions (called from game.js) ───────────────

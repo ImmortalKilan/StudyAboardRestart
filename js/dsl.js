@@ -10,7 +10,7 @@ const ALIASES = {
   TIER: 'schoolTier', schoolTier: 'schoolTier',
   MAJOR: 'major', major: 'major',
   STORYLINE: 'storyline', storyline: 'storyline',
-  MMR: 'MMR', POP: 'POP', POK: 'POK', REP: 'REP', BND: 'BND', FAN: 'FAN',
+  MMR: 'MMR', POP: 'POP', POK: 'POK', REP: 'REP', BND: 'BND', FAN: 'FAN', NET: 'NET', net: 'NET',
   match_fixing: 'match_fixing',
   influencer_scandal: 'influencer_scandal', content_style: 'content_style',
   route: 'route',
@@ -30,7 +30,8 @@ const ALIASES = {
   deja_vu: 'deja_vu', taint_score: 'taint_score', knows_clue: 'knows_clue',
   timeloop_escaped: 'timeloop_escaped', timeloop_scarred: 'timeloop_scarred',
   timeloop_trapped: 'timeloop_trapped', timeloop_round: 'timeloop_round',
-  timeloop_loop_count: 'timeloop_loop_count'
+  timeloop_loop_count: 'timeloop_loop_count',
+  cheater_route: 'cheater_route', cheat_risk: 'cheat_risk', cheat_risk_final: 'cheat_risk_final'
 };
 
 function readVar(state, key) {

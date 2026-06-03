@@ -19,16 +19,16 @@ const STAT_KEYS = ['SOC', 'INT', 'MNY', 'PER', 'HLT', 'APP'];
 const STAT_LABELS = {
   SOC: '社交', INT: '智力', MNY: '家境',
   HAP: '快乐', HLT: '健康', PER: '毅力', APP: '颜值',
-  POP: '人气', POK: '牌技', MMR: '天梯分', FIT: '体能', CKL: '厨艺', ATH: '运动', MAG: '魔力', REP: '声望', BND: '影响力', FAN: '粉丝',
+  POP: '人气', POK: '牌技', MMR: '天梯分', FIT: '体能', CKL: '厨艺', ATH: '运动', MAG: '魔力', REP: '声望', BND: '影响力', FAN: '粉丝', NET: '势力',
   cul: '修为', dao: '大道', karma: '机缘', tribulation: '渡劫', realm: '境界'
 };
-const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG', 'REP', 'BND', 'FAN', 'HEAT', 'cul', 'dao', 'karma', 'tribulation', 'darkOmen', 'courage', 'alliance', 'knowledge']);
+const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG', 'REP', 'BND', 'FAN', 'NET', 'HEAT', 'cul', 'dao', 'karma', 'tribulation', 'darkOmen', 'courage', 'alliance', 'knowledge', 'cheat_risk']);
 const XIANXIA_KEYS = ['realm', 'cul', 'dao', 'karma', 'tribulation'];
 
 // ── Special Scoring Endings ──
 const LEGENDARY_ENDINGS = new Set([
   50099, // Spy Success
-  60040, // Abyss Success
+  60090, 60095, // Abyss: 数字神明 / AGI融合 (真结局)
   70092, 70093, // Meta: Ctrl+W / True Ending
   82090, // CEO Peak
   83090, // Esports World Champion
@@ -54,6 +54,8 @@ const LEGENDARY_ENDINGS = new Set([
   78081, // Band: Battle of the Bands champion
   76090, // Influencer: 全网顶流 (Forbes 30U30)
   76096, // Influencer: 咸鱼翻身
+  88261, // Cheater trad: 考神 (S-tier)
+  88267, // Cheater tech: 幽灵 (S-tier)
 ]);
 
 const GOOD_ENDINGS = new Set([
@@ -71,6 +73,9 @@ const GOOD_ENDINGS = new Set([
   48792, // LAW: 知名人权律师
   48992, // Film: 奥斯卡编剧
   76095, // Influencer: MCN合约到期平稳退出
+  88160, // Cheater: 金盆洗手 (B-tier)
+  88262, // Cheater: 惊险过关 (B-tier)
+  88264, // Cheater: 跑路 (C-tier)
 ]);
 
 function deriveRealm(cul) {
@@ -190,6 +195,19 @@ const STORYLINE_CFG = {
     progressChecks: [
       { cond: s => s.thief_stage === 'active' && s.age - s.storylineStart >= 3, event: 87100 },
     ],
+    },
+    cheater: {
+      gracePeriod: 8,
+      eventRate: 0.75,
+      deathChecks: [
+        { cond: s => (s.INT || 0) <= 2, event: 88190 },
+        { cond: s => (s.SOC || 0) <= 0, event: 88191 },
+        { cond: s => (s.MNY || 0) <= -5, event: 88192 },
+      ],
+      progressChecks: [
+        { cond: s => (s.NET || 0) >= 15 && s.cheater_stage === 'job_window' && !s.firedEvents.has(88150), event: 88150 },
+      ],
+      flavor: () => cheaterFlavor(),
     },
       idol: {    gracePeriod: 12,
     eventRate: 0.7,
@@ -856,6 +874,101 @@ function resolveChefFinal() {
   } else {
     triggerEvent(85062);
   }
+}
+
+// ── Cheater Stage Clock ──────────────────────────────────────────
+const CHEATER_STARTUP_LEN = 6;
+const CHEATER_FORCE_LEN = 24;
+const CHEATER_JOB_COOLDOWN = 3;
+const CHEATER_DECAY_GRACE = 6;
+const CHEATER_DECAY_PER_MONTH = 1;
+const CHEATER_DECAY_CAP = 12;
+
+function initCheaterStage() {
+  state.cheater_stage = 'startup';
+  state.cheater_last_job = -99;
+  state.cheater_decay = 0;
+  state.cheat_risk = 0;
+}
+
+function updateCheaterStage() {
+  if (state.storyline !== 'cheater') return;
+  if (state.cheater_stage === undefined || state.cheater_stage === null) initCheaterStage();
+  if (state.cheater_stage === 'completed' || state.cheater_stage === 'bigjob') return;
+  const monthsIn = state.monthTotal - (state.storylineStartMonth || 0);
+  if (state.cheater_stage === 'startup' && monthsIn >= CHEATER_STARTUP_LEN) {
+    state.cheater_stage = 'job_window';
+    state.cheater_window_start = state.monthTotal;
+    state.cheater_decay = 0;
+  }
+  if (state.cheater_stage === 'job_window') {
+    const inWin = state.monthTotal - (state.cheater_window_start || state.monthTotal);
+    if (inWin > CHEATER_DECAY_GRACE) {
+      state.cheater_decay = Math.min(CHEATER_DECAY_CAP,
+        Math.round((inWin - CHEATER_DECAY_GRACE) * CHEATER_DECAY_PER_MONTH));
+    }
+  }
+  if (state.cheater_stage === 'job_window' && monthsIn >= CHEATER_FORCE_LEN && !state.firedEvents.has(88150)) {
+    triggerEvent(88150);
+  }
+}
+
+function computeCheaterProb(s) {
+  if (s.storyline !== 'cheater') return 0;
+  const route = s.cheater_route || 'trad';
+  let p;
+  if (route === 'trad') {
+    p = 5 + (s.SOC || 0) * 2 + (s.NET || 0) * 0.5 + (s.PER || 0) * 0.5;
+  } else {
+    p = 0 + (s.INT || 0) * 2 + (s.NET || 0) * 0.5 + (s.PER || 0) * 0.3;
+  }
+  p -= (s.cheater_decay || 0);
+  const floor = route === 'trad' ? 10 : 8;
+  const ceil = route === 'trad' ? 80 : 75;
+  return Math.max(floor, Math.min(ceil, Math.round(p)));
+}
+
+async function attemptCheaterJob() {
+  if (state.storyline !== 'cheater') return;
+  if (state.cheater_stage !== 'job_window') return;
+  const sinceLastJob = state.monthTotal - (state.cheater_last_job || -99);
+  if (sinceLastJob < CHEATER_JOB_COOLDOWN) return;
+
+  const prob = computeCheaterProb(state);
+  const success = Math.random() * 100 < prob;
+  state.cheater_last_job = state.monthTotal;
+
+  const route = state.cheater_route || 'trad';
+  if (route === 'trad') {
+    triggerEvent(success ? 88140 : 88141);
+  } else {
+    triggerEvent(success ? 88142 : 88143);
+  }
+  render();
+}
+
+function cheaterFlavor() {
+  const route = state.cheater_route || 'trad';
+  const trad = [
+    '你在协调三个时区的枪手排班。',
+    '有人发消息问这周能不能加急。你已经习惯了。',
+    '你在星巴克面试新枪手，假装是在讨论课程。',
+    '又一个深夜，你在确认时差表没算错。',
+    '你的第二部手机响了。工作号永远比生活号忙。',
+    '你教新枪手如何模仿客户的字迹。',
+    '一个老客户给你介绍了三个新客户。转介费抽成20%。',
+  ];
+  const tech = [
+    '你在调试AI模型的「人类化」参数。太完美的答案反而可疑。',
+    '又一个安全补丁。你喝了杯咖啡，开始逆向。',
+    '你在暗网论坛上交流最新的反检测技术。',
+    '服务器账单越来越贵。算力不便宜。',
+    '你给AI加了一个「故意犯错」模块。B+比A-更安全。',
+    'ProctorU又更新了人脸检测。你需要升级你的虚拟摄像头。',
+    '你写了一个自动化脚本：截题→AI生成→模拟打字→提交，全程无人值守。',
+  ];
+  const lines = route === 'trad' ? trad : tech;
+  return lines[Math.floor(Math.random() * lines.length)];
 }
 
 // ── Athlete Stage Clock ──────────────────────────────────────────
@@ -1706,9 +1819,10 @@ const STORYLINE_NAMES = {
   influencer: '自媒体博主',
   mcn: '头部网红',
   washed: '过气博主',
+  cheater: '代考帝国',
 };
 const HIDDEN_STORYLINES = new Set(['spy', 'abyss', 'meta', 'xianxia', 'thief', 'hogwarts', 'timeloop']);
-const SPECIAL_STORYLINES = new Set(['idol', 'superstar', 'streamer', 'poker', 'triton', 'local_shark', 'party', 'ceo', 'wasted', 'esports', 'worlds', 'minor_league', 'fitness', 'chef', 'athlete', 'academic', 'band', 'influencer', 'mcn']);
+const SPECIAL_STORYLINES = new Set(['idol', 'superstar', 'streamer', 'poker', 'triton', 'local_shark', 'party', 'ceo', 'wasted', 'esports', 'worlds', 'minor_league', 'fitness', 'chef', 'athlete', 'academic', 'band', 'influencer', 'mcn', 'cheater']);
 const STORYLINE_UNLOCK_STAT = {
   idol: 'POP', superstar: 'POP', streamer: 'POP',
   poker: 'POK', triton: 'POK', local_shark: 'POK',
@@ -1720,6 +1834,7 @@ const STORYLINE_UNLOCK_STAT = {
   academic: 'REP',
   band: 'BND',
   influencer: 'FAN', mcn: 'FAN',
+  cheater: 'NET',
 };
 const STUDENT_PHASES = new Set([
   '高中生', '本科生', '理工生', '商科生', '文科生',
@@ -1904,7 +2019,7 @@ function clampStats() {
     const blueResult = checkBlueTrigger(state);
     if (blueResult) {
       pushLog(blueResult.log);
-      pushLog(`[遗物共鸣] ${blueResult.effectDesc}`);
+      pushLog(`[遗物共鸣] ${blueResult.effectDesc}`, 'relic-blue');
     }
   }
 }
@@ -2193,14 +2308,15 @@ function applyEvent(ev) {
       if (ev.set.storyline === 'academic') initAcademicStage();
       if (ev.set.storyline === 'band') initBandStage();
       if (ev.set.storyline === 'influencer') initInfluencerStage();
+      if (ev.set.storyline === 'cheater') initCheaterStage();
     }
     // Purple relic trigger: boost storyline stat when re-entering matching storyline
     if (ev.set.storyline && state._inheritedRelic) {
       const purpleResult = checkPurpleTrigger(state, ev.set.storyline);
       if (purpleResult) {
         const statName = STAT_LABELS[purpleResult.boostStat] || purpleResult.boostStat;
-        pushLog(purpleResult.log);
-        pushLog(`[遗物共鸣] ${statName} +${purpleResult.boostAmount}`);
+        pushLog(purpleResult.log, 'relic-purple');
+        pushLog(`[遗物共鸣] ${statName} +${purpleResult.boostAmount}`, 'relic-purple');
       }
     }
     // Reveal the career stat for this storyline in both desktop and mobile panels
@@ -2277,6 +2393,11 @@ function applyEvent(ev) {
     if (EFFECT_KEYS.has(k)) state[k] = (state[k] || 0) + v;
   }
   if (typeof ev.happyDelta === 'number') state.HAP += ev.happyDelta;
+
+  // Compute cheat_risk_final before 88260 branch evaluates
+  if (ev.id === 88260) {
+    state.cheat_risk_final = Math.max(0, (state.cheat_risk || 0) - Math.floor((state.NET || 0) / 7));
+  }
 
   clampStats();
 
@@ -2453,6 +2574,7 @@ function _checkEventAchievements(ev) {
         band: 'sl_band',
         timeloop: 'sl_timeloop',
         influencer: 'sl_influencer',
+        cheater: 'sl_cheater',
       };
       if (SL_MAP[sl]) unlockAchievement(SL_MAP[sl]);
     }
@@ -2495,6 +2617,8 @@ function _checkEventAchievements(ev) {
   if (id === 89092) unlockAchievement('end_academic_black'); // academic black hat true ending
   if (id === 78081) unlockAchievement('end_band_win');   // band: Battle of the Bands champion
   if (id === 78082) unlockAchievement('end_band_fail');  // band: disbanded
+  if (id === 88261) unlockAchievement('end_cheater_empire'); // cheater trad: 考神
+  if (id === 88267) unlockAchievement('end_cheater_ghost'); // cheater tech: 幽灵
   if (id === 89041) { // FBI翻供：黑转白，重置时间线
     state.storylineStart = state.age;
     state.storylineStartMonth = state.monthTotal;
@@ -2832,6 +2956,7 @@ function advanceMonth() {
     updateAcademicStage();
     updateBandStage();
     updateInfluencerStage();
+    updateCheaterStage();
     updateHogwartsYear();
     if (state.phase === 'ended' || state.pendingChoice) { render(); return; }
     // === Storyline mode: skip normal events, only draw storyline events ===
@@ -3509,6 +3634,14 @@ function renderAlloc() {
   // ── Achievement bonuses ──
   const achData = getAchievementBonuses();
   state._achExtraPts = achData.extraPts;
+
+  // ── Share bonus: +2 pts, consumed from localStorage on first render ──
+  if (localStorage.getItem('sasr_share_bonus')) {
+    localStorage.removeItem('sasr_share_bonus');
+    state._shareBonus = true;
+  }
+  if (state._shareBonus) state._achExtraPts += 2;
+
   state._achFixedBonus = achData.fixedBonus;
 
   const allocTotal = getAllocTotal();
@@ -3725,6 +3858,7 @@ function render() {
       if (state.showREP) shown.push('REP');
       if (state.showBND) shown.push('BND');
       if (state.showFAN) shown.push('FAN');
+      if (state.showNET) shown.push('NET');
       const dynamicMax = Math.max(1, ...shown.filter(k => k !== 'HAP').map(k => state[k]));
       const SPECIAL_STATS = new Set(['POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG', 'REP', 'BND', 'FAN']);
       for (const k of shown) {
@@ -3995,6 +4129,52 @@ function render() {
         }
       } else {
         academicBox.style.display = 'none';
+      }
+    }
+
+    const cheaterBox = $('cheater-box');
+    if (cheaterBox) {
+      if (state.storyline === 'cheater' && state.cheater_stage !== 'completed' && state.cheater_stage !== 'bigjob' && state.phase !== 'ended') {
+        cheaterBox.style.display = 'flex';
+        const stageEl = $('cheater-stage');
+        const probEl = $('cheater-prob');
+        const warnEl = $('cheater-decay-warn');
+        const btn = $('btn-try-cheater');
+        const titleEl = $('cheater-title');
+        const monthsIn = state.monthTotal - (state.storylineStartMonth || 0);
+        const route = state.cheater_route || 'trad';
+        titleEl.textContent = route === 'trad' ? '时差代考网络' : 'AI代考系统';
+
+        if (state.cheater_stage === 'startup' || state.cheater_stage == null) {
+          const remaining = Math.max(0, CHEATER_STARTUP_LEN - monthsIn);
+          stageEl.textContent = `积累势力中 · 还剩 ${remaining} 个月`;
+          probEl.textContent = '--';
+          warnEl.textContent = '满 6 个月后开启接单';
+          btn.disabled = true;
+        } else {
+          const prob = computeCheaterProb(state);
+          const monthsToForce = Math.max(0, CHEATER_FORCE_LEN - monthsIn);
+          const sinceLastJob = state.monthTotal - (state.cheater_last_job || -99);
+          const cooldown = sinceLastJob < CHEATER_JOB_COOLDOWN;
+          stageEl.textContent = `接单中 · 强制结算还剩 ${monthsToForce} 个月`;
+          probEl.textContent = prob + '%';
+          probEl.style.color = prob >= 50 ? '#7ed7a0' : prob >= 25 ? '#f5b642' : '#e06060';
+          const inWin = state.monthTotal - (state.cheater_window_start || state.monthTotal);
+          const decay = state.cheater_decay || 0;
+          if (cooldown) {
+            const cdLeft = CHEATER_JOB_COOLDOWN - sinceLastJob;
+            warnEl.textContent = `冷却中，${cdLeft} 个月后可再次接单`;
+          } else if (decay >= CHEATER_DECAY_CAP) {
+            warnEl.textContent = `状态衰减已封顶（-${CHEATER_DECAY_CAP}%），尽快行动`;
+          } else if (inWin <= CHEATER_DECAY_GRACE) {
+            warnEl.textContent = `${CHEATER_DECAY_GRACE - inWin} 个月后成功率开始衰减`;
+          } else {
+            warnEl.textContent = `成功率已衰减 ${decay}%（每月 -${CHEATER_DECAY_PER_MONTH}%）`;
+          }
+          btn.disabled = cooldown;
+        }
+      } else {
+        cheaterBox.style.display = 'none';
       }
     }
 
@@ -4456,8 +4636,9 @@ function initGame() {
     pushLog('你又重生了，重生在15岁的冬天。');
   }
   if (_relic) {
-    pushLog(`你的口袋里多了一样东西——${_relic.name}。${_relic.description}`);
-    pushLog(`[${['白·凡物','蓝·遗珍','紫·宿命','金·传说'][_relic.grade]}] ${_relic.name}：${relicFormatEffect(_relic.effect)}`);
+    const _relicLog = ['relic-white','relic-blue','relic-purple','relic-gold'][_relic.grade] || 'relic-white';
+    pushLog(`你的口袋里多了一样东西——${_relic.name}。${_relic.description}`, _relicLog);
+    pushLog(`[${['白·凡物','蓝·遗珍','紫·宿命','金·传说'][_relic.grade]}] ${_relic.name}：${relicFormatEffect(_relic.effect)}`, _relicLog);
   }
   unlockAchievement('first_play');
   const plan = state.yearlyPlan.get(15);
@@ -4780,6 +4961,18 @@ function _autoShowRelicReward() {
 }
 
 function renderSummary() {
+  // Update share bonus hint visibility
+  const hint = $('share-bonus-hint');
+  if (hint) {
+    if (localStorage.getItem('sasr_share_bonus')) {
+      hint.classList.add('claimed');
+      hint.innerHTML = '✅ 已解锁！下一局属性点 <strong>+2</strong>';
+    } else {
+      hint.classList.remove('claimed');
+      hint.innerHTML = '🎁 分享人生档案，下一局属性点 <strong>+2</strong>！';
+    }
+  }
+
   const ageY = state.age;
   const ageM = state.monthOfYear;
   $('summary-subtitle').textContent = `走过 ${ageY} 岁 ${ageM} 个月`;
@@ -6460,6 +6653,33 @@ async function main() {
     });
   }
 
+  const btnTryCheater = $('btn-try-cheater');
+  if (btnTryCheater) {
+    btnTryCheater.addEventListener('click', async () => {
+      if (state.phase === 'ended') return;
+      if (state.storyline !== 'cheater') return;
+      if (state.cheater_stage !== 'job_window') return;
+      const sinceLastJob = state.monthTotal - (state.cheater_last_job || -99);
+      if (sinceLastJob < CHEATER_JOB_COOLDOWN) return;
+      const prob = computeCheaterProb(state);
+      const route = state.cheater_route || 'trad';
+      const ok = await showConfirm({
+        title: route === 'trad' ? '接单：时差代考' : '接单：AI代考',
+        body: route === 'trad'
+          ? '一个新客户找上门了。你需要协调枪手、确认时差、安排替身。'
+          : '一个新客户提交了需求。你需要部署AI模型、绕过检测系统。',
+        stats: [
+          { label: '成功率', value: prob + '%', tone: probTone(prob) },
+          { label: '成功', value: '势力+2~3，收入+2' },
+          { label: '失败', value: '势力下降，压力增加', tone: 'warn' },
+        ],
+        okText: '开始接单',
+        cancelText: '先不接'
+      });
+      if (ok) attemptCheaterJob();
+    });
+  }
+
   const btnTryChef = $('btn-try-chef');
   if (btnTryChef) {
     btnTryChef.addEventListener('click', async () => {
@@ -6765,7 +6985,8 @@ async function main() {
           xianxia: '修仙线', chef: '厨神线', athlete: '运动员线', fitness: '健身线',
           poker: '德扑线', triton: '赌神线', esports: '电竞线', worlds: '世界赛线',
           ceo: 'CEO线', party: '派对线', meta: '元叙事线', abyss: '深渊线',
-          thief: '怪盗线', hogwarts: '魔法线', timeloop: '时间循环'
+          thief: '怪盗线', hogwarts: '魔法线', timeloop: '时间循环',
+          cheater: '代考帝国'
         };
         if (state.storyline && STORYLINE_NAMES[state.storyline]) {
           lifeChips.push(`⚡ <b>${STORYLINE_NAMES[state.storyline]}</b>`);
@@ -6826,13 +7047,14 @@ async function main() {
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 760;
 
       if (!isMobile) {
-        // Desktop: direct download
+        // Desktop: direct download + grant bonus
         const a = document.createElement('a');
         a.href = dataUrl;
         a.download = '我的留学人生档案.png';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+        grantShareBonus();
       } else {
         // Mobile: show modal with share + download buttons
         const imgWrap = $('poster-img-wrap');
@@ -6863,10 +7085,57 @@ async function main() {
     }
   });
 
-  $('btn-close-poster').addEventListener('click', () => {
+  // Close poster fullscreen view
+  function closePoster() {
+    const modal = $('poster-modal');
     SFX.sfxModalClose();
-    $('poster-modal').style.display = 'none';
-  });
+    modal.classList.add('poster-dismissing');
+    setTimeout(() => {
+      modal.style.display = 'none';
+      modal.classList.remove('poster-dismissing');
+    }, 200);
+  }
+  $('btn-close-poster').addEventListener('click', closePoster);
+
+  // Swipe-down to dismiss
+  {
+    const body = $('poster-fs-body');
+    const wrap = $('poster-img-wrap');
+    let startY = 0, currentY = 0, dragging = false;
+    body.addEventListener('touchstart', e => {
+      if (body.scrollTop > 0) return;
+      startY = e.touches[0].clientY;
+      currentY = startY;
+      dragging = true;
+      wrap.style.transition = 'none';
+    }, { passive: true });
+    body.addEventListener('touchmove', e => {
+      if (!dragging) return;
+      currentY = e.touches[0].clientY;
+      const dy = Math.max(0, currentY - startY);
+      wrap.style.transform = `translateY(${dy}px)`;
+    }, { passive: true });
+    body.addEventListener('touchend', () => {
+      if (!dragging) return;
+      dragging = false;
+      const dy = currentY - startY;
+      wrap.style.transition = 'transform 0.15s ease-out';
+      if (dy > 120) {
+        closePoster();
+      }
+      wrap.style.transform = '';
+    });
+  }
+
+  function grantShareBonus() {
+    if (localStorage.getItem('sasr_share_bonus')) return;
+    localStorage.setItem('sasr_share_bonus', '1');
+    const hint = $('share-bonus-hint');
+    if (hint) {
+      hint.classList.add('claimed');
+      hint.innerHTML = '✅ 已解锁！下一局属性点 <strong>+2</strong>';
+    }
+  }
 
   // Share via Web Share API (mobile)
   $('btn-poster-share').addEventListener('click', async () => {
@@ -6878,9 +7147,9 @@ async function main() {
       if (navigator.canShare && navigator.canShare(shareData)) {
         await navigator.share(shareData);
       } else {
-        // Fallback: share without file
         await navigator.share({ title: '留学重开模拟器', text: '我玩出了这样的人生，你也快来试试！', url: 'https://immortalkilan.github.io/StudyAboardRestart' });
       }
+      grantShareBonus();
     } catch (e) {
       if (e.name !== 'AbortError') console.error('Share failed:', e);
     }
@@ -6896,6 +7165,7 @@ async function main() {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+    grantShareBonus();
   });
 
   $('btn-start').addEventListener('click', async () => {
@@ -8329,7 +8599,7 @@ function _resetGameState() {
   // 隐藏特殊属性面板
   state.showPOP = false; state.showPOK = false; state.showMMR = false;
   state.showFIT = false; state.showCKL = false; state.showATH = false;
-  state.showMAG = false; state.showREP = false; state.showBND = false; state.showFAN = false;
+  state.showMAG = false; state.showREP = false; state.showBND = false; state.showFAN = false; state.showNET = false;
   state.REP = 0; state.BND = 0;
   state.cul = 0; state.dao = 0; state.karma = 0; state.tribulation = 0;
   state.xianxiaSeed = 0; state.yuanshen_book = 0; state.xingchen_book = 0;

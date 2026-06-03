@@ -111,8 +111,8 @@ const STORYLINE_HINTS = {
     gradient: 'linear-gradient(135deg, #0a1a1e 0%, #0d2d34 40%, #1a4a54 100%)',
     icon: '🎮', iconArt: 'controller',
     hints: [
-      '「电竞天才需要极高的智力和毅力双修……黄金年龄转瞬即逝。」',
-      '智力>8 + 毅力>8，16-22岁触发。双属性高要求，不需要特殊天赋。'
+      '「电竞天才需要极高的智力和毅力双修……以及像魔王一般的天赋......黄金年龄转瞬即逝。」',
+      '智力>8 + 毅力>8，16-22岁触发。双属性高要求，需要「魔王代」天赋。'
     ]
   },
   fitness: {
@@ -160,11 +160,20 @@ const STORYLINE_HINTS = {
       '智力≥8 + 毅力≥5 + 出国留学，18-23岁触发。进入后有关键选择，不需要特殊天赋。'
     ]
   },
+  cheater: {
+    name: '代考帝国', category: 'special', color: '#2ecc71', accent: '#27ae60',
+    gradient: 'linear-gradient(135deg, #0a1a0d 0%, #1a2d14 40%, #2d4a22 100%)',
+    icon: '📝', iconArt: 'pen',
+    hints: [
+      '「前世的记忆中，那个人把知识变成了生意……需要足够聪明，也需要足够会来事。」',
+      '智力≥8 + 社交≥6，出国后18岁以上触发。不需要特殊天赋。'
+    ]
+  },
 };
 
 const STORYLINE_ORDER = [
   'spy', 'abyss', 'meta', 'xianxia', 'thief', 'hogwarts', 'timeloop',
-  'idol', 'poker', 'party', 'esports', 'fitness', 'chef', 'band', 'influencer', 'academic',
+  'idol', 'poker', 'party', 'esports', 'fitness', 'chef', 'band', 'influencer', 'academic', 'cheater',
 ];
 
 // ── Persistence ──

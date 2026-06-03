@@ -57,6 +57,9 @@ export const ACHIEVEMENTS = [
   { id: 'end_academic_black', name: 'Ghost',     icon: '👻', rarity: 'legendary', cat: '终局',   desc: '金盆洗手，无人知晓你曾是暗网上的Ghost' },
   { id: 'sl_band',           name: '地下新声',   icon: '🎸', rarity: 'rare',      cat: '剧情',   desc: '加入了一支地下乐队，虽然你只是贝斯手' },
   { id: 'end_band_win',      name: 'Encore!',    icon: '🏆', rarity: 'legendary', cat: '终局',   desc: '在Battle of the Bands中获得冠军，全场高喊Encore' },
+  { id: 'sl_cheater',        name: '天才枪手',   icon: '🎭', rarity: 'rare',      cat: '剧情',   desc: '踏入了代考的灰色地带' },
+  { id: 'end_cheater_empire', name: '考神',       icon: '🧠', rarity: 'legendary', cat: '终局',   desc: '建立了跨国代考帝国' },
+  { id: 'end_cheater_ghost',   name: '零日',      icon: '🕹️', rarity: 'legendary', cat: '终局',   desc: '成为暗网上让所有考试系统颤抖的传说' },
 
   // ── 专业传奇终局 ──────────────────────────────────────────────────────────
   { id: 'end_ee',           name: '半导体教父',   icon: '🔬', rarity: 'legendary', cat: '终局',   desc: '在芯片领域封神，重塑了半导体产业格局' },

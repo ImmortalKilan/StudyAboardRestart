@@ -2092,6 +2092,26 @@ body.in-game .left-panel {
 .log-entry.log-special .log-text {
   color: #f5b642 !important;
 }
+.log-entry.log-relic-white .log-text {
+  color: #ccc !important;
+  border-left: 3px solid #888;
+  padding-left: 10px;
+}
+.log-entry.log-relic-blue .log-text {
+  color: #5b9bf5 !important;
+  border-left: 3px solid #5b9bf5;
+  padding-left: 10px;
+}
+.log-entry.log-relic-purple .log-text {
+  color: #a78bfa !important;
+  border-left: 3px solid #a78bfa;
+  padding-left: 10px;
+}
+.log-entry.log-relic-gold .log-text {
+  color: #f5c842 !important;
+  border-left: 3px solid #f5c842;
+  padding-left: 10px;
+}
 .log-entry.log-fitness .log-text {
   border-left: 3px solid #e67e22;
   padding-left: 10px;
@@ -9678,4 +9698,117 @@ body:has(.moments-rfloat:not(.collapsed)) .mute-btn {
 @keyframes updateSlideIn {
   from { transform: translateY(-100%); }
   to   { transform: translateY(0); }
+}
+
+/* ── Poster Fullscreen View ───────────────────────────────── */
+.poster-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  animation: posterFadeIn 0.25s ease-out;
+}
+.poster-fullscreen.poster-dismissing {
+  transition: opacity 0.2s ease-out;
+  opacity: 0;
+}
+.poster-fs-close {
+  position: absolute;
+  top: max(env(safe-area-inset-top, 12px), 12px);
+  right: 12px;
+  z-index: 2;
+  background: rgba(255,255,255,0.12);
+  border: none;
+  color: #fff;
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.poster-fs-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 48px 16px 16px;
+  touch-action: pan-y;
+}
+.poster-fs-img-wrap {
+  max-width: 92vw;
+  max-height: 78vh;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  transition: transform 0.15s ease-out;
+  will-change: transform;
+}
+.poster-fs-img-wrap img {
+  width: 100%;
+  display: block;
+}
+.poster-fs-bar {
+  display: flex;
+  gap: 10px;
+  padding: 12px 20px max(env(safe-area-inset-bottom, 16px), 16px);
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  justify-content: center;
+}
+.poster-fs-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 11px 22px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.15s;
+}
+.poster-fs-btn:active { opacity: 0.75; }
+.poster-fs-btn-share {
+  background: linear-gradient(135deg, #25d366, #128c7e);
+  color: #fff;
+}
+.poster-fs-btn-save {
+  background: rgba(255,255,255,0.12);
+  color: #ddd;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+@keyframes posterFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Share Bonus Hint ─────────────────────────────────────── */
+.share-bonus-hint {
+  font-size: 13px;
+  color: #f5c842;
+  animation: bonusPulse 2s ease-in-out infinite;
+  text-align: center;
+  letter-spacing: 0.3px;
+}
+.share-bonus-hint strong {
+  color: #ff9f1a;
+  font-size: 15px;
+}
+.share-bonus-hint.claimed {
+  animation: none;
+  color: #7ed7a0;
+}
+@keyframes bonusPulse {
+  0%, 100% { opacity: 0.8; }
+  50%      { opacity: 1; text-shadow: 0 0 8px rgba(245,200,66,0.4); }
 }

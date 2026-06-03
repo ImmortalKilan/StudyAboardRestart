@@ -48,7 +48,7 @@
           🗺️ <span class="start-top-label">命运图谱</span>
         </button>
         <button id="ach-trophy-start-btn" class="ghost start-top-btn" title="成就墙">
-          🏆 <span id="ach-trophy-start-badge" class="start-top-badge" style="color:#f1c40f;">0/75</span>
+          🏆 <span id="ach-trophy-start-badge" class="start-top-badge" style="color:#f1c40f;">0/78</span>
           <span id="ach-start-level" class="ach-start-level">Lv.0</span>
         </button>
       </div>
@@ -552,7 +552,7 @@
               <button id="btn-summary" class="ghost" style="display:none;">查看总结</button>
               <button id="btn-restart" class="ghost">重开</button>
               <button id="ach-trophy-btn" class="ghost" title="成就墙" style="display:flex; align-items:center; gap:6px;">
-                🏆 <span id="ach-trophy-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/75</span>
+                🏆 <span id="ach-trophy-badge" style="font-weight:bold; font-size:13px; color:#f1c40f;">0/78</span>
               </button>
             </div>
           </div>
@@ -620,6 +620,19 @@
             </div>
             <div id="chef-decay-warn" class="banner-warn"></div>
             <button id="btn-try-chef" class="primary banner-btn">呈上主菜</button>
+          </div>
+
+          <div id="cheater-box" class="action-banner" style="display:none;">
+            <div class="banner-title-col">
+              <span class="banner-title" id="cheater-title">代考网络</span>
+              <span id="cheater-stage" class="banner-stage">积累势力中</span>
+            </div>
+            <div class="banner-prob-col">
+              <span class="banner-prob-label">成功率</span>
+              <span id="cheater-prob" class="banner-prob">--</span>
+            </div>
+            <div id="cheater-decay-warn" class="banner-warn"></div>
+            <button id="btn-try-cheater" class="primary banner-btn">接单</button>
           </div>
 
           <div id="athlete-box" class="action-banner" style="display:none;">
@@ -747,6 +760,7 @@
           </div>
           <div class="summary-actions">
             <button id="btn-summary-share" class="primary share-btn" style="background: linear-gradient(135deg, #f1c40f, #e67e22); border: none; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5);"><span class="icon">📸</span> 生成人生档案</button>
+            <div id="share-bonus-hint" class="share-bonus-hint">🎁 分享人生档案，下一局属性点 <strong>+2</strong>！</div>
             <button id="btn-mp-vs" class="primary mp-vs-btn" style="display:none;">⚔️ 查看双人对比</button>
             <button id="btn-summary-back" class="ghost">返回事件流</button>
             <button id="btn-summary-restart" class="primary">再来一次</button>
@@ -933,19 +947,18 @@
 
   </main>
 
-  <div id="poster-modal" class="overlay" style="display:none; z-index: 10000; align-items:center; justify-content:center; background: rgba(0,0,0,0.85); flex-direction:column;">
-    <div class="poster-modal-content" style="position:relative; display:flex; flex-direction:column; align-items:center; max-width:90vw;">
-      <button id="btn-close-poster" style="position:absolute; right:-12px; top:-44px; background:none; border:none; color:#fff; font-size:32px; cursor:pointer; z-index:1;">&times;</button>
-      <div id="poster-img-wrap" style="max-height:65vh; max-width:90vw; overflow-y:auto; border-radius:12px; border:2px solid #333; box-shadow:0 10px 40px rgba(0,0,0,0.8);"></div>
-      <div class="poster-modal-actions" style="display:flex; gap:12px; margin-top:16px; width:100%; justify-content:center; flex-wrap:wrap;">
-        <button id="btn-poster-share" class="primary" style="background:linear-gradient(135deg,#25d366,#128c7e); border:none; color:#fff; padding:10px 20px; border-radius:8px; font-size:15px; cursor:pointer; display:flex; align-items:center; gap:6px;">
-          <span>📤</span> 分享给好友
-        </button>
-        <button id="btn-poster-download" class="ghost" style="border:1px solid #555; color:#ccc; padding:10px 20px; border-radius:8px; font-size:15px; cursor:pointer; display:flex; align-items:center; gap:6px;">
-          <span>💾</span> 保存图片
-        </button>
-      </div>
-      <div style="color:#666; margin-top:10px; font-size:12px;">也可长按图片保存</div>
+  <div id="poster-modal" class="poster-fullscreen" style="display:none;">
+    <button id="btn-close-poster" class="poster-fs-close" aria-label="关闭">&times;</button>
+    <div id="poster-fs-body" class="poster-fs-body">
+      <div id="poster-img-wrap" class="poster-fs-img-wrap"></div>
+    </div>
+    <div class="poster-fs-bar">
+      <button id="btn-poster-share" class="poster-fs-btn poster-fs-btn-share">
+        <span>📤</span> 分享给好友
+      </button>
+      <button id="btn-poster-download" class="poster-fs-btn poster-fs-btn-save">
+        <span>💾</span> 保存图片
+      </button>
     </div>
   </div>
 
@@ -955,7 +968,7 @@
     <div class="ach-wall-panel">
       <div class="ach-wall-head">
         <div class="ach-wall-title">🏆&nbsp;&nbsp;成就</div>
-        <span id="ach-wall-count" class="ach-wall-count">0/75</span>
+        <span id="ach-wall-count" class="ach-wall-count">0/78</span>
         <button id="ach-wall-close" class="ach-wall-close" aria-label="关闭成就墙">✕</button>
       </div>
       <div id="ach-wall-grid" class="ach-wall-grid"></div>
