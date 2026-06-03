@@ -52,11 +52,11 @@ const RELIC_TEMPLATES = {
     { name: '破碎的手机屏', effect: { SOC: 2, APP: 2 }, desc: '屏幕碎了但还亮着，通知栏有999+未读', storylines: ['influencer', 'mcn', 'streamer', 'washed'], cond: s => ['influencer','mcn','streamer','washed'].includes(s.storyline) },
   ],
   3: [
-    { name: '轮回之钥', effect: { SOC: 2, INT: 2, MNY: 2, PER: 2, HLT: 2, APP: 2 }, desc: '握住它的瞬间，你想起了一切', cond: s => s._isLegendary },
-    { name: '神秘黑卡', effect: { MNY: 5, SOC: 2 }, desc: '没有卡号，没有姓名，但每台POS机都认它', cond: s => (s._score || 0) >= 28000 },
-    { name: '命运罗盘', effect: { INT: 2, PER: 2 }, desc: '指针永远指向你', special: 'extra_talent', cond: s => s._isLegendary && s._isHiddenStoryline },
-    { name: '不朽笔记', effect: { INT: 4 }, desc: '最后一页写着："这不是第一次了"', noDecay: true, cond: s => s.storyline === 'meta' },
-    { name: '凤凰羽毛', effect: { HLT: 4, HAP: 2 }, desc: '握在手里时，伤口似乎愈合得更快', cond: s => s._isLegendary },
+    { name: '轮回之钥', effect: { SOC: 2, INT: 2, MNY: 2, PER: 2, HLT: 2, APP: 2 }, desc: '终点之后，钥匙会再转一次。你不会空手而归。', cond: s => s._isLegendary || (s._score || 0) >= 25000 },
+    { name: '神秘黑卡', effect: { MNY: 5, SOC: 2 }, desc: '没有卡号，没有姓名，但每年都会准时寄来一份礼物。', cond: s => (s._score || 0) >= 22000 || (s._peakMNY || 0) >= 30 },
+    { name: '命运罗盘', effect: { INT: 2, PER: 2 }, desc: '岔路口前，指针总会轻轻晃动。它比你更早知道答案。', special: 'extra_talent', cond: s => s._isLegendary || (s._score || 0) >= 25000 },
+    { name: '不朽笔记', effect: { INT: 4 }, desc: '有些句子会自己改写。坏消息落笔时，墨迹偶尔会反着干。', noDecay: true, cond: s => (s._peakINT || 0) >= 30 },
+    { name: '凤凰羽毛', effect: { HLT: 4, HAP: 2 }, desc: '最暗的时刻，羽毛会替你燃烧一次。', cond: s => s._isLegendary || s._isGoodEnding },
   ],
 };
 
@@ -274,7 +274,7 @@ export function consumeActiveRelic() {
   relic.lives--;
   let mutationResult = null;
 
-  if (relic.lives > 0 && !relic.noDecay) {
+  if (relic.lives > 0 && !relic.noDecay && relic.grade < 3) {
     mutationResult = _tryMutate(relic);
   }
 
@@ -287,11 +287,43 @@ export function consumeActiveRelic() {
   return { relic, mutationResult, destroyed: relic.lives <= 0 };
 }
 
+// ── Phoenix Feather: block one death check per playthrough ──────
+// Returns { stats, boostDesc } if saved, or null if no phoenix feather / already used.
+export function tryPhoenixSave(gameState, statKeys) {
+  if (gameState._phoenixUsed) return null;
+  const relic = getActiveRelic();
+  if (!relic || relic.name !== '凤凰羽毛') return null;
+
+  gameState._phoenixUsed = true;
+
+  // Boost each triggering stat by +5
+  const labels = { SOC:'社交', INT:'智力', MNY:'家境', HAP:'快乐', HLT:'健康', PER:'毅力', APP:'颜值',
+    POP:'人气', POK:'牌技', MMR:'天梯分', FIT:'体能', CKL:'厨艺', ATH:'运动', MAG:'魔力', REP:'声望', BND:'影响力', FAN:'粉丝', NET:'势力' };
+  for (const k of statKeys) {
+    gameState[k] = (gameState[k] || 0) + 5;
+  }
+  const boostDesc = statKeys.map(k => `${labels[k] || k} +5`).join('  ');
+
+  // Consume one life from the relic
+  const data = _load();
+  const stored = data.vault.find(r => r.id === relic.id);
+  if (stored) {
+    stored.lives--;
+    if (stored.lives <= 0) {
+      data.vault = data.vault.filter(r => r.id !== stored.id);
+      if (data.activeRelicId === stored.id) data.activeRelicId = null;
+    }
+    _save(data);
+  }
+
+  return { stats: statKeys, boostDesc, destroyed: stored ? stored.lives <= 0 : false };
+}
+
 // ── Relic Generation ─────────────────────────────────────────────
 
 export function generateRelic(state, score, isLegendary, isGood, storylineNameMap) {
   const targetGrade = _determineGrade(state, score, isLegendary, isGood);
-  const template = _pickTemplate(targetGrade, state, score, isLegendary);
+  const template = _pickTemplate(targetGrade, state, score, isLegendary, isGood);
   const grade = template.actualGrade;
 
   const slName = (storylineNameMap && state.storyline) ? (storylineNameMap[state.storyline] || state.storyline) : '';
@@ -340,12 +372,16 @@ function _determineGrade(state, score, isLegendary, isGood) {
   return Math.random() < 0.15 ? 1 : 0;
 }
 
-function _pickTemplate(grade, state, score, isLegendary) {
+function _pickTemplate(grade, state, score, isLegendary, isGood) {
+  const peaks = state.statPeaks || {};
   const enriched = {
     ...state,
     _score: score,
     _isLegendary: isLegendary,
+    _isGoodEnding: isGood,
     _isHiddenStoryline: ['spy', 'abyss', 'meta', 'xianxia', 'thief', 'hogwarts', 'timeloop'].includes(state.storyline),
+    _peakINT: peaks.INT || 0,
+    _peakMNY: peaks.MNY || 0,
   };
 
   // Try the target grade first, then fall through lower grades

@@ -4,7 +4,7 @@ import { playStorylineIntro, playStorylineExit } from './cinematic.js';
 import { initAchievements, unlockAchievement, setOnUnlock, getAchievementBonuses } from './achievements.js';
 import { initFlowchart, openFlowchart, unlockFlowchartNode, setFlowchartSfx, resetSessionUnlocks, getSessionUnlocks } from './flowchart.js';
 import { initMemoryUI, renderMemoryPanel, recordPlaythrough, showNewCardToast } from './memory.js';
-import { initRelicUI, updateVaultButton, openVaultModal, renderRelicSlot, initRelicSlot, finalizeRelicChoice, generateRelicChoices, showRelicReward, getActiveRelic, clearActiveRelic, consumeActiveRelic, showMutationToast, checkGiftLink, redeemRelicCode, formatEffect as relicFormatEffect, addRelic, getRelicVault, checkBlueTrigger, checkPurpleTrigger } from './relic.js';
+import { initRelicUI, updateVaultButton, openVaultModal, renderRelicSlot, initRelicSlot, finalizeRelicChoice, generateRelicChoices, showRelicReward, getActiveRelic, clearActiveRelic, consumeActiveRelic, showMutationToast, checkGiftLink, redeemRelicCode, formatEffect as relicFormatEffect, addRelic, getRelicVault, checkBlueTrigger, checkPurpleTrigger, tryPhoenixSave } from './relic.js';
 import { initMoments, tickMoments, checkPostable, playerPost, mountMomentsUI, mountMobileMoments, openMobileMoments, mountMobileDrawer, resetMoments, showPostPrompt, isMomentsVisible, getClassReunion, reactToPlayerEvent, setMomentsActionHandler, setMomentsDramaHandler, addMomLastPost, setMomentsHiddenEntryHandler } from './moments.js';
 import * as SFX from './audio.js';
 // Multiplayer — loaded dynamically so single-player works even if it fails
@@ -113,12 +113,12 @@ const STORYLINE_CFG = {
     successEvent: 50099,
     eventRate: 0.8,
     deathChecks: [
-      { cond: s => s.HLT <= -2, event: 50060 },
-      { cond: s => s.PER <= -2, event: 50061 },
-      { cond: s => s.SOC <= -2 && s.HAP <= -2, event: 50064 },
-      { cond: s => s.INT <= -2, event: 50062 },
-      { cond: s => s.SOC <= -4, event: 50063 },
-      { cond: s => s.HAP <= -4 && s.INT > -2, event: 50065 },
+      { cond: s => s.HLT <= -2, event: 50060, stat: ['HLT'] },
+      { cond: s => s.PER <= -2, event: 50061, stat: ['PER'] },
+      { cond: s => s.SOC <= -2 && s.HAP <= -2, event: 50064, stat: ['SOC', 'HAP'] },
+      { cond: s => s.INT <= -2, event: 50062, stat: ['INT'] },
+      { cond: s => s.SOC <= -4, event: 50063, stat: ['SOC'] },
+      { cond: s => s.HAP <= -4 && s.INT > -2, event: 50065, stat: ['HAP'] },
     ],
     flavor: () => spyFlavor(),
   },
@@ -128,8 +128,8 @@ const STORYLINE_CFG = {
     successEvent: 60040,
     eventRate: 0.8,
     deathChecks: [
-      { cond: s => s.HLT <= -20, event: 60091 },
-      { cond: s => s.HAP <= -8, event: 60091 },
+      { cond: s => s.HLT <= -20, event: 60091, stat: ['HLT'] },
+      { cond: s => s.HAP <= -8, event: 60091, stat: ['HAP'] },
     ],
     flavor: () => abyssFlavor(),
   },
@@ -137,8 +137,8 @@ const STORYLINE_CFG = {
     gracePeriod: 6,
     eventRate: 0.85,
     deathChecks: [
-      { cond: s => s.HAP <= -5, event: 70094 },
-      { cond: s => s.HLT <= -5, event: 70095 }
+      { cond: s => s.HAP <= -5, event: 70094, stat: ['HAP'] },
+      { cond: s => s.HLT <= -5, event: 70095, stat: ['HLT'] }
     ],
     progressChecks: [
       { cond: s => (s.meta_aware || 0) >= 4 && !s.firedEvents.has(70010), event: 70010 },
@@ -157,8 +157,8 @@ const STORYLINE_CFG = {
     gracePeriod: 12,
     eventRate: 0.8,
     deathChecks: [
-      { cond: s => s.PER < 3, event: 84094 },
-      { cond: s => s.MNY <= -4, event: 84095 },
+      { cond: s => s.PER < 3, event: 84094, stat: ['PER'] },
+      { cond: s => s.MNY <= -4, event: 84095, stat: ['MNY'] },
     ],
     progressChecks: [
       { cond: s => s.HLT < 0 && s.FIT >= 10, event: 84093 },
@@ -168,9 +168,9 @@ const STORYLINE_CFG = {
     gracePeriod: 12,
     eventRate: 0.8,
     deathChecks: [
-      { cond: s => (s.HLT || 0) <= 0, event: 85080 },
-      { cond: s => (s.HAP || 0) <= 0, event: 85081 },
-      { cond: s => (s.SOC || 0) <= 0, event: 85095 },
+      { cond: s => (s.HLT || 0) <= 0, event: 85080, stat: ['HLT'] },
+      { cond: s => (s.HAP || 0) <= 0, event: 85081, stat: ['HAP'] },
+      { cond: s => (s.SOC || 0) <= 0, event: 85095, stat: ['SOC'] },
     ],
     progressChecks: [],
     },
@@ -178,9 +178,9 @@ const STORYLINE_CFG = {
     gracePeriod: 12,
     eventRate: 0.8,
     deathChecks: [
-      { cond: s => (s.HLT || 0) <= 0, event: 86151 },
-      { cond: s => (s.HAP || 0) <= 0, event: 86152 },
-      { cond: s => (s.SOC || 0) <= 0, event: 86153 },
+      { cond: s => (s.HLT || 0) <= 0, event: 86151, stat: ['HLT'] },
+      { cond: s => (s.HAP || 0) <= 0, event: 86152, stat: ['HAP'] },
+      { cond: s => (s.SOC || 0) <= 0, event: 86153, stat: ['SOC'] },
     ],
     progressChecks: [],
     },
@@ -188,9 +188,9 @@ const STORYLINE_CFG = {
     gracePeriod: 12,
     eventRate: 0.7,
     deathChecks: [
-      { cond: s => (s.HLT || 0) <= 0, event: 87195 },
-      { cond: s => (s.HAP || 0) <= -3, event: 87196 },
-      { cond: s => (s.SOC || 0) <= -3, event: 87197 },
+      { cond: s => (s.HLT || 0) <= 0, event: 87195, stat: ['HLT'] },
+      { cond: s => (s.HAP || 0) <= -3, event: 87196, stat: ['HAP'] },
+      { cond: s => (s.SOC || 0) <= -3, event: 87197, stat: ['SOC'] },
     ],
     progressChecks: [
       { cond: s => s.thief_stage === 'active' && s.age - s.storylineStart >= 3, event: 87100 },
@@ -200,9 +200,9 @@ const STORYLINE_CFG = {
       gracePeriod: 8,
       eventRate: 0.75,
       deathChecks: [
-        { cond: s => (s.INT || 0) <= 2, event: 88190 },
-        { cond: s => (s.SOC || 0) <= 0, event: 88191 },
-        { cond: s => (s.MNY || 0) <= -5, event: 88192 },
+        { cond: s => (s.INT || 0) <= 2, event: 88190, stat: ['INT'] },
+        { cond: s => (s.SOC || 0) <= 0, event: 88191, stat: ['SOC'] },
+        { cond: s => (s.MNY || 0) <= -5, event: 88192, stat: ['MNY'] },
       ],
       progressChecks: [
         { cond: s => (s.NET || 0) >= 15 && s.cheater_stage === 'job_window' && !s.firedEvents.has(88150), event: 88150 },
@@ -212,7 +212,7 @@ const STORYLINE_CFG = {
       idol: {    gracePeriod: 12,
     eventRate: 0.7,
     deathChecks: [
-      { cond: s => s.HLT <= -2, event: 82021 },
+      { cond: s => s.HLT <= -2, event: 82021, stat: ['HLT'] },
     ],
     progressChecks: [],
   },
@@ -220,10 +220,10 @@ const STORYLINE_CFG = {
     gracePeriod: 6,
     eventRate: 0.8,
     deathChecks: [
-      { cond: s => s.HLT < 2 && Math.random() < 0.25, event: 82022 },
-      { cond: s => s.HLT <= -3, event: 82021 },
-      { cond: s => s.SOC <= -3, event: 82020 },
-      { cond: s => s.MNY <= -3, event: 82091 },
+      { cond: s => s.HLT < 2 && Math.random() < 0.25, event: 82022, stat: ['HLT'] },
+      { cond: s => s.HLT <= -3, event: 82021, stat: ['HLT'] },
+      { cond: s => s.SOC <= -3, event: 82020, stat: ['SOC'] },
+      { cond: s => s.MNY <= -3, event: 82091, stat: ['MNY'] },
     ],
     progressChecks: [],
     flavor: () => {
@@ -235,7 +235,7 @@ const STORYLINE_CFG = {
     gracePeriod: 12,
     eventRate: 0.7,
     deathChecks: [
-      { cond: s => s.MNY <= -2, event: 82095 },
+      { cond: s => s.MNY <= -2, event: 82095, stat: ['MNY'] },
     ],
     progressChecks: [
       { cond: s => (s.age - s.storylineStart) >= 2 && s.SOC >= 30 && s.MNY >= 10, event: 82090 },
@@ -246,8 +246,8 @@ const STORYLINE_CFG = {
     gracePeriod: 12,
     eventRate: 0.7,
     deathChecks: [
-      { cond: s => s.MNY <= -4, event: 81091 },
-      { cond: s => (s.POK || 0) <= 0 && s.age - s.storylineStart >= 1, event: 81094 },
+      { cond: s => s.MNY <= -4, event: 81091, stat: ['MNY'] },
+      { cond: s => (s.POK || 0) <= 0 && s.age - s.storylineStart >= 1, event: 81094, stat: ['POK'] },
     ],
     progressChecks: [],
   },
@@ -255,7 +255,7 @@ const STORYLINE_CFG = {
     gracePeriod: 12,
     eventRate: 0.7,
     deathChecks: [
-      { cond: s => s.POK < -4 || s.MNY <= -4, event: 81091 },
+      { cond: s => s.POK < -4 || s.MNY <= -4, event: 81091, stat: ['POK', 'MNY'] },
     ],
     progressChecks: [
       { cond: s => s.POK >= 30, event: () => Math.random() < 0.75 ? 81090 : 81092 },
@@ -265,7 +265,7 @@ const STORYLINE_CFG = {
     gracePeriod: 12,
     eventRate: 0.7,
     deathChecks: [
-      { cond: s => s.MNY <= -4, event: 81091 },
+      { cond: s => s.MNY <= -4, event: 81091, stat: ['MNY'] },
     ],
     progressChecks: [
       { cond: s => s.POK >= 20, event: 81092 },
@@ -276,7 +276,7 @@ const STORYLINE_CFG = {
     gracePeriod: 12,
     eventRate: 0.7,
     deathChecks: [
-      { cond: s => s.HLT <= -2, event: 83091 },
+      { cond: s => s.HLT <= -2, event: 83091, stat: ['HLT'] },
     ],
     progressChecks: [
       { cond: s => s.match_fixing, event: 83092 },
@@ -286,7 +286,7 @@ const STORYLINE_CFG = {
     gracePeriod: 12,
     eventRate: 0.7,
     deathChecks: [
-      { cond: s => s.HLT <= -1, event: 83091 },
+      { cond: s => s.HLT <= -1, event: 83091, stat: ['HLT'] },
     ],
     progressChecks: [
       { cond: s => s.match_fixing, event: 83092 },
@@ -306,8 +306,8 @@ const STORYLINE_CFG = {
     gracePeriod: 10,
     eventRate: 0.75,
     deathChecks: [
-      { cond: s => s.route === 'black' && (s.REP || 0) >= 35 && (s.PER || 0) < 5, event: 89093 },
-      { cond: s => s.route === 'black' && s.HAP <= -8, event: 89094 },
+      { cond: s => s.route === 'black' && (s.REP || 0) >= 35 && (s.PER || 0) < 5, event: 89093, stat: ['PER'] },
+      { cond: s => s.route === 'black' && s.HAP <= -8, event: 89094, stat: ['HAP'] },
     ],
     progressChecks: [
       { cond: s => s.route === 'black' && (s.REP || 0) >= 20 && !s.firedEvents.has(89040), event: 89040 },
@@ -318,7 +318,7 @@ const STORYLINE_CFG = {
     gracePeriod: 12,
     eventRate: 0.75,
     deathChecks: [
-      { cond: s => s.HLT <= -3, event: 82021 },
+      { cond: s => s.HLT <= -3, event: 82021, stat: ['HLT'] },
     ],
     progressChecks: [],
     flavor: () => bandFlavor(),
@@ -378,9 +378,9 @@ const STORYLINE_CFG = {
       { cond: s => (s.hogwartsYear || 1) >= 7 && !s.firedEvents.has(61600) && (s.darkForces || 0) === 0, event: 61500 },
     ],
     deathChecks: [
-      { cond: s => (s.MAG || 0) <= 0, event: 61950 },
-      { cond: s => (s.HLT || 0) <= -5 && (s.darkForces || 0) === 1, event: 61951 },
-      { cond: s => (s.PER || 0) <= -3, event: 61952 },
+      { cond: s => (s.MAG || 0) <= 0, event: 61950, stat: ['MAG'] },
+      { cond: s => (s.HLT || 0) <= -5 && (s.darkForces || 0) === 1, event: 61951, stat: ['HLT'] },
+      { cond: s => (s.PER || 0) <= -3, event: 61952, stat: ['PER'] },
     ],
     flavor: () => hogwartsFlavor(),
   },
@@ -388,8 +388,8 @@ const STORYLINE_CFG = {
     gracePeriod: 12,
     eventRate: 0.7,
     deathChecks: [
-      { cond: s => s.HLT <= -2, event: 76091 },
-      { cond: s => s.influencer_scandal && (s.SOC || 0) <= 0, event: 76092 },
+      { cond: s => s.HLT <= -2, event: 76091, stat: ['HLT'] },
+      { cond: s => s.influencer_scandal && (s.SOC || 0) <= 0, event: 76092, stat: ['SOC'] },
     ],
     progressChecks: [],
     flavor: () => influencerFlavor(),
@@ -403,7 +403,7 @@ const STORYLINE_CFG = {
       { cond: s => s.age - s.storylineStart >= 3, event: 76095 },
     ],
     deathChecks: [
-      { cond: s => s.HLT <= -2, event: 76091 },
+      { cond: s => s.HLT <= -2, event: 76091, stat: ['HLT'] },
     ],
     flavor: () => mcnFlavor(),
   },
@@ -415,7 +415,7 @@ const STORYLINE_CFG = {
       { cond: s => s.age - s.storylineStart >= 2 && (s.FAN || 0) < 30, event: 76097 },
     ],
     deathChecks: [
-      { cond: s => s.influencer_scandal && (s.SOC || 0) <= 0, event: 76092 },
+      { cond: s => s.influencer_scandal && (s.SOC || 0) <= 0, event: 76092, stat: ['SOC'] },
     ],
     flavor: () => washedFlavor(),
   },
@@ -2261,6 +2261,25 @@ function _applySetObj(obj) {
   }
 }
 
+// Helper: 不朽笔记 flip negative effects (60% per negative stat)
+function _notesFlipEffect(effect, happyDelta) {
+  const relic = getActiveRelic();
+  if (!relic || relic.name !== '不朽笔记') {
+    return { effect: effect || {}, happyDelta: typeof happyDelta === 'number' ? happyDelta : null };
+  }
+  let flipped = false;
+  let eff = effect ? { ...effect } : {};
+  if (effect) {
+    for (const [k, v] of Object.entries(eff)) {
+      if (v < 0 && Math.random() < 0.6) { eff[k] = -v; flipped = true; }
+    }
+  }
+  let hd = typeof happyDelta === 'number' ? happyDelta : null;
+  if (hd !== null && hd < 0 && Math.random() < 0.6) { hd = -hd; flipped = true; }
+  if (flipped) pushLog('笔记上的文字闪烁了一下，命运被悄然改写……', 'relic-gold');
+  return { effect: eff, happyDelta: hd };
+}
+
 function applyEvent(ev) {
   // Storyline replay: only show text, skip all side effects
   if (ev._replay) {
@@ -2389,10 +2408,13 @@ function applyEvent(ev) {
   for (const k of STAT_KEYS) _preFx[k] = state[k] || 0;
   _preFx.HAP = state.HAP || 0;
 
-  if (ev.effect) for (const [k, v] of Object.entries(ev.effect)) {
+  // ── 不朽笔记「改写命运」: 60% chance to flip negative effects ──
+  const _evFlipped = _notesFlipEffect(ev.effect, ev.happyDelta);
+
+  if (_evFlipped.effect) for (const [k, v] of Object.entries(_evFlipped.effect)) {
     if (EFFECT_KEYS.has(k)) state[k] = (state[k] || 0) + v;
   }
-  if (typeof ev.happyDelta === 'number') state.HAP += ev.happyDelta;
+  if (_evFlipped.happyDelta !== null) state.HAP += _evFlipped.happyDelta;
 
   // Compute cheat_risk_final before 88260 branch evaluates
   if (ev.id === 88260) {
@@ -2454,6 +2476,10 @@ function applyEvent(ev) {
       setTimeout(() => showNewCardToast(), 1500);
     }
     renderMemoryPanel();
+
+    // Check for 轮回之钥 BEFORE consuming relic
+    const _preConsumeRelic = getActiveRelic();
+    state._hasReincarnationKey = _preConsumeRelic && _preConsumeRelic.name === '轮回之钥';
 
     // Consume inherited relic (lives -1, mutation check)
     const relicResult = consumeActiveRelic();
@@ -2788,6 +2814,7 @@ function resolveChoice(index) {
     chosenIdx: index,
   });
   state.pendingChoice = null;
+  state._compassLogShown = false;
 
   if (choice.branch) {
     const nextId = pickBranch(state, choice.branch);
@@ -2800,12 +2827,16 @@ function resolveChoice(index) {
       _applySetObj(choice.set);
     }
     if (choice.effect) {
-      for (const [k, v] of Object.entries(choice.effect)) {
+      const _cEff = _notesFlipEffect(choice.effect, choice.happyDelta);
+      for (const [k, v] of Object.entries(_cEff.effect)) {
         if (EFFECT_KEYS.has(k)) state[k] = (state[k] || 0) + v;
       }
       clampStats();
+      if (_cEff.happyDelta !== null) state.HAP += _cEff.happyDelta;
+    } else if (typeof choice.happyDelta === 'number') {
+      const _cEff = _notesFlipEffect(null, choice.happyDelta);
+      if (_cEff.happyDelta !== null) state.HAP += _cEff.happyDelta;
     }
-    if (typeof choice.happyDelta === 'number') state.HAP += choice.happyDelta;
     const ev = state.eventsMap.get(choice.next);
     if (ev) applyEvent(ev);
   } else if (choice.effect || choice.set || choice.resultText || choice.text) {
@@ -2816,12 +2847,16 @@ function resolveChoice(index) {
       _applySetObj(choice.set);
     }
     if (choice.effect) {
-      for (const [k, v] of Object.entries(choice.effect)) {
+      const _cEff2 = _notesFlipEffect(choice.effect, choice.happyDelta);
+      for (const [k, v] of Object.entries(_cEff2.effect)) {
         if (EFFECT_KEYS.has(k)) state[k] = (state[k] || 0) + v;
       }
       clampStats();
+      if (_cEff2.happyDelta !== null) state.HAP += _cEff2.happyDelta;
+    } else if (typeof choice.happyDelta === 'number') {
+      const _cEff2 = _notesFlipEffect(null, choice.happyDelta);
+      if (_cEff2.happyDelta !== null) state.HAP += _cEff2.happyDelta;
     }
-    if (typeof choice.happyDelta === 'number') state.HAP += choice.happyDelta;
 
     const isExit = choice.set && choice.set.storyline === '' && prevStoryline;
     let logType = undefined;
@@ -2977,13 +3012,31 @@ function advanceMonth() {
         return false;
       })) { /* handled */ }
       // Check death/fail conditions (skip during grace period)
-      else if (cfg.deathChecks && state.monthTotal - (state.storylineStartMonth || 0) > (cfg.gracePeriod || 0) && cfg.deathChecks.some(dc => {
-        if (dc.cond(state)) {
-          const ev = state.eventsMap.get(dc.event);
-          if (ev && !state.firedEvents.has(dc.event)) { applyEvent(ev); return true; }
-        }
-        return false;
-      })) { /* handled */ }
+      else if ((() => {
+        if (!cfg.deathChecks || state.monthTotal - (state.storylineStartMonth || 0) <= (cfg.gracePeriod || 0)) return false;
+        let phoenixSaved = false;
+        const died = cfg.deathChecks.some(dc => {
+          if (dc.cond(state)) {
+            // Phoenix feather: block death and boost stats instead
+            if (dc.stat && !phoenixSaved) {
+              const phoenix = tryPhoenixSave(state, dc.stat);
+              if (phoenix) {
+                pushLog('凤凰羽毛燃烧殆尽，灼热的光芒将你从深渊边缘拉了回来。', 'relic-gold');
+                pushLog(`[浴火重生] ${phoenix.boostDesc}`, 'relic-gold');
+                if (phoenix.destroyed) pushLog('羽毛化为灰烬，消散在空气中。', 'relic-gold');
+                phoenixSaved = true;
+                return false; // saved, skip ALL remaining death checks this month
+              }
+            }
+            if (phoenixSaved) return false; // already saved, skip
+            const ev = state.eventsMap.get(dc.event);
+            if (ev && !state.firedEvents.has(dc.event)) { applyEvent(ev); return true; }
+          }
+          return false;
+        });
+        if (phoenixSaved) return false; // not dead — fall through to normal events
+        return died;
+      })()) { /* death handled */ }
       else {
         const re = Math.random() < (cfg.eventRate || 0.8) ? drawRandomEvent() : null;
         if (re) applyEvent(re);
@@ -3094,6 +3147,23 @@ function advanceMonth() {
           mp.butterflySent.add(rule.key);
           mpSend('butterfly', { payload: { key: rule.key, srcAge: state.age } });
           break; // max 1 auto-butterfly per check
+        }
+      }
+    }
+  }
+
+  // ── Black card: annual perk event ──
+  if (!state.pendingChoice && !state.pendingEvent) {
+    const _bcRelic = getActiveRelic();
+    if (_bcRelic && _bcRelic.name === '神秘黑卡') {
+      const lastBC = state._blackCardLastMonth || 0;
+      if (state.monthTotal - lastBC >= 12) {
+        const bcIds = [99800, 99801, 99802, 99803, 99804];
+        const bcId = bcIds[Math.floor(Math.random() * bcIds.length)];
+        const bcEv = state.eventsMap.get(bcId);
+        if (bcEv) {
+          state._blackCardLastMonth = state.monthTotal;
+          applyEvent(bcEv);
         }
       }
     }
@@ -4467,6 +4537,40 @@ function render() {
       let canClick = false;
       setTimeout(() => { canClick = true; }, 500);
 
+      // ── 命运罗盘「命运岔口」: mark the best choice ──
+      let _compassBestIdx = -1;
+      const _compassRelic = getActiveRelic();
+      if (_compassRelic && _compassRelic.name === '命运罗盘') {
+        let bestScore = -Infinity;
+        let _hasAnyEffect = false;
+        state.pendingChoice.forEach((c, i) => {
+          const locked = c.requireExpr && !evalCondition(state, c.requireExpr);
+          if (locked) return;
+          let s = 0;
+          if (c.effect) {
+            _hasAnyEffect = true;
+            for (const v of Object.values(c.effect)) s += (typeof v === 'number' ? v : 0);
+          }
+          if (typeof c.happyDelta === 'number') { _hasAnyEffect = true; s += c.happyDelta; }
+          if (c.set) {
+            for (const [k, v] of Object.entries(c.set)) {
+              if (typeof v === 'string' && (k.includes('risk') || k.includes('danger'))) {
+                const num = Number(v);
+                if (!isNaN(num)) { _hasAnyEffect = true; s -= num * 2; }
+              } else if (typeof v === 'number' && (k.includes('risk') || k.includes('danger'))) {
+                _hasAnyEffect = true; s -= v * 2;
+              }
+            }
+          }
+          if (s > bestScore) { bestScore = s; _compassBestIdx = i; }
+        });
+        if (!_hasAnyEffect) _compassBestIdx = -1;
+        if (_compassBestIdx >= 0 && !state._compassLogShown) {
+          state._compassLogShown = true;
+          pushLog('命运罗盘微微震动，似乎指向了某个方向……', 'relic-gold');
+        }
+      }
+
       state.pendingChoice.forEach((c, i) => {
         const btn = document.createElement('button');
         btn.className = 'choice-btn';
@@ -4504,6 +4608,7 @@ function render() {
           : '';
         if (colorType) btn.classList.add('choice-' + colorType);
         if (c.gold) btn.classList.add('choice-gold');
+        if (i === _compassBestIdx) btn.classList.add('choice-compass');
         if (locked) {
           btn.classList.add('choice-locked');
           btn.disabled = true;
@@ -4708,8 +4813,113 @@ function showEndCinematic() {
   }
 
   setTimeout(() => {
+    // Check if player had 轮回之钥 — show reincarnation card instead
+    if (state._hasReincarnationKey && !state._reincarnationUsed) {
+      $('end-card').style.display = 'none';
+      $('end-card-reincarnation').style.display = '';
+    } else {
+      $('end-card').style.display = '';
+      $('end-card-reincarnation').style.display = 'none';
+    }
     overlay.classList.add('show-card');
   }, 1400);
+}
+
+function doReincarnation() {
+  const STAT_CAP = 30;
+  const STAT_FLOOR = 5;
+
+  // Save stats and talents from current life
+  const savedStats = {};
+  for (const k of STAT_KEYS) {
+    const v = state[k] || 0;
+    savedStats[k] = Math.min(STAT_CAP, v < 0 ? STAT_FLOOR : v);
+  }
+  savedStats.HAP = Math.min(STAT_CAP, (state.HAP || 0) < 0 ? STAT_FLOOR : (state.HAP || 0));
+  const savedTalents = state.talentsPicked ? [...state.talentsPicked] : [];
+
+  // Relic already consumed at end-of-game (applyEvent ev.end block)
+  // No need to consume again here
+
+  // Save eventsMap and other persistent references before reset
+  const savedEventsMap = state.eventsMap;
+  const savedAgesMap = state.agesMap;
+  const savedPlayerName = state.playerName || state.cnName || '同学';
+  const savedSex = state.sex;
+
+  // Full state reset (same as what renderAlloc does)
+  const freshState = {
+    phase: 'game',
+    age: 15,
+    monthOfYear: 1,
+    monthTotal: 1,
+    gradEndAge: 0,
+    gradEndMonth: 0,
+    log: [],
+    logRenderedCount: 0,
+    firedEvents: new Set(),
+    yearlyPlan: new Map(),
+    pendingEvent: null,
+    pendingChoice: null,
+    pendingCinematic: false,
+    storyline: '',
+    storylineStart: 0,
+    storylineStartMonth: 0,
+    overseas: 0,
+    school: '',
+    schoolTier: '',
+    country: '',
+    countryIntent: '',
+    hsType: '',
+    major: '',
+    profession: '高中生',
+    relationship: '单身',
+    sex: savedSex,
+    bonuses: {},
+    eventsMap: savedEventsMap,
+    agesMap: savedAgesMap,
+    talentsPicked: savedTalents,
+    talentIds: new Set(savedTalents.map(t => t.id)),
+    statPeaks: {},
+    storylinesVisited: new Set(),
+    choiceHistory: [],
+    milestones: [],
+    cardHistory: [],
+    alloc: {},
+    _reincarnationUsed: true,
+    _reincarnationLife: 2,
+    _inheritedRelic: null,
+    _relicTriggered: new Set(),
+    _relicChoices: null,
+    _relicRewardShown: false,
+    playerName: savedPlayerName,
+    cnName: savedPlayerName,
+    _playerCnName: savedPlayerName,
+    showPOP: false, showPOK: false, showMMR: false,
+    showFIT: false, showCKL: false, showATH: false,
+    showMAG: false, showREP: false, showBND: false, showFAN: false, showNET: false,
+  };
+
+  // Overwrite state
+  for (const k of Object.keys(state)) delete state[k];
+  Object.assign(state, freshState);
+
+  // Apply saved stats (talent bonuses already baked in from first life — don't re-apply)
+  for (const k of STAT_KEYS) state[k] = savedStats[k];
+  state.HAP = savedStats.HAP;
+
+  clampStats();
+  syncProfessionByAge();
+  planYear(15);
+
+  _endCinematicShown = false;
+  sessionPlayCount++;
+
+  pushLog('金光消散。你睁开眼——又是15岁的冬天。但这一次，你记得一切。', 'relic-gold');
+
+  showScreen('game-screen');
+  initMoments(state);
+  render();
 }
 
 function dismissEndOverlay() {
@@ -6863,6 +7073,20 @@ async function main() {
     SFX.sfxRestart();
     if (mp.enabled && mp.connected) { _mpHandleRestart(); return; }
     location.reload();
+  });
+
+  $('btn-reincarnation-yes').addEventListener('click', () => {
+    SFX.sfxNav();
+    dismissEndOverlay();
+    doReincarnation();
+  });
+
+  $('btn-reincarnation-no').addEventListener('click', () => {
+    SFX.sfxNav();
+    // Hide reincarnation card, show normal end card
+    $('end-card-reincarnation').style.display = 'none';
+    $('end-card').style.display = '';
+    // Consume the relic anyway (they chose not to use it)
   });
 
   $('btn-summary-back').addEventListener('click', () => {

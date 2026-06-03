@@ -89,6 +89,7 @@
           </div>
         </div>
       </div>
+      <button id="btn-check-update" class="check-update-btn">检查更新</button>
     </section>
 
     <!-- Memory Card Collection Modal -->
@@ -841,9 +842,17 @@
       <div id="end-card" class="end-card">
         <div class="end-card-tag" id="end-card-tag"></div>
         <div class="end-card-text" id="end-card-text"></div>
-        <div class="end-card-actions">
+        <div class="end-card-actions" id="end-card-actions">
           <button id="btn-end-restart" class="ghost">再来一次</button>
           <button id="btn-end-summary" class="primary">查看人生总结</button>
+        </div>
+      </div>
+      <div id="end-card-reincarnation" class="end-card end-card-reincarnation" style="display:none;">
+        <div class="end-card-tag" style="color:#f5c842;">轮回之钥</div>
+        <div class="end-card-text" style="color:#f5c842;">钥匙在你手中发出耀眼的金光。上一世的记忆正在消散——但你可以选择带着它们，重新来过。</div>
+        <div class="end-card-actions">
+          <button id="btn-reincarnation-no" class="ghost">放弃（查看人生总结）</button>
+          <button id="btn-reincarnation-yes" class="primary" style="background:linear-gradient(135deg,#f5c842,#e6a817);color:#1a1a2e;">轮回重生</button>
         </div>
       </div>
     </div>
@@ -1172,8 +1181,8 @@
   })();
   </script>
   <script>
+    const LOCAL_VER = '3.1';
     if ('serviceWorker' in navigator) {
-      const LOCAL_VER = '3.0';
       navigator.serviceWorker.register('./sw.js').then(reg => {
         let lastCheck = 0;
         function checkUpdate() {
@@ -1235,6 +1244,33 @@
         });
       }).catch(() => {});
     }
+
+    // Manual update check button
+    const _updateBtn = document.getElementById('btn-check-update');
+    _updateBtn.textContent = 'v' + LOCAL_VER + ' · 检查更新';
+    _updateBtn.addEventListener('click', function() {
+      const btn = this;
+      const origText = btn.textContent;
+      btn.textContent = '检查中…';
+      btn.disabled = true;
+      fetch('./version.json?_t=' + Date.now(), { cache: 'no-store' })
+        .then(r => r.json())
+        .then(data => {
+          if (data.version && data.version !== LOCAL_VER) {
+            btn.textContent = '发现新版本 v' + data.version + '，正在更新…';
+            caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))))
+              .then(() => window.location.reload(true))
+              .catch(() => window.location.reload(true));
+          } else {
+            btn.textContent = '✓ 已是最新版本';
+            setTimeout(() => { btn.textContent = origText; btn.disabled = false; }, 2000);
+          }
+        })
+        .catch(() => {
+          btn.textContent = '网络错误，请重试';
+          setTimeout(() => { btn.textContent = origText; btn.disabled = false; }, 2000);
+        });
+    });
   </script>
 
   <!-- PWA Install Guide (iOS / Android) -->

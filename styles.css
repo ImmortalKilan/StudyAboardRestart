@@ -386,6 +386,32 @@ body.in-creation .app {
 }
 
 /* GitHub Promotion */
+/* Check update button — start screen bottom corner */
+.check-update-btn {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  z-index: 50;
+  background: none;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--ink-soft);
+  font-size: 0.72rem;
+  padding: 4px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  opacity: 0.6;
+}
+.check-update-btn:hover {
+  opacity: 1;
+  border-color: rgba(255,255,255,0.35);
+  color: #fff;
+}
+.check-update-btn:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
 .github-promo {
   position: absolute;
   top: 20px;
@@ -2823,6 +2849,23 @@ body.in-summary {
   transform: scale(1) translateY(0);
   pointer-events: auto;
 }
+.end-card.end-card-reincarnation {
+  background: linear-gradient(160deg,
+    rgba(245, 200, 66, 0.25) 0%,
+    rgba(245, 168, 23, 0.15) 50%,
+    rgba(20, 24, 36, 0.95) 100%);
+  border: 1.5px solid rgba(245, 200, 66, 0.7);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+    0 24px 60px rgba(0, 0, 0, 0.55),
+    0 0 120px rgba(245, 200, 66, 0.3),
+    0 0 40px rgba(245, 182, 66, 0.15) inset;
+  animation: reincarnation-pulse 2s ease-in-out infinite alternate;
+}
+@keyframes reincarnation-pulse {
+  from { box-shadow: 0 0 0 1px rgba(255,255,255,.06) inset, 0 24px 60px rgba(0,0,0,.55), 0 0 80px rgba(245,200,66,.2), 0 0 40px rgba(245,182,66,.1) inset; }
+  to   { box-shadow: 0 0 0 1px rgba(255,255,255,.06) inset, 0 24px 60px rgba(0,0,0,.55), 0 0 140px rgba(245,200,66,.4), 0 0 60px rgba(245,182,66,.2) inset; }
+}
 .end-card::before {
   content: '';
   position: absolute;
@@ -3267,6 +3310,29 @@ body.in-summary {
   background: linear-gradient(135deg, #ffd76a, #f5b642);
   color: #0f1420;
   box-shadow: 0 2px 12px rgba(255, 215, 106, 0.45);
+}
+
+/* 命运罗盘 — compass best-choice marker */
+.choice-btn.choice-compass {
+  border-color: #f5c842;
+  box-shadow: 0 0 8px rgba(245, 200, 66, 0.4), inset 0 0 0 1px rgba(245, 200, 66, 0.3);
+  position: relative;
+}
+.choice-btn.choice-compass::after {
+  content: ' ✦ 命运之选';
+  color: #f5c842;
+  font-size: 0.75em;
+  margin-left: 0.4em;
+  opacity: 0.9;
+}
+.choice-btn.choice-compass.choice-card::after {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  margin-left: 0;
+}
+.choice-btn.choice-compass:hover {
+  box-shadow: 0 0 14px rgba(245, 200, 66, 0.6), inset 0 0 0 1px rgba(245, 200, 66, 0.5);
 }
 
 @media (max-width: 760px) {

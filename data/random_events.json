@@ -32614,5 +32614,170 @@
     "set": {
       "cheater_stage": "completed"
     }
+  },
+  {
+    "id": 99800,
+    "event": "黑卡震动了一下。你打开手机，一条匿名转账通知——附言只有一个字：「用。」",
+    "noRandom": true,
+    "repeatable": true,
+    "logType": "special",
+    "choices": [
+      {
+        "text": "存起来，以备不时之需",
+        "effect": {
+          "MNY": 3
+        }
+      },
+      {
+        "text": "请朋友们吃一顿好的",
+        "effect": {
+          "SOC": 3
+        }
+      },
+      {
+        "text": "买一身新行头",
+        "effect": {
+          "APP": 3
+        }
+      },
+      {
+        "text": "订一张去海边的机票，什么都不想",
+        "effect": {
+          "HAP": 3
+        }
+      }
+    ]
+  },
+  {
+    "id": 99801,
+    "event": "机场贵宾厅的服务员看了一眼你的黑卡，态度从礼貌变成了恭敬。「持卡人专属服务，请问今天需要什么？」",
+    "noRandom": true,
+    "repeatable": true,
+    "logType": "special",
+    "choices": [
+      {
+        "text": "「帮我升头等舱，谢谢」",
+        "effect": {
+          "MNY": 3
+        }
+      },
+      {
+        "text": "「帮我订一间包厢，我要请几个重要的人」",
+        "effect": {
+          "SOC": 3
+        }
+      },
+      {
+        "text": "「我要做一套全身SPA」",
+        "effect": {
+          "APP": 3
+        }
+      },
+      {
+        "text": "「给我一个安静的角落，一杯最好的威士忌就行」",
+        "effect": {
+          "HAP": 3
+        }
+      }
+    ]
+  },
+  {
+    "id": 99802,
+    "event": "你收到一封没有署名的邀请函。烫金字体，只印了一个地址和一句话：「持卡人之夜。」你到了才发现，在场的每个人手里都有一张和你一样的黑卡。",
+    "noRandom": true,
+    "repeatable": true,
+    "logType": "special",
+    "choices": [
+      {
+        "text": "在拍卖环节举了几次牌，低调地赚了一笔",
+        "effect": {
+          "MNY": 3
+        }
+      },
+      {
+        "text": "和几位神秘来宾交换了联系方式",
+        "effect": {
+          "SOC": 3
+        }
+      },
+      {
+        "text": "现场有顶级造型师，你让他给你做了个新形象",
+        "effect": {
+          "APP": 3
+        }
+      },
+      {
+        "text": "坐在露台上看了一夜星空，和陌生人聊了人生",
+        "effect": {
+          "HAP": 3
+        }
+      }
+    ]
+  },
+  {
+    "id": 99803,
+    "event": "黑卡背面闪了一下，出现一行小字：「年度权益已更新。」你不知道谁在管理这张卡，但你知道该怎么用。",
+    "noRandom": true,
+    "repeatable": true,
+    "logType": "special",
+    "choices": [
+      {
+        "text": "兑换现金权益",
+        "effect": {
+          "MNY": 3
+        }
+      },
+      {
+        "text": "兑换高端社交活动入场券",
+        "effect": {
+          "SOC": 3
+        }
+      },
+      {
+        "text": "兑换私人形象顾问服务",
+        "effect": {
+          "APP": 3
+        }
+      },
+      {
+        "text": "兑换一次说走就走的旅行",
+        "effect": {
+          "HAP": 3
+        }
+      }
+    ]
+  },
+  {
+    "id": 99804,
+    "event": "深夜，黑卡发出轻微的嗡鸣声。你拿起来一看，卡面上浮现出一串你看不懂的数字。几秒后数字消失了，取而代之的是一行字：「选一个礼物。」",
+    "noRandom": true,
+    "repeatable": true,
+    "logType": "special",
+    "choices": [
+      {
+        "text": "一个匿名海外账户的密钥",
+        "effect": {
+          "MNY": 3
+        }
+      },
+      {
+        "text": "一份某个圈子的推荐信",
+        "effect": {
+          "SOC": 3
+        }
+      },
+      {
+        "text": "一张顶级医美诊所的终身会员卡",
+        "effect": {
+          "APP": 3
+        }
+      },
+      {
+        "text": "一个装满老唱片的木箱，和一台留声机",
+        "effect": {
+          "HAP": 3
+        }
+      }
+    ]
   }
 ]
