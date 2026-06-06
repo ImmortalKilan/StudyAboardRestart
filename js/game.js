@@ -4841,13 +4841,14 @@ function doReincarnation() {
   // Relic already consumed at end-of-game (applyEvent ev.end block)
   // No need to consume again here
 
-  // Save eventsMap and other persistent references before reset
+  // Save persistent references before reset
   const savedEventsMap = state.eventsMap;
   const savedAgesMap = state.agesMap;
+  const savedRandomEvents = state.randomEvents;
   const savedPlayerName = state.playerName || state.cnName || '同学';
   const savedSex = state.sex;
 
-  // Full state reset (same as what renderAlloc does)
+  // Full state reset
   const freshState = {
     phase: 'game',
     age: 15,
@@ -4858,15 +4859,18 @@ function doReincarnation() {
     log: [],
     logRenderedCount: 0,
     firedEvents: new Set(),
+    randomEvents: savedRandomEvents,
     yearlyPlan: new Map(),
     pendingEvent: null,
     pendingChoice: null,
     pendingCinematic: false,
+    lastChoiceMonth: 0,
+    _savedAutoMode: 0,
     storyline: '',
     storylineStart: 0,
     storylineStartMonth: 0,
     overseas: 0,
-    school: '',
+    school: '无',
     schoolTier: '',
     country: '',
     countryIntent: '',
@@ -4874,6 +4878,7 @@ function doReincarnation() {
     major: '',
     profession: '高中生',
     relationship: '单身',
+    relationshipHistory: [],
     sex: savedSex,
     bonuses: {},
     eventsMap: savedEventsMap,
@@ -4886,6 +4891,11 @@ function doReincarnation() {
     milestones: [],
     cardHistory: [],
     alloc: {},
+    // Hidden career/xianxia stats — reset to 0
+    POP: 0, POK: 0, MMR: 0, FIT: 0, CKL: 0, ATH: 0, BND: 0, FAN: 0, NET: 0,
+    cul: 0, dao: 0, karma: 0, tribulation: 0,
+    xianxiaSeed: 0, yuanshen_book: 0, xingchen_book: 0,
+    MAG: 0, hogwartsYear: 0, housePt: 0, house: '', hasOwl: 0, hogwartsSeed: 0, horcrux: 0,
     _reincarnationUsed: true,
     _reincarnationLife: 2,
     _inheritedRelic: null,
@@ -4905,8 +4915,10 @@ function doReincarnation() {
   Object.assign(state, freshState);
 
   // Apply saved stats (talent bonuses already baked in from first life — don't re-apply)
-  for (const k of STAT_KEYS) state[k] = savedStats[k];
-  state.HAP = savedStats.HAP;
+  // Floor: any stat below 5 gets bumped to 5 in second life
+  const REINCARNATION_FLOOR = 5;
+  for (const k of STAT_KEYS) state[k] = Math.max(REINCARNATION_FLOOR, savedStats[k]);
+  state.HAP = Math.max(REINCARNATION_FLOOR, savedStats.HAP);
 
   clampStats();
   syncProfessionByAge();
@@ -6396,15 +6408,21 @@ async function main() {
   if (fcStartBtn) fcStartBtn.addEventListener('click', () => { openFlowchart(); });
   // Mute button
   const muteBtn = $('btn-mute');
-  if (muteBtn) {
-    muteBtn.textContent = SFX.isMuted() ? '🔇' : '🔊';
-    muteBtn.addEventListener('click', () => {
-      const next = !SFX.isMuted();
-      SFX.setMuted(next);
-      muteBtn.textContent = next ? '🔇' : '🔊';
-      SFX.sfxToggle();
-    });
+  const muteStartBtn = $('btn-mute-start');
+  function _syncMuteBtns() {
+    const muted = SFX.isMuted();
+    if (muteBtn) muteBtn.textContent = muted ? '🔇' : '🔊';
+    if (muteStartBtn) muteStartBtn.textContent = muted ? '🔇 音效' : '🔊 音效';
   }
+  _syncMuteBtns();
+  function _toggleMute() {
+    const next = !SFX.isMuted();
+    SFX.setMuted(next);
+    _syncMuteBtns();
+    SFX.sfxToggle();
+  }
+  if (muteBtn) muteBtn.addEventListener('click', _toggleMute);
+  if (muteStartBtn) muteStartBtn.addEventListener('click', _toggleMute);
   const talents = await loadData();
   _allTalents = talents;
 

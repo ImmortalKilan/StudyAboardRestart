@@ -74,6 +74,10 @@ body {
 .mute-btn:active {
   transform: scale(0.95);
 }
+/* Hide global mute btn when start screen is visible (start screen has its own) */
+body:has(#start-screen.active) .mute-btn {
+  display: none;
+}
 
 body::before {
   content: '';
@@ -386,30 +390,27 @@ body.in-creation .app {
 }
 
 /* GitHub Promotion */
-/* Check update button — start screen bottom corner */
-.check-update-btn {
+/* Start screen bottom bar — update + sound buttons */
+.start-bottom-bar {
   position: absolute;
-  bottom: 16px;
-  right: 16px;
-  z-index: 50;
-  background: none;
-  border: 1px solid rgba(255,255,255,0.15);
-  color: var(--ink-soft);
-  font-size: 0.72rem;
-  padding: 4px 10px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-  opacity: 0.6;
+  bottom: 20px;
+  right: 24px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
-.check-update-btn:hover {
+.start-bottom-btn {
+  font-size: 12px !important;
+  padding: 6px 14px !important;
+  opacity: 0.7;
+}
+.start-bottom-btn:hover {
   opacity: 1;
-  border-color: rgba(255,255,255,0.35);
-  color: #fff;
 }
-.check-update-btn:disabled {
+.start-bottom-btn:disabled {
   cursor: default;
-  opacity: 0.5;
+  opacity: 0.4;
 }
 
 .github-promo {
@@ -483,6 +484,15 @@ body.in-creation .app {
   .ach-start-level {
     font-size: 10px !important;
     padding: 1px 4px !important;
+  }
+  .start-bottom-bar {
+    right: 16px;
+    bottom: 16px;
+    gap: 8px;
+  }
+  .start-bottom-btn {
+    font-size: 11px !important;
+    padding: 5px 10px !important;
   }
   .github-promo {
     top: 15px;
