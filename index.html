@@ -380,7 +380,11 @@
               <p class="sub">推翻你现在的人生吧！</p>
             </header>
 
-            <h2 class="section-title">抽取天赋 <span class="hint">选 3 个</span></h2>
+            <h2 class="section-title">抽取天赋 <span class="hint">选 3 个</span> <button class="inline-help-btn" data-help="talent" title="天赋说明">?</button>
+              <div class="inline-help-pop" id="help-pop-talent" style="display:none;">
+                <div class="inline-help-text">随机 10 张天赋卡，<strong>选 3 张</strong>带入本局。<br>颜色代表稀有度：<span style="color:#aaa">灰·普通</span>　<span style="color:#5b9aff">蓝·稀有</span>　<span style="color:#a855f7">紫·史诗</span>　<span style="color:#f59e0b">橙·传说</span><br>每次保底至少 1 张紫/橙。</div>
+              </div>
+            </h2>
             <div id="talent-list" class="talent-grid"></div>
 
             <div class="footer-actions">
@@ -549,7 +553,11 @@
           </div>
 
           <div class="right-head">
-            <h2>事件流</h2>
+            <h2 style="position:relative;">事件流 <button class="inline-help-btn" data-help="events" title="事件流说明">?</button>
+              <div class="inline-help-pop" id="help-pop-events" style="display:none;">
+                <div class="inline-help-text">点击「下一月」推进一个月，每月触发一个事件。<br>遇到<strong>选择</strong>时会暂停，灰色选项 = 属性不够。<br>「自动播放」可以自动跑，遇到选择自动暂停。</div>
+              </div>
+            </h2>
             <div class="right-actions">
               <button id="btn-auto-1x" class="ghost">自动播放</button>
               <button id="btn-auto-2x" class="ghost">自动播放 X2</button>

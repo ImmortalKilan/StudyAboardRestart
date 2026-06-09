@@ -148,7 +148,7 @@ const BLUE_TRIGGERS = [
 // give a stat boost to the storyline-specific stat. `boostStat` is the stat key,
 // `boostAmount` is the bonus applied once when entering the storyline.
 const PURPLE_TRIGGERS = [
-  { relicName: '修仙残卷', storylines: ['xianxia'], boostStat: 'cul', boostAmount: 3, log: '残卷上的符文自行浮现，修为大增。' },
+  { relicName: '修仙残卷', storylines: ['xianxia'], boostStat: 'cul', boostAmount: 100, log: '残卷上的符文自行浮现，修为大增。' },
   { relicName: '特工日记', storylines: ['spy'], boostStat: 'PER', boostAmount: 2, log: '日记里的暗号你竟然看得懂，身手敏捷了许多。' },
   { relicName: '冠军奖杯', storylines: ['esports', 'worlds', 'minor_league'], boostStat: 'MMR', boostAmount: 50, log: '握住奖杯的瞬间，操作手感回来了。' },
   { relicName: '冠军奖杯', storylines: ['athlete'], boostStat: 'ATH', boostAmount: 3, log: '奖杯在背包里发出微光，你的身体充满力量。' },
@@ -735,7 +735,11 @@ function _renderSlotContent(slot, vault) {
   slot.innerHTML = `
     <div class="relic-slot-header">
       <span class="relic-slot-title">前世遗物</span>
+      <button class="inline-help-btn" data-help="relic" title="遗物说明">?</button>
       <span class="relic-slot-sub">选 1 个带入本局 · 结束后轮回次数 -1</span>
+      <div class="inline-help-pop" id="help-pop-relic" style="display:none;">
+        <div class="inline-help-text">通关后你的人生会化为一件<strong>遗物</strong>。<br>下一局可选 1 件带入，获得属性加成。<br>紫色遗物对应特定剧情线，再次进入同一条线会触发<strong>遗物共鸣</strong>。</div>
+      </div>
     </div>
     <div class="relic-slot-grid">
       ${vault.map(r => {

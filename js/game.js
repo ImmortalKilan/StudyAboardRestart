@@ -7471,21 +7471,10 @@ async function main() {
     $('tutorial-modal').style.display = 'none';
   }
 
-  // First-time prompt
+  // First-time prompt — disabled; users can access tutorial via start screen button
+  // (kept elements in DOM for backwards compatibility, just never show)
   if (!_tutSeen) {
-    $('tutorial-prompt').style.display = '';
-    $('tutorial-prompt-yes').addEventListener('click', () => {
-      SFX.sfxConfirm();
-      $('tutorial-prompt').style.display = 'none';
-      try { localStorage.setItem('sasr_tutorial_seen', '1'); } catch(e) {}
-      _openTutorial();
-    });
-    $('tutorial-prompt-no').addEventListener('click', () => {
-      SFX.sfxClick();
-      $('tutorial-prompt').style.display = 'none';
-      try { localStorage.setItem('sasr_tutorial_seen', '1'); } catch(e) {}
-      try { localStorage.setItem('sasr_guide_done', '1'); } catch(e) {}
-    });
+    try { localStorage.setItem('sasr_tutorial_seen', '1'); } catch(e) {}
   }
 
   // Tutorial button on start screen
@@ -7496,8 +7485,9 @@ async function main() {
     $('btn-start').click();
   });
 
-  // ── Step-by-step Guide (A层) ────────────────────────────────────
-  const _guideDone = (() => { try { return localStorage.getItem('sasr_guide_done'); } catch(e) { return null; } })();
+  // ── Step-by-step Guide (A层) — disabled, replaced by inline "?" help tips ──
+  // Force guide as "done" so phase-resume hooks never fire
+  const _guideDone = true;
   let _guideActive = false;
   let _guideStep = 0;
 
@@ -7708,16 +7698,9 @@ async function main() {
   }
 
   // Called by various hooks when the right phase becomes visible
+  // Disabled — inline "?" help tips replace the step-by-step guide
   function _guideResumeForPhase(phase) {
-    if (_guideStep >= GUIDE_STEPS.length) return;
-    if (_guideActive) return; // already showing
-    const nextStep = GUIDE_STEPS[_guideStep];
-    if (nextStep && nextStep.phase === phase) {
-      setTimeout(() => {
-        _guideActive = true;
-        _guideShow(_guideStep);
-      }, 500);
-    }
+    return; // no-op
   }
 
   $('guide-next').addEventListener('click', _guideNext);
@@ -7737,22 +7720,29 @@ async function main() {
     _guideResumeForPhase('alloc');
   };
 
-  // Hook: start guide when entering creation screen for the first time
-  if (!_guideDone) {
-    let _guideStarted = false;
-    const _creationObserver = new MutationObserver(() => {
-      if (!_guideStarted && $('creation-screen').classList.contains('active')) {
-        _guideStarted = true;
-        _creationObserver.disconnect();
-        setTimeout(() => {
-          _guideStep = 0;
-          _guideActive = true;
-          _guideShow(0);
-        }, 500);
-      }
-    });
-    _creationObserver.observe($('creation-screen'), { attributes: true, attributeFilter: ['class'] });
-  }
+  // Step-by-step guide auto-start — disabled; replaced by inline "?" help tips.
+  // Guide can still be triggered manually if needed via _guideShow(0).
+
+  // ── Inline help "?" tip toggles (event delegation for dynamic content) ──
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.inline-help-btn');
+    if (btn) {
+      e.stopPropagation();
+      const helpId = btn.getAttribute('data-help');
+      const pop = document.getElementById('help-pop-' + helpId);
+      if (!pop) return;
+      // Close all other help popovers first
+      document.querySelectorAll('.inline-help-pop').forEach(p => {
+        if (p !== pop) p.style.display = 'none';
+      });
+      pop.style.display = pop.style.display === 'none' ? '' : 'none';
+      return;
+    }
+    // Close all help popovers on outside click
+    if (!e.target.closest('.inline-help-pop')) {
+      document.querySelectorAll('.inline-help-pop').forEach(p => { p.style.display = 'none'; });
+    }
+  });
 
   // ── Multiplayer (optional) ──────────────────────────────────────
   try {
