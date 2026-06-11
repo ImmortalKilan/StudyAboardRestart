@@ -6282,22 +6282,19 @@ function updateMobileStatsGrid(grid) {
   // 基础 7 项：社/智/家/乐 + 健/毅/颜（HAP 放在第4格）
   // 触发剧情后追加 career stat 凑成 2x4（用 show* 标志判断）
   const baseKeys = ['SOC', 'INT', 'MNY', 'HAP', 'HLT', 'PER', 'APP'];
-  const careerKeys = ['POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG', 'REP', 'BND', 'FAN'];
+  const careerKeys = ['POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG', 'REP', 'BND', 'FAN', 'NET'];
 
   let cellsHtml = '';
   for (const k of baseKeys) {
     const v = s[k] ?? 0;
     const label = STAT_LABELS[k] || k;
-    const pct = Math.max(0, Math.min(100, (v / 30) * 100));
-    cellsHtml += `<div class="msg-cell"><span class="msg-label">${label}</span><div class="msg-bar"><div class="msg-bar-fill" style="width:${pct}%"></div></div><span class="msg-val">${v}</span></div>`;
+    cellsHtml += `<div class="msg-cell"><span class="msg-label">${label}</span><span class="msg-val">${v}</span></div>`;
   }
   for (const k of careerKeys) {
     if (s['show' + k]) {
       const v = s[k] || 0;
       const label = STAT_LABELS[k] || k;
-      const cap = (k === 'MMR') ? 4000 : 100;
-      const pct = Math.max(0, Math.min(100, (v / cap) * 100));
-      cellsHtml += `<div class="msg-cell career"><span class="msg-label">${label}</span><div class="msg-bar"><div class="msg-bar-fill" style="width:${pct}%"></div></div><span class="msg-val">${v}</span></div>`;
+      cellsHtml += `<div class="msg-cell career"><span class="msg-label">${label}</span><span class="msg-val">${v}</span></div>`;
     }
   }
 
@@ -6801,8 +6798,9 @@ async function main() {
 
   document.querySelector('.right-panel').addEventListener('click', (e) => {
     if (e.target.closest('button')) return;
-    // Don't advance when clicking inside the moments float panel
+    // Don't advance when clicking inside the moments float panel or FAB
     if (e.target.closest('#moments-panel')) return;
+    if (e.target.closest('#moments-fab')) return;
     if (state.phase === 'ended') {
       if (!_endCinematicShown) showEndCinematic();
       return;

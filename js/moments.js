@@ -2281,6 +2281,7 @@ let _momentsPanel = null;
 let _momentsMobilePanel = null;
 let _mobileDrawer = null;
 let _drawerState = 'collapsed'; // 'collapsed' | 'half' | 'full'
+let _mobileFab = null;          // floating circle button (mobile)
 let _momentsVisible = false;
 
 export function getMomentsPanel() { return _momentsPanel; }
@@ -2964,7 +2965,17 @@ function _updateBadge() {
       drawerBadge.style.display = 'none';
     }
   }
-  // Bounce drawer on new posts
+  // FAB badge
+  const fabBadge = document.getElementById('moments-fab-badge');
+  if (fabBadge) {
+    if (momentsState && momentsState.unreadCount > 0 && !_momentsVisible) {
+      fabBadge.textContent = momentsState.unreadCount > 99 ? '99+' : momentsState.unreadCount;
+      fabBadge.style.display = '';
+    } else {
+      fabBadge.style.display = 'none';
+    }
+  }
+  // Bounce FAB / drawer on new posts
   if (momentsState && momentsState.unreadCount > 0 && !_momentsVisible) {
     drawerBounce();
   }
@@ -3127,42 +3138,64 @@ const DRAWER_SNAP_THRESHOLDS = { half: 0.45, full: 0.85 };
 export function mountMobileDrawer() {
   if (_mobileDrawer) return;
 
-  _mobileDrawer = document.createElement('div');
-  _mobileDrawer.id = 'moments-drawer';
-  _mobileDrawer.className = 'moments-drawer';
-  _mobileDrawer.innerHTML = `
-    <div class="moments-drawer-handle" id="moments-drawer-handle">
-      <div class="moments-drawer-handle-bar"></div>
-      <div class="moments-drawer-handle-row">
-        <span class="moments-drawer-label">朋友圈</span>
-        <span id="moments-drawer-badge" class="moments-drawer-badge" style="display:none">0</span>
-      </div>
-    </div>
-    <div class="moments-drawer-feed"></div>
+  // ── 1. Floating Action Button (FAB) ──
+  _mobileFab = document.createElement('div');
+  _mobileFab.id = 'moments-fab';
+  _mobileFab.className = 'moments-fab';
+  _mobileFab.innerHTML = `
+    <span class="moments-fab-icon">💬</span>
+    <span id="moments-fab-badge" class="moments-fab-badge" style="display:none">0</span>
   `;
 
-  // Insert into game-layout flex flow (after right-panel)
-  const gameLayout = document.querySelector('.game-layout');
-  if (gameLayout) {
-    gameLayout.appendChild(_mobileDrawer);
+  const rightPanel = document.querySelector('.right-panel');
+  if (rightPanel) {
+    rightPanel.appendChild(_mobileFab);
   } else {
-    document.body.appendChild(_mobileDrawer);
+    document.body.appendChild(_mobileFab);
   }
+
+  // ── 2. Bottom Sheet ──
+  _mobileDrawer = document.createElement('div');
+  _mobileDrawer.id = 'moments-drawer';
+  _mobileDrawer.className = 'moments-sheet';
+  _mobileDrawer.innerHTML = `
+    <div class="moments-sheet-backdrop"></div>
+    <div class="moments-sheet-panel">
+      <div class="moments-sheet-handle" id="moments-sheet-handle">
+        <div class="moments-sheet-handle-bar"></div>
+        <div class="moments-sheet-header">
+          <span class="moments-sheet-title">朋友圈</span>
+          <span id="moments-drawer-badge" class="moments-fab-badge moments-sheet-badge" style="display:none">0</span>
+        </div>
+      </div>
+      <div class="moments-drawer-feed moments-sheet-feed"></div>
+    </div>
+  `;
+  document.body.appendChild(_mobileDrawer);
 
   _drawerState = 'collapsed';
 
-  // Tap handle to toggle
-  const handle = _mobileDrawer.querySelector('#moments-drawer-handle');
-  handle.addEventListener('click', () => {
+  // ── 3. FAB tap → open sheet ──
+  _mobileFab.addEventListener('click', (e) => {
+    e.stopPropagation();
     if (_drawerState === 'collapsed') _setDrawerState('half');
     else _setDrawerState('collapsed');
   });
 
-  // Touch drag on handle
-  _initDrawerDrag(handle);
+  // ── 4. FAB drag ──
+  _initFabDrag(_mobileFab);
 
-  // Stop propagation inside drawer so game doesn't advance
-  _mobileDrawer.addEventListener('click', e => e.stopPropagation());
+  // ── 5. Backdrop tap → close ──
+  _mobileDrawer.querySelector('.moments-sheet-backdrop').addEventListener('click', () => {
+    _setDrawerState('collapsed');
+  });
+
+  // ── 6. Sheet handle drag ──
+  const handle = _mobileDrawer.querySelector('#moments-sheet-handle');
+  _initSheetDrag(handle);
+
+  // Stop propagation inside sheet
+  _mobileDrawer.querySelector('.moments-sheet-panel').addEventListener('click', e => e.stopPropagation());
 
   // Initial sync
   _syncDrawerFeed();
@@ -3170,25 +3203,21 @@ export function mountMobileDrawer() {
 
 function _setDrawerState(newState) {
   if (!_mobileDrawer) return;
-  const gameLayout = _mobileDrawer.closest('.game-layout');
 
   _drawerState = newState;
-  _mobileDrawer.classList.remove('expanded', 'full');
-  if (gameLayout) gameLayout.classList.remove('drawer-open');
+  const panel = _mobileDrawer.querySelector('.moments-sheet-panel');
+
+  _mobileDrawer.classList.remove('sheet-open', 'sheet-full');
+  if (panel) panel.style.transform = '';
 
   if (newState === 'collapsed') {
     _momentsVisible = false;
-    _mobileDrawer.style.flex = '';
   } else if (newState === 'half') {
     _momentsVisible = true;
-    _mobileDrawer.classList.add('expanded');
-    _mobileDrawer.style.flex = '1';
-    if (gameLayout) gameLayout.classList.add('drawer-open');
+    _mobileDrawer.classList.add('sheet-open');
   } else {
     _momentsVisible = true;
-    _mobileDrawer.classList.add('expanded', 'full');
-    _mobileDrawer.style.flex = '2.5';
-    if (gameLayout) gameLayout.classList.add('drawer-open');
+    _mobileDrawer.classList.add('sheet-open', 'sheet-full');
   }
 
   if (newState !== 'collapsed') {
@@ -3198,7 +3227,90 @@ function _setDrawerState(newState) {
   }
 }
 
-function _initDrawerDrag(handle) {
+// ── FAB drag (move the circle around the screen) ──
+function _initFabDrag(fab) {
+  let startX = 0, startY = 0;
+  let fabStartX = 0, fabStartY = 0;
+  let dragging = false;
+  let didDrag = false;
+
+  const onStart = (e) => {
+    const t = e.touches ? e.touches[0] : e;
+    startX = t.clientX;
+    startY = t.clientY;
+    const rect = fab.getBoundingClientRect();
+    fabStartX = rect.left;
+    fabStartY = rect.top;
+    dragging = true;
+    didDrag = false;
+    fab.classList.add('dragging');
+    e.preventDefault();
+  };
+
+  const onMove = (e) => {
+    if (!dragging) return;
+    const t = e.touches ? e.touches[0] : e;
+    const dx = t.clientX - startX;
+    const dy = t.clientY - startY;
+    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) didDrag = true;
+    if (!didDrag) return;
+    e.preventDefault();
+
+    const parent = fab.offsetParent || document.body;
+    const parentRect = parent.getBoundingClientRect();
+    let newX = fabStartX + dx - parentRect.left;
+    let newY = fabStartY + dy - parentRect.top;
+
+    // Clamp inside parent
+    const fabSize = fab.offsetWidth;
+    newX = Math.max(0, Math.min(newX, parentRect.width - fabSize));
+    newY = Math.max(0, Math.min(newY, parentRect.height - fabSize));
+
+    fab.style.right = 'auto';
+    fab.style.top = 'auto';
+    fab.style.left = newX + 'px';
+    fab.style.top = newY + 'px';
+  };
+
+  const onEnd = () => {
+    if (!dragging) return;
+    dragging = false;
+    fab.classList.remove('dragging');
+
+    if (didDrag) {
+      // Snap to nearest left/right edge
+      const parent = fab.offsetParent || document.body;
+      const parentRect = parent.getBoundingClientRect();
+      const fabRect = fab.getBoundingClientRect();
+      const centerX = fabRect.left + fabRect.width / 2 - parentRect.left;
+      const snapRight = centerX > parentRect.width / 2;
+
+      fab.style.transition = 'left 0.25s ease, right 0.25s ease';
+      if (snapRight) {
+        fab.style.left = 'auto';
+        fab.style.right = '12px';
+      } else {
+        fab.style.right = 'auto';
+        fab.style.left = '12px';
+      }
+      setTimeout(() => { fab.style.transition = ''; }, 260);
+    } else {
+      // Tap (no drag) → toggle sheet
+      if (_drawerState === 'collapsed') _setDrawerState('half');
+      else _setDrawerState('collapsed');
+    }
+  };
+
+  fab.addEventListener('touchstart', onStart, { passive: false });
+  document.addEventListener('touchmove', onMove, { passive: false });
+  document.addEventListener('touchend', onEnd);
+  fab.addEventListener('mousedown', onStart);
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onEnd);
+}
+
+// ── Sheet handle drag (swipe up/down to resize/close) ──
+function _initSheetDrag(handle) {
   let startY = 0;
   let dragging = false;
   let didDrag = false;
@@ -3215,21 +3327,27 @@ function _initDrawerDrag(handle) {
   const onMove = (e) => {
     if (!dragging) return;
     const t = e.touches ? e.touches[0] : e;
-    cumDY = startY - t.clientY; // positive = swipe up
+    cumDY = startY - t.clientY;
     if (Math.abs(cumDY) > 8) didDrag = true;
     if (didDrag) e.preventDefault();
+
+    // Live drag feedback: translate panel
+    if (didDrag && cumDY < 0) {
+      const panel = _mobileDrawer && _mobileDrawer.querySelector('.moments-sheet-panel');
+      if (panel) panel.style.transform = `translateY(${-cumDY}px)`;
+    }
   };
 
   const onEnd = () => {
     if (!dragging) return;
     dragging = false;
-    if (!didDrag) return; // let click handler deal with taps
+    const panel = _mobileDrawer && _mobileDrawer.querySelector('.moments-sheet-panel');
+    if (panel) panel.style.transform = '';
+    if (!didDrag) return;
 
-    // Swipe up → expand, swipe down → collapse
-    if (cumDY > 30) {
-      if (_drawerState === 'collapsed') _setDrawerState('half');
-      else if (_drawerState === 'half') _setDrawerState('full');
-    } else if (cumDY < -30) {
+    if (cumDY > 40) {
+      if (_drawerState === 'half') _setDrawerState('full');
+    } else if (cumDY < -40) {
       if (_drawerState === 'full') _setDrawerState('half');
       else if (_drawerState === 'half') _setDrawerState('collapsed');
     }
@@ -3244,6 +3362,11 @@ function _initDrawerDrag(handle) {
 }
 
 export function drawerBounce() {
+  if (_mobileFab && _drawerState === 'collapsed') {
+    _mobileFab.classList.add('fab-bounce');
+    setTimeout(() => _mobileFab.classList.remove('fab-bounce'), 600);
+    return;
+  }
   if (!_mobileDrawer || _drawerState !== 'collapsed') return;
   _mobileDrawer.classList.add('bounce');
   setTimeout(() => _mobileDrawer.classList.remove('bounce'), 600);
@@ -3264,6 +3387,10 @@ export function resetMoments() {
     const feed = _mobileDrawer.querySelector('.moments-drawer-feed');
     if (feed) feed.innerHTML = '';
     _setDrawerState('collapsed');
+  }
+  if (_mobileFab) {
+    _mobileFab.remove();
+    _mobileFab = null;
   }
   _updateBadge();
 }
