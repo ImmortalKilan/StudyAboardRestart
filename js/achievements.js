@@ -113,6 +113,7 @@ export function initAchievements() {
     _unlocked = new Set();
   }
   _setupWallHandlers();
+  _initWallTabs();
   _updateBadge();
 }
 
@@ -349,6 +350,127 @@ function _renderWall() {
           <div class="ach-card-desc">${done ? def.desc : '???'}</div>
         </div>
         ${done ? '<div class="ach-card-check">✓</div>' : ''}
+      `;
+      row.appendChild(card);
+    }
+
+    section.appendChild(row);
+    grid.appendChild(section);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  ENDING CATALOG (结局图鉴)
+// ══════════════════════════════════════════════════════════════════════════════
+
+const ENDING_STORAGE_KEY = 'sasr_endings_v1';
+let _collectedEndings = {};  // id → { text, tier, ts }
+let _endingCatalog = [];     // built from event data at init
+let _activeWallTab = 'ach';
+
+function _loadEndings() {
+  try {
+    const raw = localStorage.getItem(ENDING_STORAGE_KEY);
+    _collectedEndings = raw ? JSON.parse(raw) : {};
+  } catch { _collectedEndings = {}; }
+}
+
+function _saveEndings() {
+  try { localStorage.setItem(ENDING_STORAGE_KEY, JSON.stringify(_collectedEndings)); } catch {}
+}
+
+export function recordEnding(endingId, endingText, tier) {
+  _loadEndings();
+  if (_collectedEndings[endingId]) return;
+  _collectedEndings[endingId] = {
+    text: (endingText || '').slice(0, 80),
+    tier: tier || 'C',
+    ts: Date.now(),
+  };
+  _saveEndings();
+}
+
+export function buildEndingCatalog(eventsMap, legendarySet, goodSet) {
+  _loadEndings();
+  const catalog = [];
+  for (const [id, ev] of eventsMap) {
+    if (!ev.end) continue;
+    const tier = legendarySet.has(id) ? 'S' : goodSet.has(id) ? 'A' : 'C';
+    catalog.push({ id, tier, text: (ev.text || '').replace(/\n/g, ' ').slice(0, 80) });
+  }
+  catalog.sort((a, b) => {
+    const tierOrder = { S: 0, A: 1, C: 2 };
+    return (tierOrder[a.tier] - tierOrder[b.tier]) || a.id - b.id;
+  });
+  _endingCatalog = catalog;
+}
+
+function _initWallTabs() {
+  const wall = document.getElementById('ach-wall');
+  if (!wall) return;
+  wall.addEventListener('click', (e) => {
+    const tab = e.target.closest('.ach-wall-tab');
+    if (!tab) return;
+    const key = tab.dataset.tab;
+    if (key === _activeWallTab) return;
+    _activeWallTab = key;
+    wall.querySelectorAll('.ach-wall-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === key));
+    const achGrid = document.getElementById('ach-wall-grid');
+    const endGrid = document.getElementById('ending-wall-grid');
+    if (key === 'ach') {
+      if (achGrid) achGrid.style.display = '';
+      if (endGrid) endGrid.style.display = 'none';
+    } else {
+      if (achGrid) achGrid.style.display = 'none';
+      if (endGrid) endGrid.style.display = '';
+      _renderEndingWall();
+    }
+  });
+}
+
+function _renderEndingWall() {
+  const grid = document.getElementById('ending-wall-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  _loadEndings();
+
+  const collected = Object.keys(_collectedEndings).length;
+  const total = _endingCatalog.length;
+  const countEl = document.getElementById('ending-wall-count');
+  if (countEl) countEl.textContent = `${collected}/${total}`;
+
+  const tierLabels = { S: '传奇结局', A: '优秀结局', C: '普通结局' };
+  const tierIcons = { S: '👑', A: '⭐', C: '📄' };
+
+  for (const tier of ['S', 'A', 'C']) {
+    const items = _endingCatalog.filter(e => e.tier === tier);
+    if (!items.length) continue;
+
+    const section = document.createElement('div');
+    section.className = 'ach-section';
+
+    const title = document.createElement('div');
+    title.className = 'ach-section-title';
+    const tierCollected = items.filter(e => _collectedEndings[e.id]).length;
+    title.textContent = `${tierLabels[tier]}  ${tierCollected}/${items.length}`;
+    section.appendChild(title);
+
+    const row = document.createElement('div');
+    row.className = 'ach-section-items ending-section-items';
+
+    for (const def of items) {
+      const done = !!_collectedEndings[def.id];
+      const savedText = done ? (_collectedEndings[def.id].text || def.text) : '';
+      const displayText = done ? (savedText || def.text || '结局已解锁') : '???';
+
+      const card = document.createElement('div');
+      card.className = `ending-card ending-tier-${tier.toLowerCase()} ${done ? 'ending-unlocked' : 'ending-locked'}`;
+      card.innerHTML = `
+        <div class="ending-card-icon">${done ? tierIcons[tier] : '🔒'}</div>
+        <div class="ending-card-body">
+          <div class="ending-card-id">${done ? '#' + def.id : ''}</div>
+          <div class="ending-card-text">${displayText}</div>
+        </div>
       `;
       row.appendChild(card);
     }

@@ -11,7 +11,7 @@
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0a0e17" />
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="js/html2canvas.min.js"></script>
 </head>
 <body>
   <!-- PWA update banner -->
@@ -987,11 +987,14 @@
   <div id="ach-wall" class="ach-wall-overlay" aria-modal="true" role="dialog" aria-label="成就墙">
     <div class="ach-wall-panel">
       <div class="ach-wall-head">
-        <div class="ach-wall-title">🏆&nbsp;&nbsp;成就</div>
-        <span id="ach-wall-count" class="ach-wall-count">0/78</span>
-        <button id="ach-wall-close" class="ach-wall-close" aria-label="关闭成就墙">✕</button>
+        <div class="ach-wall-tabs">
+          <button class="ach-wall-tab active" data-tab="ach">🏆 成就 <span id="ach-wall-count" class="ach-wall-count">0/78</span></button>
+          <button class="ach-wall-tab" data-tab="endings">📖 结局图鉴 <span id="ending-wall-count" class="ach-wall-count">0/0</span></button>
+        </div>
+        <button id="ach-wall-close" class="ach-wall-close" aria-label="关闭">✕</button>
       </div>
       <div id="ach-wall-grid" class="ach-wall-grid"></div>
+      <div id="ending-wall-grid" class="ach-wall-grid" style="display:none"></div>
     </div>
   </div>
 

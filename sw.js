@@ -19,6 +19,7 @@ const CORE_ASSETS = [
   './js/flowchart.js',
   './js/moments.js',
   './js/relic.js',
+  './js/html2canvas.min.js',
   // Data
   './data/ages.json',
   './data/events.json',

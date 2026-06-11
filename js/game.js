@@ -1,7 +1,7 @@
 import { evalCondition, pickBranch, pickWeightedBranch } from './dsl.js';
 import { renderAvatar, createStandaloneAvatar } from './avatar.js';
 import { playStorylineIntro, playStorylineExit } from './cinematic.js';
-import { initAchievements, unlockAchievement, setOnUnlock, getAchievementBonuses } from './achievements.js';
+import { initAchievements, unlockAchievement, setOnUnlock, getAchievementBonuses, recordEnding, buildEndingCatalog } from './achievements.js';
 import { initFlowchart, openFlowchart, unlockFlowchartNode, setFlowchartSfx, resetSessionUnlocks, getSessionUnlocks } from './flowchart.js';
 import { initMemoryUI, renderMemoryPanel, recordPlaythrough, showNewCardToast } from './memory.js';
 import { initRelicUI, updateVaultButton, openVaultModal, renderRelicSlot, initRelicSlot, finalizeRelicChoice, generateRelicChoices, showRelicReward, getActiveRelic, clearActiveRelic, consumeActiveRelic, showMutationToast, checkGiftLink, redeemRelicCode, formatEffect as relicFormatEffect, addRelic, getRelicVault, checkBlueTrigger, checkPurpleTrigger, tryPhoenixSave } from './relic.js';
@@ -1924,6 +1924,7 @@ async function loadData() {
   // Index mp events but DON'T put them in random pool (they're triggered explicitly)
   const realMpEvents = mpEvents.filter(e => typeof e.id === 'number');
   for (const re of realMpEvents) state.eventsMap.set(re.id, re);
+  buildEndingCatalog(state.eventsMap, LEGENDARY_ENDINGS, GOOD_ENDINGS);
   return talents;
 }
 
@@ -2458,6 +2459,8 @@ function applyEvent(ev) {
     state.endingId = ev.id;
     state.endingAge = state.age;
     SFX.sfxGameEnd();
+    const _endTier = LEGENDARY_ENDINGS.has(ev.id) ? 'S' : GOOD_ENDINGS.has(ev.id) ? 'A' : 'C';
+    recordEnding(ev.id, ev.text, _endTier);
     // Clean up any pending MP reunion state
     if (mp._reunionTimeout) { clearTimeout(mp._reunionTimeout); mp._reunionTimeout = null; }
     mp.isWaiting = false;
@@ -2472,6 +2475,7 @@ function applyEvent(ev) {
     } catch (e) { console.warn('mom last post failed', e); }
     // Record playthrough for memory card system
     const memResult = recordPlaythrough(state);
+    state._memResult = memResult;
     if (memResult.newCard) {
       setTimeout(() => showNewCardToast(), 1500);
     }
@@ -4820,9 +4824,64 @@ function showEndCinematic() {
     } else {
       $('end-card').style.display = '';
       $('end-card-reincarnation').style.display = 'none';
+
+      // Hint for early playthroughs (plays 1-2): tease replayability
+      const mem = state._memResult;
+      if (mem && mem.totalPlays <= 2) {
+        _appendEndHint($('end-card'), '你隐约感到，每一次重来都不会白费……也许下一世，会有什么不同。');
+      }
+      // First memory card earned (play 3): stronger guide
+      if (mem && mem.newCard && mem.totalCards === 1) {
+        _appendEndHint($('end-card'), '🃏 你获得了第一张「前世记忆」卡。返回主界面后，点击「前世记忆」可以解锁隐藏剧情的线索。');
+        try { localStorage.setItem('sasr_first_card_guide', '1'); } catch {}
+      }
     }
     overlay.classList.add('show-card');
   }, 1400);
+}
+
+function _appendEndHint(card, text) {
+  if (!card) return;
+  const el = document.createElement('div');
+  el.className = 'end-card-hint';
+  el.textContent = text;
+  const actions = card.querySelector('.end-card-actions');
+  if (actions) card.insertBefore(el, actions);
+  else card.appendChild(el);
+}
+
+function _checkFirstCardGuide() {
+  try {
+    if (localStorage.getItem('sasr_first_card_guide') !== '1') return;
+    localStorage.removeItem('sasr_first_card_guide');
+  } catch { return; }
+
+  const btn = $('memory-btn');
+  if (!btn) return;
+
+  // Pulse the memory button
+  btn.classList.add('guide-pulse');
+
+  // Tooltip
+  const tip = document.createElement('div');
+  tip.className = 'memory-guide-tip';
+  tip.innerHTML = `
+    <div class="memory-guide-arrow"></div>
+    <div class="memory-guide-body">
+      <div class="memory-guide-title">前世记忆已解锁</div>
+      <div class="memory-guide-text">你获得了一张记忆卡，可以用来解锁隐藏剧情的线索。<br>点击这里查看！</div>
+    </div>
+  `;
+  btn.style.position = 'relative';
+  btn.appendChild(tip);
+
+  const dismiss = () => {
+    btn.classList.remove('guide-pulse');
+    tip.classList.add('guide-fade-out');
+    setTimeout(() => tip.remove(), 300);
+  };
+  btn.addEventListener('click', dismiss, { once: true });
+  setTimeout(dismiss, 12000);
 }
 
 function doReincarnation() {
@@ -4937,6 +4996,8 @@ function doReincarnation() {
 function dismissEndOverlay() {
   const overlay = $('end-overlay');
   overlay.classList.remove('active', 'show-card');
+  // Clean up dynamic hint elements
+  overlay.querySelectorAll('.end-card-hint').forEach(el => el.remove());
 }
 
 function calculateScore() {
@@ -6272,6 +6333,8 @@ function updateMobileStatsStrip(strip) {
 }
 
 // 头像右侧的属性 grid：时间 + 2x4 stat 单元格 + 信息 chip 列表
+const _prevMobileStats = {};
+
 function updateMobileStatsGrid(grid) {
   if (!grid) return;
   const s = state;
@@ -6279,30 +6342,52 @@ function updateMobileStatsGrid(grid) {
   const timeEl = document.getElementById('time-display');
   const timeText = timeEl ? timeEl.textContent : `${s.age}岁`;
 
-  // 基础 7 项：社/智/家/乐 + 健/毅/颜（HAP 放在第4格）
-  // 触发剧情后追加 career stat 凑成 2x4（用 show* 标志判断）
   const baseKeys = ['SOC', 'INT', 'MNY', 'HAP', 'HLT', 'PER', 'APP'];
   const careerKeys = ['POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG', 'REP', 'BND', 'FAN', 'NET'];
 
+  const allKeys = [...baseKeys];
+  for (const k of careerKeys) {
+    if (s['show' + k]) allKeys.push(k);
+  }
+
+  // Build new values and compute deltas
+  const newVals = {};
+  const deltas = {};
+  for (const k of allKeys) {
+    const v = (k === 'HAP') ? (s[k] ?? 0) : (s[k] ?? 0);
+    newVals[k] = v;
+    if (k in _prevMobileStats && _prevMobileStats[k] !== v) {
+      deltas[k] = v - _prevMobileStats[k];
+    }
+  }
+
   let cellsHtml = '';
   for (const k of baseKeys) {
-    const v = s[k] ?? 0;
+    const v = newVals[k];
     const label = STAT_LABELS[k] || k;
-    cellsHtml += `<div class="msg-cell"><span class="msg-label">${label}</span><span class="msg-val">${v}</span></div>`;
+    const delta = deltas[k];
+    const cls = delta > 0 ? ' stat-up' : delta < 0 ? ' stat-down' : '';
+    const deltaHtml = delta ? `<span class="msg-delta ${delta > 0 ? 'delta-up' : 'delta-down'}">${delta > 0 ? '+' : ''}${delta}</span>` : '';
+    cellsHtml += `<div class="msg-cell${cls}"><span class="msg-label">${label}</span><span class="msg-val">${v}</span>${deltaHtml}</div>`;
   }
   for (const k of careerKeys) {
     if (s['show' + k]) {
-      const v = s[k] || 0;
+      const v = newVals[k];
       const label = STAT_LABELS[k] || k;
-      cellsHtml += `<div class="msg-cell career"><span class="msg-label">${label}</span><span class="msg-val">${v}</span></div>`;
+      const delta = deltas[k];
+      const cls = delta > 0 ? ' stat-up' : delta < 0 ? ' stat-down' : '';
+      const deltaHtml = delta ? `<span class="msg-delta ${delta > 0 ? 'delta-up' : 'delta-down'}">${delta > 0 ? '+' : ''}${delta}</span>` : '';
+      cellsHtml += `<div class="msg-cell career${cls}"><span class="msg-label">${label}</span><span class="msg-val">${v}</span>${deltaHtml}</div>`;
     }
   }
+
+  // Save current values for next diff
+  for (const k of allKeys) _prevMobileStats[k] = newVals[k];
 
   // 信息 chip 区：专业 / 学校 / 恋爱 / 职业 / 剧情
   let infoHtml = '';
   const majorEl = document.getElementById('major-display');
   if (majorEl) infoHtml += `<div class="msg-info-chip"><span class="msg-info-label">专业</span><span class="msg-info-val">${majorEl.textContent}</span></div>`;
-  // 学校/职业 始终显示，没数据时给占位文案，保证右上区域不留白
   const schoolEl = document.getElementById('school-display');
   const schoolText = schoolEl && schoolEl.parentElement && schoolEl.parentElement.style.display !== 'none'
     ? schoolEl.textContent : (s.school && s.school !== '无' ? s.school : '在读');
@@ -7436,6 +7521,7 @@ async function main() {
   renderTalentSelect(talents);
   updateCreationAvatar();
   initMemoryUI();
+  _checkFirstCardGuide();
   initRelicUI();
   initRelicSlot();
   $('relic-vault-btn').addEventListener('click', () => { SFX.sfxNav(); openVaultModal(); });
@@ -8789,6 +8875,8 @@ function _wireMultiplayerUI() {
 
 // ── 完整重置游戏状态（不 reload 页面） ─────────────────────────────────────
 function _resetGameState() {
+  // 清空属性变化追踪
+  for (const k in _prevMobileStats) delete _prevMobileStats[k];
   // 清空 state 到初始值
   state.phase = 'talent';
   for (const k of STAT_KEYS) { state.alloc[k] = 0; state.allocBase[k] = 0; state[k] = 0; }
