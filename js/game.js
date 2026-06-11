@@ -2,6 +2,15 @@ import { evalCondition, pickBranch, pickWeightedBranch } from './dsl.js';
 import { renderAvatar, createStandaloneAvatar } from './avatar.js';
 import { playStorylineIntro, playStorylineExit } from './cinematic.js';
 import { initAchievements, unlockAchievement, setOnUnlock, getAchievementBonuses, recordEnding, buildEndingCatalog } from './achievements.js';
+import {
+  STAT_KEYS, STAT_LABELS, EFFECT_KEYS, XIANXIA_KEYS,
+  LEGENDARY_ENDINGS, GOOD_ENDINGS,
+  deriveRealm, ALLOC_TOTAL_BASE, MAX_PER_STAT,
+  DEFAULT_PROF_BY_AGE,
+  HIDDEN_STORYLINES, SPECIAL_STORYLINES, STORYLINE_UNLOCK_STAT,
+  STUDENT_PHASES, GRAD_SCHOOL_PHASES,
+} from './engine/constants.js';
+import { sample, gachaDraw } from './engine/utils.js';
 import { initFlowchart, openFlowchart, unlockFlowchartNode, setFlowchartSfx, resetSessionUnlocks, getSessionUnlocks } from './flowchart.js';
 import { initMemoryUI, renderMemoryPanel, recordPlaythrough, showNewCardToast } from './memory.js';
 import { initRelicUI, updateVaultButton, openVaultModal, renderRelicSlot, initRelicSlot, finalizeRelicChoice, generateRelicChoices, showRelicReward, getActiveRelic, clearActiveRelic, consumeActiveRelic, showMutationToast, checkGiftLink, redeemRelicCode, formatEffect as relicFormatEffect, addRelic, getRelicVault, checkBlueTrigger, checkPurpleTrigger, tryPhoenixSave } from './relic.js';
@@ -15,95 +24,16 @@ let _mpMyEndData = null;   // own final snapshot, set when game ends
 let _mpOppEndData = null;  // opponent's final snapshot, received via game_end
 let _allTalents = null;    // cached talents data for restart without reload
 
-const STAT_KEYS = ['SOC', 'INT', 'MNY', 'PER', 'HLT', 'APP'];
-const STAT_LABELS = {
-  SOC: '社交', INT: '智力', MNY: '家境',
-  HAP: '快乐', HLT: '健康', PER: '毅力', APP: '颜值',
-  POP: '人气', POK: '牌技', MMR: '天梯分', FIT: '体能', CKL: '厨艺', ATH: '运动', MAG: '魔力', REP: '声望', BND: '影响力', FAN: '粉丝', NET: '势力',
-  cul: '修为', dao: '大道', karma: '机缘', tribulation: '渡劫', realm: '境界'
-};
-const EFFECT_KEYS = new Set([...STAT_KEYS, 'HAP', 'POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG', 'REP', 'BND', 'FAN', 'NET', 'HEAT', 'cul', 'dao', 'karma', 'tribulation', 'darkOmen', 'courage', 'alliance', 'knowledge', 'cheat_risk']);
-const XIANXIA_KEYS = ['realm', 'cul', 'dao', 'karma', 'tribulation'];
+// STAT_KEYS, STAT_LABELS, EFFECT_KEYS, XIANXIA_KEYS → engine/constants.js
 
-// ── Special Scoring Endings ──
-const LEGENDARY_ENDINGS = new Set([
-  50099, // Spy Success
-  60090, 60095, // Abyss: 数字神明 / AGI融合 (真结局)
-  70092, 70093, // Meta: Ctrl+W / True Ending
-  82090, // CEO Peak
-  83090, // Esports World Champion
-  84061, // Fitness Legend
-  85061, // Chef 3-Star
-  81090, // Poker God
-  86105, 86120, 86136, // Athlete Top Tier (NBA状元, World Cup Champion, Frisbee Worlds Champion)
-  87190, // Thief Ghost Rating
-  61611, // Hogwarts: defeated Voldemort with Elder Wand
-  48190, 48191, // EE: 半导体教父, 芯片独角兽
-  48290, 48291, // ME: 总工程师, 智造独角兽
-  48390, 48391, // BIO: 新药教父, 生物医药独角兽
-  48590, 48591, // MED: 科室主任, 新术式命名
-  48790, 48791, // LAW: 管理合伙人, 首席大检察官
-  48990, 48991, // Film: 金棕榈独立导演, 百亿票房商业导演
-  42190, 42191, // CS: 大厂核心, 连续创业者
-  43190,        // 商科: 投行精英/风投巨鳄
-  44190,        // 理科: 全奖直博巅峰
-  45191,        // 文科/文艺: 传世大家
-  49990, 49991, 49992,  // 音乐: 独立音乐人, 流行歌手, 作曲家
-  89090, // Academic White Hat: Google Project Zero
-  89092, // Academic Black Hat: Ghost金盆洗手
-  78081, // Band: Battle of the Bands champion
-  76090, // Influencer: 全网顶流 (Forbes 30U30)
-  76096, // Influencer: 咸鱼翻身
-  88261, // Cheater trad: 考神 (S-tier)
-  88267, // Cheater tech: 幽灵 (S-tier)
-]);
+// LEGENDARY_ENDINGS, GOOD_ENDINGS → engine/constants.js
 
-const GOOD_ENDINGS = new Set([
-  70091, // Meta: Accept Ending
-  80105, // Idol Superstar
-  82096, // Corporate Elite
-  84091, // Fitness Influencer
-  85091, 85092, // Chef 2-Star / 1-Star
-  90050, 90052, 90054, 90056, // Late dropout good endings
-  61612, // Hogwarts: sacrificial victory (all horcruxes but low MAG)
-  48192, // EE: 转码逆袭
-  48292, // ME: 转码逆袭
-  48392, // BIO: 生信逆袭
-  48592, // MED: 受人尊敬的主治
-  48792, // LAW: 知名人权律师
-  48992, // Film: 奥斯卡编剧
-  76095, // Influencer: MCN合约到期平稳退出
-  88160, // Cheater: 金盆洗手 (B-tier)
-  88262, // Cheater: 惊险过关 (B-tier)
-  88264, // Cheater: 跑路 (C-tier)
-]);
-
-function deriveRealm(cul) {
-  cul = cul || 0;
-  if (cul < 1) return '凡人';
-  if (cul < 20) return `引气${'一二三四五六七八九'[Math.min(8, Math.floor((cul - 1) / 2))]}层`;
-  if (cul < 60) return ['筑基初期', '筑基中期', '筑基后期', '筑基巅峰'][Math.min(3, Math.floor((cul - 20) / 10))];
-  if (cul < 150) return `金丹${'一二三四五六七八九'[Math.min(8, Math.floor((cul - 60) / 10))]}层`;
-  if (cul < 300) return `元婴${'一二三四五六七八九'[Math.min(8, Math.floor((cul - 150) / 17))]}层`;
-  if (cul < 600) return '化神期';
-  if (cul < 1000) return '渡劫期';
-  if (cul < 1500) return '羽化境';
-  return '仙人境';
-}
-const ALLOC_TOTAL_BASE = 25;
-const MAX_PER_STAT = 10;
+// deriveRealm, ALLOC_TOTAL_BASE, MAX_PER_STAT → engine/constants.js
 /** Dynamic alloc total = base + achievement bonus pts */
 function getAllocTotal() { return ALLOC_TOTAL_BASE + (state._achExtraPts || 0); }
 
 
-const DEFAULT_PROF_BY_AGE = [
-  { max: 18, prof: '高中生' },
-  { max: 22, prof: '本科生' },
-  { max: 25, prof: '打工人' },
-  { max: 35, prof: '社畜' },
-  { max: 55, prof: '中年人' },
-  { max: 99, prof: '退休' }
-];
+// DEFAULT_PROF_BY_AGE → engine/constants.js
 
 // Storyline configurations: death checks, completion, event rate, flavor
 const STORYLINE_CFG = {
@@ -1821,26 +1751,7 @@ const STORYLINE_NAMES = {
   washed: '过气博主',
   cheater: '代考帝国',
 };
-const HIDDEN_STORYLINES = new Set(['spy', 'abyss', 'meta', 'xianxia', 'thief', 'hogwarts', 'timeloop']);
-const SPECIAL_STORYLINES = new Set(['idol', 'superstar', 'streamer', 'poker', 'triton', 'local_shark', 'party', 'ceo', 'wasted', 'esports', 'worlds', 'minor_league', 'fitness', 'chef', 'athlete', 'academic', 'band', 'influencer', 'mcn', 'cheater']);
-const STORYLINE_UNLOCK_STAT = {
-  idol: 'POP', superstar: 'POP', streamer: 'POP',
-  poker: 'POK', triton: 'POK', local_shark: 'POK',
-  esports: 'MMR', worlds: 'MMR', minor_league: 'MMR',
-  fitness: 'FIT',
-  chef: 'CKL',
-  athlete: 'ATH',
-  hogwarts: 'MAG',
-  academic: 'REP',
-  band: 'BND',
-  influencer: 'FAN', mcn: 'FAN',
-  cheater: 'NET',
-};
-const STUDENT_PHASES = new Set([
-  '高中生', '本科生', '理工生', '商科生', '文科生',
-  '准留学生', '考研党', '迷茫大学生', '准研究生', '研究生', '海外研究生',
-]);
-const GRAD_SCHOOL_PHASES = new Set(['准研究生', '研究生', '海外研究生']);
+// HIDDEN_STORYLINES, SPECIAL_STORYLINES, STORYLINE_UNLOCK_STAT, STUDENT_PHASES, GRAD_SCHOOL_PHASES → engine/constants.js
 
 const state = {
   phase: 'talent',
@@ -1928,63 +1839,7 @@ async function loadData() {
   return talents;
 }
 
-function sample(arr, n) {
-  const a = arr.slice();
-  const out = [];
-  while (out.length < n && a.length) {
-    const i = Math.floor(Math.random() * a.length);
-    out.push(a.splice(i, 1)[0]);
-  }
-  return out;
-}
-
-function gachaDraw(talents, n) {
-  // Group talents by grade
-  const pools = [[], [], [], []];
-  for (const t of talents) pools[t.grade]?.push(t);
-
-  // Rarity roll thresholds: grade 0 (white) 80%, 1 (blue) 15%, 2 (purple) 4%, 3 (orange) 1%
-  function rollGrade() {
-    const r = Math.random() * 100;
-    if (r < 4) return 3;   // orange
-    if (r < 10) return 2;   // purple
-    if (r < 30) return 1;  // blue
-    return 0;               // white
-  }
-
-  function pickFrom(pool, seen) {
-    const available = pool.filter(t => !seen.has(t.id));
-    if (!available.length) return null;
-    return available[Math.floor(Math.random() * available.length)];
-  }
-
-  const chosen = [];
-  const seen = new Set();
-  let gotRare = false; // track if any purple (2) or orange (3) appeared
-
-  for (let i = 0; i < n; i++) {
-    let grade = rollGrade();
-    if (grade >= 2) gotRare = true;
-
-    // Pity: if this is the last slot and no rare yet, force purple or orange
-    if (i === n - 1 && !gotRare) {
-      grade = Math.random() < 0.2 ? 3 : 2;
-    }
-
-    let t = pickFrom(pools[grade], seen);
-    // Fallback: if pool exhausted, try adjacent grades
-    if (!t) {
-      for (const fallback of [grade - 1, grade + 1, 0, 1, 2, 3]) {
-        if (fallback >= 0 && fallback <= 3) {
-          t = pickFrom(pools[fallback], seen);
-          if (t) break;
-        }
-      }
-    }
-    if (t) { seen.add(t.id); chosen.push(t); }
-  }
-  return chosen;
-}
+// sample, gachaDraw → engine/utils.js
 
 function applyTalentEffects() {
   for (const t of state.talentsPicked) {
@@ -2093,19 +1948,24 @@ function assignFallbackMajor() {
 }
 
 function planYear(age) {
-  const pool = (state.agesMap[age]?.event ?? [])
+  const allEvents = (state.agesMap[age]?.event ?? [])
     .map(id => state.eventsMap.get(id))
     .filter(Boolean)
     .filter(ev => !ev.noRandom)
-    .filter(ev => !state.firedEvents.has(ev.id))
+    .filter(ev => !state.firedEvents.has(ev.id));
+
+  // Fixed-month events: don't pre-filter by include — conditions may depend on
+  // state set by earlier months in the same year. advanceMonth re-checks include
+  // at firing time (line ~2919), so stale entries are safely skipped.
+  const fixed = allEvents.filter(ev => ev.fixedMonth);
+
+  // Flex events: evaluate include now since they'll be scheduled to random months
+  const flex = allEvents
+    .filter(ev => !ev.fixedMonth)
     .filter(ev => evalCondition(state, ev.include))
     .filter(ev => !ev.exclude || !evalCondition(state, ev.exclude));
 
-  if (!pool.length) return;
-
-  // Separate fixed-month events from flexible ones
-  const fixed = pool.filter(ev => ev.fixedMonth);
-  const flex = pool.filter(ev => !ev.fixedMonth);
+  if (!fixed.length && !flex.length) return;
 
   const plan = new Map();
   for (const ev of fixed) plan.set(ev.fixedMonth, ev.id);

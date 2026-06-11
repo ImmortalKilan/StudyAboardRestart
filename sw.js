@@ -20,6 +20,8 @@ const CORE_ASSETS = [
   './js/moments.js',
   './js/relic.js',
   './js/html2canvas.min.js',
+  './js/engine/constants.js',
+  './js/engine/utils.js',
   // Data
   './data/ages.json',
   './data/events.json',

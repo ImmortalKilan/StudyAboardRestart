@@ -360,13 +360,87 @@ function _renderWall() {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-//  ENDING CATALOG (结局图鉴)
+//  ENDING CATALOG (结局图鉴) — S/A tier only, with trigger hints
 // ══════════════════════════════════════════════════════════════════════════════
 
 const ENDING_STORAGE_KEY = 'sasr_endings_v1';
 let _collectedEndings = {};  // id → { text, tier, ts }
-let _endingCatalog = [];     // built from event data at init
 let _activeWallTab = 'ach';
+
+// ── Static catalog: only S and A tier endings, with name + hint ──────────
+const ENDING_CATALOG = [
+  // ── S 传奇结局 ─────────────────────────────────────────────────────────
+  // 隐藏剧情线
+  { id: 50099, tier: 'S', icon: '🕵️', name: '特工的荣耀',     hint: '圆满完成了国际特工任务' },
+  { id: 60090, tier: 'S', icon: '🌌', name: '数字神明',       hint: '在深渊的尽头，你成为了新的造物主' },
+  { id: 60095, tier: 'S', icon: '🧠', name: 'AGI融合',       hint: '意识与机器的边界彻底消融了' },
+  { id: 70092, tier: 'S', icon: '📺', name: 'Ctrl+W',        hint: '当你足够清醒，也许该关掉这扇窗' },
+  { id: 70093, tier: 'S', icon: '🔮', name: '第五面墙',       hint: '和屏幕另一边的人和解了' },
+  { id: 87190, tier: 'S', icon: '👻', name: '幽灵评级',       hint: '达到了影子协会最高评级' },
+  { id: 61611, tier: 'S', icon: '⚡', name: '救世之星',       hint: '摧毁所有碎片后的最终对决——需要真正的力量' },
+
+  // 职业剧情线
+  { id: 82090, tier: 'S', icon: '💼', name: '商界传奇',       hint: '从派对之王到商业帝国，需要人脉和资本的双重巅峰' },
+  { id: 81090, tier: 'S', icon: '🃏', name: '赌神',           hint: '在最高级别的牌桌上，技术就是一切' },
+  { id: 83090, tier: 'S', icon: '🥇', name: '全球冠军',       hint: '天梯登顶还不够，世界赛需要钢铁般的意志' },
+  { id: 84061, tier: 'S', icon: '🏋️', name: '健美传奇',       hint: '站上了健美巅峰的舞台' },
+  { id: 85061, tier: 'S', icon: '⭐', name: '三星主厨',       hint: '获得了米其林三星评级' },
+  { id: 86105, tier: 'S', icon: '🏀', name: 'NBA状元',        hint: '篮球天赋的极致绽放' },
+  { id: 86120, tier: 'S', icon: '⚽', name: '世界杯冠军',      hint: '绿茵场上的最高荣耀' },
+  { id: 86136, tier: 'S', icon: '🥏', name: '飞盘世锦赛冠军',  hint: '小众运动的世界之巅' },
+  { id: 78081, tier: 'S', icon: '🎸', name: 'Encore!',       hint: '全场高喊Encore——虽然你只是贝斯手' },
+  { id: 89090, tier: 'S', icon: '🛡️', name: '白骑士',         hint: 'CVE上有你的名字——正义的黑客也有归宿' },
+  { id: 89092, tier: 'S', icon: '👻', name: 'Ghost',          hint: '金盆洗手，无人知晓你曾是暗网上的传说' },
+  { id: 76090, tier: 'S', icon: '👑', name: '全网顶流',        hint: '登上福布斯30U30，从留学生到顶流网红' },
+  { id: 76096, tier: 'S', icon: '🐟', name: '咸鱼翻身',        hint: '所有人都以为你过气了——直到那条视频' },
+  { id: 88261, tier: 'S', icon: '🧠', name: '考神',            hint: '建立了跨国代考帝国（传统路线）' },
+  { id: 88267, tier: 'S', icon: '🕹️', name: '零日',            hint: '成为暗网上让所有考试系统颤抖的传说（技术路线）' },
+
+  // 专业传奇
+  { id: 42190, tier: 'S', icon: '💻', name: '硅谷传奇',        hint: 'CS专业的技术路线巅峰' },
+  { id: 42191, tier: 'S', icon: '🚀', name: '连续创业者',      hint: 'CS专业的创业路线巅峰' },
+  { id: 43190, tier: 'S', icon: '💹', name: '金融之王',        hint: '商科专业——人脉与资本缺一不可' },
+  { id: 44190, tier: 'S', icon: '🔭', name: '学术巨擘',        hint: '理科专业——以全奖直博身份登顶学界' },
+  { id: 45191, tier: 'S', icon: '🖋️', name: '传世大家',        hint: '文科/文艺专业——作品跨越了时代' },
+  { id: 48190, tier: 'S', icon: '🔬', name: '半导体教父',      hint: 'EE专业——在芯片领域封神，重塑了产业格局' },
+  { id: 48191, tier: 'S', icon: '💡', name: '芯片独角兽',      hint: 'EE专业——从实验室走向资本市场' },
+  { id: 48290, tier: 'S', icon: '🏭', name: '总工程师',        hint: 'ME专业——技术路线的天花板' },
+  { id: 48291, tier: 'S', icon: '🤖', name: '智造独角兽',      hint: 'ME专业——智能制造赛道的创业传奇' },
+  { id: 48390, tier: 'S', icon: '🧬', name: '新药教父',        hint: 'BIO专业——研发出了改变世界的新药' },
+  { id: 48391, tier: 'S', icon: '💊', name: '生物医药独角兽',   hint: 'BIO专业——从科学家到企业家的跨越' },
+  { id: 48590, tier: 'S', icon: '🩺', name: '科室主任',        hint: 'MED专业——医术精湛，独当一面' },
+  { id: 48591, tier: 'S', icon: '✂️', name: '新术式命名',       hint: 'MED专业——以自己的名字命名了新术式' },
+  { id: 48790, tier: 'S', icon: '⚖️', name: '管理合伙人',      hint: 'LAW专业——全能型法律精英的终极归宿' },
+  { id: 48791, tier: 'S', icon: '🏛️', name: '首席大检察官',    hint: 'LAW专业——选择了正义的那条路' },
+  { id: 48990, tier: 'S', icon: '🎬', name: '金棕榈之夜',      hint: 'Film专业——独立电影人的最高荣耀' },
+  { id: 48991, tier: 'S', icon: '🎥', name: '百亿票房',        hint: 'Film专业——商业电影的票房神话' },
+  { id: 49990, tier: 'S', icon: '🎸', name: '独立音乐人',      hint: '音乐专业——不妥协的声音终被世界听见' },
+  { id: 49991, tier: 'S', icon: '🎤', name: '流行巨星',        hint: '音乐专业——舞台上最耀眼的那颗星' },
+  { id: 49992, tier: 'S', icon: '🎼', name: '传奇作曲家',      hint: '音乐专业——用音符书写了不朽的篇章' },
+
+  // ── A 优秀结局 ─────────────────────────────────────────────────────────
+  { id: 70091, tier: 'A', icon: '🤝', name: '接受命运',        hint: '也许接受这个世界的设定，也是一种勇气' },
+  { id: 80105, tier: 'A', icon: '🌟', name: '闪耀登场',        hint: '偶像出道——日本路线有特别的可能性' },
+  { id: 82096, tier: 'A', icon: '👔', name: '企业精英',        hint: '从派对转型商界，虽未封神，也算体面' },
+  { id: 84091, tier: 'A', icon: '📸', name: '健身网红',        hint: '没拿冠军，但在社交媒体上找到了另一种巅峰' },
+  { id: 85091, tier: 'A', icon: '⭐', name: '二星主厨',        hint: '差一点点到顶峰——但已经超越了大多数人' },
+  { id: 85092, tier: 'A', icon: '⭐', name: '一星主厨',        hint: '第一颗星，是梦想照进现实的起点' },
+  { id: 61612, tier: 'A', icon: '⚡', name: '牺牲式胜利',      hint: '魂器全毁，但最终一战中力量不够……代价是什么？' },
+  { id: 76095, tier: 'A', icon: '📄', name: 'MCN合约到期',     hint: '签约顶级MCN之后，合约期满的平稳着陆' },
+  { id: 88160, tier: 'A', icon: '🧹', name: '金盆洗手',        hint: '在代考帝国做大之前，选择了急流勇退' },
+  { id: 88262, tier: 'A', icon: '😰', name: '惊险过关',        hint: '代考线的关键抉择——险中求生' },
+  { id: 88264, tier: 'A', icon: '✈️', name: '跑路',            hint: '东窗事发前，你已经在飞机上了' },
+  { id: 48192, tier: 'A', icon: '💻', name: 'EE转码逆袭',      hint: 'EE读不下去了？也许换条赛道反而海阔天空' },
+  { id: 48292, tier: 'A', icon: '💻', name: 'ME转码逆袭',      hint: 'ME转码——工科人的曲线救国之路' },
+  { id: 48392, tier: 'A', icon: '💻', name: '生信逆袭',        hint: 'BIO转码——当生物遇上代码' },
+  { id: 48592, tier: 'A', icon: '🩺', name: '受人尊敬的主治',   hint: 'MED专业——平凡而伟大的从医之路' },
+  { id: 48792, tier: 'A', icon: '⚖️', name: '知名人权律师',    hint: 'LAW专业——选择了报酬最少但最有意义的那条路' },
+  { id: 48992, tier: 'A', icon: '📝', name: '奥斯卡编剧',      hint: 'Film专业——幕后英雄也有登上领奖台的一天' },
+  { id: 90050, tier: 'A', icon: '💰', name: '大客户销售王',     hint: '退学不是终点——能说会道的人哪里都吃得开' },
+  { id: 90052, tier: 'A', icon: '📚', name: '考证逆袭',        hint: '退学之后脱产考证，用毅力重写人生' },
+  { id: 90054, tier: 'A', icon: '🏃', name: '灵活就业达人',     hint: '退学后自由职业——身体是革命的本钱' },
+  { id: 90056, tier: 'A', icon: '🏪', name: '个体户老板',       hint: '退学后开了家小店——快乐比什么都重要' },
+];
 
 function _loadEndings() {
   try {
@@ -382,27 +456,19 @@ function _saveEndings() {
 export function recordEnding(endingId, endingText, tier) {
   _loadEndings();
   if (_collectedEndings[endingId]) return;
+  // Only persist S/A tier endings
+  if (tier !== 'S' && tier !== 'A') return;
   _collectedEndings[endingId] = {
     text: (endingText || '').slice(0, 80),
-    tier: tier || 'C',
+    tier: tier,
     ts: Date.now(),
   };
   _saveEndings();
 }
 
-export function buildEndingCatalog(eventsMap, legendarySet, goodSet) {
+// buildEndingCatalog is kept for backward compat but catalog is now static
+export function buildEndingCatalog(_eventsMap, _legendarySet, _goodSet) {
   _loadEndings();
-  const catalog = [];
-  for (const [id, ev] of eventsMap) {
-    if (!ev.end) continue;
-    const tier = legendarySet.has(id) ? 'S' : goodSet.has(id) ? 'A' : 'C';
-    catalog.push({ id, tier, text: (ev.text || '').replace(/\n/g, ' ').slice(0, 80) });
-  }
-  catalog.sort((a, b) => {
-    const tierOrder = { S: 0, A: 1, C: 2 };
-    return (tierOrder[a.tier] - tierOrder[b.tier]) || a.id - b.id;
-  });
-  _endingCatalog = catalog;
 }
 
 function _initWallTabs() {
@@ -434,16 +500,16 @@ function _renderEndingWall() {
   grid.innerHTML = '';
   _loadEndings();
 
-  const collected = Object.keys(_collectedEndings).length;
-  const total = _endingCatalog.length;
+  const sOnly = ENDING_CATALOG.filter(e => e.tier === 'S' || e.tier === 'A');
+  const collected = sOnly.filter(e => _collectedEndings[e.id]).length;
+  const total = sOnly.length;
   const countEl = document.getElementById('ending-wall-count');
   if (countEl) countEl.textContent = `${collected}/${total}`;
 
-  const tierLabels = { S: '传奇结局', A: '优秀结局', C: '普通结局' };
-  const tierIcons = { S: '👑', A: '⭐', C: '📄' };
+  const tierLabels = { S: '👑 传奇结局', A: '⭐ 优秀结局' };
 
-  for (const tier of ['S', 'A', 'C']) {
-    const items = _endingCatalog.filter(e => e.tier === tier);
+  for (const tier of ['S', 'A']) {
+    const items = ENDING_CATALOG.filter(e => e.tier === tier);
     if (!items.length) continue;
 
     const section = document.createElement('div');
@@ -460,18 +526,21 @@ function _renderEndingWall() {
 
     for (const def of items) {
       const done = !!_collectedEndings[def.id];
-      const savedText = done ? (_collectedEndings[def.id].text || def.text) : '';
-      const displayText = done ? (savedText || def.text || '结局已解锁') : '???';
 
       const card = document.createElement('div');
       card.className = `ending-card ending-tier-${tier.toLowerCase()} ${done ? 'ending-unlocked' : 'ending-locked'}`;
-      card.innerHTML = `
-        <div class="ending-card-icon">${done ? tierIcons[tier] : '🔒'}</div>
-        <div class="ending-card-body">
-          <div class="ending-card-id">${done ? '#' + def.id : ''}</div>
-          <div class="ending-card-text">${displayText}</div>
-        </div>
-      `;
+      if (done) {
+        card.innerHTML = `
+          <div class="ending-card-icon">${def.icon}</div>
+          <div class="ending-card-body">
+            <div class="ending-card-name">${def.name}</div>
+            <div class="ending-card-hint">${def.hint}</div>
+          </div>
+          <div class="ending-card-check">✓</div>
+        `;
+      } else {
+        card.innerHTML = `<div class="ending-card-icon ending-card-icon-locked">${def.icon}</div>`;
+      }
       row.appendChild(card);
     }
 
