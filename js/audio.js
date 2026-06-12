@@ -298,3 +298,126 @@ export function sfxBack() {
 export function sfxError() {
   _playFile('error_005.ogg', 0.5);
 }
+
+// ── Stings (Web Audio synthesis, no files needed) ────────────────────────────
+// Short one-shot musical hits triggered at story beats. Each composes the
+// existing primitives (_bit, _wood) plus a few extras inline.
+
+function _tone(type, freq, duration, vol, slide = 0) {
+  if (_muted) return;
+  try {
+    const ctx = _ensureCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    const t = ctx.currentTime;
+    osc.frequency.setValueAtTime(freq, t);
+    if (slide) osc.frequency.exponentialRampToValueAtTime(Math.max(20, freq + slide), t + duration);
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(vol, t + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + duration + 0.05);
+  } catch (e) {}
+}
+
+function _noiseBurst(duration, vol, filterFreq = 4000, q = 1) {
+  if (_muted) return;
+  try {
+    const ctx = _ensureCtx();
+    const bufferSize = Math.floor(ctx.sampleRate * duration);
+    const buf = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = filterFreq;
+    filter.Q.value = q;
+    const gain = ctx.createGain();
+    const t = ctx.currentTime;
+    gain.gain.setValueAtTime(vol, t);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+    src.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    src.start(t);
+    src.stop(t + duration + 0.05);
+  } catch (e) {}
+}
+
+// Red-cinematic intro sting (hidden storyline): low rumble + reverse-cymbal swell + impact
+export function stingHiddenIntro() {
+  if (_muted) return;
+  _noiseBurst(0.8, 0.08, 2000, 0.5);            // swell
+  setTimeout(() => {
+    _tone('sawtooth', 110, 0.6, 0.08, -40);     // low rumble
+    _tone('square', 55, 0.8, 0.06);             // sub
+    _noiseBurst(0.15, 0.12, 800, 2);            // impact
+  }, 700);
+}
+
+// Gold intro sting (special / career storyline): rising brass-like chord
+export function stingSpecialIntro() {
+  if (_muted) return;
+  // C major triad arpeggio then chord
+  _wood(523, 0.18, 0.07);                         // C5
+  setTimeout(() => _wood(659, 0.18, 0.07), 90);   // E5
+  setTimeout(() => _wood(784, 0.22, 0.07), 180);  // G5
+  setTimeout(() => {
+    _tone('triangle', 523, 0.6, 0.06);
+    _tone('triangle', 659, 0.6, 0.05);
+    _tone('triangle', 784, 0.6, 0.05);
+    _tone('triangle', 1047, 0.6, 0.04);           // C6 sparkle
+  }, 280);
+}
+
+// Death sting: low sustained tone + bell decay
+export function stingDeath() {
+  if (_muted) return;
+  _tone('sine', 110, 1.2, 0.08);
+  _tone('sine', 165, 1.2, 0.05);
+  setTimeout(() => {
+    _tone('sine', 392, 1.6, 0.07);                // G4 bell
+    _tone('sine', 784, 1.6, 0.03);                // G5 overtone
+  }, 200);
+}
+
+// Legendary ending sting: rising triumphant triad
+export function stingLegendary() {
+  if (_muted) return;
+  _wood(523, 0.2, 0.08);
+  setTimeout(() => _wood(659, 0.2, 0.08), 120);
+  setTimeout(() => _wood(784, 0.25, 0.08), 240);
+  setTimeout(() => {
+    _wood(1047, 0.5, 0.09);
+    _tone('triangle', 1047, 0.7, 0.05);
+    _tone('triangle', 1319, 0.7, 0.04);            // E6
+    _tone('triangle', 1568, 0.7, 0.04);            // G6
+  }, 380);
+}
+
+// Attempt success: ascending three-note flourish
+export function stingSuccess() {
+  if (_muted) return;
+  _bit(523, 0.08, 0.07);
+  setTimeout(() => _bit(659, 0.08, 0.07), 80);
+  setTimeout(() => {
+    _bit(784, 0.12, 0.07);
+    _wood(784, 0.2, 0.06);
+  }, 160);
+}
+
+// Attempt failure: descending minor flourish
+export function stingFail() {
+  if (_muted) return;
+  _bit(523, 0.1, 0.07);
+  setTimeout(() => _bit(440, 0.1, 0.06), 110);
+  setTimeout(() => {
+    _bit(330, 0.15, 0.06);
+    _tone('sawtooth', 165, 0.5, 0.05, -30);
+  }, 220);
+}

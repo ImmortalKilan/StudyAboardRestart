@@ -100,6 +100,109 @@ export const ACHIEVEMENTS = [
   { id: 'egg_hidden_npc',     name: '???的踪迹',           icon: '👤', rarity: 'epic',   cat: '朋友圈', desc: '名单上多出来的那位' },
   { id: 'egg_dejavu',         name: '前世的回响',           icon: '🫧', rarity: 'epic',   cat: '朋友圈', desc: '重开够多次才能解锁' },
   { id: 'egg_hidden_entry',   name: '朋友圈里的暗号',       icon: '🔑', rarity: 'legendary', cat: '朋友圈', desc: '用对的暗号回复对的人' },
+
+  // ── 日常 — 吃饭/生存 ───────────────────────────────────────────────────
+  { id: 'daily_dreamer',        name: '白日梦想家',     icon: '🥫', rarity: 'normal',  cat: '日常', desc: '连续吃了一周最便宜的食物，还觉得挺好吃' },
+  { id: 'daily_chef',           name: '中华小当家',     icon: '🍳', rarity: 'normal',  cat: '日常', desc: '第一次在国外做出了一道像样的中餐' },
+  { id: 'daily_noodle',         name: '泡面大师',       icon: '🍜', rarity: 'normal',  cat: '日常', desc: '凌晨三点，泡面加蛋加火腿肠，这就是留学的味道' },
+  { id: 'daily_hotpot',         name: '火锅外交官',     icon: '🍲', rarity: 'rare',    cat: '日常', desc: '用一顿火锅搞定了三个国家的室友' },
+
+  // ── 日常 — 学业 ────────────────────────────────────────────────────────
+  { id: 'daily_monk',           name: '苦行僧',         icon: '📚', rarity: 'normal',  cat: '日常', desc: '组里的人集体消失，你一人完成了小组项目' },
+  { id: 'daily_gpt',            name: 'GPT门徒',       icon: '🤖', rarity: 'rare',    cat: '日常', desc: '用AI写作业被抓到了' },
+  { id: 'daily_charity',        name: '慈善家',         icon: '💸', rarity: 'normal',  cat: '日常', desc: '交了一门课的重修费，感觉给教授买了辆车' },
+  { id: 'daily_chegg',          name: '学术偷渡者',     icon: '📝', rarity: 'normal',  cat: '日常', desc: '全靠往年卷撑过了这学期' },
+  { id: 'daily_office',         name: 'Office Hours常客', icon: '🏫', rarity: 'rare',  cat: '日常', desc: '教授已经能叫出你的中文名了' },
+  { id: 'daily_fullattend',     name: '全勤战士',       icon: '⏰', rarity: 'rare',    cat: '日常', desc: '一学期没缺过一节早八' },
+  { id: 'daily_course',         name: '选课大师',       icon: '🎯', rarity: 'normal',  cat: '日常', desc: '用三个学期练就了避开hard professor的直觉' },
+  { id: 'daily_deadline',       name: 'Deadline战神',   icon: '⚡', rarity: 'normal',  cat: '日常', desc: '在due前两小时写完了论文，质量居然还不错' },
+  { id: 'daily_library',        name: '图书馆幽灵',     icon: '👻', rarity: 'normal',  cat: '日常', desc: '期末周在图书馆待到闭馆，保安都认识你了' },
+
+  // ── 日常 — 社交/情感 ──────────────────────────────────────────────────
+  { id: 'daily_shycourage',     name: '社恐の勇气',     icon: '🫡', rarity: 'normal',  cat: '日常', desc: '第一次主动跟外国同学搭话，磕磕巴巴但对方笑了' },
+  { id: 'daily_sober',          name: '人间清醒',       icon: '🌙', rarity: 'normal',  cat: '日常', desc: '朋友圈大家都在秀，你默默关掉了手机' },
+  { id: 'daily_drunk',          name: '喝醉了',         icon: '🍺', rarity: 'normal',  cat: '日常', desc: '有些委屈，只能让酒精替我说完' },
+  { id: 'daily_fakeextro',      name: '假装外向',       icon: '🎭', rarity: 'normal',  cat: '日常', desc: 'party上笑得最大声的人，回家后最沉默' },
+  { id: 'daily_peace',          name: '和解于心',       icon: '🤝', rarity: 'rare',    cat: '日常', desc: '原谅了那个没能成为理想模样的自己' },
+
+  // ── 日常 — 生活 ────────────────────────────────────────────────────────
+  { id: 'daily_nocar',          name: '车轮上的美国',   icon: '🚗', rarity: 'normal',  cat: '日常', desc: '没有车寸步难行，靠室友蹭车买了三个月菜' },
+  { id: 'daily_metro',          name: '地铁老司机',     icon: '🚇', rarity: 'normal',  cat: '日常', desc: '这座城市的地铁图已经刻在DNA里了' },
+  { id: 'daily_ikea',           name: '宜家组装师',     icon: '🔧', rarity: 'normal',  cat: '日常', desc: '一个人组装家具到凌晨三点，螺丝还多了两颗' },
+  { id: 'daily_visa',           name: '签证焦虑症',     icon: '📄', rarity: 'normal',  cat: '日常', desc: '续签的那段日子，每天刷十遍邮箱' },
+  { id: 'daily_jetlag',         name: '时差候鸟',       icon: '🕐', rarity: 'normal',  cat: '日常', desc: '凌晨三点跟爸妈视频，假装自己过得很好' },
+  { id: 'daily_nomad',          name: '搬家游牧民',     icon: '📦', rarity: 'normal',  cat: '日常', desc: '来这个城市两年，换了四次住处' },
+  { id: 'daily_daigou',         name: '人肉代购',       icon: '🧳', rarity: 'normal',  cat: '日常', desc: '回国行李箱一半是给亲戚朋友带的东西' },
+
+  // ── 日常 — 打工/经济 ──────────────────────────────────────────────────
+  { id: 'daily_moonlight',      name: '月光族',         icon: '💰', rarity: 'normal',  cat: '日常', desc: '工资到账和花光之间只隔了一顿火锅' },
+  { id: 'daily_blackwork',      name: '黑工体验家',     icon: '🍽️', rarity: 'rare',    cat: '日常', desc: '在中餐馆洗碗到凌晨，时薪折算不如国内' },
+  { id: 'daily_resume',         name: '简历海王',       icon: '📮', rarity: 'normal',  cat: '日常', desc: '投了200份简历，收到了3个拒信和197个已读不回' },
+  { id: 'daily_exchange',       name: '汇率心碎',       icon: '💱', rarity: 'normal',  cat: '日常', desc: '每次花钱都在心里乘以汇率，然后默默放下购物车' },
+  { id: 'daily_scholarship',    name: '奖学金猎手',     icon: '🏅', rarity: 'rare',    cat: '日常', desc: '申到了奖学金，这学期终于不用吃土了' },
+
+  // ── 日常 — 文化/适应 ──────────────────────────────────────────────────
+  { id: 'daily_shock',          name: '文化休克',       icon: '😵', rarity: 'normal',  cat: '日常', desc: '来了才发现，课本上教的和真实世界是两种语言' },
+  { id: 'daily_nodsmile',       name: '点头微笑机器',   icon: '😊', rarity: 'normal',  cat: '日常', desc: '听不懂但你已经学会了在正确的时候笑' },
+  { id: 'daily_dreamenglish',   name: '梦里说英语',     icon: '💤', rarity: 'rare',    cat: '日常', desc: '有一天梦里突然开始说英语了，这算融入了吗？' },
+  { id: 'daily_worldly',        name: '甘败世俗',       icon: '👔', rarity: 'normal',  cat: '日常', desc: '你终于成为了小时候最不想成为的大人' },
+  { id: 'daily_noequal',        name: '事与愿违',       icon: '📉', rarity: 'normal',  cat: '日常', desc: '努力和结果，不是等号' },
+  { id: 'daily_tradeoff',       name: '有舍有得',       icon: '⚖️', rarity: 'normal',  cat: '日常', desc: '硬币没有第三面，人生没有两全' },
+
+  // ── 日常 — 专业 ───────────────────────────────────────────────────────
+  { id: 'daily_debug',          name: 'Debug人生',      icon: '🐛', rarity: 'normal',  cat: '日常', desc: '凌晨四点终于找到了那个少写的分号' },
+  { id: 'daily_case',           name: 'Case面试官',     icon: '📊', rarity: 'normal',  cat: '日常', desc: '能用framework分析一切，包括今晚吃什么' },
+  { id: 'daily_labghost',       name: '实验室幽灵',     icon: '🔬', rarity: 'normal',  cat: '日常', desc: '导师以为你住在实验室，其实你真的住在实验室' },
+  { id: 'daily_pre',            name: 'Pre恐惧症',      icon: '🎤', rarity: 'normal',  cat: '日常', desc: 'Presentation前一晚对着镜子练了二十遍' },
+  { id: 'daily_medbags',        name: '医学生的黑眼圈', icon: '🩺', rarity: 'normal',  cat: '日常', desc: '连续考了三周，黑眼圈已经成了你的标志' },
+  { id: 'daily_mootcourt',      name: '模拟法庭之王',   icon: '⚖️', rarity: 'rare',    cat: '日常', desc: '用中式逻辑赢了一场英语辩论' },
+  { id: 'daily_client',         name: '甲方乙方',       icon: '🎬', rarity: 'normal',  cat: '日常', desc: '学Film才知道，最难的不是创作，是满足甲方' },
+
+  // ── 日常 — 情绪/氛围 ─────────────────────────────────────────────────
+  { id: 'daily_firstsnow',      name: '第一场雪',       icon: '❄️', rarity: 'normal',  cat: '日常', desc: '异国的第一场雪，你在街头站了很久' },
+  { id: 'daily_airport',        name: '凌晨的机场',     icon: '✈️', rarity: 'normal',  cat: '日常', desc: '一个人拖着行李箱，突然觉得自己很勇敢' },
+  { id: 'daily_goodreport',     name: '报喜不报忧',     icon: '📱', rarity: 'normal',  cat: '日常', desc: '挂了电话之后，眼泪才掉下来' },
+  { id: 'daily_honest',         name: '坦白局',         icon: '💬', rarity: 'rare',    cat: '日常', desc: '妈，我其实不太好——最亲的人一直在等你开口' },
+  { id: 'daily_emo',            name: '深夜emo',        icon: '🌃', rarity: 'normal',  cat: '日常', desc: '半夜发了一条很丧的朋友圈，五分钟后删掉了' },
+
+  // ── 日常 — 选择类社交 ─────────────────────────────────────────────────
+  { id: 'daily_niceguy',        name: '老好人',         icon: '😇', rarity: 'normal',  cat: '日常', desc: '你不会拒绝别人，但有谁在意过你也很累？' },
+  { id: 'daily_hedgehog',       name: '刺猬',           icon: '🦔', rarity: 'normal',  cat: '日常', desc: '不是不想靠近，是怕靠近了又要失去' },
+  { id: 'daily_truth',          name: '真话很贵',       icon: '💎', rarity: 'rare',    cat: '日常', desc: '真话可能刺耳，但你选择了尊重' },
+  { id: 'daily_flatter',        name: '职业捧场王',     icon: '👏', rarity: 'normal',  cat: '日常', desc: '你总是说对的话，但不一定是真的话' },
+  { id: 'daily_outsider',       name: '局外人',         icon: '🪟', rarity: 'normal',  cat: '日常', desc: '热闹是他们的，你什么也没有' },
+  { id: 'daily_braveit',        name: '硬着头皮',       icon: '💪', rarity: 'normal',  cat: '日常', desc: '全场你只听懂了How are you，但你去了' },
+  { id: 'daily_partways',       name: '分道扬镳',       icon: '🚶', rarity: 'normal',  cat: '日常', desc: '不是所有关系都值得委屈自己去维护' },
+  { id: 'daily_drunktruth',     name: '酒后真言',       icon: '🥃', rarity: 'normal',  cat: '日常', desc: '清醒时不敢说的话，酒替你说了' },
+
+  // ── 日常 — 选择类学业/职业 ────────────────────────────────────────────
+  { id: 'daily_switchtrack',    name: '换赛道',         icon: '🔀', rarity: 'rare',    cat: '日常', desc: '别人在冲终点，你回到了起跑线——但这次是自己选的' },
+  { id: 'daily_grindlord',      name: '卷王觉醒',       icon: '📖', rarity: 'normal',  cat: '日常', desc: '你不知道路通向哪里，但你就是停不下来' },
+  { id: 'daily_tangping',       name: '躺平宣言',       icon: '🛋️', rarity: 'normal',  cat: '日常', desc: '想通了，绩点是暂时的，快乐是永恒的' },
+  { id: 'daily_freeintern',     name: '实习牛马',       icon: '🐴', rarity: 'normal',  cat: '日常', desc: 'PPT最后一页"感谢实习生的贡献"——就这？' },
+  { id: 'daily_stable',         name: '铁饭碗',         icon: '🍚', rarity: 'normal',  cat: '日常', desc: '长大就是学会把梦想折好放进抽屉' },
+  { id: 'daily_dream',          name: '追梦人',         icon: '🌠', rarity: 'rare',    cat: '日常', desc: '不确定能走多远，但至少方向是自己选的' },
+  { id: 'daily_gapyear',        name: 'Gap Year',       icon: '🌍', rarity: 'rare',    cat: '日常', desc: '所有人都在赶路，你选择了停下来看看风景' },
+  { id: 'daily_integrity',      name: '学术诚信',       icon: '🛡️', rarity: 'rare',    cat: '日常', desc: '正确答案可能在那张纸条上，但你选择了不知道' },
+  { id: 'daily_gambler',        name: '学术赌徒',       icon: '🎲', rarity: 'normal',  cat: '日常', desc: '心跳了一整场考试，卷子上的字一个都没看进去' },
+
+  // ── 日常 — 选择类生活 ─────────────────────────────────────────────────
+  { id: 'daily_latenight',      name: '深夜外卖',       icon: '🥡', rarity: 'normal',  cat: '日常', desc: '这单外卖比任何安慰都管用' },
+  { id: 'daily_yolo',           name: '青春无价',       icon: '🎒', rarity: 'rare',    cat: '日常', desc: '钱花了还能赚，青春过了就没了' },
+  { id: 'daily_sensible',       name: '量力而行',       icon: '📏', rarity: 'normal',  cat: '日常', desc: '你学会了一个大人才懂的词' },
+  { id: 'daily_letgo',          name: '断舍离',         icon: '🗑️', rarity: 'normal',  cat: '日常', desc: '扔掉旧东西的时候，好像也放下了一些什么' },
+  { id: 'daily_stay',           name: '留下来',         icon: '🏠', rarity: 'rare',    cat: '日常', desc: '留下需要勇气，你不想让这几年变成一场旅行' },
+  { id: 'daily_gohome',         name: '回家',           icon: '🏡', rarity: 'normal',  cat: '日常', desc: '落地那一刻，故乡也变成了远方' },
+  { id: 'daily_er',             name: '第一次看急诊',   icon: '🏥', rarity: 'normal',  cat: '日常', desc: '看完账单/排完队，觉得自己的病突然好了' },
+  { id: 'daily_restart',        name: '删掉重来',       icon: '🗃️', rarity: 'rare',    cat: '日常', desc: '凌晨两点按下全选删除——有些东西必须亲手推倒' },
+
+  // ── 日常 — 选择类成长 ─────────────────────────────────────────────────
+  { id: 'daily_sayno',          name: '说不',           icon: '✋', rarity: 'rare',    cat: '日常', desc: '你终于学会了世界上最短也最难说的那个字' },
+  { id: 'daily_selfpeace',      name: '与自己和解',     icon: '🕊️', rarity: 'rare',    cat: '日常', desc: '你不再追赶那个完美的自己了' },
+  { id: 'daily_solotrip',       name: '一个人的旅行',   icon: '🧭', rarity: 'normal',  cat: '日常', desc: '你以为你在找风景，其实你在找自己' },
+  { id: 'daily_lookback',       name: '回头看',         icon: '🪞', rarity: 'normal',  cat: '日常', desc: '人生没有存档点，但你学会了不后悔' },
+  { id: 'daily_giveup',         name: '认输',           icon: '🏳️', rarity: 'normal',  cat: '日常', desc: '放手不是懦弱，是终于听见了自己的声音' },
+  { id: 'daily_onemore',        name: '再试一次',       icon: '🔥', rarity: 'rare',    cat: '日常', desc: '所有人都觉得你疯了——然后你做到了' },
 ];
 
 let _unlocked = new Set();
@@ -319,9 +422,11 @@ function _renderWall() {
   if (!grid) return;
   grid.innerHTML = '';
 
-  // Update progress count in header
+  // Update progress count in header (exclude 日常, they have their own tab)
+  const nonDaily = ACHIEVEMENTS.filter(a => a.cat !== '日常');
+  const nonDailyUnlocked = nonDaily.filter(a => _unlocked.has(a.id)).length;
   const countEl = document.getElementById('ach-wall-count');
-  if (countEl) countEl.textContent = `${_unlocked.size} / ${ACHIEVEMENTS.length}`;
+  if (countEl) countEl.textContent = `${nonDailyUnlocked} / ${nonDaily.length}`;
 
   const cats = ['里程碑', '感情', '剧情', '终局', '彩蛋', '朋友圈'];
   for (const cat of cats) {
@@ -482,15 +587,13 @@ function _initWallTabs() {
     _activeWallTab = key;
     wall.querySelectorAll('.ach-wall-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === key));
     const achGrid = document.getElementById('ach-wall-grid');
+    const dailyGrid = document.getElementById('daily-wall-grid');
     const endGrid = document.getElementById('ending-wall-grid');
-    if (key === 'ach') {
-      if (achGrid) achGrid.style.display = '';
-      if (endGrid) endGrid.style.display = 'none';
-    } else {
-      if (achGrid) achGrid.style.display = 'none';
-      if (endGrid) endGrid.style.display = '';
-      _renderEndingWall();
-    }
+    achGrid && (achGrid.style.display = key === 'ach' ? '' : 'none');
+    dailyGrid && (dailyGrid.style.display = key === 'daily' ? '' : 'none');
+    endGrid && (endGrid.style.display = key === 'endings' ? '' : 'none');
+    if (key === 'daily') _renderDailyWall();
+    if (key === 'endings') _renderEndingWall();
   });
 }
 
@@ -541,6 +644,55 @@ function _renderEndingWall() {
       } else {
         card.innerHTML = `<div class="ending-card-icon ending-card-icon-locked">${def.icon}</div>`;
       }
+      row.appendChild(card);
+    }
+
+    section.appendChild(row);
+    grid.appendChild(section);
+  }
+}
+
+function _renderDailyWall() {
+  const grid = document.getElementById('daily-wall-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  const dailyAch = ACHIEVEMENTS.filter(a => a.cat === '日常');
+  const unlocked = dailyAch.filter(a => _unlocked.has(a.id)).length;
+  const countEl = document.getElementById('daily-wall-count');
+  if (countEl) countEl.textContent = `${unlocked}/${dailyAch.length}`;
+
+  const rarityOrder = ['legendary', 'epic', 'rare', 'normal'];
+  const rarityLabels = { legendary: '🌟 传说', epic: '💜 史诗', rare: '💙 稀有', normal: '🤍 普通' };
+
+  for (const r of rarityOrder) {
+    const items = dailyAch.filter(a => a.rarity === r);
+    if (!items.length) continue;
+
+    const section = document.createElement('div');
+    section.className = 'ach-section';
+
+    const title = document.createElement('div');
+    title.className = 'ach-section-title';
+    const rUnlocked = items.filter(a => _unlocked.has(a.id)).length;
+    title.textContent = `${rarityLabels[r]}  ${rUnlocked}/${items.length}`;
+    section.appendChild(title);
+
+    const row = document.createElement('div');
+    row.className = 'ach-section-items';
+
+    for (const def of items) {
+      const done = _unlocked.has(def.id);
+      const card = document.createElement('div');
+      card.className = `ach-card ach-r-${def.rarity} ${done ? 'ach-unlocked' : 'ach-locked'}`;
+      card.innerHTML = `
+        <div class="ach-card-icon">${def.icon}</div>
+        <div class="ach-card-body">
+          <div class="ach-card-name">${def.name}</div>
+          <div class="ach-card-desc">${done ? def.desc : '???'}</div>
+        </div>
+        ${done ? '<div class="ach-card-check">✓</div>' : ''}
+      `;
       row.appendChild(card);
     }
 

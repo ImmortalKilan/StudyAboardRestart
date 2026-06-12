@@ -16,6 +16,7 @@ import { initMemoryUI, renderMemoryPanel, recordPlaythrough, showNewCardToast } 
 import { initRelicUI, updateVaultButton, openVaultModal, renderRelicSlot, initRelicSlot, finalizeRelicChoice, generateRelicChoices, showRelicReward, getActiveRelic, clearActiveRelic, consumeActiveRelic, showMutationToast, checkGiftLink, redeemRelicCode, formatEffect as relicFormatEffect, addRelic, getRelicVault, checkBlueTrigger, checkPurpleTrigger, tryPhoenixSave } from './relic.js';
 import { initMoments, tickMoments, checkPostable, playerPost, mountMomentsUI, mountMobileMoments, openMobileMoments, mountMobileDrawer, resetMoments, showPostPrompt, isMomentsVisible, getClassReunion, reactToPlayerEvent, setMomentsActionHandler, setMomentsDramaHandler, addMomLastPost, setMomentsHiddenEntryHandler } from './moments.js';
 import * as SFX from './audio.js';
+import * as BGM from './bgm.js';
 // Multiplayer — loaded dynamically so single-player works even if it fails
 let mp = { enabled: false, connected: false, cards: [], opponent: {} };
 let createRoom, joinRoom, mpSend, mpOn, mpDisconnect, resetMpState, REUNION_AGES, FATE_CARDS, initialFateCards, draftFrenemyCards, FRENEMY_CARD_POOL;
@@ -1805,6 +1806,10 @@ const state = {
   xianxiaSeed: 0, yuanshen_book: 0, xingchen_book: 0,
   MAG: 0, hogwartsYear: 0, housePt: 0, house: '', hasOwl: 0, hogwartsSeed: 0, horcrux: 0,
 
+  // Daily achievement accumulators
+  _dailyHelpCount: 0,
+  _dailyRefuseCount: 0,
+
   // Summary tracking
   statPeaks: {},
   storylinesVisited: new Set(),
@@ -2363,11 +2368,14 @@ function applyEvent(ev) {
   if (ev.set && ev.set.storyline && ev.set.storyline !== prevStorylineForCinematic
       && (HIDDEN_STORYLINES.has(ev.set.storyline) || SPECIAL_STORYLINES.has(ev.set.storyline))) {
     SFX.sfxKeyEvent();
+    const isHidden = HIDDEN_STORYLINES.has(state.storyline);
+    // BGM: fade out current track, play sting matching cinematic color
+    BGM.fadeOutForCinematic(400);
+    if (isHidden) SFX.stingHiddenIntro(); else SFX.stingSpecialIntro();
     state.pendingCinematic = true;
     state._cineSavedAuto = autoMode;
     stopAuto();
     render();
-    const isHidden = HIDDEN_STORYLINES.has(state.storyline);
     const newStat = STORYLINE_UNLOCK_STAT[state.storyline];
     const prevStat = STORYLINE_UNLOCK_STAT[prevStorylineForCinematic];
     playStorylineIntro({
@@ -2380,6 +2388,7 @@ function applyEvent(ev) {
         const saved = state._cineSavedAuto || 0;
         state._cineSavedAuto = 0;
         if (saved > 0) startAuto(saved);
+        BGM.resumeAfterCinematic(state);
         render();
       }
     });
@@ -2387,6 +2396,7 @@ function applyEvent(ev) {
 
   // Cinematic exit when leaving a special/hidden storyline
   if (isStorylineExit) {
+    BGM.fadeOutForCinematic(400);
     state.pendingCinematic = true;
     state._cineSavedAuto = autoMode;
     stopAuto();
@@ -2402,6 +2412,7 @@ function applyEvent(ev) {
         const saved = state._cineSavedAuto || 0;
         state._cineSavedAuto = 0;
         if (saved > 0) startAuto(saved);
+        BGM.resumeAfterCinematic(state);
         render();
       }
     });
@@ -2552,6 +2563,205 @@ function _checkEventAchievements(ev) {
   if (id === 76090) unlockAchievement('end_influencer_top');     // 全网顶流
   if (id === 76096) unlockAchievement('end_influencer_comeback'); // 咸鱼翻身
   if (id === 76041) unlockAchievement('influencer_mcn');          // MCN签约
+
+  // ═══════════════════════════════════════════════════════════════════
+  //  日常成就 triggers (77xxx events)
+  // ═══════════════════════════════════════════════════════════════════
+
+  // ── 社交选择 ──────────────────────────────────────────────────────
+  // 老好人 / 刺猬: accumulate help/refuse counts (threshold = 2)
+  if (id === 77002 || id === 77005) {
+    state._dailyHelpCount = (state._dailyHelpCount || 0) + 1;
+    if (state._dailyHelpCount >= 2) unlockAchievement('daily_niceguy');
+  }
+  if (id === 77003 || id === 77006) {
+    state._dailyRefuseCount = (state._dailyRefuseCount || 0) + 1;
+    if (state._dailyRefuseCount >= 2) unlockAchievement('daily_hedgehog');
+  }
+  // 真话很贵 (说实话) / 职业捧场王 (说假话)
+  if (id === 77008) unlockAchievement('daily_truth');
+  if (id === 77009) unlockAchievement('daily_flatter');
+  // 社恐の勇气 (硬着头皮去聚会) / 局外人 (不去)
+  if (id === 77011) unlockAchievement('daily_shycourage');
+  if (id === 77012) unlockAchievement('daily_outsider');
+  // 分道扬镳 (坚持观点) / 和解于心 (避开分歧)
+  if (id === 77014) unlockAchievement('daily_partways');
+  if (id === 77015) unlockAchievement('daily_peace');
+  // 喝醉了 + 酒后真言 (喝酒链) / 人间清醒 (不喝)
+  if (id === 77017) unlockAchievement('daily_drunk');
+  if (id === 77018) unlockAchievement('daily_drunktruth');
+  if (id === 77019) unlockAchievement('daily_sober');
+
+  // ── 学业/职业选择 ─────────────────────────────────────────────────
+  // GPT门徒 (用AI写被抓/侥幸) / 学术诚信 (自己写)
+  if (id === 77201 || id === 77202 || id === 77204) unlockAchievement('daily_gpt');
+  if (id === 77203) unlockAchievement('daily_integrity');
+  // 慈善家 (交了重修费)
+  if (id === 77202 || id === 48408) unlockAchievement('daily_charity');
+  // 学术赌徒 (偷看答案) / 慈善家 → daily_honest (不看)
+  // Note: 77206=不看, 77207/77208/77209=偷看
+  if (id === 77206) unlockAchievement('daily_honest');
+  if (id === 77207 || id === 77208 || id === 77209) unlockAchievement('daily_gambler');
+  // 图书馆幽灵 (去图书馆) / 深夜emo (打游戏看剧)
+  if (id === 77211) unlockAchievement('daily_library');
+  if (id === 77212) unlockAchievement('daily_emo');
+  // 换赛道 (转专业) / 卷王觉醒 (咬牙读完)
+  if (id === 77216) unlockAchievement('daily_switchtrack');
+  if (id === 77217) unlockAchievement('daily_grindlord');
+  // 实习牛马 (无薪实习) / 铁饭碗 → daily_stable 不做
+  // 77221/77222/77224=去实习, 77223=不去
+  if (id === 77221 || id === 77222 || id === 77224) unlockAchievement('daily_freeintern');
+  if (id === 77223) unlockAchievement('daily_stable');
+  // 追梦人 (创业) / 躺平宣言 → daily_tangping (选大厂)
+  if (id === 77232) unlockAchievement('daily_dream');
+  if (id === 77231) unlockAchievement('daily_tangping');
+  // Gap Year (gap) / 卷王觉醒 already covered
+  if (id === 77236) unlockAchievement('daily_gapyear');
+  // Pre恐惧症 (硬讲) / 学术偷渡者 → daily_chegg (念稿)
+  if (id === 77241) unlockAchievement('daily_pre');
+  if (id === 77242) unlockAchievement('daily_chegg');
+
+  // ── 生活选择 ──────────────────────────────────────────────────────
+  // 报喜不报忧 (说没事) / 坦白局 (说实话)
+  if (id === 77301) unlockAchievement('daily_goodreport');
+  if (id === 77302) unlockAchievement('daily_honest');
+  // 青春无价 (花钱去旅行) / 量力而行 (不去)
+  if (id === 77306) unlockAchievement('daily_yolo');
+  if (id === 77307) unlockAchievement('daily_sensible');
+  // 深夜外卖 (点外卖) / 泡面大师 (泡面)
+  if (id === 77311) unlockAchievement('daily_latenight');
+  if (id === 77312) unlockAchievement('daily_noodle');
+  // 中华小当家 (自己做饭成功) / no achievement for fail/order
+  if (id === 77317) unlockAchievement('daily_chef');
+  if (id === 77319) unlockAchievement('daily_chef');  // 做糊了也算尝试了
+  // 火锅外交官 (火锅聚餐)
+  if (id === 77321 || id === 77322) unlockAchievement('daily_hotpot');
+  // 断舍离 (扔旧东西) / 留下来的记忆 not an ach
+  if (id === 77326) unlockAchievement('daily_letgo');
+  // 留下来 / 回家
+  if (id === 77331) unlockAchievement('daily_stay');
+  if (id === 77332) unlockAchievement('daily_gohome');
+  // 第一次看急诊 (去医院)
+  if (id === 77336 || id === 77337 || id === 77338 || id === 77339) unlockAchievement('daily_er');
+  // 删掉重来 (推倒重写) / 硬着头皮 (硬圆)
+  if (id === 77346) unlockAchievement('daily_restart');
+  if (id === 77347) unlockAchievement('daily_braveit');
+  // 人肉代购 (帮亲戚带) / 说不 (拒绝)
+  if (id === 77351) unlockAchievement('daily_daigou');
+  if (id === 77352) unlockAchievement('daily_sayno');
+  // 黑工体验家 (去打黑工) / (不去)
+  if (id === 77356 || id === 77357 || id === 77359) unlockAchievement('daily_blackwork');
+
+  // ── 成长/哲学选择 ─────────────────────────────────────────────────
+  // 说不 (退群) / 老好人 (帮改作业) - already covered by niceguy accumulator
+  if (id === 77401) unlockAchievement('daily_sayno');
+  if (id === 77402) {
+    state._dailyHelpCount = (state._dailyHelpCount || 0) + 1;
+    if (state._dailyHelpCount >= 2) unlockAchievement('daily_niceguy');
+  }
+  // 甘败世俗 (接受长大) / 不一样
+  if (id === 77406) unlockAchievement('daily_worldly');
+  if (id === 77407) unlockAchievement('daily_worldly');  // 两个选项都是关于成长
+  // 认输 (放弃) / 再试一次 (再来)
+  if (id === 77411) unlockAchievement('daily_giveup');
+  if (id === 77412 || id === 77413 || id === 77414) unlockAchievement('daily_onemore');
+  // 一个人的旅行 (独自出发) / (跟大家)
+  if (id === 77421) unlockAchievement('daily_solotrip');
+  // 深夜emo (发丧朋友圈)
+  if (id === 77426 || id === 77427) unlockAchievement('daily_emo');
+  // 与自己和解 (接受平凡) / 再试一次 → restart
+  if (id === 77431) unlockAchievement('daily_selfpeace');
+  if (id === 77432) unlockAchievement('daily_onemore');
+  // 回头看 (回头看那条没走的路)
+  if (id === 77436) unlockAchievement('daily_lookback');
+  if (id === 77437) unlockAchievement('daily_lookback');
+  // 有舍有得 (没有两全) / 事与愿违 (我做错了吗)
+  if (id === 77441) unlockAchievement('daily_tradeoff');
+  if (id === 77442) unlockAchievement('daily_noequal');
+
+  // ── 专业选择 ──────────────────────────────────────────────────────
+  // Debug人生 (CS: 找到分号)
+  if (id === 77601 || id === 77602) unlockAchievement('daily_debug');
+  // Case面试官 (商科Case Comp)
+  if (id === 77621 || id === 77622) unlockAchievement('daily_case');
+  // 实验室幽灵 (理科/BIO: 48h实验室)
+  if (id === 77631 || id === 77632) unlockAchievement('daily_labghost');
+  // 模拟法庭之王 (法学辩论)
+  if (id === 77641 || id === 77642) unlockAchievement('daily_mootcourt');
+  // 甲方乙方 (Film: 改/不改作品)
+  if (id === 77611 || id === 77612) unlockAchievement('daily_client');
+  // 医学生的黑眼圈 (MED: 连续考试)
+  if (id === 77651 || id === 77652) unlockAchievement('daily_medbags');
+
+  // ── 食物/生存状态触发 ─────────────────────────────────────────────
+  // 白日梦想家 (省钱吃便宜食物, 各国版本)
+  if (id >= 77700 && id <= 77706) unlockAchievement('daily_dreamer');
+  // 泡面大师 (凌晨泡面)
+  if (id === 77707) unlockAchievement('daily_noodle');
+
+  // ── 学业状态触发 ──────────────────────────────────────────────────
+  // 全勤战士 (没逃过课)
+  if (id === 77750) unlockAchievement('daily_fullattend');
+  // 选课大师 (RateMyProfessor选课)
+  if (id === 77751) unlockAchievement('daily_course');
+  // Deadline战神 (due前两小时赶完)
+  if (id === 77752) unlockAchievement('daily_deadline');
+  // 图书馆幽灵 (期末图书馆)
+  if (id === 77753) unlockAchievement('daily_library');
+  // Office Hours常客
+  if (id === 77754) unlockAchievement('daily_office');
+
+  // ── 社交/情绪状态触发 ─────────────────────────────────────────────
+  // 深夜emo (刷朋友圈)
+  if (id === 77800) unlockAchievement('daily_emo');
+  // 假装外向 (party后独处)
+  if (id === 77801) unlockAchievement('daily_fakeextro');
+  // 社恐の勇气 (主动搭话)
+  if (id === 77802) unlockAchievement('daily_shycourage');
+
+  // ── 生活状态触发 ──────────────────────────────────────────────────
+  // 车轮上的美国 (美国没车)
+  if (id === 77850) unlockAchievement('daily_nocar');
+  // 地铁老司机 (港/日/英地铁)
+  if (id === 77851 || id === 77852 || id === 77853) unlockAchievement('daily_metro');
+  // 宜家组装师 (搬家组家具)
+  if (id === 77854) unlockAchievement('daily_ikea');
+  // 签证焦虑症
+  if (id === 77855) unlockAchievement('daily_visa');
+  // 时差候鸟 (跨时区和家人视频)
+  if (id === 77856) unlockAchievement('daily_jetlag');
+  // 搬家游牧民
+  if (id === 77857) unlockAchievement('daily_nomad');
+
+  // ── 经济状态触发 ──────────────────────────────────────────────────
+  // 月光族
+  if (id === 77900) unlockAchievement('daily_moonlight');
+  // 汇率心碎
+  if (id === 77901) unlockAchievement('daily_exchange');
+
+  // ── 文化/适应状态触发 ─────────────────────────────────────────────
+  // 文化休克 (听不懂课)
+  if (id === 77930) unlockAchievement('daily_shock');
+  // 点头微笑机器 (假装听懂笑话)
+  if (id === 77931) unlockAchievement('daily_nodsmile');
+  // 梦里说英语
+  if (id === 77932) unlockAchievement('daily_dreamenglish');
+  // 事与愿违 (努力不等于回报)
+  if (id === 77933) unlockAchievement('daily_noequal');
+
+  // ── 氛围/情感状态触发 ─────────────────────────────────────────────
+  // 第一场雪 (各城市版本)
+  if (id === 77960 || id === 77961 || id === 77962) unlockAchievement('daily_firstsnow');
+  // 凌晨的机场
+  if (id === 77963) unlockAchievement('daily_airport');
+
+  // ── 已有事件 hook (触发日常成就) ──────────────────────────────────
+  // 简历海王: 海投简历 (Career Fair)
+  if (id === 18001) unlockAchievement('daily_resume');
+  // 奖学金猎手: 奖学金事件
+  if (id === 14001) unlockAchievement('daily_scholarship');
+  // 苦行僧: 小组作业被迫单刷 / 队友摸鱼carry
+  if (id === 11002 || id === 42032 || id === 48622) unlockAchievement('daily_monk');
 }
 
 function _parseRequireHint(expr) {
@@ -4496,6 +4706,10 @@ function render() {
 
   // ── Time-loop glitch effects ──
   _timeloopGlitchTick();
+
+  // ── BGM reactive sync ──
+  BGM.sync(state);
+  if (state.pendingChoice) BGM.duck(); else BGM.unduck();
 }
 
 function updateAutoButtons() {
@@ -6344,6 +6558,8 @@ async function main() {
   });
   setOnUnlock(() => SFX.sfxAchievement());
   SFX.initMuteState();
+  BGM.init();
+  BGM.setMuted(SFX.isMuted());
 
   // Flowchart open buttons
   const fcStartBtn = $('fc-open-start-btn');
@@ -6360,6 +6576,7 @@ async function main() {
   function _toggleMute() {
     const next = !SFX.isMuted();
     SFX.setMuted(next);
+    BGM.setMuted(next);
     _syncMuteBtns();
     SFX.sfxToggle();
   }
