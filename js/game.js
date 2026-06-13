@@ -7867,11 +7867,13 @@ async function main() {
   $('guide-next').addEventListener('click', _guideNext);
   $('guide-skip').addEventListener('click', () => { SFX.sfxClick(); _guideEnd(); });
 
-  // Hook showScreen for game-screen phase resume
+  // Hook showScreen for game-screen phase resume + BGM sync
   const _origShowScreen = showScreen;
   showScreen = function(id) {
     _origShowScreen(id);
     if (id === 'game-screen') _guideResumeForPhase('game');
+    // BGM follows screen changes (talent/alloc/start screens skip render())
+    BGM.sync(state);
   };
 
   // Hook _scrollToAlloc for alloc phase resume

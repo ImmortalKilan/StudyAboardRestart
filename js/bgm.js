@@ -39,6 +39,7 @@ const STORYLINE_TRACK = {
   // bright
   idol: 'special_bright', superstar: 'special_bright', streamer: 'special_bright',
   influencer: 'special_bright', mcn: 'special_bright', band: 'special_bright',
+  partners: 'special_bright',  // multiplayer co-op
   // hustle
   fitness: 'special_hustle', chef: 'special_hustle', athlete: 'special_hustle',
   academic: 'special_hustle', ceo: 'special_hustle',
@@ -48,10 +49,11 @@ const STORYLINE_TRACK = {
   cheater: 'special_neon',
   // party
   party: 'special_party', wasted: 'special_party',
-  // hidden — spy family
+  // hidden — spy / thief family (dark thriller vibe)
   spy: 'hidden_spy', abyss: 'hidden_spy', meta: 'hidden_spy', timeloop: 'hidden_spy',
-  // hidden — xianxia family
-  xianxia: 'hidden_xianxia', thief: 'hidden_xianxia',
+  thief: 'hidden_spy',
+  // hidden — xianxia (solo, ancient cultivation vibe)
+  xianxia: 'hidden_xianxia',
   // hidden — magic
   hogwarts: 'hidden_hogwarts',
 };
@@ -121,7 +123,27 @@ export function init() {
     if (v === '1') _muted = true;
   } catch (e) {}
   _ensureCtx();
+  // Autoplay policy: if ctx starts suspended, retry sync on first user gesture.
+  if (_ctx && _ctx.state !== 'running') {
+    const _kick = () => {
+      try { _ctx.resume(); } catch (e) {}
+      // Replay whatever track we were supposed to be on
+      if (_pendingTrackOnResume) {
+        const t = _pendingTrackOnResume;
+        _pendingTrackOnResume = null;
+        _switchTo(t, FADE_MS);
+      }
+      window.removeEventListener('click', _kick, true);
+      window.removeEventListener('keydown', _kick, true);
+      window.removeEventListener('touchstart', _kick, true);
+    };
+    window.addEventListener('click', _kick, true);
+    window.addEventListener('keydown', _kick, true);
+    window.addEventListener('touchstart', _kick, true);
+  }
 }
+
+let _pendingTrackOnResume = null;
 
 // ── Track switching ──────────────────────────────────────────────────────────
 function _stopCurrent(fadeMs = FADE_MS) {
@@ -181,11 +203,11 @@ async function _playTrack(trackId, fadeMs = FADE_MS) {
 }
 
 function _switchTo(trackId, fadeMs = FADE_MS) {
+  // Cinematic owns BGM transitions entirely — ignore sync() calls during it.
+  // Do NOT touch _currentTrackId here, or resumeAfterCinematic will think
+  // we're already on the target track and skip the actual playback.
+  if (_suppressedForCinematic) return;
   if (_currentTrackId === trackId) return;
-  if (_suppressedForCinematic) {
-    _currentTrackId = trackId; // record intent; resumeAfterCinematic will play
-    return;
-  }
   _stopCurrent(fadeMs);
   // small delay so old track has begun its fade-out before new one starts
   setTimeout(() => {
@@ -209,7 +231,13 @@ function _pickTrack(state) {
 export function sync(state) {
   if (!_initialized) return;
   const target = _pickTrack(state);
-  if (target && target !== _currentTrackId) _switchTo(target);
+  if (!target) return;
+  // If AudioContext can't run yet (no user gesture), remember target and bail.
+  if (_ctx && _ctx.state !== 'running') {
+    _pendingTrackOnResume = target;
+    return;
+  }
+  if (target !== _currentTrackId) _switchTo(target);
 }
 
 export function duck() {

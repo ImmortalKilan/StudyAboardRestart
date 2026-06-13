@@ -1,6 +1,6 @@
 // Service Worker for 留学重开模拟器 PWA
 // Bump CACHE_VER to force re-cache after content updates
-const CACHE_VER = 'sasr-3.4';
+const CACHE_VER = 'sasr-4.0';
 
 const CORE_ASSETS = [
   './',
@@ -61,17 +61,17 @@ const CORE_ASSETS = [
   './assets/sfx/switch7.ogg',
   './assets/sfx/switch8.ogg',
   './assets/sfx/switch9.ogg',
-  // BGM (optional — engine silently skips missing files; add only after producing them)
-  // './assets/bgm/title.ogg',
-  // './assets/bgm/daily.ogg',
-  // './assets/bgm/summary.ogg',
-  // './assets/bgm/special_bright.ogg',
-  // './assets/bgm/special_hustle.ogg',
-  // './assets/bgm/special_neon.ogg',
-  // './assets/bgm/special_party.ogg',
-  // './assets/bgm/hidden_spy.ogg',
-  // './assets/bgm/hidden_xianxia.ogg',
-  // './assets/bgm/hidden_hogwarts.ogg',
+  // BGM (engine silently skips missing files; uncomment as more are produced)
+  './assets/bgm/title.ogg',
+  './assets/bgm/daily.ogg',
+  './assets/bgm/summary.ogg',
+  './assets/bgm/special_bright.ogg',
+  './assets/bgm/special_hustle.ogg',
+  './assets/bgm/special_neon.ogg',
+  './assets/bgm/special_party.ogg',
+  './assets/bgm/hidden_spy.ogg',
+  './assets/bgm/hidden_xianxia.ogg',
+  './assets/bgm/hidden_hogwarts.ogg',
   // Avatar assets (modular_v1_calibrated)
   './assets/avatars/modular_v1_calibrated/anchors.json',
   // -- bg

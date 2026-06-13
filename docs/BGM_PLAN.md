@@ -11,12 +11,12 @@
 | `title.ogg` | 开始屏、抽天赋、分配属性（`state.phase === 'talent'` / `'alloc'`） | — |
 | `daily.ogg` | 推进中，无剧情线（`state.phase === 'game'` 且 `state.storyline === ''`） | — |
 | `summary.ogg` | 结算屏（`state.phase === 'ended'`） | — |
-| `special_bright.ogg` | 偶像/超级巨星/主播/网红/MCN/乐队 剧情线 | `idol`, `superstar`, `streamer`, `influencer`, `mcn`, `band` |
+| `special_bright.ogg` | 偶像/超级巨星/主播/网红/MCN/乐队/联机合作 剧情线 | `idol`, `superstar`, `streamer`, `influencer`, `mcn`, `band`, `partners` |
 | `special_hustle.ogg` | 健身/厨师/运动员/学术/CEO 剧情线 | `fitness`, `chef`, `athlete`, `academic`, `ceo` |
 | `special_neon.ogg` | 电竞/扑克/作弊 剧情线 | `esports`, `worlds`, `minor_league`, `poker`, `triton`, `local_shark`, `cheater` |
 | `special_party.ogg` | 派对/堕落 剧情线 | `party`, `wasted` |
-| `hidden_spy.ogg` | 间谍/深渊/Meta/时间循环 隐藏线 | `spy`, `abyss`, `meta`, `timeloop` |
-| `hidden_xianxia.ogg` | 修仙/神偷 隐藏线 | `xianxia`, `thief` |
+| `hidden_spy.ogg` | 间谍/深渊/Meta/时间循环/神偷 隐藏线 | `spy`, `abyss`, `meta`, `timeloop`, `thief` |
+| `hidden_xianxia.ogg` | 修仙 隐藏线（单独） | `xianxia` |
 | `hidden_hogwarts.ogg` | 霍格沃茨 隐藏线 | `hogwarts` |
 
 > 映射表在 `js/bgm.js` 的 `STORYLINE_TRACK` 常量里，可以随时改。

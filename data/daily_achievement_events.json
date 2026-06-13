@@ -168,7 +168,7 @@
         "next": 77019
       }
     ],
-    "include": "(overseas==1)&(HAP<=4)&(AGE>=18)&(AGE<=30)",
+    "include": "(overseas==1)&(HAP<=4)&(AGE>=18)&(AGE<=22)",
     "weight": 2
   },
   {
@@ -1013,7 +1013,7 @@
         "next": 77422
       }
     ],
-    "include": "(overseas==1)&(AGE>=18)&(AGE<=30)&(MNY>=3)",
+    "include": "(overseas==1)&(AGE>=18)&(AGE<=22)&(MNY>=3)",
     "weight": 2
   },
   {
@@ -1497,7 +1497,7 @@
   {
     "id": 77852,
     "event": "东京的地铁图终于刻进了你的DNA。你可以在新宿站闭着眼换乘三条线。今天你居然在高峰期帮一个日本大爷找到了出口——他鞠了一躬，你也鞠了一躬。",
-    "include": "(country==日本)&(AGE>=19)&(AGE<=28)",
+    "include": "(country==日本)&(AGE>=18)&(AGE<=22)",
     "weight": 2,
     "happyDelta": 1,
     "effect": { "SOC": 1 }
@@ -1505,14 +1505,14 @@
   {
     "id": 77853,
     "event": "伦敦地铁又延误了。你站在站台上看着屏幕上「Minor delays」的提示，面无表情。刚来的时候你会烦躁，现在你已经学会了——这不叫延误，这叫日常。",
-    "include": "(country==英国)&(AGE>=19)&(AGE<=28)",
+    "include": "(country==英国)&(AGE>=18)&(AGE<=22)",
     "weight": 2,
     "happyDelta": 0
   },
   {
     "id": 77854,
     "event": "搬进新住处的第一天。你一个人扛了六个箱子上楼，然后花了整晚组装宜家家具。凌晨三点终于装完了——螺丝还多了两颗。你躺在新床上，看着天花板，觉得自己无所不能。",
-    "include": "(overseas==1)&(AGE>=18)&(AGE<=28)",
+    "include": "(overseas==1)&(AGE>=18)&(AGE<=22)",
     "weight": 3,
     "happyDelta": 1,
     "effect": { "PER": 1 }
@@ -1601,21 +1601,21 @@
   {
     "id": 77960,
     "event": "纽约的第一场雪。你站在街头，看着雪花落在路灯上、落在行人的伞上、落在你的睫毛上。你拍了一张照片，想发朋友圈，但想了想配什么文字都不对——这种感觉，只有站在这里的人才知道。",
-    "include": "(country==美国)&(overseas==1)&(AGE>=18)&(AGE<=28)&((MTH>=11)|(MTH<=2))",
+    "include": "(country==美国)&(overseas==1)&(AGE>=18)&(AGE<=22)&((MTH>=11)|(MTH<=2))",
     "weight": 2,
     "happyDelta": 2
   },
   {
     "id": 77961,
     "event": "伦敦难得下雪了。你推开窗，看着那一层薄薄的白色覆盖了灰蒙蒙的城市。你发了一条朋友圈，没有人点赞。但你站在窗前看了很久。",
-    "include": "(country==英国)&(overseas==1)&(AGE>=18)&(AGE<=28)&((MTH>=11)|(MTH<=2))",
+    "include": "(country==英国)&(overseas==1)&(AGE>=18)&(AGE<=22)&((MTH>=11)|(MTH<=2))",
     "weight": 2,
     "happyDelta": 1
   },
   {
     "id": 77962,
     "event": "东京初雪。你走在银座的街道上，路灯把雪照得很暖。你想起了一个人，拿起手机打了几个字又删掉了。",
-    "include": "(country==日本)&(overseas==1)&(AGE>=18)&(AGE<=28)&((MTH>=11)|(MTH<=2))",
+    "include": "(country==日本)&(overseas==1)&(AGE>=18)&(AGE<=22)&((MTH>=11)|(MTH<=2))",
     "weight": 2,
     "happyDelta": 1
   },
