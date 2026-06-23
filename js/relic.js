@@ -732,6 +732,9 @@ export function renderRelicSlot() {
 }
 
 function _renderSlotContent(slot, vault) {
+  const COLLAPSE_LIMIT = 3;
+  const hasMore = vault.length > COLLAPSE_LIMIT;
+  const wasExpanded = slot.classList.contains('expanded');
   slot.innerHTML = `
     <div class="relic-slot-header">
       <span class="relic-slot-title">前世遗物</span>
@@ -758,8 +761,10 @@ function _renderSlotContent(slot, vault) {
         `;
       }).join('')}
     </div>
+    ${hasMore ? `<button class="relic-slot-more-btn" type="button">${wasExpanded ? '收起 ▴' : `展开剩余 ${vault.length - COLLAPSE_LIMIT} 件 ▾`}</button>` : ''}
     <button class="relic-slot-skip${_slotSelectedId ? '' : ' active'}">空手而来</button>
   `;
+  if (wasExpanded) slot.classList.add('expanded');
 }
 
 export function initRelicSlot() {
@@ -769,6 +774,15 @@ export function initRelicSlot() {
   slot.addEventListener('click', (e) => {
     const vault = getRelicVault();
     if (!vault.length) return;
+
+    // Click "+N more" → toggle expanded state without re-rendering all
+    const moreBtn = e.target.closest('.relic-slot-more-btn');
+    if (moreBtn) {
+      slot.classList.toggle('expanded');
+      const expanded = slot.classList.contains('expanded');
+      moreBtn.textContent = expanded ? '收起 ▴' : `展开剩余 ${vault.length - 3} 件 ▾`;
+      return;
+    }
 
     // Click a card → select (or deselect if already selected)
     const card = e.target.closest('.relic-slot-card');

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3 种风格对比</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=ZCOOL+QingKe+HuangYou&family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@400;700;900&family=Press+Start+2P&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: "Noto Sans SC", system-ui, sans-serif;
+  background: #181818;
+  color: #E5E5E5;
+  min-height: 100vh;
+  padding: 24px 16px 80px;
+}
+.page-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.page-header h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+.page-header p { font-size: 13px; color: #999; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+@media (max-width: 1100px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 720px)  { .grid { grid-template-columns: 1fr; } }
+.col { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.col-label {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+.col-sub { font-size: 11px; color: #888; letter-spacing: 0.04em; margin-top: 4px; }
+.phone {
+  width: 380px;
+  max-width: 100%;
+  height: 780px;
+  border-radius: 36px;
+  border: 8px solid #222;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  overflow: hidden;
+}
+.scr {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+}
+.tools {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 9px;
+  font-size: 11px;
+}
+.title-block { text-align: center; margin: 28px 0 22px; }
+.h1 { font-size: 32px; font-weight: 700; line-height: 1.1; }
+.sub { font-size: 14px; opacity: 0.7; margin-top: 8px; }
+.btn-stack { display: flex; flex-direction: column; gap: 10px; align-items: center; margin-top: auto; padding-bottom: 16px; }
+.btn { padding: 14px 24px; cursor: pointer; min-width: 220px; text-align: center; font-size: 15px; font-family: inherit; border: 0; }
+.support { display: flex; align-items: center; gap: 8px; padding: 10px 14px; min-width: 220px; text-decoration: none; cursor: pointer; font-size: 13px; }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   1. 像素菜单 · NES / Game Boy 风
+   ═══════════════════════════════════════════════════════════════════════ */
+.scr-pixel {
+  background: #1A2E20;
+  color: #F5E6C8;
+  font-family: "ZCOOL QingKe HuangYou", "Noto Sans SC", sans-serif;
+  position: relative;
+}
+.scr-pixel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 4px);
+  pointer-events: none;
+}
+.scr-pixel .tools .tool {
+  background: #0F1E14;
+  color: #F5E6C8;
+  border: 2px solid #F5D200;
+  font-family: "Press Start 2P", "Noto Sans SC", sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  padding: 6px 8px;
+}
+.scr-pixel .h1 {
+  font-family: "ZCOOL QingKe HuangYou", sans-serif;
+  font-size: 38px;
+  letter-spacing: 0.06em;
+  color: #F5D200;
+  text-shadow:
+    3px 3px 0 #C92424,
+    6px 6px 0 #0F1E14;
+}
+.scr-pixel .sub {
+  font-family: "Press Start 2P", "Noto Sans SC", sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: #F5E6C8;
+  opacity: 0.85;
+  margin-top: 14px;
+}
+.scr-pixel .btn {
+  background: #F5D200;
+  color: #1A2E20;
+  font-family: "ZCOOL QingKe HuangYou", sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: 0.08em;
+  border-radius: 0;
+  box-shadow:
+    4px 4px 0 #0F1E14,
+    inset 0 -3px 0 rgba(0,0,0,0.18);
+  border: 2px solid #0F1E14;
+}
+.scr-pixel .btn.mp {
+  background: #4A90D9;
+  color: #FFF;
+}
+.scr-pixel .btn.tut {
+  background: transparent;
+  color: #F5E6C8;
+  border: 2px dashed #F5E6C8;
+  box-shadow: none;
+  font-size: 14px;
+  opacity: 0.8;
+  padding: 10px 24px;
+}
+.scr-pixel .support {
+  background: #C92424;
+  color: #F5E6C8;
+  border: 2px solid #0F1E14;
+  box-shadow: 4px 4px 0 #0F1E14;
+  border-radius: 0;
+  font-family: "ZCOOL QingKe HuangYou", sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  justify-content: center;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   2. 学生课桌 · 黑板粉笔风
+   ═══════════════════════════════════════════════════════════════════════ */
+.scr-chalk {
+  background:
+    radial-gradient(ellipse at center, #2D5C44 0%, #1F4530 70%, #163524 100%);
+  color: #F0EAD6;
+  font-family: "Ma Shan Zheng", "Noto Sans SC", sans-serif;
+  position: relative;
+}
+.scr-chalk::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.02) 0px, transparent 1.5px),
+    radial-gradient(circle at 70% 60%, rgba(255,255,255,0.02) 0px, transparent 1.5px),
+    radial-gradient(circle at 40% 80%, rgba(255,255,255,0.02) 0px, transparent 1.5px),
+    radial-gradient(circle at 85% 20%, rgba(255,255,255,0.025) 0px, transparent 1.2px);
+  background-size: 80px 80px, 60px 60px, 100px 100px, 70px 70px;
+  pointer-events: none;
+}
+.scr-chalk .tools .tool {
+  background: transparent;
+  color: #F0EAD6;
+  border: 1.5px dashed rgba(240,234,214,0.45);
+  font-family: "Ma Shan Zheng", sans-serif;
+  font-size: 13px;
+  padding: 4px 9px;
+  border-radius: 8px;
+}
+.scr-chalk .h1 {
+  font-family: "Ma Shan Zheng", sans-serif;
+  font-size: 44px;
+  font-weight: 400;
+  color: #F0EAD6;
+  letter-spacing: 0.06em;
+  text-shadow: 0 0 2px rgba(255,255,255,0.15);
+  position: relative;
+  display: inline-block;
+}
+.scr-chalk .h1::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 8%;
+  right: 8%;
+  height: 3px;
+  background: #FF6B6B;
+  opacity: 0.65;
+  border-radius: 50%;
+}
+.scr-chalk .sub {
+  font-family: "Caveat", "Ma Shan Zheng", cursive;
+  font-size: 18px;
+  font-weight: 700;
+  color: #F5D24A;
+  margin-top: 18px;
+  transform: rotate(-1deg);
+}
+.scr-chalk .btn {
+  background: transparent;
+  color: #F0EAD6;
+  border: 2px solid #F0EAD6;
+  font-family: "Ma Shan Zheng", sans-serif;
+  font-size: 19px;
+  letter-spacing: 0.05em;
+  border-radius: 22px 18px 22px 16px;
+}
+.scr-chalk .btn.mp {
+  border-color: #F5D24A;
+  color: #F5D24A;
+}
+.scr-chalk .btn.tut {
+  border: 1.5px dashed rgba(240,234,214,0.5);
+  font-size: 16px;
+  opacity: 0.7;
+  border-radius: 18px;
+}
+.scr-chalk .support {
+  background: transparent;
+  border: 2px dashed #FF6B6B;
+  color: #FFD8C2;
+  border-radius: 22px 18px 22px 18px;
+  font-family: "Ma Shan Zheng", sans-serif;
+  font-size: 16px;
+  justify-content: center;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   3. 独立游戏 · 暗酒红 + 暖橙
+   ═══════════════════════════════════════════════════════════════════════ */
+.scr-indie {
+  background: linear-gradient(180deg, #2A1620 0%, #1F1218 60%, #160C12 100%);
+  color: #F5E8DC;
+  font-family: "Noto Sans SC", sans-serif;
+  position: relative;
+}
+.scr-indie::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(255,140,66,0.10) 0%, transparent 50%),
+    radial-gradient(ellipse at 100% 100%, rgba(201,36,36,0.06) 0%, transparent 50%);
+  pointer-events: none;
+}
+.scr-indie .tools .tool {
+  background: rgba(245,232,220,0.04);
+  color: rgba(245,232,220,0.85);
+  border: 1px solid rgba(245,232,220,0.15);
+  border-radius: 999px;
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 5px 10px;
+}
+.scr-indie .h1 {
+  font-family: "Noto Sans SC", sans-serif;
+  font-weight: 900;
+  font-size: 40px;
+  letter-spacing: -0.01em;
+  color: #F5E8DC;
+  line-height: 1.05;
+}
+.scr-indie .h1 .accent { color: #FF8C42; }
+.scr-indie .sub {
+  font-family: "Caveat", "Noto Sans SC", cursive;
+  font-size: 19px;
+  color: #FFB88A;
+  margin-top: 12px;
+  transform: rotate(-0.6deg);
+}
+.scr-indie .btn {
+  background: #FF8C42;
+  color: #1F1218;
+  font-family: "Noto Sans SC", sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  border-radius: 10px;
+  border: none;
+  letter-spacing: 0.04em;
+  box-shadow: 0 4px 0 #B5582A;
+}
+.scr-indie .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #B5582A; }
+.scr-indie .btn.mp {
+  background: transparent;
+  color: #F5E8DC;
+  border: 1.5px solid rgba(245,232,220,0.4);
+  box-shadow: none;
+}
+.scr-indie .btn.tut {
+  background: transparent;
+  color: rgba(245,232,220,0.65);
+  border: none;
+  box-shadow: none;
+  font-size: 14px;
+  padding: 10px 24px;
+  text-decoration: underline;
+  text-decoration-color: rgba(245,232,220,0.25);
+  text-underline-offset: 4px;
+}
+.scr-indie .support {
+  background: rgba(255,140,66,0.10);
+  border: 1px solid rgba(255,140,66,0.35);
+  border-radius: 10px;
+  color: #FFB88A;
+  font-family: "Noto Sans SC", sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  justify-content: center;
+}
+
+.decision {
+  margin: 50px auto 0;
+  padding: 22px 28px;
+  background: #232323;
+  border-radius: 12px;
+  max-width: 560px;
+  text-align: center;
+}
+.decision h2 { font-size: 16px; margin-bottom: 10px; }
+.decision p { font-size: 14px; line-height: 1.7; color: #BBB; }
+.k { padding: 2px 9px; background: #383838; border-radius: 5px; font-family: ui-monospace, monospace; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="page-header">
+  <h1>三种风格对比 · 同布局 / 不同色彩</h1>
+  <p>顶部工具栏 + 标题 + 三个主按钮 + 支持卡 · 结构完全一致，只换皮肤</p>
+</div>
+
+<div class="grid">
+  <!-- ═══════ 1. 像素菜单 ═══════ -->
+  <div class="col">
+    <div class="col-label">1 · 像素菜单<div class="col-sub">PIXEL · NES · 黑板调色</div></div>
+    <div class="phone">
+      <div class="scr scr-pixel">
+        <div class="tools">
+          <span class="tool">🏺 遗物 5/5</span>
+          <span class="tool">🃏 记忆 0</span>
+          <span class="tool">🗺 图谱</span>
+          <span class="tool">🏆 成就 69</span>
+        </div>
+        <div class="title-block">
+          <div class="h1">留学重开模拟器</div>
+          <div class="sub">A LIFE SIMULATOR</div>
+        </div>
+        <div class="btn-stack">
+          <button class="btn">↻ 立即重开</button>
+          <button class="btn mp">🤝 联机重开</button>
+          <a class="support">❤️ 支持我们 →</a>
+          <button class="btn tut">📖 新手教程</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ 2. 黑板粉笔 ═══════ -->
+  <div class="col">
+    <div class="col-label">2 · 学生课桌<div class="col-sub">CHALKBOARD · 黑板粉笔</div></div>
+    <div class="phone">
+      <div class="scr scr-chalk">
+        <div class="tools">
+          <span class="tool">🏺 遗物 5/5</span>
+          <span class="tool">🃏 记忆 0</span>
+          <span class="tool">🗺 图谱</span>
+          <span class="tool">🏆 成就 69</span>
+        </div>
+        <div class="title-block">
+          <div class="h1">留学重开模拟器</div>
+          <div class="sub">这垃圾留学，一秒也不想学了！</div>
+        </div>
+        <div class="btn-stack">
+          <button class="btn">↻ 立即重开</button>
+          <button class="btn mp">🤝 联机重开</button>
+          <a class="support">❤️ 支持我们 →</a>
+          <button class="btn tut">📖 新手教程</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ 3. 独立游戏 ═══════ -->
+  <div class="col">
+    <div class="col-label">3 · 独立游戏<div class="col-sub">INDIE · 暗酒红 + 暖橙</div></div>
+    <div class="phone">
+      <div class="scr scr-indie">
+        <div class="tools">
+          <span class="tool">🏺 遗物 5/5</span>
+          <span class="tool">🃏 记忆 0</span>
+          <span class="tool">🗺 图谱</span>
+          <span class="tool">🏆 成就 69</span>
+        </div>
+        <div class="title-block">
+          <div class="h1">留学，<span class="accent">重开</span>。</div>
+          <div class="sub">这垃圾留学，一秒也不想学了！</div>
+        </div>
+        <div class="btn-stack">
+          <button class="btn">↻ 立即重开</button>
+          <button class="btn mp">🤝 联机重开</button>
+          <a class="support">❤️ 支持我们 →</a>
+          <button class="btn tut">📖 新手教程</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="decision">
+  <h2>选 1 / 2 / 3</h2>
+  <p>回 <span class="k">1</span> 像素菜单 · <span class="k">2</span> 学生课桌 · <span class="k">3</span> 独立游戏<br>
+  或者告诉我哪个细节想要改（例：要 1 但 hover 改红色 / 要 2 但字体大点）。</p>
+</div>
+</body>
+</html>

@@ -2167,6 +2167,13 @@ function applyEvent(ev) {
     // Stash previous relationship for moments reaction system
     state._prevRelationshipForMoments = prevRel;
     _applySetObj(ev.set);
+    // First entry to xianxia line: map base stats × 3 → xianxia stats
+    if (ev.set.storyline === 'xianxia' && prevStoryline !== 'xianxia') {
+      state.cul         = Math.max(state.cul || 0, (state.HLT || 0) * 3);
+      state.dao         = Math.max(state.dao || 0, (state.INT || 0) * 3);
+      state.karma       = Math.max(state.karma || 0, (state.APP || 0) * 3);
+      state.tribulation = Math.max(state.tribulation || 0, (state.PER || 0) * 3);
+    }
     // Trigger NPC reactions for significant player events (school/relationship/storyline)
     try { reactToPlayerEvent(ev, state); } catch (e) { console.warn('reactToPlayerEvent failed', e); }
     if (ev.set.relationship !== undefined && ev.set.relationship !== prevRel) {
@@ -3746,6 +3753,7 @@ function _renderFrenemyDraft() {
 }
 
 function renderTalentSelect(talents) {
+  const GRADE_CN = ['普通', '稀有', '史诗', '传奇'];
   const pool = gachaDraw(talents, 10);
   state.talentsPool = pool;
   const list = $('talent-list');
@@ -3753,7 +3761,11 @@ function renderTalentSelect(talents) {
   pool.forEach(t => {
     const el = document.createElement('div');
     el.className = 'talent-card grade-' + t.grade;
-    el.innerHTML = `<div class="t-name">${t.name}</div><div class="t-desc">${t.description}</div>`;
+    el.innerHTML = `
+      <button class="t-info-btn" type="button" aria-label="查看完整说明" title="完整说明">ⓘ</button>
+      <div class="t-name">${t.name}</div>
+      <div class="t-desc" title="${(t.description || '').replace(/"/g,'&quot;')}">${t.description}</div>
+    `;
     el.addEventListener('click', () => {
       const idx = state.talentsPicked.findIndex(x => x.id === t.id);
       if (idx >= 0) {
@@ -3769,6 +3781,13 @@ function renderTalentSelect(talents) {
       $('talent-confirm').disabled = cnt !== 3;
       $('talent-confirm').textContent = cnt === 3 ? '确认天赋 →' : `确认天赋（${cnt}/3）`;
       if (typeof updateCreationAvatar === 'function') updateCreationAvatar();
+    });
+    // Info button opens detail modal without triggering selection
+    el.querySelector('.t-info-btn')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      window._showTalentDetail?.(t, GRADE_CN[t.grade] || '普通');
+      SFX.sfxModalOpen?.();
     });
     list.appendChild(el);
   });
@@ -6413,6 +6432,39 @@ function updateMobileStatsGrid(grid) {
   if (!grid) return;
   const s = state;
 
+  // ── Xianxia mode: show 修仙 stats instead of base six ───────────────────
+  if (s.storyline === 'xianxia') {
+    if (!grid.classList.contains('mode-xianxia')) grid.classList.add('mode-xianxia');
+    const realm = (typeof deriveRealm === 'function') ? deriveRealm(s.cul || 0) : '凡人';
+    const cul = s.cul || 0;
+    const xKeys = [
+      { k: 'cul',         label: '修为', val: cul },
+      { k: 'dao',         label: '大道', val: s.dao || 0 },
+      { k: 'karma',       label: '机缘', val: s.karma || 0 },
+      { k: 'tribulation', label: '渡劫', val: s.tribulation || 0 },
+    ];
+    let cellsHtml = `<div class="msg-cell msg-cell-xianxia realm-cell"><span class="msg-label">境界</span><span class="msg-val">${realm}</span></div>`;
+    for (const x of xKeys) {
+      const prev = _prevMobileStats[x.k];
+      const delta = (typeof prev === 'number' && prev !== x.val) ? (x.val - prev) : 0;
+      const cls = delta > 0 ? ' stat-up' : delta < 0 ? ' stat-down' : '';
+      const deltaHtml = delta ? `<span class="msg-delta ${delta > 0 ? 'delta-up' : 'delta-down'}">${delta > 0 ? '+' : ''}${delta}</span>` : '';
+      cellsHtml += `<div class="msg-cell msg-cell-xianxia${cls}"><span class="msg-label">${x.label}</span><span class="msg-val">${x.val}</span>${deltaHtml}</div>`;
+      _prevMobileStats[x.k] = x.val;
+    }
+    // Info chips: minimal — just storyline + profession
+    let infoHtml = '';
+    const profEl = document.getElementById('profession-display');
+    if (profEl) infoHtml += `<div class="msg-info-chip"><span class="msg-info-label">道途</span><span class="msg-info-val">${profEl.textContent}</span></div>`;
+    infoHtml += `<div class="msg-info-chip msg-info-storyline"><span class="msg-info-label">剧情</span><span class="msg-info-val">修真求道</span></div>`;
+    grid.innerHTML = `
+      <div class="msg-cells">${cellsHtml}</div>
+      ${infoHtml ? `<div class="msg-info">${infoHtml}</div>` : ''}
+    `;
+    return;
+  }
+  if (grid.classList.contains('mode-xianxia')) grid.classList.remove('mode-xianxia');
+
   const timeEl = document.getElementById('time-display');
   const timeText = timeEl ? timeEl.textContent : `${s.age}岁`;
 
@@ -7570,10 +7622,58 @@ async function main() {
     grantShareBonus();
   });
 
+  // ── Talent detail modal (full description popup) ──────────────────
+  function _showTalentDetail(t, gradeCn) {
+    const m = document.getElementById('talent-detail-modal');
+    if (!m) return;
+    const setText = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    const tagNo = String(t.id).padStart(3, '0').slice(-3);
+    setText('td-no', '#' + tagNo);
+    setText('td-grade-tag', gradeCn || '普通');
+    setText('td-name', t.name);
+    setText('td-desc', t.description || '');
+    const eff = document.getElementById('td-effects');
+    if (eff) {
+      const STAT_NAMES = { SOC:'社交', INT:'智力', MNY:'家境', PER:'毅力', HLT:'健康', APP:'颜值' };
+      const parts = [];
+      if (t.effect) for (const k of Object.keys(t.effect)) {
+        const v = t.effect[k];
+        if (!v) continue;
+        const name = STAT_NAMES[k] || k;
+        parts.push(`<span class="td-eff-chip ${v>0?'pos':'neg'}">${name} ${v>0?'+':''}${v}</span>`);
+      }
+      if (t.happyDelta) parts.push(`<span class="td-eff-chip ${t.happyDelta>0?'pos':'neg'}">快乐 ${t.happyDelta>0?'+':''}${t.happyDelta}</span>`);
+      eff.innerHTML = parts.length ? parts.join('') : '<span class="td-eff-empty">无属性加成</span>';
+    }
+    m.className = 'td-modal td-grade-' + (t.grade || 0);
+    m.hidden = false;
+    document.body.classList.add('td-open');
+  }
+  function _hideTalentDetail() {
+    const m = document.getElementById('talent-detail-modal');
+    if (!m) return;
+    m.hidden = true;
+    document.body.classList.remove('td-open');
+  }
+  window._showTalentDetail = _showTalentDetail;
+  document.querySelectorAll('#talent-detail-modal [data-close]').forEach(el => {
+    el.addEventListener('click', () => { _hideTalentDetail(); SFX.sfxModalClose?.(); });
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !document.getElementById('talent-detail-modal')?.hidden) {
+      _hideTalentDetail();
+    }
+  });
+
   $('btn-start').addEventListener('click', async () => {
     SFX.preloadSounds();
     SFX.sfxConfirm();
     resetSessionUnlocks();
+    // Track total runs (used by past-lives / stats features)
+    try {
+      const cur = parseInt(localStorage.getItem('sasr_total_runs') || '0', 10) || 0;
+      localStorage.setItem('sasr_total_runs', String(cur + 1));
+    } catch (e) {}
     // Initialize random appearance before showing
     state.faceVariant = Math.floor(Math.random() * 10);
     state.topVariant = Math.floor(Math.random() * 24);

@@ -22,16 +22,16 @@ const NORMAL_VOL = 0.55;    // base BGM volume (relative to ctx)
 // ── Track catalogue ──────────────────────────────────────────────────────────
 // id → filename (under assets/bgm/)
 const TRACKS = {
-  title:           'title.ogg',
-  daily:           'daily.ogg',
-  summary:         'summary.ogg',
-  special_bright:  'special_bright.ogg',
-  special_hustle:  'special_hustle.ogg',
-  special_neon:    'special_neon.ogg',
-  special_party:   'special_party.ogg',
-  hidden_spy:      'hidden_spy.ogg',
-  hidden_xianxia:  'hidden_xianxia.ogg',
-  hidden_hogwarts: 'hidden_hogwarts.ogg',
+  title:           'title.mp3',
+  daily:           'daily.mp3',
+  summary:         'summary.mp3',
+  special_bright:  'special_bright.mp3',
+  special_hustle:  'special_hustle.mp3',
+  special_neon:    'special_neon.mp3',
+  special_party:   'special_party.mp3',
+  hidden_spy:      'hidden_spy.mp3',
+  hidden_xianxia:  'hidden_xianxia.mp3',
+  hidden_hogwarts: 'hidden_hogwarts.mp3',
 };
 
 // storyline id → track id
@@ -125,21 +125,28 @@ export function init() {
   _ensureCtx();
   // Autoplay policy: if ctx starts suspended, retry sync on first user gesture.
   if (_ctx && _ctx.state !== 'running') {
-    const _kick = () => {
-      try { _ctx.resume(); } catch (e) {}
-      // Replay whatever track we were supposed to be on
-      if (_pendingTrackOnResume) {
-        const t = _pendingTrackOnResume;
-        _pendingTrackOnResume = null;
-        _switchTo(t, FADE_MS);
-      }
+    const _flushPending = () => {
+      if (!_pendingTrackOnResume) return;
+      const t = _pendingTrackOnResume;
+      _pendingTrackOnResume = null;
+      _switchTo(t, FADE_MS);
+    };
+    // Listen for ctx running — fires when resume() resolves
+    _ctx.addEventListener('statechange', () => {
+      if (_ctx.state === 'running') _flushPending();
+    });
+    const _kick = async () => {
+      try { await _ctx.resume(); } catch (e) {}
+      if (_ctx.state === 'running') _flushPending();
       window.removeEventListener('click', _kick, true);
       window.removeEventListener('keydown', _kick, true);
       window.removeEventListener('touchstart', _kick, true);
+      window.removeEventListener('pointerdown', _kick, true);
     };
     window.addEventListener('click', _kick, true);
     window.addEventListener('keydown', _kick, true);
     window.addEventListener('touchstart', _kick, true);
+    window.addEventListener('pointerdown', _kick, true);
   }
 }
 

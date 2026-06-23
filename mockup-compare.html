@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UI v2 · 现代机票 vs 现代程序</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+html, body {
+  font-family: "Geist", "Noto Sans SC", system-ui, sans-serif;
+  background: #F0EEE9;
+  color: #18181B;
+  min-height: 100vh;
+}
+.page {
+  padding: 32px 16px 80px;
+  max-width: 920px;
+  margin: 0 auto;
+}
+.page-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.page-header h1 {
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+  color: #18181B;
+}
+.page-header p {
+  font-family: "Geist Mono", monospace;
+  font-size: 12px;
+  color: #71717A;
+  letter-spacing: 0.04em;
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  justify-items: center;
+}
+@media (max-width: 840px) {
+  .grid { grid-template-columns: 1fr; }
+}
+.col { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.col-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: "Geist", sans-serif;
+}
+.badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  font-family: "Geist", sans-serif;
+}
+.badge-a { background: #1E2A3A; color: #F4F1EC; }
+.badge-b { background: #8B5CF6; color: #FAFAFA; }
+.col-name {
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #18181B;
+}
+.col-sub {
+  font-family: "Geist Mono", monospace;
+  font-size: 11px;
+  color: #71717A;
+  letter-spacing: 0.04em;
+}
+
+.phone {
+  width: 380px;
+  max-width: 100%;
+  height: 800px;
+  border-radius: 44px;
+  border: 10px solid #1A1A1A;
+  box-shadow:
+    0 30px 60px -20px rgba(0,0,0,0.3),
+    0 18px 36px -12px rgba(0,0,0,0.15);
+  overflow: hidden;
+  position: relative;
+  background: #000;
+}
+
+/* ═══════════════════════════════════════════════════════
+   A · 现代电子机票 (Cathay App / Apple Wallet style)
+   ═══════════════════════════════════════════════════════ */
+.a {
+  width: 100%;
+  height: 100%;
+  background: #F4F1EC;
+  color: #18181B;
+  padding: 24px 20px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  overflow-y: auto;
+  font-family: "Noto Sans SC", "Geist", sans-serif;
+}
+
+.a-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.a-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "Geist Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: #71717A;
+  text-transform: uppercase;
+}
+.a-brand-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #FF7A45;
+}
+.a-bearer {
+  font-family: "Geist Mono", monospace;
+  font-size: 11px;
+  color: #71717A;
+  letter-spacing: 0.04em;
+}
+.a-bearer .em { color: #18181B; font-weight: 600; }
+
+.a-ticket {
+  position: relative;
+  background: linear-gradient(135deg, #1E2A3A 0%, #2C3E5A 50%, #3A2E55 100%);
+  border-radius: 22px;
+  padding: 22px 22px 20px;
+  color: #F4F1EC;
+  overflow: hidden;
+}
+.a-ticket::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 80% 20%, rgba(255,122,69,0.18) 0%, transparent 60%);
+  pointer-events: none;
+}
+.a-ticket-row {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 22px;
+}
+.a-city {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.a-city-code {
+  font-family: "Geist", sans-serif;
+  font-weight: 700;
+  font-size: 34px;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.a-city-name {
+  font-family: "Geist Mono", monospace;
+  font-size: 10px;
+  color: #A8B4C8;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.a-arrow {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin: 0 14px 6px;
+}
+.a-arrow svg { width: 100%; height: 24px; }
+.a-arrow-plane {
+  position: absolute;
+  background: #1E2A3A;
+  padding: 0 4px;
+  color: #FF7A45;
+  font-size: 14px;
+}
+.a-ticket-meta {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(244,241,236,0.12);
+}
+.a-meta-label {
+  font-family: "Geist Mono", monospace;
+  font-size: 9px;
+  color: #A8B4C8;
+  letter-spacing: 0.14em;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+.a-meta-value {
+  font-family: "Geist Mono", monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: #F4F1EC;
+  letter-spacing: 0.02em;
+}
+
+.a-headline {
+  margin-top: 6px;
+}
+.a-headline h1 {
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 44px;
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: #18181B;
+}
+.a-headline p {
+  font-family: "Geist", sans-serif;
+  font-size: 13px;
+  color: #71717A;
+  margin-top: 6px;
+  letter-spacing: 0.01em;
+}
+
+.a-cta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.a-btn-primary {
+  background: #18181B;
+  color: #F4F1EC;
+  padding: 17px 22px;
+  border: none;
+  border-radius: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: "Noto Sans SC", sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: transform 0.15s, background 0.15s;
+}
+.a-btn-primary:hover { background: #27272A; transform: translateY(-1px); }
+.a-btn-primary .arrow {
+  font-family: "Geist Mono", monospace;
+  font-size: 18px;
+  color: #FF7A45;
+}
+.a-btn-sub {
+  display: flex;
+  gap: 8px;
+}
+.a-btn-sub button {
+  flex: 1;
+  background: transparent;
+  border: 1px solid #D4D0C8;
+  color: #18181B;
+  padding: 13px;
+  border-radius: 12px;
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.a-btn-sub button:hover { border-color: #18181B; }
+
+.a-tools {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 4px;
+}
+.a-tool {
+  background: #FFFFFF;
+  border-radius: 14px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: transform 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border: 1px solid #E8E5DE;
+}
+.a-tool:hover { transform: translateY(-2px); }
+.a-tool-label {
+  font-family: "Geist Mono", monospace;
+  font-size: 9px;
+  color: #71717A;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.a-tool-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.a-tool-name {
+  font-family: "Noto Sans SC", sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: #18181B;
+}
+.a-tool-count {
+  font-family: "Geist Mono", monospace;
+  font-weight: 600;
+  font-size: 14px;
+  color: #FF7A45;
+}
+
+/* ═══════════════════════════════════════════════════════
+   B · 现代设计师程序 (Linear / Raycast / Vercel)
+   ═══════════════════════════════════════════════════════ */
+.b {
+  width: 100%;
+  height: 100%;
+  background: #0A0A0B;
+  color: #FAFAFA;
+  padding: 22px 18px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  font-family: "Geist", "Noto Sans SC", system-ui, sans-serif;
+}
+
+.b-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 4px;
+}
+.b-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "Geist", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #FAFAFA;
+}
+.b-brand-mark {
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FAFAFA;
+  font-size: 12px;
+  font-weight: 700;
+}
+.b-bearer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: "Geist Mono", monospace;
+  font-size: 11px;
+  color: #71717A;
+  background: #18181B;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid #27272A;
+}
+.b-bearer .dot { width: 6px; height: 6px; border-radius: 50%; background: #10B981; }
+
+.b-pill {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px 5px 8px;
+  border-radius: 999px;
+  background: rgba(139,92,246,0.12);
+  border: 1px solid rgba(139,92,246,0.3);
+  font-family: "Geist Mono", monospace;
+  font-size: 11px;
+  color: #C4B5FD;
+  letter-spacing: 0.04em;
+  margin-top: 4px;
+}
+.b-pill-dot { width: 6px; height: 6px; border-radius: 50%; background: #8B5CF6; }
+
+.b-headline h1 {
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 42px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: #FAFAFA;
+  margin-top: 6px;
+}
+.b-headline p {
+  font-family: "Geist", sans-serif;
+  font-size: 13px;
+  color: #71717A;
+  margin-top: 8px;
+}
+.b-headline p .em { color: #FAFAFA; font-weight: 500; }
+
+.b-cta { display: flex; flex-direction: column; gap: 8px; margin-top: 2px; }
+.b-btn-primary {
+  background: #FAFAFA;
+  color: #0A0A0B;
+  padding: 15px 20px;
+  border: none;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: "Noto Sans SC", sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+}
+.b-btn-primary:hover { background: #E4E4E7; }
+.b-btn-primary .kbd {
+  font-family: "Geist Mono", monospace;
+  font-size: 11px;
+  color: #71717A;
+  padding: 3px 7px;
+  background: #18181B;
+  border-radius: 5px;
+  border: 1px solid #27272A;
+}
+.b-btn-secondary {
+  background: #18181B;
+  color: #FAFAFA;
+  padding: 13px 18px;
+  border: 1px solid #27272A;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.b-btn-secondary:hover { background: #1F1F23; border-color: #3F3F46; }
+.b-btn-secondary .arrow {
+  font-family: "Geist", sans-serif;
+  color: #71717A;
+}
+
+.b-section {
+  margin-top: 6px;
+}
+.b-section-h {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: "Geist", sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #71717A;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.b-section-h .count {
+  font-family: "Geist Mono", monospace;
+  color: #52525B;
+}
+.b-list {
+  background: #18181B;
+  border-radius: 12px;
+  border: 1px solid #27272A;
+  overflow: hidden;
+}
+.b-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #27272A;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.b-row:last-child { border-bottom: none; }
+.b-row:hover { background: #1F1F23; }
+.b-row-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  background: #27272A;
+}
+.b-row-icon.c-purple { background: rgba(139,92,246,0.15); color: #C4B5FD; }
+.b-row-icon.c-amber { background: rgba(245,158,11,0.15); color: #FCD34D; }
+.b-row-icon.c-teal { background: rgba(20,184,166,0.15); color: #5EEAD4; }
+.b-row-icon.c-rose { background: rgba(244,63,94,0.15); color: #FDA4AF; }
+.b-row-body { flex: 1; display: flex; flex-direction: column; gap: 1px; }
+.b-row-name {
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #FAFAFA;
+}
+.b-row-sub {
+  font-family: "Geist Mono", monospace;
+  font-size: 10.5px;
+  color: #71717A;
+  letter-spacing: 0.04em;
+}
+.b-row-count {
+  font-family: "Geist Mono", monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: #FAFAFA;
+}
+.b-row-arrow {
+  color: #52525B;
+  font-size: 14px;
+}
+
+/* Decision bar */
+.decision {
+  margin-top: 50px;
+  padding: 24px 28px;
+  background: #FFFFFF;
+  border-radius: 16px;
+  border: 1px solid #E8E5DE;
+  text-align: center;
+}
+.decision h2 {
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #18181B;
+}
+.decision p {
+  font-family: "Noto Sans SC", sans-serif;
+  color: #52525B;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.decision .key {
+  display: inline-block;
+  font-family: "Geist Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  background: #F4F1EC;
+  border-radius: 5px;
+  border: 1px solid #D4D0C8;
+  margin: 0 2px;
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-header">
+    <h1>v2 · 现代设计两版</h1>
+    <p>NO DECORATION · TYPOGRAPHY-FIRST · 2026.06</p>
+  </div>
+
+  <div class="grid">
+    <!-- ═══════════════ A · 现代机票 ═══════════════ -->
+    <div class="col">
+      <div class="col-label">
+        <span class="badge badge-a">A</span>
+        <div>
+          <div class="col-name">现代电子机票</div>
+          <div class="col-sub">CATHAY · APPLE WALLET</div>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="a">
+          <div class="a-top">
+            <div class="a-brand">
+              <span class="a-brand-dot"></span>
+              <span>SASR Airways</span>
+            </div>
+            <div class="a-bearer">BEARER <span class="em">HCK</span></div>
+          </div>
+
+          <div class="a-ticket">
+            <div class="a-ticket-row">
+              <div class="a-city">
+                <div class="a-city-code">SHA</div>
+                <div class="a-city-name">SHANGHAI</div>
+              </div>
+              <div class="a-arrow">
+                <svg viewBox="0 0 200 12" preserveAspectRatio="none">
+                  <line x1="0" y1="6" x2="200" y2="6" stroke="#A8B4C8" stroke-width="1" stroke-dasharray="3 3" opacity="0.6"/>
+                </svg>
+                <div class="a-arrow-plane">✈</div>
+              </div>
+              <div class="a-city" style="text-align:right; align-items:flex-end;">
+                <div class="a-city-code">???</div>
+                <div class="a-city-name">UNKNOWN</div>
+              </div>
+            </div>
+            <div class="a-ticket-meta">
+              <div>
+                <div class="a-meta-label">Flight</div>
+                <div class="a-meta-value">SR 042</div>
+              </div>
+              <div>
+                <div class="a-meta-label">Gate · Seat</div>
+                <div class="a-meta-value">A17 · 17A</div>
+              </div>
+              <div>
+                <div class="a-meta-label">Boarding</div>
+                <div class="a-meta-value">06:14</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="a-headline">
+            <h1>留学，<br>重开。</h1>
+            <p>你的第 17 次人生 · 2026 春</p>
+          </div>
+
+          <div class="a-cta">
+            <button class="a-btn-primary">
+              <span>开始登机</span>
+              <span class="arrow">→</span>
+            </button>
+            <div class="a-btn-sub">
+              <button>联机重开</button>
+              <button>新手教程</button>
+            </div>
+          </div>
+
+          <div class="a-tools">
+            <div class="a-tool">
+              <div class="a-tool-label">遗物 · Relics</div>
+              <div class="a-tool-row">
+                <span class="a-tool-name">行李箱</span>
+                <span class="a-tool-count">5/5</span>
+              </div>
+            </div>
+            <div class="a-tool">
+              <div class="a-tool-label">记忆 · Memories</div>
+              <div class="a-tool-row">
+                <span class="a-tool-name">前世</span>
+                <span class="a-tool-count">0</span>
+              </div>
+            </div>
+            <div class="a-tool">
+              <div class="a-tool-label">地图 · Atlas</div>
+              <div class="a-tool-row">
+                <span class="a-tool-name">命运</span>
+                <span class="a-tool-count">∞</span>
+              </div>
+            </div>
+            <div class="a-tool">
+              <div class="a-tool-label">里程 · Miles</div>
+              <div class="a-tool-row">
+                <span class="a-tool-name">成就</span>
+                <span class="a-tool-count">69/157</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ B · 现代程序 ═══════════════ -->
+    <div class="col">
+      <div class="col-label">
+        <span class="badge badge-b">B</span>
+        <div>
+          <div class="col-name">现代设计师程序</div>
+          <div class="col-sub">LINEAR · RAYCAST · VERCEL</div>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="b">
+          <div class="b-nav">
+            <div class="b-brand">
+              <span class="b-brand-mark">S</span>
+              <span>SASR</span>
+            </div>
+            <div class="b-bearer">
+              <span class="dot"></span>
+              <span>hck · online</span>
+            </div>
+          </div>
+
+          <div class="b-pill">
+            <span class="b-pill-dot"></span>
+            <span>SESSION #017 · 第 17 次人生</span>
+          </div>
+
+          <div class="b-headline">
+            <h1>留学，重开。</h1>
+            <p>一个 <span class="em">monthly turn-based</span> 留学人生模拟器。<br>无尽分叉，无限重来。</p>
+          </div>
+
+          <div class="b-cta">
+            <button class="b-btn-primary">
+              <span>开始新一生</span>
+              <span class="kbd">↵</span>
+            </button>
+            <button class="b-btn-secondary">
+              <span>联机重开</span>
+              <span class="arrow">→</span>
+            </button>
+          </div>
+
+          <div class="b-section">
+            <div class="b-section-h">
+              <span>你的进度</span>
+              <span class="count">4 / 4</span>
+            </div>
+            <div class="b-list">
+              <div class="b-row">
+                <div class="b-row-icon c-purple">◆</div>
+                <div class="b-row-body">
+                  <div class="b-row-name">遗物库</div>
+                  <div class="b-row-sub">Relic Vault</div>
+                </div>
+                <div class="b-row-count">5 / 5</div>
+                <div class="b-row-arrow">→</div>
+              </div>
+              <div class="b-row">
+                <div class="b-row-icon c-amber">◇</div>
+                <div class="b-row-body">
+                  <div class="b-row-name">前世记忆</div>
+                  <div class="b-row-sub">Past Lives</div>
+                </div>
+                <div class="b-row-count">0</div>
+                <div class="b-row-arrow">→</div>
+              </div>
+              <div class="b-row">
+                <div class="b-row-icon c-teal">◎</div>
+                <div class="b-row-body">
+                  <div class="b-row-name">命运图谱</div>
+                  <div class="b-row-sub">Destiny Atlas</div>
+                </div>
+                <div class="b-row-count">∞</div>
+                <div class="b-row-arrow">→</div>
+              </div>
+              <div class="b-row">
+                <div class="b-row-icon c-rose">★</div>
+                <div class="b-row-body">
+                  <div class="b-row-name">成就墙</div>
+                  <div class="b-row-sub">Achievements</div>
+                </div>
+                <div class="b-row-count">69 / 157</div>
+                <div class="b-row-arrow">→</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="decision">
+    <h2>选 A 还是 B</h2>
+    <p>
+      <strong>A</strong> = 一张深色机票卡 + 米白底 + 大字标题 + 干净网格<br>
+      <strong>B</strong> = 全暗背景 + 紫色 accent + 列表行 + 像 Linear 一样有质感<br><br>
+      回 <span class="key">A</span> 或 <span class="key">B</span>，我把整套开始屏照那个方向重做。<br>
+      还是不喜欢，告诉我具体哪里不行（"颜色太冷"/"按钮丑"/"标题想要更大"等）。
+    </p>
+  </div>
+</div>
+</body>
+</html>
