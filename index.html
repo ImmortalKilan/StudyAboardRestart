@@ -92,6 +92,7 @@
         </div>
       </div>
       <div class="start-bottom-bar">
+        <button id="profile-btn" class="ghost start-bottom-btn" title="我的档案">👤 档案</button>
         <button id="btn-check-update" class="ghost start-bottom-btn">检查更新</button>
         <button id="btn-mute-start" class="ghost start-bottom-btn" title="开关音效">🔊 音效</button>
       </div>
@@ -127,6 +128,64 @@
       <div id="mm-detail" class="mm-detail">
         <div class="mm-detail-backdrop"></div>
         <div id="mm-detail-card" class="mm-detail-card"></div>
+      </div>
+    </div>
+
+    <!-- ── Profile & Data Transfer Modal ──────────────────────────── -->
+    <div id="profile-modal" class="pf-modal">
+      <div class="pf-backdrop"></div>
+      <div class="pf-container">
+        <button class="pf-close" aria-label="关闭">&times;</button>
+        <header class="pf-header">
+          <div class="pf-avatar-ring">👤</div>
+          <div class="pf-header-info">
+            <div class="pf-nick-row">
+              <input id="pf-nick-input" class="pf-nick-input" type="text" maxlength="16" placeholder="给自己起个名字">
+              <button id="pf-nick-save" class="pf-nick-save">保存</button>
+            </div>
+            <div id="pf-uid" class="pf-uid">UID: ----</div>
+          </div>
+        </header>
+
+        <div class="pf-stats">
+          <div class="pf-stat-item">
+            <div id="pf-stat-plays" class="pf-stat-num">0</div>
+            <div class="pf-stat-label">重开次数</div>
+          </div>
+          <div class="pf-stat-item">
+            <div id="pf-stat-ach" class="pf-stat-num">0</div>
+            <div class="pf-stat-label">成就解锁</div>
+          </div>
+          <div class="pf-stat-item">
+            <div id="pf-stat-endings" class="pf-stat-num">0</div>
+            <div class="pf-stat-label">结局收集</div>
+          </div>
+        </div>
+
+        <div class="pf-section">
+          <div class="pf-section-title">导出数据</div>
+          <div class="pf-section-desc">将所有游戏数据（成就、遗物、记忆卡等）导出，用于转移到其他设备</div>
+          <div class="pf-btn-row">
+            <button id="pf-export-json" class="pf-btn pf-btn-primary">下载存档文件</button>
+            <button id="pf-export-text" class="pf-btn">生成转移码</button>
+          </div>
+          <div class="pf-text-wrap" style="display:none">
+            <textarea id="pf-text-area" class="pf-textarea" readonly rows="3" placeholder="转移码"></textarea>
+          </div>
+        </div>
+
+        <div class="pf-section">
+          <div class="pf-section-title">导入数据</div>
+          <div class="pf-section-desc">从其他设备导入存档，将覆盖当前数据</div>
+          <div class="pf-btn-row">
+            <button id="pf-import-json" class="pf-btn pf-btn-primary">选择存档文件</button>
+            <button id="pf-import-text-btn" class="pf-btn">粘贴转移码</button>
+          </div>
+          <input id="pf-import-file" type="file" accept=".json" style="display:none">
+          <div class="pf-text-wrap" style="display:none">
+            <textarea id="pf-import-text-area" class="pf-textarea" rows="3" placeholder="在此粘贴转移码..."></textarea>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1199,7 +1258,7 @@
   })();
   </script>
   <script>
-    const LOCAL_VER = '4.6';
+    const LOCAL_VER = '4.7';
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js').then(reg => {
         let lastCheck = 0;

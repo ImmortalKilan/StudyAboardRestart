@@ -1,6 +1,6 @@
 // Service Worker for 留学重开模拟器 PWA
 // Bump CACHE_VER to force re-cache after content updates
-const CACHE_VER = 'sasr-4.6';
+const CACHE_VER = 'sasr-4.7';
 
 const CORE_ASSETS = [
   './',
@@ -20,6 +20,7 @@ const CORE_ASSETS = [
   './js/flowchart.js',
   './js/moments.js',
   './js/relic.js',
+  './js/profile.js',
   './js/html2canvas.min.js',
   './js/engine/constants.js',
   './js/engine/utils.js',

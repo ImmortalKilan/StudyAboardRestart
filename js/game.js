@@ -17,6 +17,7 @@ import { initRelicUI, updateVaultButton, openVaultModal, renderRelicSlot, initRe
 import { initMoments, tickMoments, checkPostable, playerPost, mountMomentsUI, mountMobileMoments, openMobileMoments, mountMobileDrawer, resetMoments, showPostPrompt, isMomentsVisible, getClassReunion, reactToPlayerEvent, setMomentsActionHandler, setMomentsDramaHandler, addMomLastPost, setMomentsHiddenEntryHandler } from './moments.js';
 import * as SFX from './audio.js';
 import * as BGM from './bgm.js';
+import { initProfile } from './profile.js';
 // Multiplayer — loaded dynamically so single-player works even if it fails
 let mp = { enabled: false, connected: false, cards: [], opponent: {} };
 let createRoom, joinRoom, mpSend, mpOn, mpDisconnect, resetMpState, REUNION_AGES, FATE_CARDS, initialFateCards, draftFrenemyCards, FRENEMY_CARD_POOL;
@@ -7700,6 +7701,7 @@ async function main() {
   initMemoryUI();
   _checkFirstCardGuide();
   initRelicUI();
+  initProfile();
   initRelicSlot();
   $('relic-vault-btn').addEventListener('click', () => { SFX.sfxNav(); openVaultModal(); });
 
