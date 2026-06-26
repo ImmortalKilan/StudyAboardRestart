@@ -85,6 +85,57 @@ const STORYLINE_CFG = {
       deathChecks: [],
       flavor: () => '时间凝固了。你能听到自己的心跳声在空荡的走廊里回响。',
     },
+    mutant: {
+      gracePeriod: 18,
+      eventRate: 0.85,
+      deathChecks: [
+        { cond: s => (s.CLARITY || 0) <= 0 && (s.monthTotal - (s.storylineStartMonth || 0)) > 12, event: 96503, stat: ['CLARITY'] },
+        { cond: s => (s.HLT || 0) <= 1 && (s.monthTotal - (s.storylineStartMonth || 0)) > 18, event: 96504, stat: ['HLT'] },
+        { cond: s => (s.PSY || 0) < 5 && (s.monthTotal - (s.storylineStartMonth || 0)) > 36, event: 96504, stat: ['PSY'] },
+      ],
+      progressChecks: [
+        { cond: s => s.mutant_path && s.firedEvents && (
+            (s.mutant_path === 'truth' && s.firedEvents.has(96313)) ||
+            (s.mutant_path === 'solo' && s.firedEvents.has(96323)) ||
+            (s.mutant_path === 'accept' && s.firedEvents.has(96333)) ||
+            (s.mutant_path === 'alliance' && s.firedEvents.has(96343))
+          ), event: s => {
+            if ((s.PSY || 0) >= 20 && (s.CLARITY || 0) <= 2 && (s.moral || 0) <= -3) return 96505;
+            if ((s.PSY || 0) >= 20 && (s.CLARITY || 0) <= 2) return 96503;
+            return null;
+          }
+        },
+      ],
+      flavor: () => {
+        const flavors = [
+          '你碰了一下扶手，看到了上一个人急匆匆赶路的记忆。已经习惯了。',
+          '头痛又来了。但这次很快就过去了。你在变强。',
+          '你戴着手套走在人群中，感觉自己是唯一清醒的人。',
+        ];
+        return flavors[Math.floor(Math.random() * flavors.length)];
+      },
+    },
+    timeslip: {
+      gracePeriod: 18,
+      eventRate: 0.85,
+      deathChecks: [
+        { cond: s => (s.CHRONO || 0) < 5 && (s.monthTotal - (s.storylineStartMonth || 0)) > 36, event: s => {
+          const era = s.timeslip_era;
+          if (era === 'warring_states') return 98163;
+          if (era === 'ww2') return 98263;
+          return 98363;
+        }, stat: ['CHRONO'] },
+      ],
+      progressChecks: [],
+      flavor: () => {
+        const flavors = [
+          '时空的裂隙在你身边微微震动，提醒你这里不是你的时代。',
+          '你闭上眼睛，能感受到两个时代的气息在交织。',
+          '又是平静的一天。但你知道，历史正因为你的存在而悄然改变。',
+        ];
+        return flavors[Math.floor(Math.random() * flavors.length)];
+      },
+    },
     fitness: {
     gracePeriod: 12,
     eventRate: 0.8,
@@ -296,9 +347,8 @@ const STORYLINE_CFG = {
       { cond: s => (s.cul || 0) >= 55 && !s.firedEvents.has(99039) && !s.firedEvents.has(99040), event: 99039 },
       { cond: s => (s.cul || 0) >= 140 && !s.firedEvents.has(99061) && !s.firedEvents.has(99062), event: 99061 },
       { cond: s => (s.cul || 0) >= 290 && (s.dao || 0) >= 4 && !s.firedEvents.has(99079) && !s.firedEvents.has(99080), event: 99079 },
-      { cond: s => (s.cul || 0) >= 580 && !s.firedEvents.has(99089), event: 99089 },
-      // 40 岁仍未筑基 → 泯然众人
-      { cond: s => s.age >= 40 && (s.cul || 0) < 18, event: 99305 },
+      // 修行第七年：最终结算
+      { cond: s => (s.monthTotal || 0) - (s.storylineStartMonth || 0) >= 84 && !s.firedEvents.has(99310), event: 99310 },
     ],
     deathChecks: [],
     flavor: () => xianxiaFlavor(),
@@ -950,7 +1000,7 @@ function updateHogwartsYear() {
 
 function computeAthleteProb(s) {
   if (s.storyline !== 'athlete') return 0;
-  let p = -15;
+  let p = 5;
   p += (s.ATH || 0) * 2;
   p += (s.PER || 0) * 0.5;
   p += (s.HLT || 0) * 0.5;
@@ -977,10 +1027,10 @@ function runNBADraft() {
       setTimeout(() => {
         const ath = state.ATH || 0;
         let probs;
-        if (ath >= 40)      probs = [8, 12, 15, 30, 25, 10, 0];
-        else if (ath >= 30) probs = [0, 3, 7, 25, 35, 30, 0];
-        else if (ath >= 22) probs = [0, 0, 0, 5, 25, 60, 10];
-        else                probs = [0, 0, 0, 0, 5, 45, 50];
+        if (ath >= 25)      probs = [50, 20, 15, 10, 5, 0, 0];
+        else if (ath >= 18) probs = [40, 15, 10, 15, 12, 8, 0];
+        else if (ath >= 12) probs = [5, 5, 5, 15, 25, 35, 10];
+        else                probs = [0, 0, 0, 2, 8, 40, 50];
         const events = [86105, 86106, 86107, 86108, 86109, 86110, 86111];
         const roll = Math.random() * 100;
         let cum = 0;
@@ -1005,13 +1055,13 @@ function runWorldCup() {
   ];
   function playRound(i) {
     if (i >= rounds.length) {
-      const wp = Math.max(20, Math.min(85, 30 + (state.ATH || 0) * 1.2 - 20));
+      const wp = Math.max(20, Math.min(90, 45 + (state.ATH || 0) * 2.5 - 20));
       triggerEvent(Math.random() * 100 < wp ? 86120 : 86121);
       finishAthleteCompetition();
       return;
     }
     const r = rounds[i];
-    const wp = Math.max(20, Math.min(85, 30 + (state.ATH || 0) * 1.2 - r.penalty));
+    const wp = Math.max(20, Math.min(90, 45 + (state.ATH || 0) * 2.5 - r.penalty));
     const won = Math.random() * 100 < wp;
     triggerEvent(won ? r.win : r.lose);
     if (!won) { finishAthleteCompetition(); return; }
@@ -1028,13 +1078,13 @@ function runFrisbeeWorlds() {
   ];
   function playRound(i) {
     if (i >= rounds.length) {
-      const wp = Math.max(20, Math.min(85, 30 + (state.ATH || 0) * 1.2 - 15));
+      const wp = Math.max(20, Math.min(90, 37 + (state.ATH || 0) * 2.5 - 15));
       triggerEvent(Math.random() * 100 < wp ? 86136 : 86137);
       finishAthleteCompetition();
       return;
     }
     const r = rounds[i];
-    const wp = Math.max(20, Math.min(85, 30 + (state.ATH || 0) * 1.2 - r.penalty));
+    const wp = Math.max(20, Math.min(90, 37 + (state.ATH || 0) * 2.5 - r.penalty));
     const won = Math.random() * 100 < wp;
     triggerEvent(won ? r.win : r.lose);
     if (!won) { finishAthleteCompetition(); return; }
@@ -1806,6 +1856,8 @@ const state = {
   cul: 0, dao: 0, karma: 0, tribulation: 0,
   xianxiaSeed: 0, yuanshen_book: 0, xingchen_book: 0,
   MAG: 0, hogwartsYear: 0, housePt: 0, house: '', hasOwl: 0, hogwartsSeed: 0, horcrux: 0,
+  timeslipSeed: 0, timeslip_era: '', timeslip_progress: 0, CHRONO: 0,
+  mutantSeed: 0, mutant_progress: 0, mutant_path: '', PSY: 0, CLARITY: 0, moral: 0,
 
   // Daily achievement accumulators
   _dailyHelpCount: 0,
@@ -2484,6 +2536,8 @@ function _checkEventAchievements(ev) {
         timeloop: 'sl_timeloop',
         influencer: 'sl_influencer',
         cheater: 'sl_cheater',
+        timeslip: 'sl_timeslip',
+        mutant: 'sl_mutant',
       };
       if (SL_MAP[sl]) unlockAchievement(SL_MAP[sl]);
     }
@@ -2515,7 +2569,7 @@ function _checkEventAchievements(ev) {
   if (id === 60090 || id === 60095) unlockAchievement('end_abyss');
   if (id === 70093) unlockAchievement('end_meta');          // meta storyline true ending
   if (id === 82041 || id === 82090) unlockAchievement('end_ceo');   // CEO success
-  if (id === 83090 || id === 83094) unlockAchievement('end_worlds'); // worlds win
+  if (id === 83090) unlockAchievement('end_worlds'); // worlds win
 
   if (id === 84061) unlockAchievement('end_fitness');        // fitness legend
   if (id === 85061) unlockAchievement('end_chef');           // chef 3-star
@@ -2528,6 +2582,13 @@ function _checkEventAchievements(ev) {
   if (id === 78082) unlockAchievement('end_band_fail');  // band: disbanded
   if (id === 88261) unlockAchievement('end_cheater_empire'); // cheater trad: 考神
   if (id === 88267) unlockAchievement('end_cheater_ghost'); // cheater tech: 幽灵
+  if (id === 98160) unlockAchievement('end_timeslip_wg');    // timeslip: 战国真结局
+  if (id === 98260) unlockAchievement('end_timeslip_ww2');   // timeslip: 二战真结局
+  if (id === 98360) unlockAchievement('end_timeslip_palace'); // timeslip: 宫斗真结局
+  if (id === 96510) unlockAchievement('end_mutant_truth');    // mutant: 真相线真结局
+  if (id === 96520) unlockAchievement('end_mutant_solo');     // mutant: 独行线真结局
+  if (id === 96530) unlockAchievement('end_mutant_accept');   // mutant: 接纳线真结局
+  if (id === 96540) unlockAchievement('end_mutant_alliance'); // mutant: 同盟线真结局
   if (id === 89041) { // FBI翻供：黑转白，重置时间线
     state.storylineStart = state.age;
     state.storylineStartMonth = state.monthTotal;
@@ -2794,8 +2855,21 @@ function _parseRequireHint(expr) {
   return parts.length > 0 ? '需要 ' + parts.join('，') : '条件不满足';
 }
 
+const _XIANXIA_YEAR_NAMES = ['初','二','三','四','五','六','七','八','九','十'];
+function _xianxiaTimeTag() {
+  const totalMonths = (state.monthTotal || 0) - (state.storylineStartMonth || 0);
+  const y = Math.floor(totalMonths / 12);
+  const m = (totalMonths % 12) + 1;
+  const yStr = y < 10 ? (_XIANXIA_YEAR_NAMES[y] || y) : y;
+  return `修行第${yStr}年·${m}月`;
+}
+function _timeTag() {
+  if (state.storyline === 'xianxia') return _xianxiaTimeTag();
+  return `${state.age}岁${state.monthOfYear}月`;
+}
+
 function pushLog(text, typeOverride, opts) {
-  const tag = `${state.age}岁${state.monthOfYear}月`;
+  const tag = _timeTag();
   let logType = typeOverride || '';
   if (!logType && state.storyline) {
     if (state.storyline === 'hogwarts') logType = 'hogwarts';
@@ -3149,7 +3223,7 @@ function advanceMonth() {
     }
   }
 
-  if (!state.storyline) {
+  if (!state.storyline && state.phase !== 'ended') {
     const _statComboDeaths = [
       { cond: s => s.INT <= 0 && s.overseas, event: 99931 },
       { cond: s => s.SOC <= 0 && s.HAP <= 0 && s.overseas, event: 99932 },
@@ -3167,15 +3241,16 @@ function advanceMonth() {
       if (ev) applyEvent(ev);
     }
 
-    if (state.HLT <= -5) {
+    if (state.phase === 'ended') {
+      // event from statComboDeaths already ended the game
+    } else if (state.HLT <= -5) {
       pushLog('「结局：油尽灯枯」长期的忽视和透支终于压垮了你的身体。你在一个深夜倒下，再也没有醒来。人生就此画上句号。', 'ending');
       state.phase = 'ended';
       unlockAchievement('end_health');
       if (mp._reunionTimeout) { clearTimeout(mp._reunionTimeout); mp._reunionTimeout = null; }
       mp.isWaiting = false;
       const memR1 = recordPlaythrough(state); if (memR1.newCard) setTimeout(() => showNewCardToast(), 1500); renderMemoryPanel();
-    }
-    if (state.age >= 60) {
+    } else if (state.age >= 60) {
       pushLog('你退休了。回首这一生，百感交集。', 'ending');
       state.phase = 'ended';
       unlockAchievement('end_retire');
@@ -4023,8 +4098,10 @@ function render() {
       if (state.showBND) shown.push('BND');
       if (state.showFAN) shown.push('FAN');
       if (state.showNET) shown.push('NET');
+      if (state.showCHRONO) shown.push('CHRONO');
+      if (state.showPSY) { shown.push('PSY'); shown.push('CLARITY'); }
       const dynamicMax = Math.max(1, ...shown.filter(k => k !== 'HAP').map(k => state[k]));
-      const SPECIAL_STATS = new Set(['POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG', 'REP', 'BND', 'FAN']);
+      const SPECIAL_STATS = new Set(['POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG', 'REP', 'BND', 'FAN', 'CHRONO', 'PSY', 'CLARITY']);
       for (const k of shown) {
         const row = document.createElement('div');
         const isSpecial = SPECIAL_STATS.has(k);
@@ -4580,7 +4657,7 @@ function render() {
       }
     }
 
-    $('time-display').textContent = `${state.age}岁${state.monthOfYear}个月`;
+    $('time-display').textContent = state.storyline === 'xianxia' ? _xianxiaTimeTag() : `${state.age}岁${state.monthOfYear}个月`;
 
     const logEl = $('event-log');
     if (state.logRenderedCount > state.log.length) {
@@ -5049,6 +5126,8 @@ function doReincarnation() {
     cul: 0, dao: 0, karma: 0, tribulation: 0,
     xianxiaSeed: 0, yuanshen_book: 0, xingchen_book: 0,
     MAG: 0, hogwartsYear: 0, housePt: 0, house: '', hasOwl: 0, hogwartsSeed: 0, horcrux: 0,
+    timeslipSeed: 0, timeslip_era: '', timeslip_progress: 0, CHRONO: 0,
+    mutantSeed: 0, mutant_progress: 0, mutant_path: '', PSY: 0, CLARITY: 0, moral: 0,
     _reincarnationUsed: true,
     _reincarnationLife: 2,
     _inheritedRelic: null,
@@ -5061,6 +5140,8 @@ function doReincarnation() {
     showPOP: false, showPOK: false, showMMR: false,
     showFIT: false, showCKL: false, showATH: false,
     showMAG: false, showREP: false, showBND: false, showFAN: false, showNET: false,
+    showCHRONO: false,
+    showPSY: false,
   };
 
   // Overwrite state
@@ -6470,12 +6551,13 @@ function updateMobileStatsGrid(grid) {
   const timeText = timeEl ? timeEl.textContent : `${s.age}岁`;
 
   const baseKeys = ['SOC', 'INT', 'MNY', 'HAP', 'HLT', 'PER', 'APP'];
-  const careerKeys = ['POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG', 'REP', 'BND', 'FAN', 'NET'];
+  const careerKeys = ['POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG', 'REP', 'BND', 'FAN', 'NET', 'CHRONO'];
 
   const allKeys = [...baseKeys];
   for (const k of careerKeys) {
     if (s['show' + k]) allKeys.push(k);
   }
+  if (s.showPSY) { allKeys.push('PSY'); allKeys.push('CLARITY'); }
 
   // Build new values and compute deltas
   const newVals = {};
@@ -6506,6 +6588,19 @@ function updateMobileStatsGrid(grid) {
       const deltaHtml = delta ? `<span class="msg-delta ${delta > 0 ? 'delta-up' : 'delta-down'}">${delta > 0 ? '+' : ''}${delta}</span>` : '';
       cellsHtml += `<div class="msg-cell career${cls}"><span class="msg-label">${label}</span><span class="msg-val">${v}</span>${deltaHtml}</div>`;
     }
+  }
+
+  if (s.showPSY) {
+    const psyV = s.PSY || 0, claV = s.CLARITY || 0;
+    const psyD = deltas['PSY'], claD = deltas['CLARITY'];
+    const psyCls = psyD > 0 ? ' stat-up' : psyD < 0 ? ' stat-down' : '';
+    const claCls = claD > 0 ? ' stat-up' : claD < 0 ? ' stat-down' : '';
+    const psyDH = psyD ? `<span class="msg-delta ${psyD > 0 ? 'delta-up' : 'delta-down'}">${psyD > 0 ? '+' : ''}${psyD}</span>` : '';
+    const claDH = claD ? `<span class="msg-delta ${claD > 0 ? 'delta-up' : 'delta-down'}">${claD > 0 ? '+' : ''}${claD}</span>` : '';
+    cellsHtml += `<div class="msg-cell msg-cell-dual career">
+      <div class="dual-row${psyCls}"><span class="msg-label">精神力</span><span class="msg-val">${psyV}</span>${psyDH}</div>
+      <div class="dual-row${claCls}"><span class="msg-label">清醒度</span><span class="msg-val">${claV}</span>${claDH}</div>
+    </div>`;
   }
 
   // Save current values for next diff
@@ -9099,9 +9194,13 @@ function _resetGameState() {
   state.showPOP = false; state.showPOK = false; state.showMMR = false;
   state.showFIT = false; state.showCKL = false; state.showATH = false;
   state.showMAG = false; state.showREP = false; state.showBND = false; state.showFAN = false; state.showNET = false;
+  state.showCHRONO = false;
+  state.showPSY = false;
   state.REP = 0; state.BND = 0;
   state.cul = 0; state.dao = 0; state.karma = 0; state.tribulation = 0;
   state.xianxiaSeed = 0; state.yuanshen_book = 0; state.xingchen_book = 0;
+  state.timeslipSeed = 0; state.timeslip_era = ''; state.timeslip_progress = 0; state.CHRONO = 0;
+  state.mutantSeed = 0; state.mutant_progress = 0; state.mutant_path = ''; state.PSY = 0; state.CLARITY = 0; state.moral = 0;
   state.statPeaks = {};
   state.storylinesVisited = new Set();
   state.choiceHistory = [];

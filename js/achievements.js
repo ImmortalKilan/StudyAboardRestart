@@ -58,8 +58,17 @@ export const ACHIEVEMENTS = [
   { id: 'sl_band',           name: '地下新声',   icon: '🎸', rarity: 'rare',      cat: '剧情',   desc: '加入了一支地下乐队，虽然你只是贝斯手' },
   { id: 'end_band_win',      name: 'Encore!',    icon: '🏆', rarity: 'legendary', cat: '终局',   desc: '在Battle of the Bands中获得冠军，全场高喊Encore' },
   { id: 'sl_cheater',        name: '天才枪手',   icon: '🎭', rarity: 'rare',      cat: '剧情',   desc: '踏入了代考的灰色地带' },
+  { id: 'sl_timeslip',       name: '时空裂隙',   icon: '⏳', rarity: 'epic',      cat: '剧情',   desc: '穿越了时空的壁垒' },
   { id: 'end_cheater_empire', name: '考神',       icon: '🧠', rarity: 'legendary', cat: '终局',   desc: '建立了跨国代考帝国' },
   { id: 'end_cheater_ghost',   name: '零日',      icon: '🕹️', rarity: 'legendary', cat: '终局',   desc: '成为暗网上让所有考试系统颤抖的传说' },
+  { id: 'end_timeslip_wg',    name: '文明的曙光', icon: '🏛️', rarity: 'legendary', cat: '终局',   desc: '以仁政统一六国，改写了华夏文明的起点' },
+  { id: 'end_timeslip_ww2',   name: '和平之子',   icon: '🕊️', rarity: 'legendary', cat: '终局',   desc: '让战争提前结束，冷战从未发生' },
+  { id: 'end_timeslip_palace', name: '凤临天下',  icon: '👑', rarity: 'legendary', cat: '终局',   desc: '在高墙之内重写了一个时代的命运' },
+  { id: 'sl_mutant',           name: '记忆觉醒',   icon: '🧠', rarity: 'epic',      cat: '剧情',   desc: '觉醒了读写记忆的能力' },
+  { id: 'end_mutant_truth',    name: '守墓人',     icon: '🔬', rarity: 'legendary', cat: '终局',   desc: '守护了记忆花园的真相' },
+  { id: 'end_mutant_solo',     name: '超越者',     icon: '🧩', rarity: 'legendary', cat: '终局',   desc: '成为了人类记忆操控能力的巅峰' },
+  { id: 'end_mutant_accept',   name: '手套下的温度', icon: '🧤', rarity: 'legendary', cat: '终局',  desc: '学会了与能力共存，用克制守护温度' },
+  { id: 'end_mutant_alliance', name: '双螺旋',     icon: '🤝', rarity: 'legendary', cat: '终局',   desc: '与曾经的敌人成为了记忆守望者' },
 
   // ── 专业传奇终局 ──────────────────────────────────────────────────────────
   { id: 'end_ee',           name: '半导体教父',   icon: '🔬', rarity: 'legendary', cat: '终局',   desc: '在芯片领域封神，重塑了半导体产业格局' },
@@ -243,7 +252,7 @@ export function unlockAchievement(id) {
 
   // Combo: unlock "见过世面" when all four hidden storylines done
   if (id !== 'all_hidden' &&
-      ['sl_spy', 'sl_xianxia', 'sl_abyss', 'sl_meta', 'sl_thief', 'sl_hogwarts', 'sl_timeloop'].every(x => _unlocked.has(x))) {
+      ['sl_spy', 'sl_xianxia', 'sl_abyss', 'sl_meta', 'sl_thief', 'sl_hogwarts', 'sl_timeloop', 'sl_timeslip', 'sl_mutant'].every(x => _unlocked.has(x))) {
     unlockAchievement('all_hidden');
   }
   return true;
@@ -500,6 +509,13 @@ const ENDING_CATALOG = [
   { id: 76096, tier: 'S', icon: '🐟', name: '咸鱼翻身',        hint: '所有人都以为你过气了——直到那条视频' },
   { id: 88261, tier: 'S', icon: '🧠', name: '考神',            hint: '建立了跨国代考帝国（传统路线）' },
   { id: 88267, tier: 'S', icon: '🕹️', name: '零日',            hint: '成为暗网上让所有考试系统颤抖的传说（技术路线）' },
+  { id: 98160, tier: 'S', icon: '🏛️', name: '文明的曙光',     hint: '在战国乱世以仁政改写历史——需要极高的时空影响力' },
+  { id: 98260, tier: 'S', icon: '🕊️', name: '和平之子',       hint: '让二战提前结束，重塑世界格局——每个决策都关乎历史走向' },
+  { id: 98360, tier: 'S', icon: '👑', name: '凤临天下',       hint: '在紫禁城高墙内推动变革——权谋与良知的终极考验' },
+  { id: 96510, tier: 'S', icon: '🧠', name: '记忆解放者',     hint: '揭露真相后精神力达到极致——你让所有人想起了被抹去的记忆' },
+  { id: 96520, tier: 'S', icon: '🔒', name: '孤独王座',       hint: '封印自身的记忆读写——清醒到最后一刻的代价是永远的孤独' },
+  { id: 96530, tier: 'S', icon: '🤝', name: '共生体',         hint: '接受基因突变并与之融合——你不再是人类，但你选择留下' },
+  { id: 96540, tier: 'S', icon: '⚔️', name: '变异者联盟',     hint: '联合所有觉醒者——你们不再躲藏，而是站到了阳光下' },
 
   // 专业传奇
   { id: 42190, tier: 'S', icon: '💻', name: '硅谷传奇',        hint: 'CS专业的技术路线巅峰' },
@@ -535,6 +551,15 @@ const ENDING_CATALOG = [
   { id: 88160, tier: 'A', icon: '🧹', name: '金盆洗手',        hint: '在代考帝国做大之前，选择了急流勇退' },
   { id: 88262, tier: 'A', icon: '😰', name: '惊险过关',        hint: '代考线的关键抉择——险中求生' },
   { id: 88264, tier: 'A', icon: '✈️', name: '跑路',            hint: '东窗事发前，你已经在飞机上了' },
+  { id: 98161, tier: 'A', icon: '📜', name: '青史留名',        hint: '战国线——改变了一些东西，但不足以重写历史' },
+  { id: 98261, tier: 'A', icon: '🎖️', name: '无名英雄',       hint: '二战线——某场战役的伤亡少了一些，某个小镇没被轰炸' },
+  { id: 98361, tier: 'A', icon: '🏮', name: '宫墙之外',       hint: '宫斗线——在高墙内留下了一点温暖' },
+  { id: 96511, tier: 'A', icon: '📡', name: '微弱的信号',     hint: '选择了揭露真相，但精神力不足以唤醒所有人' },
+  { id: 96521, tier: 'A', icon: '🧊', name: '冰封记忆',       hint: '封印了自己，但偶尔在梦中仍能读到别人的思绪' },
+  { id: 96531, tier: 'A', icon: '🧬', name: '不完全融合',     hint: '与突变共存，但排异反应让你永远需要药物维持' },
+  { id: 96541, tier: 'A', icon: '🏴', name: '地下网络',       hint: '联盟存在了，但只能在暗处运作' },
+  { id: 96503, tier: 'A', icon: '❓', name: '我是谁',         hint: '精神力失控后，你不再确定哪些记忆属于自己' },
+  { id: 96505, tier: 'A', icon: '👁️', name: '暗王',           hint: '当清醒度归零且道德沦丧——你成了最可怕的读心者' },
   { id: 48192, tier: 'A', icon: '💻', name: 'EE转码逆袭',      hint: 'EE读不下去了？也许换条赛道反而海阔天空' },
   { id: 48292, tier: 'A', icon: '💻', name: 'ME转码逆袭',      hint: 'ME转码——工科人的曲线救国之路' },
   { id: 48392, tier: 'A', icon: '💻', name: '生信逆袭',        hint: 'BIO转码——当生物遇上代码' },
@@ -597,6 +622,34 @@ function _initWallTabs() {
   });
 }
 
+function _showEndingDetail(def) {
+  let overlay = document.getElementById('ending-detail-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'ending-detail-overlay';
+    overlay.className = 'ending-detail-overlay';
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay || e.target.classList.contains('ending-detail-backdrop')) {
+        overlay.classList.remove('open');
+      }
+    });
+    document.body.appendChild(overlay);
+  }
+  const tierClass = `ending-tier-${def.tier.toLowerCase()}`;
+  overlay.innerHTML = `
+    <div class="ending-detail-backdrop"></div>
+    <div class="ending-detail-card ${tierClass}">
+      <div class="ending-detail-icon">${def.icon}</div>
+      <div class="ending-detail-name">${def.name}</div>
+      <div class="ending-detail-tier">${def.tier === 'S' ? '👑 传奇结局' : '⭐ 优秀结局'}</div>
+      <div class="ending-detail-hint">${def.hint}</div>
+      <button class="ending-detail-close">关闭</button>
+    </div>
+  `;
+  overlay.querySelector('.ending-detail-close').addEventListener('click', () => overlay.classList.remove('open'));
+  requestAnimationFrame(() => overlay.classList.add('open'));
+}
+
 function _renderEndingWall() {
   const grid = document.getElementById('ending-wall-grid');
   if (!grid) return;
@@ -633,14 +686,8 @@ function _renderEndingWall() {
       const card = document.createElement('div');
       card.className = `ending-card ending-tier-${tier.toLowerCase()} ${done ? 'ending-unlocked' : 'ending-locked'}`;
       if (done) {
-        card.innerHTML = `
-          <div class="ending-card-icon">${def.icon}</div>
-          <div class="ending-card-body">
-            <div class="ending-card-name">${def.name}</div>
-            <div class="ending-card-hint">${def.hint}</div>
-          </div>
-          <div class="ending-card-check">✓</div>
-        `;
+        card.innerHTML = `<div class="ending-card-icon">${def.icon}</div>`;
+        card.addEventListener('click', () => _showEndingDetail(def));
       } else {
         card.innerHTML = `<div class="ending-card-icon ending-card-icon-locked">${def.icon}</div>`;
       }

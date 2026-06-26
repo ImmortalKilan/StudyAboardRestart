@@ -25,9 +25,9 @@ export function gachaDraw(talents, n) {
 
   function rollGrade() {
     const r = Math.random() * 100;
-    if (r < 4) return 3;   // orange
-    if (r < 10) return 2;  // purple
-    if (r < 30) return 1;  // blue
+    if (r < 7) return 3;   // orange
+    if (r < 20) return 2;  // purple
+    if (r < 50) return 1;  // blue
     return 0;               // white
   }
 

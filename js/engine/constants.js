@@ -8,6 +8,8 @@ export const STAT_LABELS = {
   SOC: '社交', INT: '智力', MNY: '家境',
   HAP: '快乐', HLT: '健康', PER: '毅力', APP: '颜值',
   POP: '人气', POK: '牌技', MMR: '天梯分', FIT: '体能', CKL: '厨艺', ATH: '运动', MAG: '魔力', REP: '声望', BND: '影响力', FAN: '粉丝', NET: '势力',
+  CHRONO: '时空影响力',
+  PSY: '精神力', CLARITY: '清醒度',
   cul: '修为', dao: '大道', karma: '机缘', tribulation: '渡劫', realm: '境界',
 };
 
@@ -16,6 +18,8 @@ export const EFFECT_KEYS = new Set([
   'POP', 'POK', 'MMR', 'FIT', 'CKL', 'ATH', 'MAG', 'REP', 'BND', 'FAN', 'NET', 'HEAT',
   'cul', 'dao', 'karma', 'tribulation',
   'darkOmen', 'courage', 'alliance', 'knowledge', 'cheat_risk',
+  'CHRONO', 'timeslip_progress',
+  'PSY', 'CLARITY', 'mutant_progress', 'moral',
 ]);
 
 export const XIANXIA_KEYS = ['realm', 'cul', 'dao', 'karma', 'tribulation'];
@@ -51,6 +55,15 @@ export const LEGENDARY_ENDINGS = new Set([
   76096, // Influencer comeback
   88261, // Cheater trad S-tier
   88267, // Cheater tech S-tier
+  98160, // Timeslip: 战国真结局 文明的曙光
+  98260, // Timeslip: 二战真结局 和平之子
+  98360, // Timeslip: 宫斗真结局 凤临天下
+  96510, // Mutant: 真相线真结局 记忆花园的守墓人
+  96520, // Mutant: 独行线真结局 超越者
+  96530, // Mutant: 接纳线真结局 手套下的温度
+  96540, // Mutant: 同盟线真结局 双螺旋
+  99170, // Xianxia: 羽化撕碎虚空
+  99213, // Xianxia: 星尘超脱
 ]);
 
 export const GOOD_ENDINGS = new Set([
@@ -71,6 +84,17 @@ export const GOOD_ENDINGS = new Set([
   88160, // Cheater 金盆洗手
   88262, // Cheater 惊险过关
   88264, // Cheater 跑路
+  98161, // Timeslip: 战国普通结局 青史留名
+  98261, // Timeslip: 二战普通结局 无名英雄
+  98361, // Timeslip: 宫斗普通结局 宫墙之外
+  96511, // Mutant: 真相线普通结局 未完成的拼图
+  96521, // Mutant: 独行线普通结局 孤独的棋手
+  96531, // Mutant: 接纳线普通结局 带着裂缝的杯子
+  96541, // Mutant: 同盟线普通结局 不稳定的同盟
+  96503, // Mutant: 扭转结局 我是谁
+  96505, // Mutant: 暗王结局
+  99171, // Xianxia: 飞升仙界
+  99503, // Xianxia: 散仙人间
 ]);
 
 // ── Xianxia realm derivation ─────────────────────────────────────────────
@@ -103,7 +127,7 @@ export const DEFAULT_PROF_BY_AGE = [
 
 // ── Storyline categories ─────────────────────────────────────────────────
 export const HIDDEN_STORYLINES = new Set([
-  'spy', 'abyss', 'meta', 'xianxia', 'thief', 'hogwarts', 'timeloop',
+  'spy', 'abyss', 'meta', 'xianxia', 'thief', 'hogwarts', 'timeloop', 'timeslip', 'mutant',
 ]);
 
 export const SPECIAL_STORYLINES = new Set([
@@ -125,6 +149,8 @@ export const STORYLINE_UNLOCK_STAT = {
   band: 'BND',
   influencer: 'FAN', mcn: 'FAN',
   cheater: 'NET',
+  timeslip: 'CHRONO',
+  mutant: 'PSY',
 };
 
 // ── Student phase sets ───────────────────────────────────────────────────

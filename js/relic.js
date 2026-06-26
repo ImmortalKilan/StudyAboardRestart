@@ -50,6 +50,8 @@ const RELIC_TEMPLATES = {
     { name: '停摆的怀表', effect: { PER: 2, HLT: 2 }, desc: '指针永远停在3点14分，但你总觉得它还在走', storylines: ['timeloop'], cond: s => s.storyline === 'timeloop' },
     { name: '锈迹斑斑的哑铃', effect: { HLT: 3, PER: 1 }, desc: '握住它的瞬间，肌肉记忆涌了上来', storylines: ['fitness'], cond: s => s.storyline === 'fitness' },
     { name: '破碎的手机屏', effect: { SOC: 2, APP: 2 }, desc: '屏幕碎了但还亮着，通知栏有999+未读', storylines: ['influencer', 'mcn', 'streamer', 'washed'], cond: s => ['influencer','mcn','streamer','washed'].includes(s.storyline) },
+    { name: '没有指针的怀表', effect: { INT: 2, PER: 2 }, desc: '表盘上没有指针，但你能感觉到它在走', storylines: ['timeslip'], cond: s => s.storyline === 'timeslip' },
+    { name: '染血的手套', effect: { INT: 2, PER: 2 }, desc: '指尖残留着某个人的记忆碎片，你的还是别人的？', storylines: ['mutant'], cond: s => s.storyline === 'mutant' },
   ],
   3: [
     { name: '轮回之钥', effect: { SOC: 2, INT: 2, MNY: 2, PER: 2, HLT: 2, APP: 2 }, desc: '终点之后，钥匙会再转一次。你不会空手而归。', cond: s => s._isLegendary || (s._score || 0) >= 25000 },
@@ -151,7 +153,7 @@ const PURPLE_TRIGGERS = [
   { relicName: '修仙残卷', storylines: ['xianxia'], boostStat: 'cul', boostAmount: 100, log: '残卷上的符文自行浮现，修为大增。' },
   { relicName: '特工日记', storylines: ['spy'], boostStat: 'PER', boostAmount: 2, log: '日记里的暗号你竟然看得懂，身手敏捷了许多。' },
   { relicName: '冠军奖杯', storylines: ['esports', 'worlds', 'minor_league'], boostStat: 'MMR', boostAmount: 50, log: '握住奖杯的瞬间，操作手感回来了。' },
-  { relicName: '冠军奖杯', storylines: ['athlete'], boostStat: 'ATH', boostAmount: 3, log: '奖杯在背包里发出微光，你的身体充满力量。' },
+  { relicName: '冠军奖杯', storylines: ['athlete'], boostStat: 'ATH', boostAmount: 5, log: '奖杯在背包里发出微光，你的身体充满力量。' },
   { relicName: '主厨围裙', storylines: ['chef'], boostStat: 'CKL', boostAmount: 3, log: '系上围裙的瞬间，刀工记忆涌上手指。' },
   { relicName: '金唱片', storylines: ['idol', 'superstar', 'band'], boostStat: 'POP', boostAmount: 3, log: '唱片在阳光下闪烁，你不自觉地哼起了旋律。' },
   { relicName: '黑色面具', storylines: ['abyss'], boostStat: 'INT', boostAmount: 2, log: '面具贴上脸的一刻，低语变成了指引。' },
@@ -166,6 +168,8 @@ const PURPLE_TRIGGERS = [
   { relicName: '锈迹斑斑的哑铃', storylines: ['fitness'], boostStat: 'FIT', boostAmount: 3, log: '举起哑铃的那一刻，前世的肌肉记忆全部回来了。' },
   { relicName: '破碎的手机屏', storylines: ['influencer', 'mcn', 'streamer'], boostStat: 'FAN', boostAmount: 3, log: '碎屏亮起，粉丝数从0开始疯涨。' },
   { relicName: '一叠假身份证', storylines: ['cheater'], boostStat: 'NET', boostAmount: 3, log: '翻开假证的瞬间，那些代号和暗语全部回忆起来了。' },
+  { relicName: '没有指针的怀表', storylines: ['timeslip'], boostStat: 'CHRONO', boostAmount: 4, log: '⏳ 怀表在你手心震动，上一世的时空记忆让你的感知更加敏锐。' },
+  { relicName: '染血的手套', storylines: ['mutant'], boostStat: 'PSY', boostAmount: 5, log: '🧠 手套贴上皮肤的瞬间，上一世的记忆读写能力涌回大脑。' },
 ];
 
 // ── Trigger check functions (called from game.js) ───────────────

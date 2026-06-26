@@ -121,7 +121,9 @@ function _applyBundle(bundle) {
   }
   for (const key of ALL_DATA_KEYS) {
     if (key in bundle) {
-      localStorage.setItem(key, bundle[key]);
+      try { localStorage.setItem(key, bundle[key]); } catch {}
+    } else {
+      try { localStorage.removeItem(key); } catch {}
     }
   }
 }

@@ -31,7 +31,14 @@ const ALIASES = {
   timeloop_escaped: 'timeloop_escaped', timeloop_scarred: 'timeloop_scarred',
   timeloop_trapped: 'timeloop_trapped', timeloop_round: 'timeloop_round',
   timeloop_loop_count: 'timeloop_loop_count',
-  cheater_route: 'cheater_route', cheat_risk: 'cheat_risk', cheat_risk_final: 'cheat_risk_final'
+  cheater_route: 'cheater_route', cheat_risk: 'cheat_risk', cheat_risk_final: 'cheat_risk_final',
+  timeslipSeed: 'timeslipSeed', timeslip_era: 'timeslip_era', timeslip_progress: 'timeslip_progress',
+  CHRONO: 'CHRONO',
+  mutantSeed: 'mutantSeed', mutant_progress: 'mutant_progress', mutant_path: 'mutant_path',
+  PSY: 'PSY', CLARITY: 'CLARITY', moral: 'moral',
+  wg_alliance: 'wg_alliance', wg_siege: 'wg_siege', wg_prisoners: 'wg_prisoners', wg_spy: 'wg_spy', wg_final: 'wg_final',
+  ww2_bombing: 'ww2_bombing', ww2_intel: 'ww2_intel', ww2_timing: 'ww2_timing', ww2_prisoners: 'ww2_prisoners', ww2_final: 'ww2_final',
+  palace_faction: 'palace_faction', palace_secret: 'palace_secret', palace_poison: 'palace_poison', palace_loyalty: 'palace_loyalty', palace_final: 'palace_final',
 };
 
 function readVar(state, key) {

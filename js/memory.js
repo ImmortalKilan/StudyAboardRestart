@@ -79,6 +79,42 @@ const STORYLINE_HINTS = {
       '触发条件较为随机，与特定事件链相关。多次游玩增加遭遇概率。'
     ]
   },
+  mutant: {
+    name: '基因觉醒', category: 'hidden', color: '#e74c8b', accent: '#c2185b',
+    gradient: 'linear-gradient(135deg, #1a0a1e 0%, #2d1040 40%, #4a1a6e 100%)',
+    icon: '🧠', iconArt: 'brain',
+    hints: [
+      '「碰触他人的瞬间，不属于你的画面闪过脑海……这需要足够强壮的身体来承受基因的觉醒。」',
+      '健康>6 + 天赋「基因突变」，16岁以上触发。'
+    ]
+  },
+  basketball: {
+    name: '状元之路', category: 'special', color: '#e65100', accent: '#bf360c',
+    gradient: 'linear-gradient(135deg, #1a0d00 0%, #2d1800 40%, #4a2800 100%)',
+    icon: '🏀', iconArt: 'ball',
+    hints: [
+      '「前世的记忆中，那个人在球场上如鱼得水……他的投篮手感似乎是天生的，而且身体条件和意志力也不容小觑。」',
+      '健康≥6 + 毅力≥5 + 社交≥3 + 天赋「投篮天赋」，16-23岁触发。'
+    ]
+  },
+  soccer: {
+    name: '伟大的左后卫', category: 'special', color: '#2e7d32', accent: '#1b5e20',
+    gradient: 'linear-gradient(135deg, #0a1a0d 0%, #0d2d14 40%, #1a4a22 100%)',
+    icon: '⚽', iconArt: 'goal',
+    hints: [
+      '「前世的记忆中，那个人在绿茵场上风驰电掣……他的脚法灵活得不可思议，左右脚一样自如。」',
+      '健康≥6 + 毅力≥5 + 社交≥3 + 天赋「盘带天赋」，16-23岁触发。'
+    ]
+  },
+  frisbee: {
+    name: 'Huck之神', category: 'special', color: '#00838f', accent: '#006064',
+    gradient: 'linear-gradient(135deg, #0a1a1e 0%, #0d2d34 40%, #1a4a54 100%)',
+    icon: '🥏', iconArt: 'disc',
+    hints: [
+      '「前世的记忆中，那个人甩出的飞盘总是稳得离谱……他的爆发力和精准度似乎远超常人。」',
+      '健康≥7 + 毅力≥5 + 社交≥3 + 天赋「飞盘天赋」，16-23岁触发。'
+    ]
+  },
   idol: {
     name: '偶像出道', category: 'special', color: '#e91e63', accent: '#c2185b',
     gradient: 'linear-gradient(135deg, #2d0a18 0%, #4a1228 40%, #6e1a3a 100%)',
@@ -169,21 +205,50 @@ const STORYLINE_HINTS = {
       '智力≥8 + 社交≥6，出国后18岁以上触发。不需要特殊天赋。'
     ]
   },
+  timeslip: {
+    name: '时空穿越者', category: 'hidden', color: '#e67e22', accent: '#d35400',
+    gradient: 'linear-gradient(135deg, #1a1200 0%, #2d1e00 40%, #4a3200 100%)',
+    icon: '🕰️', iconArt: 'hourglass',
+    hints: [
+      '「前世的记忆里，那个人的意识不属于一个时代……课堂上、图书馆里，总有不属于这个世界的画面闪过。也许需要某种与生俱来的天赋。」',
+      '天赋「穿越者」(3025)，17岁以上开始触发裂隙闪回。四次闪回后选择三条历史线之一深入。'
+    ]
+  },
 };
 
 const STORYLINE_ORDER = [
-  'spy', 'abyss', 'meta', 'xianxia', 'thief', 'hogwarts', 'timeloop',
-  'idol', 'poker', 'party', 'esports', 'fitness', 'chef', 'band', 'influencer', 'academic', 'cheater',
+  'spy', 'abyss', 'meta', 'xianxia', 'thief', 'hogwarts', 'timeloop', 'timeslip', 'mutant',
+  'basketball', 'soccer', 'frisbee', 'idol', 'poker', 'party', 'esports', 'fitness', 'chef', 'band', 'influencer', 'academic', 'cheater',
 ];
 
 // ── Persistence ──
 
+function _defaultData() { return { totalPlays: 0, cardsEarned: 0, cardsAvailable: 0, revealed: {} }; }
+
 function _load() {
   try {
     const raw = localStorage.getItem(LS_KEY);
-    if (!raw) return { totalPlays: 0, cardsEarned: 0, cardsAvailable: 0, revealed: {} };
-    return JSON.parse(raw);
-  } catch { return { totalPlays: 0, cardsEarned: 0, cardsAvailable: 0, revealed: {} }; }
+    if (!raw) return _defaultData();
+    const data = JSON.parse(raw);
+    if (!data || typeof data !== 'object') return _defaultData();
+    data.totalPlays = Number(data.totalPlays) || 0;
+    data.cardsEarned = Number(data.cardsEarned) || 0;
+    data.cardsAvailable = Number(data.cardsAvailable) || 0;
+    if (!data.revealed || typeof data.revealed !== 'object') data.revealed = {};
+    // Repair: recalculate cardsEarned from totalPlays if out of sync
+    let expected = 0;
+    for (let i = 0; i < CARD_SCHEDULE.length; i++) {
+      if (data.totalPlays >= CARD_SCHEDULE[i]) expected = i + 1;
+      else break;
+    }
+    if (data.cardsEarned > expected) {
+      const excess = data.cardsEarned - expected;
+      data.cardsEarned = expected;
+      data.cardsAvailable = Math.max(0, data.cardsAvailable - excess);
+      _save(data);
+    }
+    return data;
+  } catch { return _defaultData(); }
 }
 
 function _save(data) {
@@ -218,11 +283,12 @@ function _renderLastAvatar(container, avatarState) {
 /** Call when a game ends (state.phase = 'ended'). Increments play count and awards cards. */
 export function recordPlaythrough(finalState = null) {
   const data = _load();
-  data.totalPlays++;
+  data.totalPlays = (Number(data.totalPlays) || 0) + 1;
+  data.cardsEarned = Number(data.cardsEarned) || 0;
+  data.cardsAvailable = Number(data.cardsAvailable) || 0;
   const avatarState = _snapshotAvatarState(finalState);
   if (avatarState) data.lastAvatar = avatarState;
 
-  // Check if a new card is earned
   const nextThreshold = CARD_SCHEDULE[data.cardsEarned] || Infinity;
   if (data.totalPlays >= nextThreshold) {
     data.cardsEarned++;

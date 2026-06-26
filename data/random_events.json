@@ -4736,7 +4736,7 @@
     "id": 70001,
     "event": "今天是很普通的一天。但你突然停下脚步——你在想，为什么你的人生好像是「一个月一个月」跳着过的？中间那些日子去哪了？你试着回忆上周二下午做了什么，脑子里一片空白。不是遗忘，是……那个下午似乎根本不存在。",
     "include": "(AGE>=19)&(INT>=7)&(PER>=4)&(TLT?[3031])&(EVT?[97011])",
-    "weight": 80,
+    "weight": 200,
     "choices": [
       {
         "text": "仔细想想这件事",
@@ -14798,8 +14798,8 @@
   {
     "id": 84999,
     "event": "深夜，你在宿舍里饿得睡不着。你摸了摸干瘪的肚子：",
-    "include": "(PER>=6)&(HLT>=6)&(AGE>=18)&(AGE<=23)",
-    "weight": 30,
+    "include": "(PER>=6)&(HLT>=6)&(AGE>=17)&(AGE<=23)",
+    "weight": 40,
     "choices": [
       {
         "text": "忍痛点昂贵的熊猫外卖",
@@ -15512,8 +15512,8 @@
   {
     "id": 86000,
     "event": "篮球校队的教练在体育课上注意到了你精准的投篮手感。他走过来拍了拍你的肩：「小伙子，你有兴趣来校队试训吗？」",
-    "include": "(HLT>=6)&(PER>=5)&(SOC>=3)&(AGE>=18)&(AGE<=23)&(TLT?[5001])",
-    "weight": 100,
+    "include": "(HLT>=6)&(PER>=5)&(SOC>=3)&(AGE>=16)&(AGE<=23)&(TLT?[5001])",
+    "weight": 200,
     "choices": [
       {
         "text": "去校队试训",
@@ -15533,8 +15533,8 @@
   {
     "id": 86001,
     "event": "足球校队的教练在一场课余野球中看到了你灵活的脚法。他赛后找到你：「你的盘带很有天赋，愿意来校队试试吗？」",
-    "include": "(HLT>=6)&(PER>=5)&(SOC>=3)&(AGE>=18)&(AGE<=23)&(TLT?[5002])",
-    "weight": 100,
+    "include": "(HLT>=6)&(PER>=5)&(SOC>=3)&(AGE>=16)&(AGE<=23)&(TLT?[5002])",
+    "weight": 200,
     "choices": [
       {
         "text": "去校队试训",
@@ -15554,8 +15554,8 @@
   {
     "id": 86005,
     "event": "飞盘社团的队长在草坪上看到了你漫不经心甩出的一记hammer——又稳又远。他跑过来：「你一定要来我们队！」",
-    "include": "(HLT>=7)&(PER>=5)&(SOC>=3)&(AGE>=18)&(AGE<=23)&(TLT?[5003])",
-    "weight": 100,
+    "include": "(HLT>=7)&(PER>=5)&(SOC>=3)&(AGE>=16)&(AGE<=23)&(TLT?[5003])",
+    "weight": 200,
     "choices": [
       {
         "text": "去飞盘队试训",
@@ -27080,9 +27080,9 @@
   {
     "id": 49640,
     "event": "你把课余时间全砸进了一个节奏游戏项目。用WebGL写渲染、用信号处理做谱面自动生成。三个月后它上架了Steam——第一天卖了47份。47份！你截图发了朋友圈。",
-    "include": "country==日本&hobby==music&major==CS&overseas==1",
+    "include": "country==日本&major==CS&overseas==1",
     "logType": "easter",
-    "weight": 1,
+    "weight": 50,
     "choices": [
       {
         "text": "全职开发，冲销量",
@@ -27108,7 +27108,7 @@
     "event": "你用商科作业的市场分析方法论，拍了一支关于校园外卖经济的纪录片。发在YouTube上一周播放量突破了50万。一家MCN的商务经理深夜发来了合作DM。",
     "include": "country==美国&hobby==film&major==商科&overseas==1",
     "logType": "easter",
-    "weight": 1,
+    "weight": 50,
     "choices": [
       {
         "text": "签约MCN，正式入局",
@@ -27133,7 +27133,7 @@
     "event": "你在法律课上写的那篇关于AI版权的论文，被一个出版社编辑看到了。他说「你有没有想过把这个写成一本面向大众的法律科普小说？」",
     "include": "country==英国&hobby==law&major==文艺&overseas==1",
     "logType": "easter",
-    "weight": 1,
+    "weight": 50,
     "choices": [
       {
         "text": "签出版合同",
@@ -27158,7 +27158,7 @@
     "event": "你用电影系学到的镜头语言，拍了一支关于大堡礁珊瑚白化的科普短片。发布当天被BBC Earth的官方账号转发了。教授转发时配文：「我的学生做到了我们实验室科普十年没做到的事。」",
     "include": "country==澳洲&hobby==science&major==电影&overseas==1&(AGE<=26)",
     "logType": "easter",
-    "weight": 1,
+    "weight": 50,
     "effect": {
       "INT": 1,
       "SOC": 2,
@@ -27170,7 +27170,7 @@
     "event": "你用流体力学的偏微分方程建模了一个物理音频合成器插件。发在KVR论坛上之后，第一条评论是「这音色不像插件，像真的模拟电路」。一周后下载量过万。",
     "include": "country==欧洲&hobby==music&major==理科&overseas==1",
     "logType": "easter",
-    "weight": 1,
+    "weight": 50,
     "effect": {
       "INT": 2,
       "HAP": 2
@@ -27181,7 +27181,7 @@
     "event": "你把CS的深度学习课程项目改成了一个热带传染病的辅助诊断模型。在学校的跨学科创新赛上拿了金奖——评委说「这才是AI应该做的事」。",
     "include": "country==新加坡&hobby==medical&major==CS&overseas==1",
     "logType": "easter",
-    "weight": 1,
+    "weight": 50,
     "choices": [
       {
         "text": "继续深入，申请联合培养博士",
@@ -27207,7 +27207,7 @@
     "event": "商法课期末moot court你代表原告。结辩时你脱稿陈述了五分钟，引用了三个真实判例。评委律师站起来鼓掌，说「这是我今年见过最好的本科生表现」。",
     "include": "country==香港&hobby==law&major==商科&overseas==1&(AGE<=24)",
     "logType": "easter",
-    "weight": 1,
+    "weight": 50,
     "choices": [
       {
         "text": "接受律所的暑期实习邀请",
@@ -27234,7 +27234,7 @@
     "event": "你说服了两个同学一起做了一个远程协作SaaS工具。用欧洲申根签的便利，你们三个人在三个国家远程办公了整个学期。柏林、里斯本、阿姆斯特丹——每个月换一个城市。",
     "include": "country==欧洲&hobby==tech&major==商科&overseas==1",
     "logType": "easter",
-    "weight": 1,
+    "weight": 50,
     "choices": [
       {
         "text": "毕业后正式注册公司",
@@ -29700,8 +29700,8 @@
   {
     "id": 78001,
     "event": "学校附近的酒吧今晚有Open Mic Night。你带着吉他上台即兴弹了一段solo，台下零星的掌声中，你注意到角落里一个戴墨镜的人一直在盯着你。",
-    "include": "(AGE>=18)&(AGE<=23)&(PER>=5)&(overseas==1)&(TLT?[5010])",
-    "weight": 50,
+    "include": "(AGE>=17)&(AGE<=23)&(PER>=5)&(overseas==1)&(TLT?[5010])",
+    "weight": 200,
     "choices": [
       {
         "text": "走过去打个招呼",
@@ -34577,5 +34577,4148 @@
     "include": "(overseas==1)&(AGE>=17)&(AGE<=28)",
     "weight": 2,
     "happyDelta": 1
+  },
+  {
+    "id": 98001,
+    "event": "课堂上，教授在讲古代史。你的眼前突然闪过一片血色的旷野——战鼓擂动，铁骑奔腾。那不是电影画面，那感觉太真实了。你甩了甩头，教授还在讲。",
+    "include": "TLT?[3025]&(AGE>=17)&(timeslipSeed==0)",
+    "weight": 200,
+    "effect": {
+      "INT": 1
+    },
+    "set": {
+      "timeslipSeed": 1
+    },
+    "repeatable": false,
+    "logType": "hidden"
+  },
+  {
+    "id": 98002,
+    "event": "图书馆里翻到一本讲二战的旧书。你的手指碰到书页的瞬间，空气中弥漫着硝烟的味道。远处有轰炸机掠过，低沉的引擎声让你的心脏猛跳。书掉在地上，周围的同学看了你一眼。",
+    "include": "TLT?[3025]&(AGE>=17)&(timeslipSeed==1)",
+    "weight": 200,
+    "effect": {
+      "INT": 1
+    },
+    "set": {
+      "timeslipSeed": 2
+    },
+    "repeatable": false,
+    "logType": "hidden"
+  },
+  {
+    "id": 98003,
+    "event": "深夜你对着电脑屏幕发呆。屏幕上映出一张不是你的脸——凤冠霞帔，眉眼间藏着算计与不甘。你伸手去碰屏幕，画面消失了。手指冰凉。",
+    "include": "TLT?[3025]&(AGE>=17)&(timeslipSeed==2)",
+    "weight": 200,
+    "effect": {
+      "INT": 1
+    },
+    "set": {
+      "timeslipSeed": 3
+    },
+    "repeatable": false,
+    "logType": "hidden"
+  },
+  {
+    "id": 98004,
+    "event": "三段不同的记忆在你脑海里越来越清晰。铁与血的战场、被炮火撕裂的天空、高墙深院里的低语。你开始确信——这些不是梦，这些是你前世的记忆碎片。时空的裂缝正在打开……",
+    "include": "TLT?[3025]&(AGE>=17)&(timeslipSeed==3)",
+    "weight": 300,
+    "set": {
+      "timeslipSeed": 4,
+      "CHRONO": 5,
+      "showCHRONO": true
+    },
+    "choices": [
+      {
+        "text": "追溯战国记忆——那片血色旷野",
+        "next": 98100,
+        "tooltip": "进入战国线：合纵连横的乱世"
+      },
+      {
+        "text": "追溯二战记忆——那片硝烟天空",
+        "next": 98200,
+        "tooltip": "进入二战线：烽火连天的年代"
+      },
+      {
+        "text": "追溯宫斗记忆——那座高墙深院",
+        "next": 98300,
+        "tooltip": "进入宫斗线：权谋与暗涌的紫禁城"
+      }
+    ],
+    "repeatable": false,
+    "logType": "hidden"
+  },
+  {
+    "id": 98100,
+    "event": "你闭上眼，意识坠入时空裂缝。再睁眼时，你身穿粗麻布衣，站在一座城墙上。远处烽火连天，有人喊你「先生」。这是战国——七雄争霸的乱世。你的现代知识在这里，就是改天换地的力量。",
+    "set": {
+      "storyline": "timeslip",
+      "timeslip_era": "warring_states",
+      "timeslip_progress": 0
+    },
+    "effect": {
+      "CHRONO": 2
+    },
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98101,
+    "event": "你教当地铁匠用高炉炼钢的原理改进冶炼。第一炉钢出来的时候，铁匠跪下了——他从没见过这么好的铁。",
+    "include": "(storyline==timeslip)&(timeslip_era==warring_states)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "CHRONO": 1,
+      "timeslip_progress": 1,
+      "INT": 1
+    }
+  },
+  {
+    "id": 98102,
+    "event": "你在竹简上画了一幅简易水车图纸。工匠们花了一个月造出来，灌溉效率提升了三倍。附近的农民开始叫你「天人」。",
+    "include": "(storyline==timeslip)&(timeslip_era==warring_states)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "CHRONO": 1,
+      "timeslip_progress": 1,
+      "INT": 1
+    }
+  },
+  {
+    "id": 98103,
+    "event": "战国的夜空没有光污染。你躺在城墙上看星星，用现代天文知识预测了一次月食。准确到时辰。全城轰动。",
+    "include": "(storyline==timeslip)&(timeslip_era==warring_states)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "CHRONO": 1,
+      "timeslip_progress": 1
+    }
+  },
+  {
+    "id": 98104,
+    "event": "你偶然提到「制衡」这个词，谋士们若有所思。几天后，一份新的外交策略摆在案头——合纵连横有了新变化。",
+    "include": "(storyline==timeslip)&(timeslip_era==warring_states)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "SOC": 1
+    }
+  },
+  {
+    "id": 98105,
+    "event": "有个年轻的士兵总跟着你。他说你看星星的眼神不像这个时代的人。你笑了笑，没有否认。",
+    "include": "(storyline==timeslip)&(timeslip_era==warring_states)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "timeslip_progress": 1,
+      "SOC": 1
+    }
+  },
+  {
+    "id": 98106,
+    "event": "你用简单的消毒和缝合知识救了一个伤兵。他的战友们用一种近乎恐惧的敬畏看着你。",
+    "include": "(storyline==timeslip)&(timeslip_era==warring_states)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "HLT": 1
+    }
+  },
+  {
+    "id": 98107,
+    "event": "主公问你对天下大势的看法。你本想说点什么，话到嘴边又咽了回去——你知道历史走向，但该不该说？",
+    "include": "(storyline==timeslip)&(timeslip_era==warring_states)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "timeslip_progress": 1
+    }
+  },
+  {
+    "id": 98108,
+    "event": "一位老儒生来访，和你辩论了一整天。你引用了一些「还没被写出来」的哲学思想。老儒生沉默良久，说了句：「先生非凡人。」",
+    "include": "(storyline==timeslip)&(timeslip_era==warring_states)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "timeslip_progress": 1,
+      "INT": 1
+    }
+  },
+  {
+    "id": 98109,
+    "event": "你教孩子们用石灰水消毒饮用水。疫病少了很多。但也有人说你是妖人，用妖术蛊惑人心。",
+    "include": "(storyline==timeslip)&(timeslip_era==warring_states)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "timeslip_progress": 1,
+      "HLT": 1
+    }
+  },
+  {
+    "id": 98110,
+    "event": "城墙修缮，你画了拱形结构的草图。工匠们半信半疑地试了。新修的城墙比旧的坚固三倍。",
+    "include": "(storyline==timeslip)&(timeslip_era==warring_states)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "INT": 1
+    }
+  },
+  {
+    "id": 98111,
+    "event": "你看着案上的竹简地图，脑海中浮现出谷歌地图的界面。你提笔修正了几处山川走势——斥候回报，全部正确。",
+    "include": "(storyline==timeslip)&(timeslip_era==warring_states)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "INT": 1
+    }
+  },
+  {
+    "id": 98112,
+    "event": "深夜独坐，你想起了手机、咖啡、和朋友们。这种思念像潮水一样涌来。你不属于这里，但这里需要你。",
+    "include": "(storyline==timeslip)&(timeslip_era==warring_states)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "timeslip_progress": 1,
+      "HAP": -1
+    }
+  },
+  {
+    "id": 98113,
+    "event": "集市上有人卖布。你摸了摸——粗糙得像砂纸。你开始怀念棉T恤和牛仔裤。穿越的浪漫在现实面前有点狼狈。",
+    "include": "(storyline==timeslip)&(timeslip_era==warring_states)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "HAP": -1
+    }
+  },
+  {
+    "id": 98114,
+    "event": "一个刺客夜闯你的营帐。你下意识用了一招从电影里学来的「格挡」——居然管用了。刺客被侍卫按住，你心有余悸。",
+    "include": "(storyline==timeslip)&(timeslip_era==warring_states)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "timeslip_progress": 1,
+      "PER": 1
+    }
+  },
+  {
+    "id": 98115,
+    "event": "一个将军请你帮忙设计攻城器械。你知道抛石机的原理，但用在战争中会死很多人。",
+    "include": "(storyline==timeslip)&(timeslip_era==warring_states)",
+    "storyline": "timeslip",
+    "weight": 4,
+    "choices": [
+      {
+        "text": "画出设计图",
+        "effect": {
+          "CHRONO": 1,
+          "INT": 1
+        },
+        "tooltip": "现代知识用于战争",
+        "next": 98170
+      },
+      {
+        "text": "假装不懂",
+        "effect": {
+          "CHRONO": -1,
+          "SOC": 1
+        },
+        "tooltip": "拒绝参与杀戮",
+        "next": 98171
+      }
+    ],
+    "repeatable": false
+  },
+  {
+    "id": 98116,
+    "event": "一个商人请你帮他算账。你用了阿拉伯数字和简单的复式记账法。他看呆了，想花重金留你。",
+    "include": "(storyline==timeslip)&(timeslip_era==warring_states)",
+    "storyline": "timeslip",
+    "weight": 4,
+    "choices": [
+      {
+        "text": "教他记账法",
+        "effect": {
+          "CHRONO": 1,
+          "MNY": 2
+        },
+        "tooltip": "传播现代商业知识",
+        "next": 98172
+      },
+      {
+        "text": "婉拒，太招摇了",
+        "effect": {
+          "SOC": 1
+        },
+        "tooltip": "低调行事",
+        "next": 98173
+      }
+    ],
+    "repeatable": false
+  },
+  {
+    "id": 98117,
+    "event": "城里爆发了瘟疫。你知道隔离和消毒的重要性，但如果你做得太过超前，可能被当成妖人处死。",
+    "include": "(storyline==timeslip)&(timeslip_era==warring_states)",
+    "storyline": "timeslip",
+    "weight": 4,
+    "choices": [
+      {
+        "text": "大张旗鼓推行隔离",
+        "effect": {
+          "CHRONO": 1,
+          "HLT": 2
+        },
+        "tooltip": "冒险救人",
+        "next": 98174
+      },
+      {
+        "text": "暗中指导几个医者",
+        "effect": {
+          "HLT": 1,
+          "SOC": 1
+        },
+        "tooltip": "谨慎行事",
+        "next": 98175
+      }
+    ],
+    "repeatable": false
+  },
+  {
+    "id": 98118,
+    "event": "一个少年缠着你学「天人之术」。他聪明好学，像极了年轻时的你。收徒意味着在这个时代扎根更深。",
+    "include": "(storyline==timeslip)&(timeslip_era==warring_states)",
+    "storyline": "timeslip",
+    "weight": 4,
+    "choices": [
+      {
+        "text": "收他为徒",
+        "effect": {
+          "CHRONO": 1,
+          "SOC": 1
+        },
+        "tooltip": "传承知识，加深羁绊",
+        "next": 98176
+      },
+      {
+        "text": "不收，怕改变太多历史",
+        "effect": {
+          "CHRONO": -1,
+          "INT": 1
+        },
+        "tooltip": "克制自己",
+        "next": 98177
+      }
+    ],
+    "repeatable": false
+  },
+  {
+    "id": 98130,
+    "event": "七国混战已久。主公问你：「先生以为，是合纵抗秦，还是连横事秦？」你知道历史的答案，但你可以改写它。这是你第一次真正站在历史的分岔口。",
+    "include": "(storyline==timeslip)&(timeslip_era==warring_states)&(timeslip_progress>=3)",
+    "storyline": "timeslip",
+    "weight": 12,
+    "choices": [
+      {
+        "text": "力主合纵——六国联盟抗秦",
+        "set": {
+          "wg_alliance": "union"
+        },
+        "effect": {
+          "CHRONO": 3,
+          "SOC": 2
+        },
+        "tooltip": "合纵：改变历史走向",
+        "next": 98178
+      },
+      {
+        "text": "建议连横——远交近攻",
+        "set": {
+          "wg_alliance": "alliance"
+        },
+        "effect": {
+          "CHRONO": 2,
+          "INT": 2
+        },
+        "tooltip": "连横：顺应历史大势",
+        "next": 98179
+      },
+      {
+        "text": "提出第三条路——建立邦联制",
+        "set": {
+          "wg_alliance": "federation"
+        },
+        "effect": {
+          "CHRONO": 4,
+          "INT": 2,
+          "SOC": 1
+        },
+        "tooltip": "超前理念，风险最高但CHRONO最多",
+        "next": 98180
+      }
+    ],
+    "repeatable": false
+  },
+  {
+    "id": 98140,
+    "event": "大军兵临城下。主公要强攻，但你知道这座城的守军有三万。强攻伤亡会很大。你手里有火药的配方——如果你用了，几千年的战争形态都会改变。",
+    "include": "(storyline==timeslip)&(timeslip_era==warring_states)&(timeslip_progress>=6)",
+    "storyline": "timeslip",
+    "weight": 12,
+    "choices": [
+      {
+        "text": "制造简易火药攻城",
+        "set": {
+          "wg_siege": "gunpowder"
+        },
+        "effect": {
+          "CHRONO": 4,
+          "INT": 2
+        },
+        "tooltip": "改变战争形态",
+        "next": 98181
+      },
+      {
+        "text": "用围城断粮的方式",
+        "set": {
+          "wg_siege": "siege"
+        },
+        "effect": {
+          "CHRONO": 2,
+          "PER": 2
+        },
+        "tooltip": "传统策略，稳妥",
+        "next": 98182
+      },
+      {
+        "text": "派间谍策反守将",
+        "set": {
+          "wg_siege": "spy"
+        },
+        "effect": {
+          "CHRONO": 3,
+          "SOC": 2
+        },
+        "tooltip": "不战而屈人之兵",
+        "next": 98183
+      }
+    ],
+    "repeatable": false
+  },
+  {
+    "id": 98145,
+    "event": "大胜之后，五千战俘跪在城外。将军们要求坑杀——这是这个时代的惯例。你想起了白起坑杀四十万赵卒的历史。你有机会阻止类似的事情发生。",
+    "include": "(storyline==timeslip)&(timeslip_era==warring_states)&(timeslip_progress>=9)",
+    "storyline": "timeslip",
+    "weight": 12,
+    "choices": [
+      {
+        "text": "力保战俘，编入劳营",
+        "set": {
+          "wg_prisoners": "spare"
+        },
+        "effect": {
+          "CHRONO": 4,
+          "SOC": -1
+        },
+        "tooltip": "人道主义，但得罪将领",
+        "next": 98184
+      },
+      {
+        "text": "沉默——这是他们的时代",
+        "set": {
+          "wg_prisoners": "silent"
+        },
+        "effect": {
+          "CHRONO": -2
+        },
+        "tooltip": "不干预历史",
+        "next": 98185
+      },
+      {
+        "text": "只保留工匠和医者",
+        "set": {
+          "wg_prisoners": "selective"
+        },
+        "effect": {
+          "CHRONO": 2,
+          "INT": 1
+        },
+        "tooltip": "务实折中",
+        "next": 98186
+      }
+    ],
+    "repeatable": false
+  },
+  {
+    "id": 98150,
+    "event": "有人发现了你藏在暗处的「天书」——那其实是你用简体中文写的笔记。巫师认定你是「异世妖人」，要求主公处死你。朝堂上一片哗然。",
+    "include": "(storyline==timeslip)&(timeslip_era==warring_states)&(timeslip_progress>=12)",
+    "storyline": "timeslip",
+    "weight": 12,
+    "choices": [
+      {
+        "text": "坦白穿越者身份",
+        "set": {
+          "wg_spy": "confess"
+        },
+        "effect": {
+          "CHRONO": 3,
+          "SOC": 2
+        },
+        "tooltip": "赌一把主公的信任",
+        "next": 98187
+      },
+      {
+        "text": "说这是密码暗语",
+        "set": {
+          "wg_spy": "lie"
+        },
+        "effect": {
+          "CHRONO": 1,
+          "INT": 2
+        },
+        "tooltip": "继续隐瞒",
+        "next": 98188
+      },
+      {
+        "text": "当众展示现代知识自证",
+        "set": {
+          "wg_spy": "demonstrate"
+        },
+        "effect": {
+          "CHRONO": 4,
+          "INT": 1,
+          "SOC": 1
+        },
+        "tooltip": "用实力说话",
+        "next": 98189
+      }
+    ],
+    "repeatable": false
+  },
+  {
+    "id": 98153,
+    "event": "在你的辅佐下，一统之势已成。但你开始犹豫：是建立一个像秦一样的中央集权帝国，还是用你的现代知识创造一个完全不同的制度？这个选择将决定华夏文明的走向。",
+    "include": "(storyline==timeslip)&(timeslip_era==warring_states)&(timeslip_progress>=15)",
+    "storyline": "timeslip",
+    "weight": 15,
+    "choices": [
+      {
+        "text": "推行郡县制+科举雏形",
+        "set": {
+          "wg_final": "reform"
+        },
+        "effect": {
+          "CHRONO": 5,
+          "INT": 3
+        },
+        "tooltip": "温和改革",
+        "next": 98190
+      },
+      {
+        "text": "建立邦联议政——两千年后的民主萌芽",
+        "set": {
+          "wg_final": "democracy"
+        },
+        "effect": {
+          "CHRONO": 6,
+          "INT": 2,
+          "SOC": 2
+        },
+        "tooltip": "激进变革",
+        "next": 98191
+      },
+      {
+        "text": "顺应历史——让帝制自然发展",
+        "set": {
+          "wg_final": "empire"
+        },
+        "effect": {
+          "CHRONO": 1
+        },
+        "tooltip": "不干预历史",
+        "next": 98192
+      }
+    ],
+    "repeatable": false
+  },
+  {
+    "id": 98160,
+    "event": "千年之后的史书上写着：「有天人自虚空来，授火器、水利、医术、治国之策。七雄化为一邦，百姓安居。天人在位三十年，传律法于后世，飘然而去。」你改写了华夏文明的起点。当时空裂缝再次打开时，你回到了现代——但课本上的历史，已经不一样了。",
+    "include": "(storyline==timeslip)&(timeslip_era==warring_states)&(CHRONO>=35)&(timeslip_progress>=15)&(EVT?[98153])",
+    "storyline": "timeslip",
+    "weight": 20,
+    "end": true,
+    "effect": {
+      "INT": 5,
+      "SOC": 5
+    },
+    "repeatable": false
+  },
+  {
+    "id": 98161,
+    "event": "你在这个时代留下了印记——改良的农具、更好的冶铁术、一套粗糙但有效的法典。但你没能阻止战争，没能建立理想中的制度。历史的惯性比你想象的大得多。当时空裂缝再次打开，你回到现代。翻开史书，多了一行小字：「有贤者佐之，民生稍安。」仅此而已，但这已经够了。",
+    "include": "(storyline==timeslip)&(timeslip_era==warring_states)&(CHRONO>=15)&(CHRONO<35)&(timeslip_progress>=15)&(EVT?[98153])",
+    "storyline": "timeslip",
+    "weight": 20,
+    "end": true,
+    "effect": {
+      "INT": 3,
+      "SOC": 2
+    },
+    "repeatable": false
+  },
+  {
+    "id": 98162,
+    "event": "你太成功了。你创造的火药让一个国家在十年内横扫天下——但也开启了一个全新的战争纪元。武器越来越强，死的人越来越多。你站在城墙上，看着远方升起的蘑菇状烟云——不，那只是火药的硝烟。但你知道，按照这个趋势，那个蘑菇云迟早会来。",
+    "include": "(storyline==timeslip)&(timeslip_era==warring_states)&(wg_siege==gunpowder)&(CHRONO>=10)&(CHRONO<25)&(EVT?[98153])",
+    "storyline": "timeslip",
+    "weight": 18,
+    "end": true,
+    "effect": {
+      "INT": 2
+    },
+    "repeatable": false
+  },
+  {
+    "id": 98163,
+    "event": "你的影响力太弱了。没有人听你的，没有人信你。在一次宫廷政变中，你被当做「外来妖人」处斩。刽子手举起刀的那一刻，你看到时空裂缝在天空中撕开——但太晚了。",
+    "noRandom": true,
+    "end": true,
+    "repeatable": false
+  },
+  {
+    "id": 98200,
+    "event": "你闭上眼，意识坠入时空裂缝。再睁眼时，防空警报声刺耳。你穿着一件旧大衣站在被炸毁的街道上。报纸上的日期是1942年。你知道接下来每一年会发生什么——诺曼底、斯大林格勒、广岛。问题是：你能改变多少？",
+    "set": {
+      "storyline": "timeslip",
+      "timeslip_era": "ww2",
+      "timeslip_progress": 0
+    },
+    "effect": {
+      "CHRONO": 2
+    },
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98201,
+    "event": "你在难民营里教人们做简易净水器。用沙子、木炭和碎石——大一化学课上学的东西，在这里能救命。",
+    "include": "(storyline==timeslip)&(timeslip_era==ww2)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "CHRONO": 1,
+      "timeslip_progress": 1,
+      "INT": 1
+    }
+  },
+  {
+    "id": 98202,
+    "event": "你偷偷画了一幅地图，标注了你记得的几个重要军事设施的位置。如果这些信息到了对的人手里……",
+    "include": "(storyline==timeslip)&(timeslip_era==ww2)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "timeslip_progress": 1,
+      "INT": 1
+    }
+  },
+  {
+    "id": 98203,
+    "event": "夜里炮声隆隆。你蜷缩在地下室里，周围是害怕的平民。你知道这场轰炸不会命中这个街区——但他们不知道。你安慰他们：「不会打到这里的。」他们信你了。",
+    "include": "(storyline==timeslip)&(timeslip_era==ww2)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "CHRONO": 1,
+      "timeslip_progress": 1
+    }
+  },
+  {
+    "id": 98204,
+    "event": "你用现代急救知识救了一个腿部中弹的士兵。止血、固定、消毒——简单但有效。军医看了你一眼：「你在哪学的？」你说：「书上看的。」",
+    "include": "(storyline==timeslip)&(timeslip_era==ww2)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "CHRONO": 1,
+      "HLT": 1
+    }
+  },
+  {
+    "id": 98205,
+    "event": "收音机里传来广播。你听到了一些你在历史课上学过的宣传口号。讽刺的是，你知道说这话的人最后是什么下场。",
+    "include": "(storyline==timeslip)&(timeslip_era==ww2)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "timeslip_progress": 1
+    }
+  },
+  {
+    "id": 98206,
+    "event": "一个年轻的抵抗组织成员问你：「你觉得战争什么时候结束？」你差点脱口而出「1945年」。你咬住了舌头。",
+    "include": "(storyline==timeslip)&(timeslip_era==ww2)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "timeslip_progress": 1,
+      "PER": 1
+    }
+  },
+  {
+    "id": 98207,
+    "event": "你用摩尔斯电码发了一条你编的「情报」——其实是你记得的一次历史上的伏击。对方的回复是：「情报已确认，行动取消，避免了伏击。」你救了多少人？不知道。",
+    "include": "(storyline==timeslip)&(timeslip_era==ww2)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "timeslip_progress": 1,
+      "INT": 1
+    }
+  },
+  {
+    "id": 98208,
+    "event": "有个小女孩在废墟里找妈妈。你帮她找到了——在另一个废墟里。她妈妈还活着。这种时代，活着就是奇迹。",
+    "include": "(storyline==timeslip)&(timeslip_era==ww2)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "timeslip_progress": 1,
+      "SOC": 1
+    }
+  },
+  {
+    "id": 98209,
+    "event": "你偷看了一份军事地图。那个战役你知道——盟军的情报有误，实际上敌军主力在北翼。你该不该告诉他们？",
+    "include": "(storyline==timeslip)&(timeslip_era==ww2)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "timeslip_progress": 1
+    }
+  },
+  {
+    "id": 98210,
+    "event": "防空洞里太闷了。有人开始唱歌。你不会唱那个年代的歌，但你跟着哼。音乐不分时代。",
+    "include": "(storyline==timeslip)&(timeslip_era==ww2)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "HAP": 1
+    }
+  },
+  {
+    "id": 98211,
+    "event": "你发现一台打字机，偷偷写下了一些「预言」——哪天哪场战役的结果。你把纸条藏在了一本书里。也许以后有人会找到。",
+    "include": "(storyline==timeslip)&(timeslip_era==ww2)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "timeslip_progress": 1,
+      "INT": 1
+    }
+  },
+  {
+    "id": 98212,
+    "event": "你开始梦到21世纪的生活。外卖、Wi-Fi、空调。醒来的时候，外面又在轰炸了。你不确定哪边才是梦。",
+    "include": "(storyline==timeslip)&(timeslip_era==ww2)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "timeslip_progress": 1,
+      "HAP": -1
+    }
+  },
+  {
+    "id": 98213,
+    "event": "一个间谍组织注意到了你。你那些「不可能知道」的情报太准确了。他们要么吸收你，要么消灭你。",
+    "include": "(storyline==timeslip)&(timeslip_era==ww2)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "timeslip_progress": 1,
+      "PER": 1
+    }
+  },
+  {
+    "id": 98214,
+    "event": "你在黑市上用一块肥皂换了两天的口粮。在物资匮乏的战时，你终于理解了「经济学」的本质——所有理论抵不过一块面包。",
+    "include": "(storyline==timeslip)&(timeslip_era==ww2)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "MNY": 1
+    }
+  },
+  {
+    "id": 98215,
+    "event": "一列运送犹太人的火车将在明天经过。你知道铁轨旁有一个没被标记的岔道。炸毁铁轨可以让火车停下，但你会暴露位置。",
+    "include": "(storyline==timeslip)&(timeslip_era==ww2)",
+    "storyline": "timeslip",
+    "weight": 4,
+    "choices": [
+      {
+        "text": "炸毁铁轨",
+        "effect": {
+          "CHRONO": 1,
+          "PER": 2
+        },
+        "tooltip": "冒险营救",
+        "next": 98270
+      },
+      {
+        "text": "通知抵抗组织处理",
+        "effect": {
+          "CHRONO": 1,
+          "SOC": 1
+        },
+        "tooltip": "借助组织力量",
+        "next": 98271
+      }
+    ],
+    "repeatable": false
+  },
+  {
+    "id": 98216,
+    "event": "你从一个受伤的敌军军官身上搜到了密码本。如果交给盟军情报部门，可能加速战争结束。但这也意味着你彻底暴露在情报战的前线。",
+    "include": "(storyline==timeslip)&(timeslip_era==ww2)",
+    "storyline": "timeslip",
+    "weight": 4,
+    "choices": [
+      {
+        "text": "交出密码本",
+        "effect": {
+          "CHRONO": 1,
+          "INT": 2
+        },
+        "tooltip": "为大局贡献",
+        "next": 98272
+      },
+      {
+        "text": "销毁它，太危险了",
+        "effect": {
+          "PER": 1
+        },
+        "tooltip": "保护自己",
+        "next": 98273
+      }
+    ],
+    "repeatable": false
+  },
+  {
+    "id": 98217,
+    "event": "一个当地的医生在秘密收治敌方伤兵。如果被发现，他会被当叛徒处决。他请你帮忙。",
+    "include": "(storyline==timeslip)&(timeslip_era==ww2)",
+    "storyline": "timeslip",
+    "weight": 4,
+    "choices": [
+      {
+        "text": "帮他——医者无国界",
+        "effect": {
+          "CHRONO": 1,
+          "HLT": 1,
+          "SOC": 1
+        },
+        "tooltip": "人道主义选择",
+        "next": 98274
+      },
+      {
+        "text": "劝他停手——太危险了",
+        "effect": {
+          "PER": 1
+        },
+        "tooltip": "务实选择",
+        "next": 98275
+      }
+    ],
+    "repeatable": false
+  },
+  {
+    "id": 98218,
+    "event": "有人在卖黑市武器。你可以用来武装一支小型抵抗队伍。但如果交易被截获，整个地下网络会暴露。",
+    "include": "(storyline==timeslip)&(timeslip_era==ww2)",
+    "storyline": "timeslip",
+    "weight": 4,
+    "choices": [
+      {
+        "text": "买下武器，武装队伍",
+        "effect": {
+          "CHRONO": 1,
+          "MNY": -1,
+          "PER": 1
+        },
+        "tooltip": "增强抵抗力量",
+        "next": 98276
+      },
+      {
+        "text": "不买——风险太大",
+        "effect": {
+          "MNY": 1
+        },
+        "tooltip": "保全组织安全",
+        "next": 98277
+      }
+    ],
+    "repeatable": false
+  },
+  {
+    "id": 98230,
+    "event": "你知道两天后盟军将对一座城市进行地毯式轰炸。历史上，这次轰炸造成了两万平民伤亡。你可以提前警告这座城市——但这可能让敌军提前设伏，导致盟军损失。",
+    "include": "(storyline==timeslip)&(timeslip_era==ww2)&(timeslip_progress>=3)",
+    "storyline": "timeslip",
+    "weight": 12,
+    "choices": [
+      {
+        "text": "警告平民撤离",
+        "set": {
+          "ww2_bombing": "warn"
+        },
+        "effect": {
+          "CHRONO": 3,
+          "SOC": 2
+        },
+        "tooltip": "救平民，但可能影响战局",
+        "next": 98278
+      },
+      {
+        "text": "通知盟军修改计划",
+        "set": {
+          "ww2_bombing": "modify"
+        },
+        "effect": {
+          "CHRONO": 4,
+          "INT": 2
+        },
+        "tooltip": "尝试精确打击，减少附带伤害",
+        "next": 98279
+      },
+      {
+        "text": "沉默——不干预历史",
+        "set": {
+          "ww2_bombing": "silent"
+        },
+        "effect": {
+          "CHRONO": -2
+        },
+        "tooltip": "两万人的命运和历史一样",
+        "next": 98280
+      }
+    ],
+    "repeatable": false
+  },
+  {
+    "id": 98240,
+    "event": "你的「预言」引起了一个高级情报官的注意。他请你喝茶，问了一些很有技巧的问题。你意识到——他在试探你是不是间谍。但你也可以利用这个机会，让关键情报到达正确的人手里。",
+    "include": "(storyline==timeslip)&(timeslip_era==ww2)&(timeslip_progress>=6)",
+    "storyline": "timeslip",
+    "weight": 12,
+    "choices": [
+      {
+        "text": "透露斯大林格勒的结局",
+        "set": {
+          "ww2_intel": "stalingrad"
+        },
+        "effect": {
+          "CHRONO": 4,
+          "INT": 2
+        },
+        "tooltip": "给出关键战役情报",
+        "next": 98281
+      },
+      {
+        "text": "只暗示——「注意东线冬天」",
+        "set": {
+          "ww2_intel": "hint"
+        },
+        "effect": {
+          "CHRONO": 2,
+          "SOC": 2
+        },
+        "tooltip": "模糊暗示，风险较低",
+        "next": 98282
+      },
+      {
+        "text": "装傻——「我只是运气好」",
+        "set": {
+          "ww2_intel": "deny"
+        },
+        "effect": {
+          "CHRONO": 1,
+          "PER": 1
+        },
+        "tooltip": "保护自己",
+        "next": 98283
+      }
+    ],
+    "repeatable": false
+  },
+  {
+    "id": 98245,
+    "event": "1944年6月。你知道诺曼底登陆的确切日期和地点。如果你把这个信息传给盟军，登陆可能更顺利，伤亡更少。但如果传给了错误的人——后果不堪设想。",
+    "include": "(storyline==timeslip)&(timeslip_era==ww2)&(timeslip_progress>=9)",
+    "storyline": "timeslip",
+    "weight": 12,
+    "choices": [
+      {
+        "text": "想办法直接联系艾森豪威尔",
+        "set": {
+          "ww2_timing": "direct"
+        },
+        "effect": {
+          "CHRONO": 5,
+          "SOC": 2
+        },
+        "tooltip": "最高风险，最高回报",
+        "next": 98284
+      },
+      {
+        "text": "通过抵抗组织传递关键信息",
+        "set": {
+          "ww2_timing": "resistance"
+        },
+        "effect": {
+          "CHRONO": 3,
+          "SOC": 1,
+          "PER": 1
+        },
+        "tooltip": "利用已有网络",
+        "next": 98285
+      },
+      {
+        "text": "只确保自己所在区域的平民安全",
+        "set": {
+          "ww2_timing": "local"
+        },
+        "effect": {
+          "CHRONO": 1,
+          "HLT": 2
+        },
+        "tooltip": "能救多少救多少",
+        "next": 98286
+      }
+    ],
+    "repeatable": false
+  },
+  {
+    "id": 98250,
+    "event": "你发现了一个隐蔽的战俘营。里面的条件惨绝人寰。你可以组织一次营救——你知道看守换班的时间表，因为这个营地在历史上被记录过。但营救行动可能打草惊蛇，让其他营地加强戒备。",
+    "include": "(storyline==timeslip)&(timeslip_era==ww2)&(timeslip_progress>=12)",
+    "storyline": "timeslip",
+    "weight": 12,
+    "choices": [
+      {
+        "text": "组织突袭营救",
+        "set": {
+          "ww2_prisoners": "raid"
+        },
+        "effect": {
+          "CHRONO": 4,
+          "PER": 2
+        },
+        "tooltip": "直接行动",
+        "next": 98287
+      },
+      {
+        "text": "把位置信息交给盟军",
+        "set": {
+          "ww2_prisoners": "intel"
+        },
+        "effect": {
+          "CHRONO": 3,
+          "INT": 2
+        },
+        "tooltip": "等待专业部队",
+        "next": 98288
+      },
+      {
+        "text": "暗中给战俘送物资和情报",
+        "set": {
+          "ww2_prisoners": "aid"
+        },
+        "effect": {
+          "CHRONO": 2,
+          "SOC": 1,
+          "HLT": 1
+        },
+        "tooltip": "长期支援",
+        "next": 98289
+      }
+    ],
+    "repeatable": false
+  },
+  {
+    "id": 98253,
+    "event": "1945年，战争即将结束。但你知道——原子弹即将投下。如果你能阻止它，冷战的格局可能完全不同。但也许，正是这颗炸弹结束了战争。你站在历史最沉重的选择面前。",
+    "include": "(storyline==timeslip)&(timeslip_era==ww2)&(timeslip_progress>=15)",
+    "storyline": "timeslip",
+    "weight": 15,
+    "choices": [
+      {
+        "text": "想办法阻止原子弹投下",
+        "set": {
+          "ww2_final": "stop_bomb"
+        },
+        "effect": {
+          "CHRONO": 6,
+          "INT": 2,
+          "SOC": 2
+        },
+        "tooltip": "改写历史最沉重的一页",
+        "next": 98290
+      },
+      {
+        "text": "不阻止，但提前组织平民撤离",
+        "set": {
+          "ww2_final": "evacuate"
+        },
+        "effect": {
+          "CHRONO": 4,
+          "SOC": 3
+        },
+        "tooltip": "在历史框架内最大限度救人",
+        "next": 98291
+      },
+      {
+        "text": "不干预——这是结束战争的代价",
+        "set": {
+          "ww2_final": "accept"
+        },
+        "effect": {
+          "CHRONO": 1
+        },
+        "tooltip": "尊重历史的选择",
+        "next": 98292
+      }
+    ],
+    "repeatable": false
+  },
+  {
+    "id": 98260,
+    "event": "战争以一种不同的方式结束了。没有蘑菇云，没有冷战，没有铁幕。你用自己的方式让这场浩劫提前画上了句号。在回到现代的那一刻，你发现——联合国总部的墙上多了一幅画：一个穿着旧大衣的陌生人，站在废墟中微笑。画的标题是「和平之子」。没有人知道那个人是你。",
+    "include": "(storyline==timeslip)&(timeslip_era==ww2)&(CHRONO>=35)&(timeslip_progress>=15)&(EVT?[98253])",
+    "storyline": "timeslip",
+    "weight": 20,
+    "end": true,
+    "effect": {
+      "SOC": 5,
+      "PER": 5
+    },
+    "repeatable": false
+  },
+  {
+    "id": 98261,
+    "event": "战争还是在1945年结束了。原子弹还是落了下来。但是，有些人活了下来——因为你提前警告了他们。有些战俘回到了家——因为你传递了情报。历史的大势没有改变，但你在每一个小角落里都留下了温度。回到现代，你在一个二战纪念馆里发现了一封泛黄的信：「致那个总能预知一切的陌生人——谢谢你。」",
+    "include": "(storyline==timeslip)&(timeslip_era==ww2)&(CHRONO>=15)&(CHRONO<35)&(timeslip_progress>=15)&(EVT?[98253])",
+    "storyline": "timeslip",
+    "weight": 20,
+    "end": true,
+    "effect": {
+      "SOC": 3,
+      "PER": 2
+    },
+    "repeatable": false
+  },
+  {
+    "id": 98262,
+    "event": "你的情报改变了几场关键战役的走向。盟军提前三个月打到了柏林。但是，这也意味着苏联没来得及占领东欧——铁幕没有落下，但一场新的、你完全不熟悉的冷战格局正在形成。你回到了一个你认不出来的现代。教科书上的历史，没有一页是你记忆中的样子。",
+    "include": "(storyline==timeslip)&(timeslip_era==ww2)&(ww2_timing==direct)&(CHRONO>=10)&(CHRONO<25)&(EVT?[98253])",
+    "storyline": "timeslip",
+    "weight": 18,
+    "end": true,
+    "effect": {
+      "INT": 2
+    },
+    "repeatable": false
+  },
+  {
+    "id": 98263,
+    "event": "你的身份暴露了。不是因为间谍，而是因为你知道的太多了。在一个秘密审讯室里，你面对着几个穿制服的人。他们不相信「穿越」的说法。最后一个冬天的清晨，一声枪响结束了一切。时空裂缝在远方的天际闪了一下，然后消失了。",
+    "noRandom": true,
+    "end": true,
+    "repeatable": false
+  },
+  {
+    "id": 98300,
+    "event": "你闭上眼，意识坠入时空裂缝。再睁眼时，你躺在一张雕花木床上。铜镜里映出一张陌生的脸——年轻，美丽，眼底有隐隐的倔强。你现在是一个刚入宫的秀女。紫禁城的高墙之内，每一步都是生死棋局。好在你看过所有的宫斗剧。",
+    "set": {
+      "storyline": "timeslip",
+      "timeslip_era": "palace",
+      "timeslip_progress": 0
+    },
+    "effect": {
+      "CHRONO": 2
+    },
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98301,
+    "event": "你在御花园里「偶遇」了一位嫔妃。你知道宫斗剧的套路——她的笑容里藏着试探。你也回了一个完美的笑。",
+    "include": "(storyline==timeslip)&(timeslip_era==palace)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "timeslip_progress": 1,
+      "SOC": 1
+    }
+  },
+  {
+    "id": 98302,
+    "event": "宫女们在议论昨晚谁侍了寝。你默默听着，把每个人的关系网画在心里。这比社交网络分析有趣多了。",
+    "include": "(storyline==timeslip)&(timeslip_era==palace)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "CHRONO": 1,
+      "timeslip_progress": 1,
+      "INT": 1
+    }
+  },
+  {
+    "id": 98170,
+    "event": "抛石机的设计图震惊了所有工匠。他们从未见过如此精密的机械。一个月后，第一台原型机在城墙外试射——巨石飞出二百步，轰然砸入靶墙。\n\n将军的眼睛亮了。你的胃却沉了下去。你刚刚给一个两千年前的战场送去了大规模杀伤性武器。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98171,
+    "event": "你假装对机械一窍不通。将军有些失望，但没有为难你。\n\n三个月后你听到消息——敌军用投石车砸开了南边的城墙。如果你画了那张图，防守方的投石车会更先进。但你没有。\n\n你不知道这算不算正确的选择。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98172,
+    "event": "你教会了他阿拉伯数字和基础的复式记账法。他用了三天就学会了。一年后他成了当地最成功的商人，因为他是唯一一个能精确算清账目的人。\n\n他给了你一大笔报酬。你收下了——在这个时代，钱意味着影响力。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98173,
+    "event": "你婉拒了他的邀请。太过超前的知识会引来不必要的注意。\n\n你已经在这个时代留下了太多痕迹。每一个都可能在历史的河流中掀起蝴蝶效应。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98174,
+    "event": "你大张旗鼓推行了隔离制度。几个巫师当场指认你是妖人——但主公站在了你这边。因为隔离起了效果：实施隔离的城区死亡率只有其他地方的十分之一。\n\n瘟疫过后，你的名声传遍了七国。有人称你为'天人'。这对你来说不是好事——太显眼了。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98175,
+    "event": "你暗中指导了几个年轻的医者。你教他们用盐水洗手、用沸水消毒器具、把病人隔离在通风处。\n\n他们照做了。效果很好，但没人知道为什么。医者们把功劳归于草药和祈祷。你没有纠正他们。\n\n有些真相，这个时代还没准备好。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98176,
+    "event": "你收了这个少年。你教他识字、算术、基本的逻辑推理。你没教他任何超前的知识——只教了思考方式。\n\n五年后他成了当地最出色的谋士。你不知道这会怎样改变历史，但你在他身上看到了一种可能性：知识可以传承，而你终究会离开这个时代。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98177,
+    "event": "你拒绝了他。他很失望，但没有纠缠。你看着他离开的背影，想起了年轻时的自己。\n\n也许在某个平行时空里，你收了这个徒弟，改变了这片土地的走向。但在这个时空里，你选择了不留痕迹。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98178,
+    "event": "你力主合纵。六国使者在你的斡旋下达成了联盟——虽然你知道历史上合纵从未真正成功过。但也许，有你这个穿越者在，结果会不同。\n\n联盟维持了八个月。然后齐国退出了。历史的惯性比你想象的更强大。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98179,
+    "event": "你建议连横——远交近攻。主公采纳了。这是历史上秦国最终胜出的策略。你在帮一个注定灭亡的国家使用胜利者的战术。\n\n讽刺的是，它奏效了。至少暂时奏效了。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98180,
+    "event": "你提出了一个这个时代闻所未闻的概念：邦联制。各国保持独立，但组建共同的议事会。\n\n主公听了很久。然后说：'先生所言太过理想。列国之间，不是你死就是我活。'\n\n你叹了口气。他说得对。但你还是想试试。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98181,
+    "event": "火药的威力远超这个时代的想象。城墙在一声巨响中崩塌，守军溃散。你站在硝烟弥漫的废墟前，看着士兵们欢呼。\n\n你提前了一千年发明了战争的终极武器。这座城陷落了。但你心里清楚——你刚刚打开了潘多拉的盒子。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98182,
+    "event": "围城持续了三个月。城中开始断粮。你用望远镜——一根自制的竹筒——观察城墙上的守军。他们越来越瘦了。\n\n不流血的胜利，代价是三万人慢慢饿死。你不知道这算不算'仁慈'。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98183,
+    "event": "你派出间谍带着一封伪造的书信进城。书信中暗示了守将家人的安全。三天后守将开城投降。\n\n兵不血刃。但你知道那封信上的内容是假的——守将的家人早已被处决了。你用谎言换了一座城。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98184,
+    "event": "你力保了五千战俘。编入劳营修路架桥。将军们不满，但主公支持了你——你用'以役代杀'的逻辑说服了他。\n\n三年后，其中一些战俘成了忠诚的士兵。你不确定你改变了多少历史，但至少今天没有万人坑。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98185,
+    "event": "你沉默了。将军们下了令。你转身走开，没有回头。\n\n那天晚上你喝了很多酒。你知道白起坑杀四十万——和五千比起来，历史上更残忍的事多的是。但这不能安慰你。因为这五千人，你认识其中的一些。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98186,
+    "event": "你说服将军只留下工匠和医者——大约八百人。其余的……你没有问。\n\n这是你能争取到的最好结果。在这个时代，这已经算是仁慈了。你反复告诉自己这一点。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98187,
+    "event": "你坦白了。所有人都沉默了。巫师脸色发白，谋士面面相觑。只有主公还在看着你。\n\n'你是说，你来自千年之后？'他问。你点头。\n\n他沉默了很久。然后说：'那你告诉我，我的国能存多久？'\n\n你说了真话。那天之后，一切都变了。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98188,
+    "event": "你说这是你发明的密码系统，用来记录军事情报。你当场'翻译'了几段，内容恰好是上次战役的复盘。\n\n巫师将信将疑地退下了。但你知道他在盯着你——你需要更小心了。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98189,
+    "event": "你当众展示了一些'小技巧'——准确预测了月食、用简易蒸馏器提纯了酒精。人群从惊恐变成了敬畏。\n\n'天人'的称号坐实了。巫师不敢再质疑你。但你也把自己推上了一个危险的位置——在这个时代，天人要么封神，要么被杀。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98190,
+    "event": "你引入了郡县制的雏形，并设立了一种简化的人才选拔机制——不看血统，只看才能。贵族们极力反对。主公犹豫了。\n\n最后他同意了一半——郡县制在新征服的领地推行，但旧地依然保留封建。\n\n你知道这不够。但千年的变革不能在一天完成。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98191,
+    "event": "你描述了一个'各国代表共议国事'的体制。所有人都觉得你疯了——包括最开明的谋士。\n\n'百姓何德何能，与天子共议？'他们说。\n\n你知道这颗种子不会在这个时代发芽。但你还是种下了它。也许在某个看不到的角落，它会悄悄生根。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98192,
+    "event": "你选择了不干预。帝制会自然发展，就像历史上那样。秦、汉、唐、宋——两千年的帝制会碾过这片土地，直到另一群人在另一个时代做出改变。\n\n你能改变一场战役的结果，但你改变不了文明的节奏。这个认知让你感到渺小。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98270,
+    "event": "爆炸在凌晨三点响起。铁轨断成两截。火车停了。混乱中，你带着几个抵抗组织成员打开了车厢。\n\n里面的人——男人、女人、孩子——他们眨着眼睛看着你，不知道发生了什么。你来不及解释。'跑。往树林里跑。'\n\n你救了一百多人。但你也暴露了这条抵抗网络。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98271,
+    "event": "你把信息传给了当地的抵抗组织。他们比你更专业——三天后火车在一个弯道脱轨，车上的人趁乱逃进了山里。\n\n你没有直接参与。但你知道，如果没有你的情报，那些人现在已经到了集中营。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98272,
+    "event": "密码本被送到了盟军情报部门。两周后，一系列精准的空袭摧毁了敌军的补给线。你不知道具体拯救了多少人，但电台里传来了前线提前推进的消息。\n\n那个军官的尸体再也不会被人找到了。你把它埋在了河边的橡树下。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98273,
+    "event": "你烧掉了密码本。火焰吞噬纸页的时候，你想到了它可能改变的一切。但你也想到了——如果这本密码本被追踪到你，整个地下网络都会暴露。\n\n战争的棋局上，有些子不能动。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98274,
+    "event": "你帮他藏了三个敌方伤兵。你用从未来带来的消毒知识处理了他们的伤口。他们活了下来。\n\n战争结束后，其中一个找到了那个医生，在他的诊所门前鞠了一躬。医生说：'你该谢的不是我。'但你已经不在了。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98275,
+    "event": "你劝他停了手。他看着你，眼里有愤怒也有疲惫。'有些事比活着更重要。'他说。\n\n两周后他被人举报了。不是因为收治伤兵——是因为别的事。你不确定你的劝说是救了他还是改变了他被发现的时间。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98276,
+    "event": "武器到手了。你把十二支步枪和四箱弹药藏在了磨坊的地下室里。一支小型抵抗队伍正式成立。\n\n你知道这些武器在历史的天平上微不足道。但对这个村庄里的人来说，这意味着他们不再是赤手空拳。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98277,
+    "event": "你没有买。回去的路上你一直在计算风险——交易被截获的概率、地下网络被牵连的范围、可能的伤亡人数。\n\n数学告诉你这是正确的决定。但你看着村口巡逻的敌军士兵，什么都说服不了你的胃。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98278,
+    "event": "你想尽办法警告了平民。有些人信了，提前逃离了城市。有些人不信——他们说你是散布谣言的间谍。\n\n轰炸来的那天，城市的东区基本疏散了，西区没有。最终伤亡比历史记载少了大约四千人。\n\n但你知道，那些没有逃走的人，有些是因为不相信你。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98279,
+    "event": "你通过地下渠道把情报传给了盟军指挥部。附带了一份详细的平民分布图和替代打击方案。\n\n轰炸还是执行了。但航线做了微调——避开了人口最密集的三个街区。\n\n你不知道这到底救了多少人。你也不知道那些'替代打击'的区域里有没有平民。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98280,
+    "event": "你什么都没做。你坐在地窖里，听着远处的轰鸣声。\n\n第二天你走上街头。废墟还在冒烟。一个女人坐在碎砖上，怀里抱着不会动的孩子。\n\n你可以阻止这一切。但你没有。你告诉自己这是为了'不干预历史'。这个理由在今天格外苍白。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98281,
+    "event": "你告诉他斯大林格勒会成为转折点——德军将在那里遭受毁灭性失败。情报官的表情从怀疑变成了震惊。\n\n一个月后你发现自己的住所被人搜过了。他们在找更多的'情报来源'。你已经被盯上了。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98282,
+    "event": "'注意东线的冬天。'你只说了这一句。情报官皱了皱眉，记在了本子上。\n\n这个暗示够模糊，不会暴露你的身份。但如果有人认真对待它——也许能少死一些人。\n\n你选择了折中。在这场战争里，折中是活下去的唯一方式。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98283,
+    "event": "'我只是运气好。'你说。情报官看了你很久，然后笑了。'好吧。运气好的人，在战争中总是有用的。'\n\n他走了。你松了一口气。但你知道他不完全相信你——他把你的名字记在了某个档案里。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98284,
+    "event": "你用了两周时间层层传递信息，最终一封匿名信到达了盟军高层。你不知道它是否被采纳，但你尽力了。\n\n1944年6月6日凌晨，诺曼底的海滩上响起了枪声。你站在远处的山丘上看着那些船。历史在你面前展开——和你知道的一样，又不太一样。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98285,
+    "event": "你通过抵抗组织传递了登陆日期和滩头信息。他们无法联系盟军高层，但在诺曼底沿岸做了准备——破坏了几处德军的通讯线路，在关键路口埋了地雷。\n\n这些小动作在历史书上不会有记载。但6月6日那天，某个路口少了一辆虎式坦克。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98286,
+    "event": "你只确保了自己所在村庄的安全。你让所有人在那天待在地窖里。\n\n炮声从海面传来，持续了一整天。你们在地窖里等着，听着历史在头顶翻页。\n\n第二天早上出来的时候，村庄完好。远处的海滩上还在冒烟。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98287,
+    "event": "突袭在凌晨四点开始。你精确计算了看守交接的时间窗口——只有十一分钟。\n\n最终救出了大部分战俘。但撤退过程中有三个人没能跟上。你不知道他们的结局。\n\n从那之后你再也没能睡一个安稳觉。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98288,
+    "event": "你把战俘营的坐标和防御图画了出来，通过地下渠道送给了盟军。标注了看守塔的射击死角和排水沟的位置。\n\n一个月后盟军执行了营救行动。你在报纸上看到了消息——'奇迹般的零伤亡救援'。你笑了笑。没有奇迹，只有情报。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98289,
+    "event": "你冒着巨大的风险一次次往战俘营里送食物和药品。通过贿赂一个看守，你建立了一条细细的生命线。\n\n你救不了所有人。但你让一些人活到了解放的那一天。战争结束后，有个瘦骨嶙峋的男人找到你，什么都没说，只是紧紧抱了你一下。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98290,
+    "event": "你想了很多办法——匿名信、暗杀、破坏运输链。但原子弹不是一个人能阻止的。它是一个国家意志的产物。\n\n最终你什么都没能做到。蘑菇云还是升起来了。你看着天空中的新闻照片，手在发抖。\n\n你是一个知道未来的人，但你依然无能为力。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98291,
+    "event": "你提前疏散了目标城市附近的一些平民。理由是'空袭预警'——那个年代人们对这种警告已经习以为常了。\n\n有些人走了，有些人没走。你永远无法统计你到底救了多少人。但你知道那道白光亮起的时候，至少有一部分人不在那里。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98292,
+    "event": "你坐在收音机旁，听到了那个消息。播音员的声音很平静。\n\n战争结束了。代价是两座城市。\n\n你没有干预。也许这是对的——原子弹的恐怖结束了战争，也开启了核威慑时代的'和平'。但'代价'这两个字的重量，你从此再也放不下了。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98370,
+    "event": "你收下了胭脂，锁进了妆匣里。半个月后你让信得过的丫鬟拿去喂了只兔子。兔子第二天死了。\n\n你没有声张。但你记住了送胭脂的人的名字。在这座宫里，记住谁要杀你，比记住谁对你好更重要。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98371,
+    "event": "'我皮肤敏感，姐姐的心意我领了。'你微笑着退回了胭脂盒。她的表情没有变化。但你看到她的丫鬟和旁边的太监交换了一个眼神。\n\n她不会轻易放弃。你需要找到她背后的人。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98372,
+    "event": "你悄悄告诉了当事人。TA半信半疑，但加了防备。三天后那两个太监突然'告老还乡'了——有人抢先处理了。\n\n你不知道你的提醒起了多大作用。但在宫里，多一份人情就多一条路。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98373,
+    "event": "你装作什么都没听见。在这座宫里，知道太多的人往往活不长。\n\n一个月后那件事果然发生了。你看着善后的场面，心里只有一个想法：还好不关你的事。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98374,
+    "event": "你在御膳房的灶台后面找到了那只猫。它正蜷在温热的砖缝里呼噜呼噜。\n\n太后很高兴。她赏了你一支金钗。金钗不重要——重要的是从今天起太后记住了你的名字。在宫里，被记住就是资本。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98375,
+    "event": "你跟着大家一起找了一下午，什么也没找到。最后猫自己跑回了太后的寝宫。\n\n没有功劳也没有过错。在宫里，平庸有时候就是最好的保护色。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98376,
+    "event": "你跪在管事嬷嬷面前替她求情。嬷嬷看了你一眼：'你替她挨十杖？'\n\n你挨了十杖。小宫女被免了罚。她从此成了你最忠心的眼线——在这座宫里，十杖换一个死士，太值了。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98377,
+    "event": "你转身走了。身后传来棍棒声和哭喊声。你没有回头。\n\n你改变不了这个时代的规矩。你能做的只是活下去，然后在有权力的时候改变规矩。\n\n但那天夜里你没有睡着。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98378,
+    "event": "你站了太后。历史告诉你她会赢。你需要站在赢的那一边——至少在赢之前。\n\n太后给了你更好的住处和更多的月例。你成了她在后宫的一颗棋子。但棋子也有自己的心思——你在等一个时机。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98379,
+    "event": "你押了皇后。历史说她输了——但你就是来改写历史的。\n\n皇后是个聪明人。她看出了你的不同，开始给你更多信任。你们在夜深人静的时候分析局势——她的见解往往出人意料。\n\n也许这一次，历史会转弯。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98380,
+    "event": "你两边下注。在太后面前你是恭顺的小辈，在皇后面前你是无害的闲人。你把从一边听到的消息悄悄透露给另一边。\n\n走钢丝的日子让你每天都睡不踏实。但你也在两边积累了筹码——当决战来临时，无论谁赢，你都有退路。\n\n至少你这样安慰自己。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98381,
+    "event": "你密报了皇上。皇上的脸色像是被人泼了冰水。他沉默了很久，然后说了一句：'朕知道了。'\n\n三天后太子被废了。后宫掀起了一场地震。而你——作为告密者——成了所有人的眼中钉。\n\n但皇上记住了你的忠诚。在这座宫里，天子的信任比命还贵。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98382,
+    "event": "你找到了当事人，用这个秘密换了一个承诺。TA脸色惨白，但最终点了头。\n\n你不打算毁掉任何人。在宫里，秘密的价值在于持有它，而不是使用它。只要这个秘密还在你手里，当事人就是你的人。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98383,
+    "event": "你把这个秘密锁在了心里。没有告诉任何人。\n\n太子继续做他的太子。你继续做你的棋子。这个秘密就像揣在怀里的一把刀——你不知道什么时候会用到它，但你知道那一天终会来。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98384,
+    "event": "你假装中毒。在床上躺了三天，同时暗中观察谁来'探病'。果然——送胭脂的那个嫔妃来了，带着一脸恰到好处的关心。\n\n你握住了她的手，虚弱地说：'姐姐，我好害怕……'\n\n她走后你坐起来。她贴身丫鬟的表情出卖了一切。现在你知道了毒的来源、指使者、以及——她们下一步的计划。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98385,
+    "event": "你当众把那杯茶泼在了地上。整个席面都安静了。\n\n'这茶味道不对。'你说。管事嬷嬷脸色大变。一番彻查之后，下毒的人被揪了出来。\n\n你安全了。但你也结了死仇——被揭发的人背后的主子，不会忘记今天。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98386,
+    "event": "你私下找到了嫌疑人。'我知道是你。'你说。'下次如果茶里再有不该有的东西，我会让全宫的人都知道。'\n\nTA的脸白了。从那以后你的茶再也没出过问题。\n\n你没有把事情闹大。在宫里，能私了的事就不要公了——公了的代价永远比你想的大。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98387,
+    "event": "你说了部分真相。不是穿越者的真相——而是一个读过太多书的人能推演出的真相。\n\n'百年之内，天下将大变。西方会有船来。他们的船比我们大十倍。'\n\n皇上沉默了很久。'你是怎么知道的？'\n\n你说：'臣妾只是喜欢读书。'\n\n他没有再问。但从那以后，他偶尔会找你聊天。这在后宫里，意味着一切。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98388,
+    "event": "你说了一句标准的漂亮话。皇上笑了笑，像是对这个答案早有预料。\n\n你错过了一个可能改变一切的机会。但你也避免了一个可能杀死你的风险。\n\n在宫里活久了，你越来越擅长这种计算。这让你有点害怕。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98389,
+    "event": "'皇上觉得呢？'你反问道。\n\n他看了你一眼。那个眼神很复杂——既有意外也有欣赏。然后他说了一个让你震惊的答案。\n\n他不是昏君。他只是被困在这座宫殿里了。和你一样。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98390,
+    "event": "你开了一所小小的女学。教宫女和低阶嫔妃的女儿识字、算术。你没教历史——你怕自己教的是'未来'。\n\n阻力很大。但太后意外地支持了你——'能识字的女人，才不会被人用假信骗了。'\n\n你笑了。不同的逻辑，相同的结果。两千年后的你会称之为'盟友'。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98391,
+    "event": "你把所有的精力放在了太子身上。你教他地理、教他基本的科学思维、教他'民为贵，社稷次之'——这句话这个时代已经有了，只是没人真的相信。\n\n太子很聪明。他开始问一些让你意外的问题。也许二十年后，这个国家会因为你种下的种子而不同。\n\n也许不会。但你试了。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98392,
+    "event": "你脱下了宫装，换上了素衣。出宫那天没有人送你——或者说你没让任何人知道。\n\n你在城外买了一间小院。种花、读书、看日出。偶尔有宫里的人来找你'叙旧'——其实是来探听消息。你一律闭门不见。\n\n你终于自由了。代价是你再也无法改变任何事。但也许这正是你需要的。",
+    "storyline": "timeslip",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 98303,
+    "event": "太医来请平安脉。你知道他把的是中医的「寸关尺」。你忍住了说「这不科学」的冲动。",
+    "include": "(storyline==timeslip)&(timeslip_era==palace)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "timeslip_progress": 1,
+      "HLT": 1
+    }
+  },
+  {
+    "id": 98304,
+    "event": "有人给你送了一盘糕点。你没吃——古装剧里的「好心」糕点通常都有问题。你让丫鬟先试了一小口。丫鬟：没事啊。你：……行吧。",
+    "include": "(storyline==timeslip)&(timeslip_era==palace)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "CHRONO": 1,
+      "INT": 1
+    }
+  },
+  {
+    "id": 98305,
+    "event": "皇上翻了你的牌子。你努力回想清宫剧里是怎么应对的——「臣妾参见皇上，皇上万福金安。」你觉得自己演技还不错。",
+    "include": "(storyline==timeslip)&(timeslip_era==palace)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "CHRONO": 1,
+      "timeslip_progress": 1,
+      "SOC": 1
+    }
+  },
+  {
+    "id": 98306,
+    "event": "一个老嬷嬷教你宫里的规矩。你发现这些规矩和现代职场PUA有异曲同工之妙——本质都是控制。",
+    "include": "(storyline==timeslip)&(timeslip_era==palace)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "timeslip_progress": 1,
+      "INT": 1
+    }
+  },
+  {
+    "id": 98307,
+    "event": "你在院子里偷偷练瑜伽——在这个时代叫「导引术」。路过的太监看呆了。你说这是祖传的养生功法。",
+    "include": "(storyline==timeslip)&(timeslip_era==palace)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "HLT": 1
+    }
+  },
+  {
+    "id": 98308,
+    "event": "宫里的伙食其实一般。你偷偷指导御膳房做了一道「新菜」——其实就是番茄炒蛋的变体。味道有点奇怪，但太后说好吃。",
+    "include": "(storyline==timeslip)&(timeslip_era==palace)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "timeslip_progress": 1,
+      "SOC": 1
+    }
+  },
+  {
+    "id": 98309,
+    "event": "深夜难眠。你想念手机、想念热水澡、想念奶茶。尤其是奶茶。穿越最大的代价不是性命，是没有奶茶。",
+    "include": "(storyline==timeslip)&(timeslip_era==palace)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "timeslip_progress": 1,
+      "HAP": -1
+    }
+  },
+  {
+    "id": 98310,
+    "event": "一个落魄的嫔妃向你求助。你知道在宫里，善良有时候是最奢侈的东西。帮还是不帮，你犹豫了。最终你还是帮了。",
+    "include": "(storyline==timeslip)&(timeslip_era==palace)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "timeslip_progress": 1,
+      "SOC": 1
+    }
+  },
+  {
+    "id": 98311,
+    "event": "你偷偷在纸上写了几首「原创」诗——其实是你高中背的唐诗。一个饱读诗书的学士看了，惊为天人。你心虚得很。",
+    "include": "(storyline==timeslip)&(timeslip_era==palace)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "INT": 1
+    }
+  },
+  {
+    "id": 98312,
+    "event": "宫墙太高了，高得看不见外面的世界。你站在角楼上远眺，想起了Google Earth上看到的紫禁城——那时候它只是一个旅游景点。",
+    "include": "(storyline==timeslip)&(timeslip_era==palace)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "timeslip_progress": 1,
+      "HAP": -1
+    }
+  },
+  {
+    "id": 98313,
+    "event": "一个太监私下找你，说可以帮你传递消息出宫。你不确定他是真心还是另一个圈套。在这里，连信任都是一种赌博。",
+    "include": "(storyline==timeslip)&(timeslip_era==palace)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "timeslip_progress": 1,
+      "PER": 1
+    }
+  },
+  {
+    "id": 98314,
+    "event": "你用简单的统计学分析了后宫嫔妃的晋升规律。结论：颜值和家世是基础，但最终决定命运的是——运气和时机。这跟职场一模一样。",
+    "include": "(storyline==timeslip)&(timeslip_era==palace)",
+    "storyline": "timeslip",
+    "weight": 3,
+    "repeatable": true,
+    "effect": {
+      "timeslip_progress": 1,
+      "INT": 1
+    }
+  },
+  {
+    "id": 98315,
+    "event": "一个嫔妃送来名贵的胭脂，说是「姐妹情深」。你的直觉告诉你这不简单。",
+    "include": "(storyline==timeslip)&(timeslip_era==palace)",
+    "storyline": "timeslip",
+    "weight": 4,
+    "choices": [
+      {
+        "text": "收下，但不用",
+        "effect": {
+          "SOC": 1,
+          "CHRONO": 1
+        },
+        "tooltip": "给面子，留证据",
+        "next": 98370
+      },
+      {
+        "text": "婉拒——「我皮肤敏感」",
+        "effect": {
+          "INT": 1
+        },
+        "tooltip": "不留把柄",
+        "next": 98371
+      }
+    ],
+    "repeatable": false
+  },
+  {
+    "id": 98316,
+    "event": "你在花园里无意间听到两个太监在密谋什么。他们提到了一个你认识的名字。",
+    "include": "(storyline==timeslip)&(timeslip_era==palace)",
+    "storyline": "timeslip",
+    "weight": 4,
+    "choices": [
+      {
+        "text": "悄悄告诉当事人",
+        "effect": {
+          "SOC": 1,
+          "CHRONO": 1
+        },
+        "tooltip": "结交盟友",
+        "next": 98372
+      },
+      {
+        "text": "装作没听见",
+        "effect": {
+          "PER": 1
+        },
+        "tooltip": "明哲保身",
+        "next": 98373
+      }
+    ],
+    "repeatable": false
+  },
+  {
+    "id": 98317,
+    "event": "太后的猫走丢了，全宫都在找。你知道猫喜欢待在温暖的地方。",
+    "include": "(storyline==timeslip)&(timeslip_era==palace)",
+    "storyline": "timeslip",
+    "weight": 4,
+    "choices": [
+      {
+        "text": "去御膳房的灶台旁找",
+        "effect": {
+          "CHRONO": 1,
+          "SOC": 2
+        },
+        "tooltip": "用现代动物行为学知识",
+        "next": 98374
+      },
+      {
+        "text": "跟着大家一起找",
+        "effect": {
+          "HLT": 1
+        },
+        "tooltip": "合群",
+        "next": 98375
+      }
+    ],
+    "repeatable": false
+  },
+  {
+    "id": 98318,
+    "event": "一个小宫女偷了东西被抓。按规矩要杖刑五十。她才十三岁。",
+    "include": "(storyline==timeslip)&(timeslip_era==palace)",
+    "storyline": "timeslip",
+    "weight": 4,
+    "choices": [
+      {
+        "text": "替她求情",
+        "effect": {
+          "CHRONO": 1,
+          "SOC": 1
+        },
+        "tooltip": "展现仁慈",
+        "next": 98376
+      },
+      {
+        "text": "不干预——你改变不了这个时代的规矩",
+        "effect": {
+          "CHRONO": -1,
+          "PER": 1
+        },
+        "tooltip": "认清现实",
+        "next": 98377
+      }
+    ],
+    "repeatable": false
+  },
+  {
+    "id": 98330,
+    "event": "后宫分成两大派系：太后一派和皇后一派。中立是不可能的——每个人都必须选边站。你知道历史上谁赢了，但问题是：你是要站赢的那边，还是……改变结局？",
+    "include": "(storyline==timeslip)&(timeslip_era==palace)&(timeslip_progress>=3)",
+    "storyline": "timeslip",
+    "weight": 12,
+    "choices": [
+      {
+        "text": "站太后——历史上她赢了",
+        "set": {
+          "palace_faction": "empress_dowager"
+        },
+        "effect": {
+          "CHRONO": 2,
+          "SOC": 2
+        },
+        "tooltip": "顺应历史，安全",
+        "next": 98378
+      },
+      {
+        "text": "站皇后——帮她逆天改命",
+        "set": {
+          "palace_faction": "empress"
+        },
+        "effect": {
+          "CHRONO": 4,
+          "SOC": 1
+        },
+        "tooltip": "逆历史而行，高风险高CHRONO",
+        "next": 98379
+      },
+      {
+        "text": "两边下注——做双面间谍",
+        "set": {
+          "palace_faction": "double"
+        },
+        "effect": {
+          "CHRONO": 3,
+          "INT": 2
+        },
+        "tooltip": "最危险也最灵活",
+        "next": 98380
+      }
+    ],
+    "repeatable": false
+  },
+  {
+    "id": 98340,
+    "event": "你发现了一个惊天秘密：太子不是皇上的亲生儿子。这个秘密在历史上没有记载——也许是被掩盖了。掌握这个秘密就等于握住了整个王朝的命脉。",
+    "include": "(storyline==timeslip)&(timeslip_era==palace)&(timeslip_progress>=6)",
+    "storyline": "timeslip",
+    "weight": 12,
+    "choices": [
+      {
+        "text": "密报皇上",
+        "set": {
+          "palace_secret": "report"
+        },
+        "effect": {
+          "CHRONO": 4,
+          "SOC": 2
+        },
+        "tooltip": "巨大风险——皇上会信你吗？",
+        "next": 98381
+      },
+      {
+        "text": "告诉当事人换取筹码",
+        "set": {
+          "palace_secret": "leverage"
+        },
+        "effect": {
+          "CHRONO": 3,
+          "INT": 2,
+          "MNY": 2
+        },
+        "tooltip": "利用秘密交易",
+        "next": 98382
+      },
+      {
+        "text": "守住秘密",
+        "set": {
+          "palace_secret": "keep"
+        },
+        "effect": {
+          "CHRONO": 1,
+          "PER": 2
+        },
+        "tooltip": "知道太多不一定是好事",
+        "next": 98383
+      }
+    ],
+    "repeatable": false
+  },
+  {
+    "id": 98345,
+    "event": "有人在你的茶里下了慢性毒药。你的现代化学知识让你察觉了——砒霜的微甜味道。你知道是谁做的。问题是：你要怎么处理这个杀手？",
+    "include": "(storyline==timeslip)&(timeslip_era==palace)&(timeslip_progress>=9)",
+    "storyline": "timeslip",
+    "weight": 12,
+    "choices": [
+      {
+        "text": "将计就计——假装中毒引蛇出洞",
+        "set": {
+          "palace_poison": "trap"
+        },
+        "effect": {
+          "CHRONO": 4,
+          "INT": 2,
+          "SOC": 1
+        },
+        "tooltip": "经典宫斗反杀",
+        "next": 98384
+      },
+      {
+        "text": "直接揭发",
+        "set": {
+          "palace_poison": "expose"
+        },
+        "effect": {
+          "CHRONO": 2,
+          "SOC": 2
+        },
+        "tooltip": "正面对决",
+        "next": 98385
+      },
+      {
+        "text": "私下警告对方——「我知道了」",
+        "set": {
+          "palace_poison": "warn"
+        },
+        "effect": {
+          "CHRONO": 3,
+          "PER": 2
+        },
+        "tooltip": "威慑但不撕破脸",
+        "next": 98386
+      }
+    ],
+    "repeatable": false
+  },
+  {
+    "id": 98350,
+    "event": "皇上突然召见你，问了一个很奇怪的问题：「你觉得这天下将来会变成什么样？」你的心猛跳了一下——他在试探你。你可以说实话（历史走向），也可以说他爱听的。在帝王面前，每一个字都是赌注。",
+    "include": "(storyline==timeslip)&(timeslip_era==palace)&(timeslip_progress>=12)",
+    "storyline": "timeslip",
+    "weight": 12,
+    "choices": [
+      {
+        "text": "说出部分真相——「百年之内，天下将大变」",
+        "set": {
+          "palace_loyalty": "truth"
+        },
+        "effect": {
+          "CHRONO": 4,
+          "INT": 2
+        },
+        "tooltip": "引发皇上的兴趣和警惕",
+        "next": 98387
+      },
+      {
+        "text": "说漂亮话——「圣上英明，天下太平」",
+        "set": {
+          "palace_loyalty": "flattery"
+        },
+        "effect": {
+          "CHRONO": 1,
+          "SOC": 2
+        },
+        "tooltip": "安全但无用",
+        "next": 98388
+      },
+      {
+        "text": "反问——「皇上觉得呢？」",
+        "set": {
+          "palace_loyalty": "deflect"
+        },
+        "effect": {
+          "CHRONO": 3,
+          "SOC": 1,
+          "INT": 1
+        },
+        "tooltip": "试探帝王心思",
+        "next": 98389
+      }
+    ],
+    "repeatable": false
+  },
+  {
+    "id": 98353,
+    "event": "你已经是后宫最有权势的人之一。但你知道——在这个时代，女人的权力永远在刀刃上。你可以选择用你的影响力做些真正改变历史的事情。太后老了，皇后被废了，新的权力真空正在形成。",
+    "include": "(storyline==timeslip)&(timeslip_era==palace)&(timeslip_progress>=15)",
+    "storyline": "timeslip",
+    "weight": 15,
+    "choices": [
+      {
+        "text": "推动开办女学——让女孩也能读书",
+        "set": {
+          "palace_final": "education"
+        },
+        "effect": {
+          "CHRONO": 5,
+          "INT": 3,
+          "SOC": 2
+        },
+        "tooltip": "在封建时代种下启蒙的种子",
+        "next": 98390
+      },
+      {
+        "text": "培养太子成为开明君主",
+        "set": {
+          "palace_final": "prince"
+        },
+        "effect": {
+          "CHRONO": 4,
+          "SOC": 3
+        },
+        "tooltip": "从上层改变",
+        "next": 98391
+      },
+      {
+        "text": "急流勇退——出宫归隐",
+        "set": {
+          "palace_final": "retire"
+        },
+        "effect": {
+          "CHRONO": 2,
+          "HAP": 3
+        },
+        "tooltip": "保全自身",
+        "next": 98392
+      }
+    ],
+    "repeatable": false
+  },
+  {
+    "id": 98360,
+    "event": "多年后的史书上多了不寻常的一页：「XX年间，有妃出身微末，然博学多才，通晓天文地理。帝甚爱之。妃力主开女学、除陋习，帝多从之。后世称其为'开明之母'。」当时空裂缝再次打开，你回到了现代。搜索引擎里多了一个词条：「中国历史上第一所女子学校，创办于……」你笑了。",
+    "include": "(storyline==timeslip)&(timeslip_era==palace)&(CHRONO>=35)&(timeslip_progress>=15)&(EVT?[98353])",
+    "storyline": "timeslip",
+    "weight": 20,
+    "end": true,
+    "effect": {
+      "SOC": 5,
+      "INT": 5
+    },
+    "repeatable": false
+  },
+  {
+    "id": 98361,
+    "event": "你在宫墙之内安稳度过了余生。你没能改变制度，但你帮了一些人——挡住了几次暗杀、救了几个被冤枉的人、让太子读了一些「超越时代」的书。你知道这些改变很小，小到史书可能不会记载。回到现代后，你在故宫的某个角落发现了一首诗，落款是你在那个时代用的名字。那首诗你从没写过——但它确实是你的笔迹。",
+    "include": "(storyline==timeslip)&(timeslip_era==palace)&(CHRONO>=15)&(CHRONO<35)&(timeslip_progress>=15)&(EVT?[98353])",
+    "storyline": "timeslip",
+    "weight": 20,
+    "end": true,
+    "effect": {
+      "SOC": 3,
+      "INT": 2
+    },
+    "repeatable": false
+  },
+  {
+    "id": 98362,
+    "event": "你玩得太大了。你的「预言」太准、你的手段太现代、你的野心太明显。当所有派系联合起来对付一个人的时候，你才意识到——在这个时代，最危险的不是毒药和匕首，是「功高震主」。你被幽禁在冷宫。时空裂缝在冷宫的窗外闪烁，像是另一个世界的月亮。",
+    "include": "(storyline==timeslip)&(timeslip_era==palace)&(palace_faction==double)&(CHRONO>=10)&(CHRONO<25)&(EVT?[98353])",
+    "storyline": "timeslip",
+    "weight": 18,
+    "end": true,
+    "effect": {
+      "INT": 2
+    },
+    "repeatable": false
+  },
+  {
+    "id": 98363,
+    "event": "你在宫中没有任何依靠，没有人脉，没有权势。在一次清洗中，你被当做「来历不明之人」处置了。行刑那天下着雨。时空裂缝在雨幕中若隐若现——但你已经没有力气走过去了。",
+    "noRandom": true,
+    "end": true,
+    "repeatable": false
+  },
+  {
+    "id": 96101,
+    "event": "最近你总是头痛。不是那种感冒的痛，而是像有什么东西在大脑深处试图醒来。更奇怪的是，每次在拥挤的地铁上和人碰触，指尖都会传来一阵异样的麻痹感。你以为是缺觉。",
+    "include": "TLT?[3028] & mutantSeed==0 & AGE>=16 & HLT>6",
+    "weight": 180,
+    "logType": "hidden",
+    "set": {
+      "mutantSeed": 1
+    },
+    "repeatable": false
+  },
+  {
+    "id": 96102,
+    "event": "下课的时候，你伸手接住了同学递过来的课本。手指碰触的瞬间——一段画面猛地闪过你的脑海：一个小男孩在雨中被狗追，吓得哇哇大哭。你愣住了。那个同学看着你说：'怎么了？脸色好差。'你摇了摇头。那段记忆不是你的。",
+    "include": "TLT?[3028] & mutantSeed==1",
+    "weight": 180,
+    "logType": "hidden",
+    "set": {
+      "mutantSeed": 2
+    },
+    "repeatable": false
+  },
+  {
+    "id": 96103,
+    "event": "你开始有意地测试这个能力。在咖啡厅里，你假装不小心碰到了朋友的手。画面来了——他昨晚和父母视频吵了一架，摔了手机，然后蹲在阳台哭了十分钟。你松开手。他完全不知道你看到了什么。\n\n你确认了：这不是幻觉。你能读取别人的记忆。",
+    "include": "TLT?[3028] & mutantSeed==2",
+    "weight": 200,
+    "logType": "hidden",
+    "set": {
+      "mutantSeed": 3
+    },
+    "repeatable": false
+  },
+  {
+    "id": 96104,
+    "event": "室友在宿舍里哭。她终于说了原因——初中时被几个女生长期霸凌，那段记忆像毒刺一样扎在心里，永远拔不掉。你握住她的手想安慰她。\n\n然后你感觉到了不同。不只是在读——你感觉自己的意识在她的记忆里留下了一道痕迹。那段霸凌的画面开始模糊、褪色……直到完全消失。\n\n室友抬起头，茫然地眨了眨眼。'我刚才在说什么来着？'\n\n你盯着自己的手。你不只能读取记忆。你还能——覆写它。\n\n一个全新的世界在你面前打开了。",
+    "include": "TLT?[3028] & mutantSeed==3",
+    "weight": 200,
+    "logType": "hidden",
+    "set": {
+      "mutantSeed": 4,
+      "storyline": "mutant",
+      "showPSY": true,
+      "PSY": 3,
+      "CLARITY": 20,
+      "moral": 0,
+      "mutant_progress": 0,
+      "mutant_path": ""
+    },
+    "repeatable": false
+  },
+  {
+    "id": 96201,
+    "event": "你在校园长椅上坐着，身旁走过一个打电话的路人。他无意中碰了你的肩膀。你闭上眼，试着深入读取他的记忆……",
+    "storyline": "mutant",
+    "weight": 2,
+    "repeatable": false,
+    "choices": [
+      {
+        "text": "深入读取深层记忆",
+        "requireExpr": "INT>=7",
+        "tooltip": "需要智力≥7",
+        "effect": {
+          "PSY": 2,
+          "CLARITY": -1,
+          "mutant_progress": 1
+        },
+        "next": 96460
+      },
+      {
+        "text": "只读表层印象",
+        "effect": {
+          "PSY": 1,
+          "mutant_progress": 1
+        },
+        "next": 96461
+      },
+      {
+        "text": "放弃，你不想窥探陌生人",
+        "effect": {
+          "mutant_progress": 1
+        },
+        "next": 96462
+      }
+    ]
+  },
+  {
+    "id": 96202,
+    "event": "你在超市结账时盯着收银员，尝试在她毫无察觉的情况下改写她对你的第一印象——从'又一个无聊的顾客'变成'今天最有礼貌的人'。",
+    "storyline": "mutant",
+    "weight": 2,
+    "repeatable": false,
+    "choices": [
+      {
+        "text": "精确写入全新印象",
+        "requireExpr": "PER>=7",
+        "tooltip": "需要毅力≥7",
+        "effect": {
+          "PSY": 2,
+          "CLARITY": -1,
+          "moral": -1,
+          "mutant_progress": 1
+        },
+        "next": 96463
+      },
+      {
+        "text": "模糊覆盖原来的印象",
+        "effect": {
+          "PSY": 1,
+          "moral": -1,
+          "mutant_progress": 1
+        },
+        "next": 96464
+      },
+      {
+        "text": "算了，用嘴说谢谢不好吗",
+        "effect": {
+          "mutant_progress": 1
+        },
+        "next": 96465
+      }
+    ]
+  },
+  {
+    "id": 96203,
+    "event": "社团开会，有个队员一直和你唱反调。你知道他为什么针对你——上次无意中碰到他的手，你看到了原因。现在你在想，要不要用更直接的方式解决这个问题。",
+    "storyline": "mutant",
+    "weight": 2,
+    "repeatable": false,
+    "choices": [
+      {
+        "text": "社交暗示 + 记忆微调",
+        "requireExpr": "SOC>=7",
+        "tooltip": "需要社交≥7",
+        "effect": {
+          "PSY": 2,
+          "CLARITY": -1,
+          "mutant_progress": 1
+        },
+        "next": 96466
+      },
+      {
+        "text": "只读取他的真实想法来调整话术",
+        "effect": {
+          "PSY": 1,
+          "SOC": 1,
+          "mutant_progress": 1
+        },
+        "next": 96467
+      },
+      {
+        "text": "用正常方式沟通解决",
+        "effect": {
+          "SOC": 1,
+          "mutant_progress": 1
+        },
+        "next": 96468
+      }
+    ]
+  },
+  {
+    "id": 96204,
+    "event": "深夜，你坐在床上，试着读取自己的记忆。这是最危险的尝试——操控者的意识指向自身，就像一面镜子对着另一面镜子。",
+    "storyline": "mutant",
+    "weight": 1.5,
+    "repeatable": false,
+    "choices": [
+      {
+        "text": "强行深入潜意识",
+        "requireExpr": "INT>=9",
+        "tooltip": "需要智力≥9",
+        "effect": {
+          "PSY": 3,
+          "CLARITY": -2,
+          "mutant_progress": 1
+        },
+        "next": 96469
+      },
+      {
+        "text": "浅层扫描",
+        "effect": {
+          "PSY": 1,
+          "mutant_progress": 1
+        },
+        "next": 96470
+      },
+      {
+        "text": "停手，太危险了",
+        "effect": {
+          "CLARITY": 1,
+          "mutant_progress": 1
+        },
+        "next": 96471
+      }
+    ]
+  },
+  {
+    "id": 96205,
+    "event": "在拥挤的食堂里，你发现自己能同时接收到周围多个人的记忆碎片。如果能学会同步处理多个信号源……",
+    "storyline": "mutant",
+    "weight": 1.5,
+    "repeatable": false,
+    "choices": [
+      {
+        "text": "尝试三人同步读取",
+        "requireExpr": "PSY>=15",
+        "tooltip": "需要精神力≥15",
+        "effect": {
+          "PSY": 3,
+          "CLARITY": -2,
+          "mutant_progress": 1
+        },
+        "next": 96472
+      },
+      {
+        "text": "双人同步",
+        "effect": {
+          "PSY": 1,
+          "CLARITY": -1,
+          "mutant_progress": 1
+        },
+        "next": 96473
+      },
+      {
+        "text": "一个一个来，稳妥一点",
+        "effect": {
+          "PSY": 1,
+          "mutant_progress": 1
+        },
+        "next": 96474
+      }
+    ]
+  },
+  {
+    "id": 96206,
+    "event": "你梦到了一段不属于你的童年。梦里的你是个女孩，住在海边的小城，每天放学后去灯塔下面捡贝壳。醒来后你花了十分钟才确认自己是谁。你不知道这是谁的记忆。",
+    "storyline": "mutant",
+    "weight": 2,
+    "repeatable": true,
+    "effect": {
+      "INT": 1
+    }
+  },
+  {
+    "id": 96207,
+    "event": "图书馆里有人碰了你的手臂，你瞬间看到了他正在复习的内容——包括答案。你赶紧移开了手。但那些公式已经印在你脑子里了。",
+    "storyline": "mutant",
+    "weight": 2,
+    "repeatable": true,
+    "effect": {
+      "PSY": 1
+    }
+  },
+  {
+    "id": 96208,
+    "event": "今天在镜子前刷牙的时候，你突然想不起来昨天早上吃了什么。然后你意识到，你能清楚地记得昨天在食堂碰到的那个陌生人十年前的生日派对。你的记忆正在被别人的记忆侵蚀。",
+    "storyline": "mutant",
+    "weight": 1.5,
+    "repeatable": true,
+    "effect": {
+      "CLARITY": -1,
+      "INT": 1
+    }
+  },
+  {
+    "id": 96209,
+    "event": "头痛越来越频繁了。每次痛完之后，你的感知力似乎都会变得更敏锐——能接收到的记忆信号范围又扩大了一圈。你不确定这是进化还是代价。",
+    "storyline": "mutant",
+    "weight": 2,
+    "repeatable": true,
+    "effect": {
+      "PSY": 1,
+      "HLT": -1
+    }
+  },
+  {
+    "id": 96210,
+    "event": "你发现自己不知不觉学会了一门从没学过的语言——意大利语。某天早上你突然能看懂意大利语菜单，然后你想起来了：上周在公交车上，一个意大利老太太靠在你肩膀上打了个盹。",
+    "storyline": "mutant",
+    "weight": 1.5,
+    "repeatable": true,
+    "effect": {
+      "INT": 1
+    }
+  },
+  {
+    "id": 96211,
+    "event": "地铁上，一个疲惫的女人靠在你肩膀上睡着了。你看到了她的记忆：三岁的女儿在病房里叫妈妈，但她必须去上夜班。你没有动。你只是安静地坐着，直到她到站下车。\n\n她永远不会知道，有个陌生人看到了她最柔软的部分。",
+    "storyline": "mutant",
+    "weight": 2,
+    "repeatable": true,
+    "effect": {
+      "PSY": 1,
+      "moral": 1
+    }
+  },
+  {
+    "id": 96212,
+    "event": "一个白发老人握着你的手道谢——你帮他捡了掉在地上的拐杖。他的记忆像一部老电影：年轻时穿着军装站在沙漠里，战友们的笑声，还有一封永远没寄出的信。你把拐杖递给他，多说了一句'保重'。",
+    "storyline": "mutant",
+    "weight": 2,
+    "repeatable": true,
+    "effect": {
+      "PER": 1
+    }
+  },
+  {
+    "id": 96213,
+    "event": "你开始下意识地避免和人接触。出门戴手套，过马路缩着肩膀，朋友伸手拍你的时候你条件反射地后退。'你最近怎么了？变得好冷淡。'你不知道该怎么回答。",
+    "storyline": "mutant",
+    "weight": 1.5,
+    "repeatable": true,
+    "effect": {
+      "SOC": -1,
+      "CLARITY": 1
+    }
+  },
+  {
+    "id": 96214,
+    "event": "你走在人流密集的步行街上，无数记忆碎片像白噪音一样涌入——某人的初吻、某人的考试焦虑、某人藏在衣柜里哭泣的童年。你深呼吸，一层一层地建起屏障，把噪音隔绝在外。你在变强。",
+    "storyline": "mutant",
+    "weight": 1.5,
+    "repeatable": true,
+    "effect": {
+      "PSY": 1,
+      "mutant_progress": 1
+    }
+  },
+  {
+    "id": 96401,
+    "event": "你无意中碰到了一个经常在背后说你坏话的同学。你读到了原因：他嫉妒你轻松拿高分，而他每天学到凌晨三点还是B。他不是坏人，只是不甘心。",
+    "storyline": "mutant",
+    "weight": 3,
+    "repeatable": false,
+    "include": "mutant_progress>=1",
+    "choices": [
+      {
+        "text": "删除他脑中关于你成绩的记忆",
+        "effect": {
+          "PSY": 1,
+          "moral": -1,
+          "CLARITY": -1,
+          "mutant_progress": 1
+        },
+        "next": 96475
+      },
+      {
+        "text": "理解他，什么都不做",
+        "effect": {
+          "PSY": 1,
+          "moral": 1,
+          "mutant_progress": 1
+        },
+        "next": 96476
+      }
+    ]
+  },
+  {
+    "id": 96402,
+    "event": "和教授握手的瞬间，你读到了他的真实想法：他打算给你的论文打低分，不是因为质量——而是因为你上课玩手机的态度让他很不爽。",
+    "storyline": "mutant",
+    "weight": 3,
+    "repeatable": false,
+    "include": "mutant_progress>=2",
+    "choices": [
+      {
+        "text": "读取他的评分标准，下次完美迎合",
+        "effect": {
+          "PSY": 1,
+          "INT": 1,
+          "mutant_progress": 1
+        },
+        "next": 96477
+      },
+      {
+        "text": "直接改写他对你的印象",
+        "effect": {
+          "PSY": 1,
+          "moral": -1,
+          "CLARITY": -1,
+          "mutant_progress": 1
+        },
+        "next": 96478
+      },
+      {
+        "text": "凭实力改变他的看法",
+        "effect": {
+          "moral": 1,
+          "mutant_progress": 1
+        },
+        "next": 96479
+      }
+    ]
+  },
+  {
+    "id": 96403,
+    "event": "好朋友失恋了，痛不欲生。她抓着你的手哭了一整晚。你清楚地看到了那段恋爱的全部记忆——甜蜜的、痛苦的、被背叛的。你的手指微微发热。你可以把这些全部抹掉。",
+    "storyline": "mutant",
+    "weight": 3,
+    "repeatable": false,
+    "include": "mutant_progress>=3",
+    "choices": [
+      {
+        "text": "抹去她关于前任的所有记忆",
+        "effect": {
+          "PSY": 1,
+          "CLARITY": -1,
+          "moral": -1,
+          "mutant_progress": 1
+        },
+        "next": 96480
+      },
+      {
+        "text": "只抹去最痛苦的那部分",
+        "effect": {
+          "PSY": 1,
+          "mutant_progress": 1
+        },
+        "next": 96481
+      },
+      {
+        "text": "陪她哭，陪她走出来",
+        "effect": {
+          "moral": 1,
+          "SOC": 1,
+          "mutant_progress": 1
+        },
+        "next": 96482
+      }
+    ]
+  },
+  {
+    "id": 96404,
+    "event": "一个陌生男人蹲在路边哭。你碰到他的时候读到了原因：他被电信诈骗骗走了全部积蓄——给女儿攒的留学基金。",
+    "storyline": "mutant",
+    "weight": 3,
+    "repeatable": false,
+    "include": "mutant_progress>=4",
+    "choices": [
+      {
+        "text": "抹去被骗的记忆，至少让他不那么痛苦",
+        "effect": {
+          "PSY": 1,
+          "moral": 1,
+          "mutant_progress": 1
+        },
+        "next": 96483
+      },
+      {
+        "text": "读取骗子的信息帮他报警",
+        "effect": {
+          "PSY": 1,
+          "INT": 1,
+          "mutant_progress": 1
+        },
+        "next": 96484
+      },
+      {
+        "text": "装没看见",
+        "effect": {
+          "mutant_progress": 1
+        },
+        "next": 96485
+      }
+    ]
+  },
+  {
+    "id": 96405,
+    "event": "室友无意中碰到你时，你读到了一个让你警觉的东西：她在写日记。日记里详细记录了你的'异常行为'——不爱和人接触、总是戴手套、碰到人之后会发呆。最后一句话写着：'我觉得TA在隐瞒什么。'",
+    "storyline": "mutant",
+    "weight": 3,
+    "repeatable": false,
+    "include": "mutant_progress>=6",
+    "choices": [
+      {
+        "text": "删除她所有关于你的怀疑",
+        "effect": {
+          "PSY": 1,
+          "CLARITY": -1,
+          "moral": -1,
+          "mutant_progress": 1
+        },
+        "next": 96486
+      },
+      {
+        "text": "读取完整日记评估暴露风险",
+        "effect": {
+          "PSY": 1,
+          "mutant_progress": 1
+        },
+        "next": 96487
+      },
+      {
+        "text": "找她坦白——你需要一个知道真相的人",
+        "effect": {
+          "moral": 1,
+          "SOC": 1,
+          "mutant_progress": 1
+        },
+        "next": 96488
+      }
+    ]
+  },
+  {
+    "id": 96406,
+    "event": "你读到了一个同学的记忆：他正在策划期末考试作弊——买了答案、联系了枪手。如果你不管，他大概率能成功。",
+    "storyline": "mutant",
+    "weight": 3,
+    "repeatable": false,
+    "include": "mutant_progress>=8",
+    "choices": [
+      {
+        "text": "改写他的计划，让他放弃作弊",
+        "effect": {
+          "PSY": 1,
+          "moral": 1,
+          "mutant_progress": 1
+        },
+        "next": 96489
+      },
+      {
+        "text": "读取他买到的答案自己也用",
+        "effect": {
+          "PSY": 1,
+          "moral": -2,
+          "mutant_progress": 1
+        },
+        "next": 96490
+      },
+      {
+        "text": "匿名举报",
+        "effect": {
+          "moral": 1,
+          "mutant_progress": 1
+        },
+        "next": 96491
+      }
+    ]
+  },
+  {
+    "id": 96407,
+    "event": "你和恋人牵手散步。这是你最害怕的时刻——长时间的肌肤接触让你无法屏蔽对方的记忆。然后你看到了：TA曾经认真地考虑过和你分手。犹豫了很久。最终留下了。\n\nTA转过头来对你笑：'想什么呢？'\n\n你攥紧了TA的手。你不知道该感激还是该难过。",
+    "storyline": "mutant",
+    "weight": 3,
+    "repeatable": false,
+    "include": "mutant_progress>=5 & REL==恋爱中",
+    "choices": [
+      {
+        "text": "悄悄删除TA犹豫的那段记忆",
+        "effect": {
+          "PSY": 1,
+          "CLARITY": -1,
+          "moral": -2,
+          "mutant_progress": 1
+        },
+        "next": 96492
+      },
+      {
+        "text": "假装没看到，TA选择了留下就够了",
+        "effect": {
+          "PSY": 1,
+          "moral": 1,
+          "mutant_progress": 1
+        },
+        "next": 96493
+      },
+      {
+        "text": "坦白你的能力",
+        "effect": {
+          "moral": 2,
+          "SOC": 1,
+          "mutant_progress": 1
+        },
+        "next": 96494
+      }
+    ]
+  },
+  {
+    "id": 96301,
+    "event": "【室友的倒计时】\n\n深夜两点，你碰到室友放在桌上的手。\n\n你看到了一段异常清晰的记忆：她反复查看天台的路线图。她在手机备忘录里存了一段话，开头是'对不起'。她的日历上有一个标红的日期——就在下周四。\n\n你注意到她最近把借的书都还了，把不用的衣服装进了箱子。你看过太多人的记忆，你知道这些意味着什么。\n\n你只有几天时间。",
+    "storyline": "mutant",
+    "weight": 4,
+    "repeatable": false,
+    "include": "mutant_progress>=3",
+    "choices": [
+      {
+        "text": "直接覆写她的绝望——把那种灰暗的情绪从根源抹去",
+        "effect": {
+          "PSY": 3,
+          "CLARITY": -2,
+          "moral": -1,
+          "mutant_progress": 1
+        },
+        "tooltip": "最快最有效，但你改变了一个人最深处的感受",
+        "next": 96421
+      },
+      {
+        "text": "读取原因，匿名通知辅导员",
+        "effect": {
+          "PSY": 2,
+          "moral": 1,
+          "mutant_progress": 1
+        },
+        "tooltip": "不侵入她的心智，但可能暴露你怎么知道的",
+        "next": 96422
+      },
+      {
+        "text": "在她的记忆里写入一段温暖的假记忆——一个不存在的拥抱",
+        "effect": {
+          "PSY": 3,
+          "CLARITY": -1,
+          "mutant_progress": 1
+        },
+        "tooltip": "给她一个活下去的理由，但它是假的",
+        "next": 96423
+      },
+      {
+        "text": "直接去和她谈，不用能力",
+        "effect": {
+          "PSY": 1,
+          "SOC": 1,
+          "moral": 2,
+          "mutant_progress": 1
+        },
+        "tooltip": "最普通的方式，但你不确定来不来得及",
+        "next": 96424
+      }
+    ]
+  },
+  {
+    "id": 96302,
+    "event": "【慈善家的双面】\n\n在一次华人社区慈善晚宴上，你和当地最知名的慈善家握手合影。闪光灯亮起的瞬间，他的记忆涌入你的大脑。\n\n你看到了血。不止一次。他杀过人——三个，在不同的年份，用不同的方式。每一次都处理得很干净。\n\n但你也看到了：他的慈善是真的。孤儿院、希望小学、免费午餐计划。上千个孩子因为他活了下来。此刻他正计划捐出全部身家。\n\n你松开了他的手。你的笑容凝固在脸上。",
+    "storyline": "mutant",
+    "weight": 4,
+    "repeatable": false,
+    "include": "mutant_progress>=5",
+    "choices": [
+      {
+        "text": "抹去他的杀人记忆，让他安心做慈善到死",
+        "effect": {
+          "PSY": 3,
+          "CLARITY": -2,
+          "moral": -2,
+          "mutant_progress": 1
+        },
+        "next": 96425
+      },
+      {
+        "text": "在他的记忆中植入自首的冲动",
+        "effect": {
+          "PSY": 3,
+          "CLARITY": -1,
+          "moral": 1,
+          "mutant_progress": 1
+        },
+        "next": 96426
+      },
+      {
+        "text": "读取完整证据链，匿名交给警方",
+        "effect": {
+          "PSY": 2,
+          "moral": 2,
+          "mutant_progress": 1
+        },
+        "next": 96427
+      },
+      {
+        "text": "什么都不做——他的善款正在救人",
+        "effect": {
+          "PSY": 1,
+          "moral": -1,
+          "mutant_progress": 1
+        },
+        "next": 96428
+      }
+    ]
+  },
+  {
+    "id": 96303,
+    "event": "【最后的温柔】\n\n养老院志愿活动。一位阿尔茨海默症老人紧紧抓住你的手不肯放。\n\n你看到了他正在消散的记忆——妻子切菜时哼歌的样子，女儿第一次叫爸爸，金婚纪念日上他念的诗。这些记忆像沙子一样从指缝间滑落。\n\n但你也看到了一段被病症'仁慈地'抹去的记忆：三十年前，他抛弃了原配和第一个孩子，带着存款消失了。\n\n老人用浑浊的眼睛看着你：'年轻人，我总觉得我忘了什么很重要的东西。你能帮帮我吗？'",
+    "storyline": "mutant",
+    "weight": 4,
+    "repeatable": false,
+    "include": "mutant_progress>=7",
+    "choices": [
+      {
+        "text": "恢复所有记忆——美好的和残忍的",
+        "effect": {
+          "PSY": 3,
+          "CLARITY": -1,
+          "moral": 1,
+          "mutant_progress": 1
+        },
+        "tooltip": "他有权知道全部真相，即使它很痛",
+        "next": 96429
+      },
+      {
+        "text": "只恢复美好的部分，永远删除那段抛弃",
+        "effect": {
+          "PSY": 4,
+          "CLARITY": -2,
+          "moral": -1,
+          "mutant_progress": 1
+        },
+        "tooltip": "你在替他做选择",
+        "next": 96430
+      },
+      {
+        "text": "编织一段完美的假记忆——他从未抛弃任何人",
+        "effect": {
+          "PSY": 3,
+          "CLARITY": -2,
+          "moral": -2,
+          "mutant_progress": 1
+        },
+        "tooltip": "最美的谎言",
+        "next": 96431
+      },
+      {
+        "text": "握着他的手说：'您没忘，她一直都在这里'",
+        "effect": {
+          "PSY": 1,
+          "moral": 1,
+          "CLARITY": 1,
+          "mutant_progress": 1
+        },
+        "tooltip": "你决定不碰任何人的记忆",
+        "next": 96432
+      }
+    ]
+  },
+  {
+    "id": 96304,
+    "event": "【记忆商人】\n\n图书馆门口，一个穿灰色风衣的男人拦住了你。他把一张纸条塞进你手里，上面写着一个加密通讯的地址。\n\n'我知道你能做什么。别问我怎么知道的。'他的声音很平静。'我有客户。第一单：一个CEO需要在测谎仪前过关——你帮他忘掉那笔行贿的事。报酬五万美金，现金。'\n\n你看着纸条。五万美金够你两年的学费。",
+    "storyline": "mutant",
+    "weight": 4,
+    "repeatable": false,
+    "include": "mutant_progress>=9",
+    "choices": [
+      {
+        "text": "接了。你需要钱，他本来也会逃脱",
+        "effect": {
+          "PSY": 2,
+          "MNY": 5,
+          "moral": -3,
+          "CLARITY": -1,
+          "mutant_progress": 1
+        },
+        "next": 96433
+      },
+      {
+        "text": "接了，但暗中保留他行贿的证据副本",
+        "effect": {
+          "PSY": 3,
+          "MNY": 3,
+          "moral": -1,
+          "mutant_progress": 1
+        },
+        "next": 96434
+      },
+      {
+        "text": "拒绝，但不暴露自己",
+        "effect": {
+          "PSY": 1,
+          "moral": 2,
+          "mutant_progress": 1
+        },
+        "next": 96435
+      },
+      {
+        "text": "拒绝，并警告他：再找你，你就覆写他关于你的所有记忆",
+        "effect": {
+          "PSY": 3,
+          "CLARITY": -1,
+          "moral": -1,
+          "mutant_progress": 1
+        },
+        "next": 96436
+      }
+    ]
+  },
+  {
+    "id": 96305,
+    "event": "【前任的伤疤】\n\n前任找到了你。你们已经分开很久了。TA在咖啡厅对面坐下来，犹豫了很久才开口：\n\n'我知道这很奇怪，但……你能不能让我忘了你？所有的。'\n\n你碰到TA的手，读取了TA的记忆。然后你愣住了。在TA的记忆里，你们的关系和你记得的完全不同。TA记忆中的你——控制欲极强，会翻对方手机，会在吵架时说很过分的话。\n\n你完全不记得这些。但TA的记忆不像是假的。",
+    "storyline": "mutant",
+    "weight": 4,
+    "repeatable": false,
+    "include": "mutant_progress>=11",
+    "choices": [
+      {
+        "text": "删除TA记忆中关于你的一切",
+        "effect": {
+          "PSY": 3,
+          "CLARITY": -2,
+          "moral": -1,
+          "mutant_progress": 1
+        },
+        "next": 96437
+      },
+      {
+        "text": "只删除痛苦的部分，保留美好的",
+        "effect": {
+          "PSY": 3,
+          "CLARITY": -1,
+          "moral": -1,
+          "mutant_progress": 1
+        },
+        "next": 96438
+      },
+      {
+        "text": "不删。但读取TA的完整记忆来理解你到底做了什么",
+        "effect": {
+          "PSY": 2,
+          "CLARITY": -1,
+          "moral": 1,
+          "mutant_progress": 1
+        },
+        "tooltip": "也许你伤害过TA，只是你自己不记得了",
+        "next": 96439
+      },
+      {
+        "text": "'对不起。我不能用这种方式来逃避。'",
+        "effect": {
+          "PSY": 1,
+          "moral": 2,
+          "CLARITY": 1,
+          "mutant_progress": 1
+        },
+        "next": 96440
+      }
+    ]
+  },
+  {
+    "id": 96306,
+    "event": "【猎人与猎物】\n\n有人在追踪你。\n\n你最近改写过记忆的人——一个，两个，三个——他们同时开始'想起来'了。被你删除的记忆像野草一样重新生长。\n\n然后你收到一条匿名消息：'你删不干净的。我能把它们全部恢复。'\n\n你在人群中看到了一张熟悉的脸——你刚来这座城市时随手篡改过的一个路人。当时只是为了练手，你觉得无所谓。\n\n他微笑着看着你。他的手指轻轻碰了一下身边人的肩膀。那个人突然变了脸色，直直地看向你——他想起来了。你做过的事，他全部还原了。\n\n后来你从他的记忆碎片中拼出了一个名字——陆沉。MG-04。和你一样的实验体，但他的能力是'恢复'，而不是'写入'。\n\n他比你更了解你的能力。因为他曾经是你的受害者。",
+    "storyline": "mutant",
+    "weight": 5,
+    "repeatable": false,
+    "include": "mutant_progress>=13",
+    "choices": [
+      {
+        "text": "找到他，强行覆写他所有关于你的记忆",
+        "effect": {
+          "PSY": 4,
+          "CLARITY": -3,
+          "moral": -2,
+          "mutant_progress": 1
+        },
+        "next": 96441
+      },
+      {
+        "text": "约他出来谈判——两个记忆操控者之间的对话",
+        "effect": {
+          "PSY": 3,
+          "moral": 1,
+          "mutant_progress": 1
+        },
+        "next": 96442
+      },
+      {
+        "text": "先读取他的记忆，搞清楚他的能力边界和弱点",
+        "effect": {
+          "PSY": 3,
+          "CLARITY": -1,
+          "mutant_progress": 1
+        },
+        "next": 96443
+      },
+      {
+        "text": "逃。搬家、换号、切断所有社交",
+        "effect": {
+          "CLARITY": 2,
+          "SOC": -2,
+          "moral": -1,
+          "mutant_progress": 1
+        },
+        "next": 96444
+      }
+    ]
+  },
+  {
+    "id": 96307,
+    "event": "【一座城的噩梦】\n\n一场严重的地铁事故。数百人受伤，十几人当场死亡。整座城市陷入恐惧。PTSD患者挤满了心理诊所，政府的援助远远不够。\n\n一个官员通过中间人联系了你。他知道你的能力——也许是从黑市，也许是从陆沉那里。\n\n'我需要你。对所有目击者进行记忆减压处理。把那些最惨烈的画面……降低一点就好。预算不是问题。'\n\n你评估了一下：技术上可以，但需要你持续工作三个月。代价是你自己的精神会被严重消耗。",
+    "storyline": "mutant",
+    "weight": 5,
+    "repeatable": false,
+    "include": "mutant_progress>=15",
+    "choices": [
+      {
+        "text": "全部接受——牺牲自己拯救全城人的噩梦",
+        "effect": {
+          "PSY": 5,
+          "CLARITY": -4,
+          "moral": 3,
+          "mutant_progress": 1
+        },
+        "next": 96445
+      },
+      {
+        "text": "只帮助最严重的案例——儿童和老人",
+        "effect": {
+          "PSY": 3,
+          "CLARITY": -2,
+          "moral": 2,
+          "mutant_progress": 1
+        },
+        "next": 96446
+      },
+      {
+        "text": "拒绝。你不是工具",
+        "effect": {
+          "PSY": 1,
+          "moral": 1,
+          "CLARITY": 1,
+          "mutant_progress": 1
+        },
+        "next": 96447
+      },
+      {
+        "text": "接受，但在过程中偷偷读取官员的记忆——你想知道事故的真正原因",
+        "effect": {
+          "PSY": 4,
+          "CLARITY": -3,
+          "moral": -1,
+          "mutant_progress": 1
+        },
+        "next": 96448
+      }
+    ]
+  },
+  {
+    "id": 96308,
+    "event": "【镜中人】\n\n陆沉又出现了。\n\n这次他没有攻击你。他就坐在公园的长椅上，双手插在大衣口袋里，像一个普通的路人。你走近的时候他抬头看了你一眼——那表情不像敌人，更像是一个等了很久的旧识。\n\n'你有没有想过，你为什么会获得这个能力？'\n\n他碰了你一下。你的大脑一阵剧痛——不是攻击。他在给你看什么。\n\n你看到了自己的记忆——上面有被篡改过的痕迹。就像用修复液涂改过的考卷，颜色不太对，质地不太对。有人在你很小的时候改写过你的记忆。不止一次。\n\n你突然想起了前任说的话——TA说你有控制欲，说你做过很过分的事。你完全不记得。但也许……不是你忘了。是有人帮你'忘了'。\n\n'你自己的记忆也是被编辑过的。'他说。'现在，你想怎么做？'",
+    "storyline": "mutant",
+    "weight": 5,
+    "repeatable": false,
+    "include": "mutant_progress>=17",
+    "choices": [
+      {
+        "text": "让他恢复你所有的原始记忆",
+        "effect": {
+          "PSY": 4,
+          "CLARITY": -3,
+          "mutant_progress": 1
+        },
+        "set": {
+          "mutant_path": "truth"
+        },
+        "tooltip": "你准备好面对自己了吗？",
+        "next": 96449
+      },
+      {
+        "text": "自己解析被篡改的痕迹",
+        "requireExpr": "PSY>=15",
+        "effect": {
+          "PSY": 5,
+          "CLARITY": -2,
+          "mutant_progress": 1
+        },
+        "set": {
+          "mutant_path": "solo"
+        },
+        "tooltip": "需要精神力≥15 | 你不信任任何人，只信自己",
+        "next": 96450
+      },
+      {
+        "text": "不看了。'我不在乎过去的我是谁，我选择现在的我。'",
+        "effect": {
+          "PSY": 3,
+          "CLARITY": 2,
+          "moral": 2,
+          "mutant_progress": 1
+        },
+        "set": {
+          "mutant_path": "accept"
+        },
+        "tooltip": "放下执念，向前走",
+        "next": 96451
+      },
+      {
+        "text": "和他合作——你们一起追溯源头",
+        "effect": {
+          "PSY": 4,
+          "CLARITY": -1,
+          "moral": 1,
+          "mutant_progress": 1
+        },
+        "set": {
+          "mutant_path": "alliance"
+        },
+        "tooltip": "敌人变盟友",
+        "next": 96452
+      }
+    ]
+  },
+  {
+    "id": 96310,
+    "event": "【碎片拼图】\n\n陆沉恢复了你的记忆。痛苦像洪水一样涌来。\n\n你看到了自己五岁的时候——一个穿白大褂的人蹲下来，微笑着碰了你的额头。他在你的记忆里植入了什么东西。一颗种子。你的能力不是基因突变，也不是进化。你是被设计出来的。\n\n更令人窒息的是：你看到了自己真实的童年。你确实伤害过很多人。前任说的是真的。那些被你'遗忘'的事——是这个研究者替你抹掉的。他不想让实验品因为负罪感而崩溃。",
+    "storyline": "mutant",
+    "weight": 180,
+    "repeatable": false,
+    "include": "mutant_path==truth & EVT?[96308]",
+    "effect": {
+      "PSY": 2,
+      "CLARITY": -1
+    }
+  },
+  {
+    "id": 96311,
+    "event": "【记忆花园】\n\n你循着记忆中的线索找到了那个研究所。它藏在郊区一栋废弃的办公楼里。\n\n实验室早已荒废，但档案室的铁门还在。你撬开它，找到了一叠编号文件。项目代号：'记忆花园'。你的编号是MG-17。陆沉的编号是MG-04。文件上还有十几个编号——你们不是唯一的两个。\n\n项目目标写在第一页：'培育能够进行大规模记忆改写的人类个体。应用场景：集体创伤修复、意识形态重建、历史叙事工程。'",
+    "storyline": "mutant",
+    "weight": 180,
+    "repeatable": false,
+    "include": "mutant_path==truth & EVT?[96310]",
+    "effect": {
+      "PSY": 2,
+      "INT": 1
+    }
+  },
+  {
+    "id": 96312,
+    "event": "【沉睡的种子】\n\n档案里有地址。你找到了另一个实验体——MG-11。她是个普通的上班族，每天朝九晚五，养了两只猫。她的能力从未觉醒。\n\n你站在她公司楼下犹豫了一整个下午。告诉她真相，意味着毁掉她平静的生活。但不告诉她，如果有一天她的能力突然觉醒，没有人会帮她。",
+    "storyline": "mutant",
+    "weight": 180,
+    "repeatable": false,
+    "include": "mutant_path==truth & EVT?[96311]",
+    "choices": [
+      {
+        "text": "唤醒她，告诉她一切",
+        "effect": {
+          "PSY": 3,
+          "moral": 1,
+          "mutant_progress": 1
+        },
+        "next": 96313
+      },
+      {
+        "text": "只读取她的记忆确认她是否安全，不告诉她",
+        "effect": {
+          "PSY": 2,
+          "CLARITY": -1,
+          "mutant_progress": 1
+        },
+        "next": 96313
+      },
+      {
+        "text": "改写她可能觉醒的那部分记忆，让她永远普通",
+        "effect": {
+          "PSY": 2,
+          "CLARITY": -2,
+          "moral": -2,
+          "mutant_progress": 1
+        },
+        "next": 96313
+      }
+    ]
+  },
+  {
+    "id": 96313,
+    "event": "【终局：记忆花园的归宿】\n\n你掌握了'记忆花园'项目的全部真相。它的创始人已经死了，但他的研究成果还在。如果这些档案被公开，会引发恐慌——人们会知道有人能改写记忆。如果被销毁，这些技术可能在暗处重新萌芽。如果你继承它……\n\n你站在档案室里，手指碰着那些泛黄的纸页。你感觉到了纸张里残留的记忆——创始人的。他写这些报告时，手是抖的。",
+    "storyline": "mutant",
+    "weight": 200,
+    "repeatable": false,
+    "include": "mutant_path==truth & EVT?[96312]",
+    "noRandom": true,
+    "branch": [
+      "PSY>=60 & CLARITY>=4?96510",
+      "PSY>=40 & CLARITY<=2 & moral<=-3?96505",
+      "PSY>=40 & CLARITY<=2?96503",
+      "PSY>=35?96511",
+      "?96504"
+    ]
+  },
+  {
+    "id": 96320,
+    "event": "【内观】\n\n你关掉手机，拉上窗帘，开始系统性地分析自己的记忆。\n\n像整理硬盘一样，你逐层扫描。被篡改的痕迹有规律——它们有一种特定的'编码风格'，就像程序员能认出别人的代码。你开始能分辨哪些记忆是原装的，哪些是后来写入的。\n\n有些'写入'的记忆质量很高，几乎无法区分。但有些粗糙得像盗版碟——你的大脑一直在试图修复它们，这就是你经常头痛的原因。",
+    "storyline": "mutant",
+    "weight": 180,
+    "repeatable": false,
+    "include": "mutant_path==solo & EVT?[96308]",
+    "effect": {
+      "PSY": 3,
+      "INT": 1
+    }
+  },
+  {
+    "id": 96321,
+    "event": "【记忆宫殿】\n\n你在脑中构建了一个完整的记忆索引系统。被篡改的标红，原始的标蓝，你写入别人的标灰。\n\n索引越来越庞大。你的精神力在飞速增长——你已经比觉醒时强了不止十倍。但代价是你越来越多的清醒时间花在了'整理'上。有时候你在整理记忆的过程中，会突然忘记自己在现实世界中正在做什么。",
+    "storyline": "mutant",
+    "weight": 180,
+    "repeatable": false,
+    "include": "mutant_path==solo & EVT?[96320]",
+    "effect": {
+      "PSY": 3,
+      "CLARITY": -1
+    }
+  },
+  {
+    "id": 96322,
+    "event": "【极限测试】\n\n你尝试了一个从未有人做过的事：同时读取、解析、改写自己的记忆。像外科医生给自己做手术。\n\n你成功了。你是第一个能自我编辑的记忆操控者。你清除了被植入的虚假记忆，恢复了部分原始版本。\n\n但在过程中，你意外删除了一段真实记忆。你突然想不起母亲的声音了。你记得她的脸、她做的菜、她送你出国时的表情——但声音，完全消失了。",
+    "storyline": "mutant",
+    "weight": 180,
+    "repeatable": false,
+    "include": "mutant_path==solo & EVT?[96321]",
+    "choices": [
+      {
+        "text": "继续推进极限——其他记忆也可以牺牲",
+        "effect": {
+          "PSY": 5,
+          "CLARITY": -3,
+          "mutant_progress": 1
+        },
+        "next": 96323
+      },
+      {
+        "text": "打电话给妈妈，请她说几句话来重建记忆",
+        "effect": {
+          "PSY": 2,
+          "CLARITY": 1,
+          "moral": 1,
+          "mutant_progress": 1
+        },
+        "next": 96323
+      },
+      {
+        "text": "记录方法论，但不再用自己做实验",
+        "effect": {
+          "PSY": 3,
+          "CLARITY": -1,
+          "mutant_progress": 1
+        },
+        "next": 96323
+      }
+    ]
+  },
+  {
+    "id": 96323,
+    "event": "【终局：自我的边界】\n\n你的能力达到了前所未有的高度。你甚至能在不接触的情况下感知到附近人的记忆波动。\n\n陆沉找到了你。不是来打架——他的'恢复'能力正在失控。他触碰过的每一个人都会不受控制地涌回被封存的记忆，引发大面积的精神混乱。\n\n'帮帮我。'他说。'你是唯一一个可能解决这个问题的人。'\n\n你审视着他。你已经强大到不需要害怕任何人了。但你也付出了代价——你的记忆宫殿里，自己的那些标蓝格子越来越少了。",
+    "storyline": "mutant",
+    "weight": 200,
+    "repeatable": false,
+    "include": "mutant_path==solo & EVT?[96322]",
+    "noRandom": true,
+    "branch": [
+      "PSY>=60 & CLARITY>=4?96520",
+      "PSY>=40 & CLARITY<=2 & moral<=-3?96505",
+      "PSY>=40 & CLARITY<=2?96503",
+      "PSY>=35?96521",
+      "?96504"
+    ]
+  },
+  {
+    "id": 96330,
+    "event": "【新的边界】\n\n你给自己定了规则：不主动读取。不改写记忆。不追查过去。\n\n你买了三副手套——黑色、白色、灰色，轮着戴。朋友以为你是fashion boy/girl。只有你知道，那是你和世界之间最后一层屏障。\n\n能力没有消失。它变成了一种本能——就像你不能让耳朵停止听声音，你也不能让大脑停止接收触碰带来的记忆信号。你能做的只是不去处理它。",
+    "storyline": "mutant",
+    "weight": 180,
+    "repeatable": false,
+    "include": "mutant_path==accept & EVT?[96308]",
+    "effect": {
+      "CLARITY": 1
+    }
+  },
+  {
+    "id": 96331,
+    "event": "【戒断反应】\n\n不使用能力的日子比想象中难熬。你的大脑不断'自动连接'碰触到的人的记忆，然后你必须花费意志力去忽略这些涌入的信息。\n\n这就像一个有千里眼的人试图不去看远方。你的精神力在持续消耗——不是因为使用能力，而是因为抑制它。\n\n某天半夜你发现自己无意识地握着室友的手腕，正在读取她的梦境。你惊醒过来，冷汗浸透了整件T恤。",
+    "storyline": "mutant",
+    "weight": 180,
+    "repeatable": false,
+    "include": "mutant_path==accept & EVT?[96330]",
+    "effect": {
+      "PSY": 1,
+      "CLARITY": -1
+    }
+  },
+  {
+    "id": 96332,
+    "event": "【无法袖手】\n\n商场里，一个三四岁的小女孩站在人群中嚎啕大哭。和父母走散了。保安问了半天，她太小了，说不清楚妈妈叫什么、住在哪里。\n\n你犹豫了三秒钟。然后你摘下手套，蹲下来，握住了她的小手。\n\n妈妈的脸、妈妈的声音、妈妈的手机号——全都在她的记忆里。你把号码报给了保安。五分钟后，一个哭红了眼的女人冲过来抱住了女孩。\n\n你重新戴上手套，手在发抖。你打破了自己的规则。",
+    "storyline": "mutant",
+    "weight": 180,
+    "repeatable": false,
+    "include": "mutant_path==accept & EVT?[96331]",
+    "choices": [
+      {
+        "text": "帮完这次，以后绝不再用了",
+        "effect": {
+          "PSY": 2,
+          "CLARITY": 1,
+          "moral": 2,
+          "mutant_progress": 1
+        },
+        "next": 96333
+      },
+      {
+        "text": "既然打破了规则，不如放开——去帮助更多人",
+        "effect": {
+          "PSY": 4,
+          "CLARITY": -1,
+          "moral": 1,
+          "mutant_progress": 1
+        },
+        "next": 96333
+      },
+      {
+        "text": "更加严格地封锁能力——加一层手套",
+        "effect": {
+          "PSY": 1,
+          "CLARITY": 2,
+          "mutant_progress": 1
+        },
+        "next": 96333
+      }
+    ]
+  },
+  {
+    "id": 96333,
+    "event": "【终局：你的规则】\n\n陆沉又出现了。但这次不是对峙。\n\n他站在你常去的那家咖啡厅门口，手插在口袋里。看到你之后，他笑了一下——不是嘲讽的笑，更像是'终于等到你了'。\n\n'我恢复了那些人的记忆。他们当中有人恨你。'他顿了顿。'但我也看了你这几个月做的事。你在克制。你在改变。'\n\n他伸出手。没戴手套的手。\n\n你知道这意味着什么——如果你握住他的手，你们会互相看到对方全部的记忆。完全透明。没有秘密。\n\n这也许是两个记忆操控者之间，最勇敢的举动。",
+    "storyline": "mutant",
+    "weight": 200,
+    "repeatable": false,
+    "include": "mutant_path==accept & EVT?[96332]",
+    "noRandom": true,
+    "branch": [
+      "PSY>=60 & CLARITY>=4?96530",
+      "PSY>=40 & CLARITY<=2 & moral<=-3?96505",
+      "PSY>=40 & CLARITY<=2?96503",
+      "PSY>=35?96531",
+      "?96504"
+    ]
+  },
+  {
+    "id": 96340,
+    "event": "【交底】\n\n你和陆沉坐在公园的长椅上。很奇怪——两个能读取对方记忆的人坐在一起，反而选择了用嘴说话。\n\n'我的能力和你相反。'他说。'你能写，我能恢复。你删掉的东西，我能找回来。但我也是被人做过手术的。'他撸起袖子，后脑勺有一道淡淡的疤痕。\n\n你们交换了信息。他告诉你：'我们'不是两个。从他恢复的记忆碎片来看，至少还有十几个。有个组织在系统性地制造你们——项目名叫'记忆花园'。而且它可能还在运作。",
+    "storyline": "mutant",
+    "weight": 180,
+    "repeatable": false,
+    "include": "mutant_path==alliance & EVT?[96308]",
+    "effect": {
+      "PSY": 2,
+      "moral": 1
+    }
+  },
+  {
+    "id": 96341,
+    "event": "【追踪者】\n\n你们开始联合调查。分工很自然——你负责读取线索中的记忆，他负责恢复被抹去的痕迹。你们像两把钥匙，分别打开锁的两半。\n\n在追踪过程中，你发现了一件事：你在城市事件中大规模使用能力的行为已经被观测到了。有人在分析你的'编码特征'。\n\n'他们找到我们了。'陆沉说。他从一个中间人那里恢复了一段被清除的记忆——里面有一张会议照片。西装革履的人围坐在会议桌旁，屏幕上显示着你们两个的照片。\n\n记忆花园从未真正关闭。",
+    "storyline": "mutant",
+    "weight": 180,
+    "repeatable": false,
+    "include": "mutant_path==alliance & EVT?[96340]",
+    "effect": {
+      "PSY": 2,
+      "CLARITY": -1
+    }
+  },
+  {
+    "id": 96342,
+    "event": "【实验室】\n\n你们潜入了组织的一个外围据点。它藏在市郊一栋普通的写字楼地下三层。\n\n里面有更多的'实验体'。有些人已经失控——被关在隔离室中，不断重复读写自己的记忆，像卡住的唱片。有些人已经不认识自己了。\n\n你看到了自己可能的未来。如果CLARITY归零，你也会变成这样。\n\n在最里面的房间，你找到了一份仍在更新的实验日志。最新的条目写着：'MG-17和MG-04出现了自主协作行为。继续观察。如协作能力超预期，启动收容程序。'\n\n他们一直在看着你们。",
+    "storyline": "mutant",
+    "weight": 180,
+    "repeatable": false,
+    "include": "mutant_path==alliance & EVT?[96341]",
+    "choices": [
+      {
+        "text": "解放所有实验体",
+        "effect": {
+          "PSY": 4,
+          "CLARITY": -2,
+          "moral": 2,
+          "mutant_progress": 1
+        },
+        "next": 96343
+      },
+      {
+        "text": "只带走还没失控的——其余的，你改写了他们的痛苦",
+        "effect": {
+          "PSY": 3,
+          "CLARITY": -2,
+          "moral": -1,
+          "mutant_progress": 1
+        },
+        "next": 96343
+      },
+      {
+        "text": "记录一切证据，交给外界处理",
+        "effect": {
+          "PSY": 2,
+          "moral": 1,
+          "mutant_progress": 1
+        },
+        "next": 96343
+      }
+    ]
+  },
+  {
+    "id": 96343,
+    "event": "【终局：双刃】\n\n组织的核心人物出现了。他也是实验体——第一代。MG-01。\n\n他看上去不过四十出头，但他的记忆里有超过一百年的内容。他的能力远超你们——他能同时读写数十人的记忆，而且不需要接触。\n\n'你们做得很好。'他说。'但你们还不理解全局。记忆花园的目标从来不是武器。是治疗。人类有太多创伤需要遗忘，太多仇恨需要消除。我只是……方法有点激进。'\n\n他看着你。'加入我。或者，我可以让你从来没有走进这栋楼。'",
+    "storyline": "mutant",
+    "weight": 200,
+    "repeatable": false,
+    "include": "mutant_path==alliance & EVT?[96342]",
+    "noRandom": true,
+    "branch": [
+      "PSY>=60 & CLARITY>=4?96540",
+      "PSY>=40 & CLARITY<=2 & moral<=-3?96505",
+      "PSY>=40 & CLARITY<=2?96503",
+      "PSY>=35?96541",
+      "?96504"
+    ]
+  },
+  {
+    "id": 96421,
+    "event": "室友安静地睡着了。你盯着自己的手——那双刚刚改写了一个人情绪的手。你不确定她明天醒来会不会觉得哪里不对。你也不确定你有没有资格替她做这个决定。\n\n但至少今夜，天台上不会有人了。",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96422,
+    "event": "辅导员第二天找到了你室友。你假装什么都不知道。一周后她开始定期去心理咨询。某天晚上她突然说'谢谢'，虽然不知道在谢谁。\n\n你什么都没说。有些事情，正常方式解决就好。",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96423,
+    "event": "你在她的记忆里种下了一段不存在的温暖。她的情绪明显好转，开始笑了，开始出门了。但偶尔她会突然愣住——'我总觉得那个拥抱的脸好模糊……'\n\n假记忆的保质期有多久？你不知道。",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96424,
+    "event": "你和她聊了一整夜。没有用能力。你们坐在宿舍走廊的地板上，从凌晨三点聊到天亮。\n\n你没办法删掉她的痛苦，但你可以陪在旁边。有时候这就够了。",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96425,
+    "event": "慈善晚宴后一周，那位慈善家继续微笑着出现在新闻里。捐款、握手、剪彩。他不记得那个雨夜了。\n\n你在家看着电视，忍不住想：被你抹去的那段记忆里，有一个受害者的名字。她再也不会被记住了。",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96426,
+    "event": "三天后，慈善家在一次演讲中突然停了下来。他看着自己的手，然后走下了台。当晚他去了警局。\n\n新闻说他'良心发现'。只有你知道，那个'发现'是你写进去的。这算正义吗？还是另一种操控？",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96427,
+    "event": "警方收到了匿名举报信——证据详实得像是凶手自己写的。慈善家被逮捕了。媒体哗然。\n\n你没留下任何痕迹。但你知道自己的手指上还残留着他的记忆——受害者的脸，在黑暗中挣扎的影像。那些画面不是你的，但现在赖在你的大脑里不肯走了。",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96428,
+    "event": "你什么都没做。慈善晚宴的新闻播完了，你关掉电视。\n\n他的善款确实在救人。他欠下的那条命，你没有立场去清算。但每次看到慈善新闻，你都会想起那个雨夜。\n\n选择不行动，有时候比行动更折磨人。",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96429,
+    "event": "老人的眼睛亮了一瞬——所有的记忆都回来了。妻子的笑容、结婚典礼、第一个孩子出生的啼哭。但那段她等了七天而他没回来的记忆也回来了。\n\n老人安静地流泪。但你看到他在笑——那是一个能感受悲伤的人的笑。比空洞地微笑强太多了。",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96430,
+    "event": "老人最近总是微笑。他记得妻子哼的歌、切菜的动作、那条花裙子。但不记得自己抛弃了她。\n\n你选择了温柔的版本。一个只有美好回忆的晚年。这算欺骗吗？也许。但看着他安详的样子……也许有些真相不需要被记住。",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96431,
+    "event": "你为他编织了一段完美的假记忆。在那个版本里，他们携手走过了一辈子，从未分开。老人的表情变得无比安宁。\n\n你离开养老院的时候回头看了一眼。一段从未存在过的幸福人生——你觉得自己像个在写小说的人。",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96432,
+    "event": "'她一直都在这里。'你握着他的手，说了这句最俗套的话。\n\n老人模糊的眼睛看着你，好像透过你看到了别人。他点了点头，笑了。\n\n你没改写任何东西。你只是在他记忆消散的缝隙里，用语言填了一小块。不是假的——是一种可能性。",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96433,
+    "event": "入账通知响了。十五万。你盯着屏幕看了很久。\n\n那个要逃脱的嫌疑人——你改写了关键证人对他脸的记忆。案件因为证据不足而撤诉。报纸上有一小段新闻，没人注意到。\n\n你删掉了转账记录。但你删不掉自己的记忆。",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96434,
+    "event": "你接了活，改写了证人的记忆。但在操作过程中，你悄悄保留了一份完整的行贿证据——隐藏在你自己的记忆深处。\n\n这是你给自己的保险。万一有一天，灰色风衣男想灭口——你手里也有他的把柄。",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96435,
+    "event": "'不做。'你把纸条还给他。\n\n他面无表情地收起来，转身走了。你以为事情就这样结束了。但那天晚上你检查了一下自己的记忆——你发现纸条上的内容已经开始模糊了。\n\n他做了什么手脚吗？还是你自己的记忆在本能地保护你？",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96436,
+    "event": "你看着他的眼睛，说：'再找我，你的大脑里将不会有关于我的任何痕迹。'\n\n灰色风衣男的表情变了——不是害怕，是一种识别同类的敬畏。他退后一步，消失在人群中。\n\n他不会再来了。但你知道，外面还有更多这样的人。你的能力对他们来说，是世界上最贵重的商品。",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96437,
+    "event": "TA在咖啡厅坐了很久。然后站起来，眼神平静。'谢谢。'TA说。然后转身走了。\n\n你看着TA的背影。TA不记得你了。在TA的人生里，这段感情从未发生过。\n\n你端起咖啡。它已经凉了。",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96438,
+    "event": "TA的眼神变了——从苦涩变成了一种奇怪的温柔。TA只记得你们一起笑的时候、一起逃课去看海的下午、你说的那句'我们'。\n\n'谢谢你。'TA说。'这段感情……好像没有那么糟。'\n\n你微笑。没告诉TA，是你选择了TA应该记住什么。",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96439,
+    "event": "你读取了TA的完整记忆。你看到了自己从未意识到的东西——你在TA面前的样子，你伤害TA的具体时刻，TA独自流泪的夜晚。\n\n那些记忆比你想象的重得多。你在咖啡厅的洗手间里站了十分钟，平复呼吸。\n\n你从别人的记忆里，第一次真正看到了自己。",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96440,
+    "event": "TA看着你，似乎在等你用能力。但你只是说了'对不起'。\n\nTA愣住了。然后苦笑了一下。'我以为你会……'\n'我不会。'\n\nTA走了。痛苦留下了。但至少这份痛苦是真实的——属于你们两个的。",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96441,
+    "event": "你找到了他。在他的记忆里，你像删除文件一样抹去了你自己的存在。操作完成后，他茫然地看着你。'你是谁？'\n\n你转身离开。身后的追踪者不再追了——因为他根本不知道自己在追谁。\n\n但你的CLARITY又下降了。你开始分不清哪些记忆是自己的了。",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96442,
+    "event": "你们在一栋废弃厂房里碰面。两个记忆操控者之间的对话不需要说话——你们直接读取对方。\n\n他的记忆里有你的信息，但也有恐惧。他害怕你。'陆沉。'你说出了从他记忆碎片中拼出的名字。他愣了一下。\n\n'没人叫过我这个名字。'他说。'实验室里他们只叫我MG-04。'\n\n他的能力不是读写——是'恢复'。被你删除的记忆，他能让它们回来。\n\n'我们是一枚硬币的两面。'他说。'你删，我复原。你觉得，谁才是对的？'",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96443,
+    "event": "你远程读取了他的记忆。他的能力边界很清晰：只能恢复被改写的记忆，不能读写新的。他的弱点是需要接触。\n\n你有了完整的情报。下一步该怎么办——消除威胁，还是利用他的能力？信息本身不做选择，做选择的是你。",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96444,
+    "event": "你搬了家。换了号码。关掉了所有社交媒体。你在一个新城市的出租屋里，戴着手套，尽量不碰任何人。\n\n一个月后你敢出门了。三个月后你几乎相信自己安全了。\n\n但你的手开始不由自主地颤抖——不是因为恐惧，是因为太久没使用能力了。那东西在你体内，像瘾一样叫嚣着。",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96445,
+    "event": "你连续工作了三个月。每天十几个小时，你坐在简陋的心理诊所里，触碰一双又一双颤抖的手。\n\n你抹掉了地铁里的尖叫声，抹掉了被扭曲的车厢，抹掉了那些永远不该出现在人类大脑中的画面。但那些画面没有消失——它们只是搬家了。搬进了你的大脑。\n\n三个月后，你是全城PTSD最严重的人。",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96446,
+    "event": "你只帮了最需要帮助的人——三个失去父母的孩子，和两个目睹亲人死亡的老人。\n\n你保留了精力，也保留了底线。你不是救世主——但你确实让五个人的夜晚不再充满噩梦。\n\n其他人的痛苦呢？你选择了不去想。你必须选择不去想。",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96447,
+    "event": "'我不是工具。'你对那个官员说。然后挂断了电话。\n\n你在家看着关于事故的新闻。评论区有人在骂政府应对不力，有人在分享自己的创伤，有人在众筹心理援助。\n\n你什么都没做。城市会自己痊愈的。也许慢一点。也许有人永远不会痊愈。但那不是你一个人的责任。",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96448,
+    "event": "你一边帮患者消除PTSD，一边偷偷读取了那个联系你的官员的记忆。事故原因清清楚楚地躺在他的大脑里：预警系统早就报过警，但报告被'搁置'了。\n\n你手里现在有了一颗定时炸弹。这个信息可以改变一切——但它的来源没法解释。你是匿名爆料，还是把这段记忆锁在自己脑子里？",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96449,
+    "event": "记忆像决堤的洪水一样涌回来。你看到了自己五岁时被带进一间白色的房间。穿白大褂的人在你脑后做了什么。然后一切都变了——你以为自己是个普通孩子，但你不是。你从来都不是。\n\n你的手在发抖。真相比谎言重太多了。但至少，那个重量是属于你的。",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96450,
+    "event": "你开始一层一层地剥离被篡改的记忆。这比让别人恢复要痛苦得多——就像自己给自己做手术。\n\n每一层下面都藏着更古老的痕迹。你的大脑被改写过不止一次。最深处的那一层，编码手法和你自己的能力一模一样。\n\n意思是——改写你记忆的人，就是你自己。曾经的你。",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96451,
+    "event": "'我不在乎过去的我是谁。'\n\n陆沉看着你，像是在看一个他不能理解的物种。\n\n'你知道你放弃了什么吗？'他说。'你的原始记忆里有你真正的身世、你的能力来源、甚至……你以前做过的事。'\n\n'我知道。'你戴上了手套。'但我选择做现在的我。过去的那个版本，就让TA死在记忆里吧。'",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96452,
+    "event": "你们一起坐在公园的长椅上，各自闭上眼睛，开始追溯。他恢复你被删除的记忆碎片，你负责解读其中的线索。\n\n拼图慢慢成形。你们都是同一个项目的产物。那个项目叫'记忆花园'。创始人已经死了——或者说，记忆中显示他死了。\n\n'如果我们被改写过，'你说，'怎么确定眼前看到的就是真相？'\n\n他沉默了。你们都没有答案。",
+    "effect": {},
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96460,
+    "event": "记忆像电影一样在你眼前展开——那个路人的初恋、搬家那天打碎的花瓶、小时候被狗咬的下午。太多了。你松开意识连接的时候，有一瞬间分不清哪些是你的记忆。\n\n头好痛。但你感觉自己更强了。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96461,
+    "event": "你只读到了表层：他在和女朋友吵架，内容是今晚吃什么。无聊。但至少安全——你不会被别人的深层记忆淹没。\n\n循序渐进。你还有很多时间。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96462,
+    "event": "你把手缩回口袋里。路人走远了，完全不知道刚才差点被一个陌生人翻了底裤。\n\n你告诉自己这是尊重隐私。但你知道真实原因——你害怕看到不该看的东西。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96463,
+    "event": "收银员的表情变了。她冲你笑了一下——不是职业假笑，是真的。'先生/小姐你好面善啊。'\n\n你面善什么，她五分钟前还在翻白眼。但这让你确认了一件事：写入能力在变精确。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96464,
+    "event": "你模糊地覆盖了她的第一印象。效果不太好——她看你的眼神从厌烦变成了困惑。像是知道有什么不对，但说不上来。\n\n模糊覆盖果然不如精确写入。但至少风险更低。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96465,
+    "event": "你老老实实说了谢谢。收银员面无表情地把小票递过来。\n\n正常的社交互动。正常得让你觉得——拥有这种能力之后，'正常'反而成了一种选择。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96466,
+    "event": "你在他脑中种了一颗种子：'也许他说的有道理。'配合读取到的记忆碎片，你精准地调整了沟通策略。会议进行得异常顺利。\n\n散会后那个队员主动找你道歉。你心里有一点点愧疚。但只有一点点。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96467,
+    "event": "他的真实想法比你预想的简单——他觉得你太强了，他在团队里没有存在感。你调整了话术，主动把功劳让给他。\n\n没有动用写入能力。有时候，读心已经足够解决问题了。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96468,
+    "event": "你花了半小时和他在走廊里聊。结果还是吵了起来。你忍住了没有动用能力。\n\n效率很低。但你的清醒度没有下降。也许这才是长期可持续的方式。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96469,
+    "event": "你看到了一些不属于你现在的记忆——很模糊，像隔着磨砂玻璃。有人在你很小的时候动过你的脑子。\n\n你从自我读取中退出来的时候，鼻血已经流到了枕头上。太深了。但你知道了——你的记忆被人改写过。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96470,
+    "event": "浅层扫描没什么发现——都是你认识的记忆。昨天的晚饭、上周的考试、一个月前的争吵。\n\n但你练习了意识指向自身的技巧。下次再深入一点。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96471,
+    "event": "你在意识即将转向自身的一刹那收手了。大脑发出了强烈的警告——像碰到了火炉边缘。\n\n也许这是一种保护机制。也许深处有你不应该看到的东西。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96472,
+    "event": "三个人的记忆同时涌进来。信息量是单人的五倍不止——它们互相交叉、重叠、干扰。你的大脑像过载的服务器一样嗡嗡作响。\n\n等你回过神来，你发现自己正在用三种不同的习惯揉眼睛。花了十分钟才找回'自己'的动作。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96473,
+    "event": "两个人的记忆同步读取勉强可以处理。像是左耳听一首歌、右耳听另一首——混乱但可控。\n\n你的处理速度在提升。也许下次可以试试三个。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96474,
+    "event": "你老老实实地一个一个来。慢，但稳。每个人的记忆都被完整读取，没有遗漏也没有串线。\n\n笨办法有笨办法的好处——至少你的脑子不会烧掉。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96475,
+    "event": "他第二天见到你，态度好了很多。他不记得自己为什么之前那么讨厌你了——理由已经不存在了。\n\n但你知道。而这种'只有你知道'的感觉，正在变得越来越习以为常。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96476,
+    "event": "他继续在背后说你坏话。你听到了，但没有动怒。你见过他记忆里的自卑和焦虑。\n\n理解一个人之后再被他伤害，滋味很复杂。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96477,
+    "event": "下一次论文拿了高分。教授在课上表扬了你。你微笑着，但心里清楚——你写的不是自己真正想写的东西，是他想看到的东西。\n\n你赢了评分，但好像输了什么别的。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96478,
+    "event": "教授下周见到你的时候格外热情。他不知道为什么——他只觉得你是个难得的好学生。记忆改写成功了。\n\n但原来的那个'偏见'消失后，你发现他的评分标准其实很合理。也许被改写的应该是你的论文。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96479,
+    "event": "你花了两周重写了论文。这次，教授给了B+。不高不低。\n\n你握了一下他的手说谢谢——忍住了没有读取他的真实评价。有些事情，不知道也挺好。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96480,
+    "event": "她好了。彻底好了。第二天醒来的时候，她不记得前任的名字、脸、声音。像是那段恋爱从未存在过。\n\n你们照常一起吃早饭。但你在她笑容里看到了一种空洞——有些东西连着痛苦一起被删掉了。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96481,
+    "event": "她不再半夜哭了。但偶尔还是会发呆——她记得那个人对她好的时候，也记得分手，但不记得最痛的那些细节了。\n\n像一部被删减的电影。也许这样更好。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96482,
+    "event": "你陪了她一整个星期。每天晚上听她说同样的话。你没动一根手指。\n\n一周后她终于能睡整夜了。这种恢复比较慢，但至少是她自己的。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96483,
+    "event": "他站起来的时候脸上的表情平静了很多。他不记得被骗这件事了。他会回家，继续过日子。\n\n但那些钱不会回来。你抹掉了痛苦，但没有解决问题。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96484,
+    "event": "你在他的记忆中读取了骗子的电话号码、银行账户和接头地点。整理之后匿名发给了警方。\n\n三周后新闻上报道了一个电诈团伙被捣毁。你不确定是不是同一伙人，但那天你睡得很好。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96485,
+    "event": "你走过去又走回来。走回来又走过去。最后还是走了。\n\n你不是每个人的救世主。你也做不了。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96486,
+    "event": "她的日记本上最后一条停在了三天前。之后的页面是空白的。她看着那些空白页，歪了歪头，然后翻回前面继续写别的了。\n\n危机解除。但你知道这只是暂时的——她很敏锐，你删得了记忆，删不了直觉。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96487,
+    "event": "你花了一个小时读完她脑中的完整日记。她的观察力比你想象的强——她记录了你戴手套的规律、你碰人后的微表情变化、甚至你左眼在读取记忆时会微微眯起来。\n\n她还没有下结论。但她快了。你需要决定怎么处理这件事。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96488,
+    "event": "你告诉了她一切。她沉默了很久。然后她说：'碰我一下。'\n\n你碰了。你让她看到你的记忆——那些挣扎、那些后悔、那些半夜醒来不知道自己是谁的时刻。\n\n她哭了。不是害怕。是心疼。你多了一个知道真相的人。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96489,
+    "event": "考试那天，他坐在考场里，翻开试卷，拿起笔——然后开始正常答题。他自己都不知道为什么那些买来的答案，他已经完全不记得了。\n\n他考了个C。但那是他自己的C。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96490,
+    "event": "你用读取来的答案拿了A。卷子发下来的时候你没有任何成就感。\n\n你看了一眼那个同学——他也拿了A。你们用了同一份答案。区别是你不需要花钱买。\n\n这让你觉得自己还不如他。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96491,
+    "event": "匿名举报信发出去了。第二天教务处找了那个同学谈话。他的脸色很难看。\n\n没人知道是你。但你知道——你是从他的大脑里偷走了这个秘密。举报本身是正义的。获取情报的方式呢？",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96492,
+    "event": "TA再也没有犹豫过。你们的感情看起来比以前更好了。\n\n只有你知道那段犹豫曾经存在过。你把它删掉了，就像删掉一条不合心意的短信。但感情能这样编辑吗？你不知道。你只知道你害怕看到答案。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96493,
+    "event": "你假装什么都没看到。TA选择了留下。这就够了。\n\n但你无法假装不知道。每次TA说'我爱你'的时候，你都会想起那段犹豫——TA的爱是真的，犹豫也是真的。你学会了和这个事实共处。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96494,
+    "event": "你摘下手套，握住TA的手。'我有件事要告诉你。'\n\n你告诉了TA一切。你让TA体验了你的视角——碰到任何人都会看到记忆的感觉。\n\nTA哭了。然后说：'怪不得你总戴手套。'\n\n从那以后TA再也没有犹豫过。但这次，是TA自己的选择。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "repeatable": false
+  },
+  {
+    "id": 96503,
+    "event": "【我是谁】\n\n你坐在一间空荡的房间里，盯着镜子中的人。\n\n那个人有你的脸。但你不认识TA。\n\n你试着回忆自己的名字。大脑里翻涌着几百个人的记忆——童年、初恋、家人、考试、工作——但你分不清哪些是自己的。它们搅在一起，像被打碎的万花筒。\n\n你的手指还在动。碰到椅子的扶手时，你读到了上一个坐在这里的人的焦虑。碰到门把手时，你读到了护士的疲惫。你已经停不下来了。\n\n某天，你发现自己在用别人的笔迹写日记。你甚至没有意识到。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "end": true
+  },
+  {
+    "id": 96505,
+    "event": "【暗王】\n\n你站在城市最高的写字楼顶层。整面玻璃墙映出的不是风景——是一张网。\n\n你花了两年时间，系统性地改写了这座城市所有关键人物的记忆。市长以为你是他最信任的顾问。警察局长相信你是他的大学同学。媒体老板觉得你救过他的命。\n\n没有人记得被操控过。\n\n你端起咖啡，看着窗外灯火辉煌的夜景。手机上有一百多条未读消息，每一条都在向你汇报什么。你微笑着。\n\n你甚至不确定'微笑'这个表情是不是你自己的。也许是某个你改写过的人的习惯。但这不重要了。什么都不重要了。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "end": true,
+    "include": "moral<=-3"
+  },
+  {
+    "id": 96504,
+    "event": "【崩溃】\n\n你的精神力枯竭了。\n\n最后的画面是图书馆里的荧光灯。你的鼻子流出了血——不多，但你知道那意味着什么。你试着站起来，但腿没有力气。\n\n周围人的记忆碎片像暴风雪一样涌入。你再也建不起屏障了。一百个人的一千段记忆同时灌进来——哭声、笑声、尖叫声、私语声——你的大脑在几秒内就过载了。\n\n你倒下的时候，手碰到了旁边人的鞋子。你看到了他今天早上给女儿编辫子的记忆。这是你看到的最后一段画面。还挺温柔的。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "end": true
+  },
+  {
+    "id": 96510,
+    "event": "【记忆花园的守墓人】\n\n你选择了守护真相。\n\n你找到了所有的'种子'——十七个人，散落在不同的城市。有些你唤醒了，帮助他们学会控制能力。有些你选择让他们保持沉睡——不是每个人都需要这个重担。\n\n记忆花园的档案被你加密存放在三个不同的地方。你不会公开它们——那会引发恐慌。但你也不会销毁它们——那是否认你们存在的证据。\n\n陆沉成了你最信任的伙伴。你写，他恢复。你抹去，他监督。你们是彼此的制衡。\n\n有时候，在深夜，你会翻看那些恢复的真实记忆。你确实伤害过人——那些是真的。但你选择记住它们。\n\n一个记忆操控者能做的最勇敢的事，就是不操控自己的记忆。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "end": true
+  },
+  {
+    "id": 96511,
+    "event": "【未完成的拼图】\n\n你知道了真相，但真相并没有让你自由。\n\n记忆花园的档案烧了一半——你来得太晚了。你找到了一些答案，也留下了更多的问题。创始人死了，组织解散了，但那些被种下'种子'的人还在世界各地，像定时炸弹一样随时可能觉醒。\n\n你无力找到他们所有人。你只能偶尔在新闻里看到疑似的蛛丝马迹——某个城市突然出现大面积的集体失忆事件——然后默默记下坐标。\n\n至少你知道了自己是什么。这就够了。也许。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "end": true
+  },
+  {
+    "id": 96520,
+    "event": "【超越者】\n\n你是人类记忆操控能力的巅峰。\n\n你学会了给自己的能力加上'权限锁'——只有在你明确授意时才会激活。就像给核按钮加了十道密码。你的记忆宫殿已经是一座完美的建筑——每一段记忆都有它的位置，每一个被篡改的痕迹都被你标注、归档、理解。\n\n你在大学谋了一个神经科学的教职。发表了几篇'理论推演极其大胆'的论文，审稿人惊叹于你对记忆机制的理解深度——当然没人知道那些不是推演。\n\n陆沉最终找到了你，请求你帮他控制失控的能力。你帮了他。不是出于善意——是因为你想验证一个假说。你成功了。\n\n后来他问你：'你还记得你妈妈的声音吗？'\n\n你笑了笑。你打了一通电话。她的声音，你重新记住了。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "end": true
+  },
+  {
+    "id": 96521,
+    "event": "【孤独的棋手】\n\n你变得比任何人都强大。也比任何人都孤独。\n\n你的记忆宫殿里有几千个人的记忆碎片——他们的童年、他们的恐惧、他们的爱。你比他们自己更了解他们。但你最珍视的那些——你自己的——已经面目全非。\n\n你偶尔会在深夜摘下手套，碰一碰枕头。什么也读不到。布料没有记忆。\n\n这种空白让你觉得安心。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "end": true
+  },
+  {
+    "id": 96530,
+    "event": "【手套下的温度】\n\n你找到了平衡。\n\n能力没有消失。你也没有假装它不存在。你在一家心理咨询机构找到了工作——是的，你在帮别人处理心理创伤，而你的工具比任何心理学理论都更直接。\n\n你制定了严格的流程：只有在来访者明确同意并充分知情后，你才会触碰他们的手。你不修改记忆——你只是帮他们看清自己遗忘的部分。\n\n你的手套成了你的标志。同事们觉得你只是怕冷。来访者们知道，你摘下手套的那一刻，意味着他们可以信任你。\n\n陆沉最终和你握了手。你们看到了彼此全部的记忆。那天晚上你们喝了很多酒。什么也没说。什么也不需要说。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "end": true
+  },
+  {
+    "id": 96531,
+    "event": "【带着裂缝的杯子】\n\n你学会了和能力共存。像和一个永远不会消失的耳鸣共存一样。\n\n好的日子里，你几乎能忘记它的存在。你戴着手套上班、吃饭、约会。偶尔不小心碰到陌生人的时候，你只是闭上眼睛等待那阵记忆波过去。\n\n不好的日子里，你会把自己锁在房间里。因为有时候那些涌入的记忆太过真实，会让你分不清现实。\n\n日子还过得下去。手套抽屉里有十几副。你甚至开始觉得它们挺好看的。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "end": true
+  },
+  {
+    "id": 96540,
+    "event": "【双螺旋】\n\n你和他成了搭档。一个写，一个恢复。\n\n你们达成了一种奇妙的平衡——你负责在必要时修改记忆（治疗创伤、解除洗脑、帮助失忆者），他负责确保你没有越界。如果你改了不该改的，他会恢复回来。如果他恢复了不该恢复的，你会和他谈。\n\n你们一起找到了其他实验体，建了一个互助网络。有的人选择封印能力，有的人选择学习控制。那个第一代——MG-01——最终同意交出他的研究资料，条件是你们继续他的初衷：治疗，而不是控制。\n\n世界上没有人知道你们的存在。记忆花园从未被公开。\n\n但每当有人从噩梦中醒来，发现心里那个最黑暗的角落莫名其妙地不那么痛了——也许，那就是你们的工作痕迹。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "end": true
+  },
+  {
+    "id": 96541,
+    "event": "【不稳定的同盟】\n\n你和他合作了。但信任从来不是完整的。\n\n你们确实做了很多事——捣毁了组织的两个据点，解救了五个实验体，甚至联手对抗了MG-01（虽然只是打了个平手）。\n\n但深夜里你总会想：他有没有偷偷恢复过你改的东西？他查了你的记忆吗？你能确定他今天说的话都是真的吗？\n\n他大概也这么想。\n\n你们之间的信任，就像两个刺猬互相取暖——离太近会扎到对方，离太远会冻死。\n\n但至少，你们还在同一条路上走着。",
+    "storyline": "mutant",
+    "noRandom": true,
+    "end": true
   }
 ]

@@ -193,6 +193,16 @@
           "id": "n_sl_timeloop",
           "label": "时间回环",
           "achId": "sl_timeloop"
+        },
+        {
+          "id": "n_sl_timeslip",
+          "label": "时空穿越",
+          "achId": "sl_timeslip"
+        },
+        {
+          "id": "n_sl_mutant",
+          "label": "记忆读写",
+          "achId": "sl_mutant"
         }
       ]
     },
@@ -343,6 +353,41 @@
           "id": "n_end_timeloop_escape",
           "label": "逃离了永恒",
           "achId": "end_timeloop_escape"
+        },
+        {
+          "id": "n_end_timeslip_wg",
+          "label": "文明的曙光",
+          "achId": "end_timeslip_wg"
+        },
+        {
+          "id": "n_end_timeslip_ww2",
+          "label": "和平之子",
+          "achId": "end_timeslip_ww2"
+        },
+        {
+          "id": "n_end_timeslip_palace",
+          "label": "凤临天下",
+          "achId": "end_timeslip_palace"
+        },
+        {
+          "id": "n_end_mutant_truth",
+          "label": "记忆解放者",
+          "achId": "end_mutant_truth"
+        },
+        {
+          "id": "n_end_mutant_solo",
+          "label": "孤独王座",
+          "achId": "end_mutant_solo"
+        },
+        {
+          "id": "n_end_mutant_accept",
+          "label": "共生体",
+          "achId": "end_mutant_accept"
+        },
+        {
+          "id": "n_end_mutant_alliance",
+          "label": "变异者联盟",
+          "achId": "end_mutant_alliance"
         }
       ]
     },
@@ -1189,6 +1234,86 @@
     {
       "from": "n_sl_cheater",
       "to": "n_end_cheater_ghost"
+    },
+    {
+      "from": "n_top",
+      "to": "n_sl_timeslip"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_sl_timeslip"
+    },
+    {
+      "from": "n_low",
+      "to": "n_sl_timeslip"
+    },
+    {
+      "from": "n_sl_timeslip",
+      "to": "n_end_timeslip_wg"
+    },
+    {
+      "from": "n_sl_timeslip",
+      "to": "n_end_timeslip_ww2"
+    },
+    {
+      "from": "n_sl_timeslip",
+      "to": "n_end_timeslip_palace"
+    },
+    {
+      "from": "n_end_timeslip_wg",
+      "to": "n_all_hidden"
+    },
+    {
+      "from": "n_end_timeslip_ww2",
+      "to": "n_all_hidden"
+    },
+    {
+      "from": "n_end_timeslip_palace",
+      "to": "n_all_hidden"
+    },
+    {
+      "from": "n_top",
+      "to": "n_sl_mutant"
+    },
+    {
+      "from": "n_mid",
+      "to": "n_sl_mutant"
+    },
+    {
+      "from": "n_low",
+      "to": "n_sl_mutant"
+    },
+    {
+      "from": "n_sl_mutant",
+      "to": "n_end_mutant_truth"
+    },
+    {
+      "from": "n_sl_mutant",
+      "to": "n_end_mutant_solo"
+    },
+    {
+      "from": "n_sl_mutant",
+      "to": "n_end_mutant_accept"
+    },
+    {
+      "from": "n_sl_mutant",
+      "to": "n_end_mutant_alliance"
+    },
+    {
+      "from": "n_end_mutant_truth",
+      "to": "n_all_hidden"
+    },
+    {
+      "from": "n_end_mutant_solo",
+      "to": "n_all_hidden"
+    },
+    {
+      "from": "n_end_mutant_accept",
+      "to": "n_all_hidden"
+    },
+    {
+      "from": "n_end_mutant_alliance",
+      "to": "n_all_hidden"
     }
   ]
 }

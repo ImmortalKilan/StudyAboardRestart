@@ -3653,6 +3653,31 @@ body.in-summary {
   body.in-game .mobile-stats-grid .msg-cell.career .msg-val { color: var(--grade-3); }
   body.in-game .mobile-stats-grid .msg-cell.career .msg-bar-fill { background: var(--grade-3); }
 
+  body.in-game .mobile-stats-grid .msg-cell-dual {
+    display: flex; flex-direction: column; gap: 1px; padding: 3px 4px;
+    border-color: rgba(168, 85, 247, 0.5);
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.10), var(--card-2));
+  }
+  body.in-game .mobile-stats-grid .msg-cell-dual .dual-row {
+    display: flex; align-items: center; gap: 3px; position: relative;
+    font-size: 10px; line-height: 1.2;
+  }
+  body.in-game .mobile-stats-grid .msg-cell-dual .dual-row .msg-label {
+    font-size: 9px; opacity: 0.7;
+  }
+  body.in-game .mobile-stats-grid .msg-cell-dual .dual-row .msg-val {
+    font-weight: 700; color: #a855f7;
+  }
+  body.in-game .mobile-stats-grid .msg-cell-dual .dual-row.stat-up .msg-val {
+    animation: stat-flash-up 0.7s ease;
+  }
+  body.in-game .mobile-stats-grid .msg-cell-dual .dual-row.stat-down .msg-val {
+    animation: stat-flash-down 0.7s ease;
+  }
+  body.in-game .mobile-stats-grid .msg-cell-dual .dual-row .msg-delta {
+    position: absolute; top: -2px; right: -2px; font-size: 8px;
+  }
+
   /* ── Stat change flash ── */
   body.in-game .mobile-stats-grid .msg-cell.stat-up .msg-val {
     animation: stat-flash-up 0.7s ease;
@@ -4811,77 +4836,156 @@ body.in-summary {
   background: var(--card-2);
   transition: border-color .2s, background .2s;
 }
-.ending-card.ending-locked {
+.ending-card.ending-locked,
+.ending-card.ending-unlocked {
   width: 44px;
   height: 44px;
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.ending-card.ending-locked {
   opacity: 0.5;
 }
 .ending-card.ending-unlocked {
-  flex: 1 1 260px;
-  max-width: 400px;
+  cursor: pointer;
 }
 .ending-card.ending-unlocked.ending-tier-s {
   border-color: rgba(245,182,66,0.5);
-  background: linear-gradient(135deg, rgba(245,182,66,0.10) 0%, var(--card-2) 70%);
+  background: linear-gradient(135deg, rgba(245,182,66,0.15) 0%, var(--card-2) 70%);
 }
 .ending-card.ending-unlocked.ending-tier-a {
   border-color: rgba(168,85,247,0.45);
-  background: linear-gradient(135deg, rgba(168,85,247,0.08) 0%, var(--card-2) 70%);
+  background: linear-gradient(135deg, rgba(168,85,247,0.12) 0%, var(--card-2) 70%);
 }
 .ending-card.ending-unlocked.ending-tier-c {
   border-color: rgba(176,184,196,0.35);
 }
+.ending-card.ending-unlocked:hover {
+  transform: scale(1.1);
+  z-index: 2;
+}
 .ending-card-icon {
-  font-size: 22px;
+  font-size: 20px;
   flex-shrink: 0;
-  width: 32px;
   text-align: center;
+  line-height: 1;
 }
 .ending-card-icon-locked { font-size: 20px; filter: grayscale(1); }
-.ending-card-body {
-  flex: 1;
-  min-width: 0;
-}
-.ending-card-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-2);
-  margin-bottom: 2px;
-}
-.ending-card.ending-unlocked .ending-card-name { color: var(--text-1); }
-.ending-card.ending-unlocked.ending-tier-s .ending-card-name {
-  background: linear-gradient(90deg, #f5b642, #f0d78c);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.ending-card-hint {
-  font-size: 12px;
-  color: var(--text-3);
-  line-height: 1.4;
-}
-.ending-card.ending-unlocked .ending-card-hint { color: var(--text-2); }
 .ending-card-check {
-  flex-shrink: 0;
-  width: 18px;
-  height: 18px;
+  position: absolute;
+  bottom: -3px;
+  right: -3px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background: #3d8c5a;
   color: #fff;
-  font-size: 11px;
+  font-size: 9px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
 }
 
+/* ── Ending detail overlay ── */
+.ending-detail-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.ending-detail-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.ending-detail-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 6, 12, 0.8);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.ending-detail-card {
+  position: relative;
+  text-align: center;
+  padding: 32px 28px 24px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: var(--card);
+  max-width: 320px;
+  width: calc(100% - 40px);
+  transform: translateY(16px) scale(0.95);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ending-detail-overlay.open .ending-detail-card {
+  transform: translateY(0) scale(1);
+}
+.ending-detail-card.ending-tier-s {
+  border-color: rgba(245,182,66,0.5);
+}
+.ending-detail-card.ending-tier-a {
+  border-color: rgba(168,85,247,0.45);
+}
+.ending-detail-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+.ending-detail-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.ending-detail-card.ending-tier-s .ending-detail-name {
+  background: linear-gradient(90deg, #f5b642, #f0d78c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.ending-detail-card.ending-tier-a .ending-detail-name {
+  color: #c084fc;
+}
+.ending-detail-tier {
+  font-size: 12px;
+  color: var(--ink-faint);
+  margin-bottom: 12px;
+}
+.ending-detail-hint {
+  font-size: 14px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+.ending-detail-close {
+  padding: 8px 28px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--bg-2);
+  color: var(--ink-soft);
+  font-size: 13px;
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: all 0.2s;
+}
+.ending-detail-close:hover {
+  background: rgba(255,255,255,0.08);
+  color: var(--ink);
+}
+
 @media (max-width: 760px) {
-  .ending-card.ending-unlocked { flex: 1 1 100%; max-width: none; }
-  .ending-card.ending-locked { width: 38px; height: 38px; }
+  .ending-card.ending-locked,
+  .ending-card.ending-unlocked { width: 38px; height: 38px; }
+  .ending-card-icon { font-size: 17px; }
   .ending-card-icon-locked { font-size: 17px; }
+  .ending-card-check { width: 12px; height: 12px; font-size: 8px; }
   .ach-wall-tab { font-size: 13px; padding: 5px 10px; }
 }
 
