@@ -1,0 +1,8 @@
+{
+	"pages": [
+		"pages/alloc/index"
+	],
+	"window": {},
+	"subpackages": [],
+	"preloadRule": {}
+}

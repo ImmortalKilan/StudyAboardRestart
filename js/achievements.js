@@ -41,7 +41,7 @@ export const ACHIEVEMENTS = [
 
   // ── 终局 ─────────────────────────────────────────────────────────────────
   { id: 'end_health',       name: '油尽灯枯',     icon: '💀', rarity: 'normal',    cat: '人生',   desc: '因健康耗尽而离开了人世' },
-  { id: 'end_idol',         name: '闪耀登场',     icon: '🌟', rarity: 'epic',      cat: '终局',   desc: '成功以偶像身份出道' },
+  { id: 'end_idol',         name: '闪耀登场',     icon: '🌟', rarity: 'epic',      cat: '剧情',   desc: '成功以偶像身份出道' },
   { id: 'end_spy',          name: '特工的荣耀',   icon: '🏅', rarity: 'legendary', cat: '终局',   desc: '圆满完成了国际特工任务' },
   { id: 'end_abyss',        name: '深渊彼岸',     icon: '🌌', rarity: 'legendary', cat: '终局',   desc: '完成了深渊科技剧情' },
   { id: 'end_meta',         name: '第五面墙',     icon: '🔮', rarity: 'legendary', cat: '终局',   desc: '和屏幕另一边的人和解了' },

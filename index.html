@@ -108,6 +108,8 @@
             <span class="mm-header-title">前世记忆</span>
           </div>
           <div class="mm-header-right">
+            <span class="mm-progress-label"></span>
+            <span class="mm-header-sep">·</span>
             <span class="mm-available-label">可用卡牌</span>
             <span class="mm-available-count">0</span>
           </div>
@@ -969,59 +971,60 @@
       </div>
     </div>
 
-    <!-- Hidden Poster Template for Image Generation -->
+    <!-- Hidden Poster Template for Image Generation — "金榜判词" layout -->
     <div id="poster-template-container" style="position: absolute; left: -9999px; top: 0; pointer-events: none;">
       <div id="poster-template" class="poster-template" data-rank="C">
-        <!-- Row 1: Header bar — title left, QR right -->
-        <div class="poster-topbar">
-          <div class="poster-brand">
-            <div class="poster-title">留学重开模拟器</div>
-            <div class="poster-subtitle">STUDY ABROAD SIMULATOR</div>
+        <div id="poster-rank-watermark" class="poster-rank-watermark">S</div>
+        <div class="poster-inner">
+
+          <!-- brand logotype + framed QR -->
+          <div class="poster-brandline">
+            <div class="poster-brand">
+              <span class="poster-title">留学重开模拟器</span>
+              <span class="poster-subtitle">STUDY ABROAD SIMULATOR</span>
+            </div>
+            <div class="poster-qr-frame">
+              <div class="poster-bracket tl"></div><div class="poster-bracket tr"></div>
+              <div class="poster-bracket bl"></div><div class="poster-bracket br"></div>
+              <div class="poster-qr-box"><img src="assets/ui/qr-code.png" alt="QR Code"></div>
+              <span class="poster-qr-hint">扫码来重开</span>
+            </div>
           </div>
-          <div class="poster-qr">
-            <img src="assets/ui/qr-code.png" alt="QR Code">
-            <span class="poster-qr-hint">快来扫码玩！</span>
+
+          <!-- hero row: portrait + rank/score/title -->
+          <div class="poster-hero-row">
+            <div class="poster-portrait">
+              <img id="poster-avatar" src="" alt="Avatar">
+            </div>
+            <div class="poster-hero-col">
+              <div class="poster-hero-grade">
+                <div id="poster-rank-letter" class="poster-rank-letter"></div>
+                <div class="poster-score-glyph"><span id="poster-score-val">0</span><span class="poster-score-unit">分</span></div>
+              </div>
+              <div id="poster-percentile" class="poster-rarity-line"></div>
+
+              <div class="poster-title-zone">
+                <span class="poster-title-label">称&nbsp;号</span>
+                <h1 id="poster-title-cn" class="poster-title-cn"></h1>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <!-- Row 2: Hero — avatar + score/rank -->
-        <div class="poster-hero">
-          <div class="poster-avatar-box">
-            <img id="poster-avatar" src="" alt="Avatar">
+          <div class="poster-rule"></div>
+
+          <!-- dossier: deduped meta line + color-tiered stats line -->
+          <div class="poster-dossier">
+            <div id="poster-meta" class="poster-meta-line"></div>
+            <div id="poster-stats" class="poster-stats-line"></div>
           </div>
-          <div class="poster-hero-right">
-            <div class="poster-score-val" id="poster-score-val">0</div>
-            <div id="poster-rank" class="poster-rank"></div>
-            <div id="poster-meta" class="poster-meta-row"></div>
+
+          <!-- ending — full narrative, editorial pull-quote -->
+          <div id="poster-ending" class="poster-ending"></div>
+
+          <!-- footer CTA -->
+          <div class="poster-foot">
+            <span id="poster-footer-text">我玩出了<span id="poster-footer-rank"></span>级人生，你也快来试试！</span>
           </div>
-        </div>
-
-        <!-- Row 3: Stats bar -->
-        <div class="poster-stats-bar">
-          <div class="poster-bar-label">终值</div>
-          <div id="poster-stats" class="poster-stats-row"></div>
-        </div>
-
-        <!-- Row 4: Talents chips -->
-        <div class="poster-talents-bar">
-          <div class="poster-bar-label">天赋</div>
-          <div id="poster-talents" class="poster-talents-row"></div>
-        </div>
-
-        <!-- Row 5: Life milestones (storyline + romance + school) -->
-        <div class="poster-life-bar">
-          <div class="poster-bar-label">经历</div>
-          <div id="poster-life" class="poster-life-row"></div>
-        </div>
-
-        <!-- Row 6: Ending -->
-        <div class="poster-ending-bar">
-          <div id="poster-ending" class="poster-ending-content"></div>
-        </div>
-
-        <!-- Row 7: Footer tagline -->
-        <div class="poster-foot">
-          <span id="poster-footer-text">我玩出了<span id="poster-footer-rank"></span>级人生，你也快来试试！</span>
         </div>
       </div>
     </div>
@@ -1258,7 +1261,7 @@
   })();
   </script>
   <script>
-    const LOCAL_VER = '5.0';
+    const LOCAL_VER = '5.1';
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js').then(reg => {
         let lastCheck = 0;

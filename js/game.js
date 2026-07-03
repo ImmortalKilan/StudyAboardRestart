@@ -5,6 +5,7 @@ import { initAchievements, unlockAchievement, setOnUnlock, getAchievementBonuses
 import {
   STAT_KEYS, STAT_LABELS, EFFECT_KEYS, XIANXIA_KEYS,
   LEGENDARY_ENDINGS, GOOD_ENDINGS,
+  ENDING_TITLES, STAT_ARCHETYPE_TITLES, RANK_PERCENTILE,
   deriveRealm, ALLOC_TOTAL_BASE, MAX_PER_STAT,
   DEFAULT_PROF_BY_AGE,
   HIDDEN_STORYLINES, SPECIAL_STORYLINES, STORYLINE_UNLOCK_STAT,
@@ -12,7 +13,7 @@ import {
 } from './engine/constants.js';
 import { sample, gachaDraw } from './engine/utils.js';
 import { initFlowchart, openFlowchart, unlockFlowchartNode, setFlowchartSfx, resetSessionUnlocks, getSessionUnlocks } from './flowchart.js';
-import { initMemoryUI, renderMemoryPanel, recordPlaythrough, showNewCardToast } from './memory.js';
+import { initMemoryUI, renderMemoryPanel, recordPlaythrough, showNewCardToast, getNextCardInfo } from './memory.js';
 import { initRelicUI, updateVaultButton, openVaultModal, renderRelicSlot, initRelicSlot, finalizeRelicChoice, generateRelicChoices, showRelicReward, getActiveRelic, clearActiveRelic, consumeActiveRelic, showMutationToast, checkGiftLink, redeemRelicCode, formatEffect as relicFormatEffect, addRelic, getRelicVault, checkBlueTrigger, checkPurpleTrigger, tryPhoenixSave } from './relic.js';
 import { initMoments, tickMoments, checkPostable, playerPost, mountMomentsUI, mountMobileMoments, openMobileMoments, mountMobileDrawer, resetMoments, showPostPrompt, isMomentsVisible, getClassReunion, reactToPlayerEvent, setMomentsActionHandler, setMomentsDramaHandler, addMomLastPost, setMomentsHiddenEntryHandler } from './moments.js';
 import * as SFX from './audio.js';
@@ -317,7 +318,7 @@ const STORYLINE_CFG = {
     gracePeriod: 12,
     eventRate: 0.6,
     progressChecks: [
-      { cond: s => s.POP >= 80, event: () => Math.random() < 0.7 ? 80090 : 80092 },
+      { cond: s => s.POP >= 70, event: 80090 },
       { cond: s => s.INT < 4, event: 80091 },
       { cond: s => s.age - s.storylineStart >= 3, event: 80094 },
     ],
@@ -380,7 +381,7 @@ const STORYLINE_CFG = {
     gracePeriod: 12,
     eventRate: 0.6,
     progressChecks: [
-      { cond: s => (s.FAN || 0) >= 80, event: () => Math.random() < 0.7 ? 76090 : 76093 },
+      { cond: s => (s.FAN || 0) >= 60, event: () => Math.random() < 0.9 ? 76090 : 76093 },
       { cond: s => s.INT < 4, event: 76094 },
       { cond: s => s.age - s.storylineStart >= 3, event: 76095 },
     ],
@@ -2608,7 +2609,7 @@ function _checkEventAchievements(ev) {
   if (id === 49990 || id === 49991 || id === 49992) unlockAchievement('end_music'); // 音乐: 传奇
 
   // Xianxia immortal ending: any game-end while in xianxia with high cul
-  if (ev.end && state.storyline === 'xianxia' && (state.cul || 0) >= 1000) {
+  if (ev.end && state.storyline === 'xianxia' && (state.cul || 0) >= 532) {
     unlockAchievement('end_xianxia');
   }
 
@@ -3241,8 +3242,29 @@ function advanceMonth() {
       if (ev) applyEvent(ev);
     }
 
+    // Force music career endings at age 35+
+    if (state.phase !== 'ended' && state.major === '音乐' && state.age >= 35) {
+      const _musicEndings = [
+        { cond: s => s.profession === '独立音乐人' && ((s.INT >= 21 && s.PER >= 19) || s.INT >= 27), event: 49990 },
+        { cond: s => s.profession === '流行歌手' && ((s.APP >= 21 && s.PER >= 21 && s.MNY >= 19) || s.PER >= 27), event: 49991 },
+        { cond: s => s.profession === '作曲家' && ((s.INT >= 22 && s.PER >= 19) || s.INT >= 29), event: 49992 },
+        { cond: s => s.profession === '音乐教师' || s.profession === '资深音乐教师', event: 49994 },
+        { cond: s => s.profession === '音乐博主' && s.age >= 36, event: 49998 },
+        { cond: s => s.profession === '独立音乐人' && s.age >= 36, event: 49995 },
+        { cond: s => s.profession === '流行歌手' && s.age >= 36, event: 49996 },
+        { cond: s => s.profession === '作曲家' && s.age >= 36, event: 49997 },
+        { cond: s => s.profession === '驻场歌手' && s.age >= 36, event: 49999 },
+        { cond: s => s.age >= 38, event: 49993 },
+      ];
+      const musicEnd = _musicEndings.find(me => me.cond(state) && !state.firedEvents.has(me.event));
+      if (musicEnd) {
+        const ev = state.eventsMap.get(musicEnd.event);
+        if (ev) applyEvent(ev);
+      }
+    }
+
     if (state.phase === 'ended') {
-      // event from statComboDeaths already ended the game
+      // event from statComboDeaths or music career already ended the game
     } else if (state.HLT <= -5) {
       pushLog('「结局：油尽灯枯」长期的忽视和透支终于压垮了你的身体。你在一个深夜倒下，再也没有醒来。人生就此画上句号。', 'ending');
       state.phase = 'ended';
@@ -5006,6 +5028,9 @@ function showEndCinematic() {
         _appendEndHint($('end-card'), '🃏 你获得了第一张「前世记忆」卡。返回主界面后，点击「前世记忆」可以解锁隐藏剧情的线索。');
         try { localStorage.setItem('sasr_first_card_guide', '1'); } catch {}
       }
+      // Progress counter toward next memory card
+      const memInfo = getNextCardInfo();
+      _appendEndHint($('end-card'), `🃏 前世记忆卡进度：${memInfo.progressCurrent}/${memInfo.progressTotal} 局`);
     }
     overlay.classList.add('show-card');
   }, 1400);
@@ -5282,6 +5307,43 @@ function calculateScore() {
   return Math.max(0, Math.floor(score * multiplier));
 }
 
+// ── Ending title (称号) resolution ────────────────────────────────────────
+// Tier 1: curated ENDING_TITLES map (legendary/good endings — see constants.js)
+// Tier 2: auto-extract a short tag already embedded in the ending's own text
+//         (many endings are authored as "XX结局：..." / "【结局：XX】" / "评级：XX")
+// Tier 3: fall back to a stat-archetype title based on the run's dominant stat
+function extractEndingTag(text) {
+  if (!text) return null;
+  const s = String(text).trim();
+  const patterns = [
+    /^[*\s【]*(?:真|坏|中间|好)?结局[：:·]\s*([^】\n。！？]{2,12})/,
+    /^[*\s【]*([一-龥A-Za-z0-9/]{2,10})结局[：:]/,
+    /^评级[：:]\s*([^\n。]{1,6})/,
+  ];
+  for (const p of patterns) {
+    const m = s.match(p);
+    if (m) return m[1].trim();
+  }
+  return null;
+}
+
+function getPlayerTitle(state, endingText) {
+  const eid = state.endingId;
+  if (eid && ENDING_TITLES[eid]) return ENDING_TITLES[eid];
+
+  const tag = extractEndingTag(endingText);
+  if (tag) return tag;
+
+  const peaks = state.statPeaks || {};
+  const keys = ['INT', 'SOC', 'MNY', 'APP', 'HLT', 'PER'];
+  let best = 'HAP', bestVal = -Infinity;
+  for (const k of keys) {
+    const v = peaks[k] || 0;
+    if (v > bestVal) { bestVal = v; best = k; }
+  }
+  return STAT_ARCHETYPE_TITLES[best] || STAT_ARCHETYPE_TITLES.HAP;
+}
+
 function animateScore(targetScore) {
   const scoreEl = $('summary-score-val');
   const rankEl = $('summary-score-rank');
@@ -5325,6 +5387,12 @@ function animateScore(targetScore) {
         rankEl.textContent = rankText;
       }
       rankEl.classList.add(rankClass, 'stamp');
+
+      // Stash rank letter/key on state so the poster generator doesn't have
+      // to scrape it back out of the animated DOM text (fragile — was
+      // silently coming back empty for the footer/rank-letter elements).
+      state._rankLetter = parts ? parts[1] : rankText;
+      state._rankKey = rankClass.replace('rank-', '');
     }
   }
   requestAnimationFrame(update);
@@ -7470,67 +7538,35 @@ async function main() {
       // Score
       $('poster-score-val').textContent = $('summary-score-val').textContent;
 
-      // Rank — extract letter and description
-      const rankEl = $('summary-score-rank');
-      const fullRankText = rankEl.textContent; // e.g. "S+ 载入史册"
-      const rankMatch = fullRankText.match(/^(S\+|[SABCDF]级?)\s*(.*)$/);
-      let rankLetter = fullRankText;
-      let rankDesc = '';
-      if (rankMatch) {
-        rankLetter = rankMatch[1];
-        rankDesc = rankMatch[2].trim();
-      }
-      const pRankEl = $('poster-rank');
-      pRankEl.innerHTML = `<div class="poster-rank-letter">${rankLetter}</div><div class="poster-rank-desc">${rankDesc}</div>`;
-
-      // Determine rank key for data-rank color theming
-      let rankKey = 'C';
-      if (/S/.test(rankLetter)) rankKey = 'S';
-      else if (/A/.test(rankLetter)) rankKey = 'A';
-      else if (/B/.test(rankLetter)) rankKey = 'B';
-      else if (/D/.test(rankLetter)) rankKey = 'D';
-      else if (/F/.test(rankLetter)) rankKey = 'F';
+      // Rank — read back from state (set by animateScore), not scraped from
+      // the animated DOM text — the old regex-on-textContent approach was
+      // coming back empty for the footer/rank-letter elements.
+      const rankLetter = state._rankLetter || 'C级'; // e.g. "S+", "C级"
+      const rankKey = state._rankKey || 'C';         // e.g. "S", "C"
       $('poster-template').setAttribute('data-rank', rankKey);
 
-      // Meta chips
-      const heroChips = document.querySelectorAll('#summary-hero-meta .hero-chip');
-      let metaHTML = '';
-      heroChips.forEach(chip => {
-        const val = chip.innerText.trim();
-        if (val) metaHTML += `<span class="poster-meta-chip">${val}</span>`;
-      });
-      $('poster-meta').innerHTML = metaHTML;
+      $('poster-rank-watermark').textContent = rankKey;
+      $('poster-rank-letter').innerHTML = rankKey + (rankLetter.includes('+') ? '<span class="poster-rank-plus">+</span>' : '');
 
-      // Stats — compact cells
-      const keys = ['SOC', 'INT', 'MNY', 'HAP', 'HLT', 'PER', 'APP'];
-      let statsHTML = '';
-      keys.forEach(k => {
-        const cur = state[k] ?? 0;
-        statsHTML += `<div class="poster-stat-cell"><div class="poster-stat-label">${STAT_LABELS[k]}</div><div class="poster-stat-val">${cur}</div></div>`;
-      });
-      $('poster-stats').innerHTML = statsHTML;
+      const pctKey = rankLetter.replace('级', '');
+      $('poster-percentile').innerHTML = RANK_PERCENTILE[pctKey] || RANK_PERCENTILE[rankKey] || '';
 
-      // Talents — compact chips (name only, no description)
-      const pTalentsEl = $('poster-talents');
-      if (state.talentsPicked && state.talentsPicked.length) {
-        pTalentsEl.innerHTML = state.talentsPicked.map(t =>
-          `<span class="poster-talent-chip grade-${t.grade}">${t.name}</span>`
-        ).join('');
-      } else {
-        pTalentsEl.innerHTML = `<span class="poster-talent-chip grade-0">无天赋</span>`;
-      }
+      // Ending — resolved once, used for both the 称号 title and the full narrative
+      const reversed = [...state.log].reverse();
+      const endingLog = reversed.find(e => e.logType === 'ending');
+      const endingText = endingLog ? endingLog.text : '这一生平淡如水。';
 
-      // Life milestones — storyline, romance, school, country, key choices
+      // 称号 — Tier1 curated / Tier2 auto-extracted / Tier3 stat archetype
+      $('poster-title-cn').textContent = getPlayerTitle(state, endingText);
+
+      // Meta line — one deduped row (age, country, major, storyline, relationship, one highlight)
       {
-        let lifeChips = [];
-        // Country
-        if (state.country) lifeChips.push(`🌏 <b>${state.country}</b>`);
-        // School
-        if (state.school && state.school !== '无') lifeChips.push(`🎓 <b>${state.school}</b>`);
-        // Major
-        if (state.major) lifeChips.push(`📚 ${state.major}`);
-        // Storyline
-        const STORYLINE_NAMES = {
+        let metaParts = [];
+        const ageY = state.age, ageM = state.monthOfYear;
+        metaParts.push(`${ageY}岁${ageM}个月`);
+        if (state.country) metaParts.push(`🌏 <b>${state.country}</b>`);
+        if (state.major) metaParts.push(`📚 ${state.major}`);
+        const STORYLINE_NAMES_POSTER = {
           spy: '间谍线', idol: '偶像线', superstar: '巨星线', streamer: '主播线',
           xianxia: '修仙线', chef: '厨神线', athlete: '运动员线', fitness: '健身线',
           poker: '德扑线', triton: '赌神线', esports: '电竞线', worlds: '世界赛线',
@@ -7538,40 +7574,50 @@ async function main() {
           thief: '怪盗线', hogwarts: '魔法线', timeloop: '时间循环',
           cheater: '代考帝国'
         };
-        if (state.storyline && STORYLINE_NAMES[state.storyline]) {
-          lifeChips.push(`⚡ <b>${STORYLINE_NAMES[state.storyline]}</b>`);
+        if (state.storyline && STORYLINE_NAMES_POSTER[state.storyline]) {
+          metaParts.push(`⚡ <b>${STORYLINE_NAMES_POSTER[state.storyline]}</b>`);
         }
-        // Romance
         const REL_ICONS = { '恋爱中': '💕', '已婚': '💍', '二婚': '💍', '离异': '💔', '海王': '🐟', '海后': '🐟' };
         if (state.relationship && state.relationship !== '单身') {
-          lifeChips.push(`${REL_ICONS[state.relationship] || '❤️'} ${state.relationship}`);
+          metaParts.push(`${REL_ICONS[state.relationship] || '❤️'} ${state.relationship}`);
         } else {
-          lifeChips.push('🚶 单身');
+          metaParts.push('🚶 单身');
         }
-        // Key highlights from choice records (top 2)
+        // one key highlight from the choice record
         const hlEl2 = $('summary-highlights');
         if (hlEl2) {
-          const records = hlEl2.querySelectorAll('.choice-record');
-          for (let i = 0; i < Math.min(records.length, 2); i++) {
-            const picked = records[i].querySelector('.choice-opt-picked')?.innerText?.trim();
-            if (picked) lifeChips.push(`📌 ${picked}`);
-          }
+          const picked = hlEl2.querySelector('.choice-record .choice-opt-picked')?.innerText?.trim();
+          if (picked) metaParts.push(`📌 ${picked}`);
         }
-        $('poster-life').innerHTML = lifeChips.map(c => `<span class="poster-life-chip">${c}</span>`).join('');
+        $('poster-meta').innerHTML = metaParts.join('<span class="dot">·</span>');
       }
 
-      // Ending
-      const reversed = [...state.log].reverse();
-      const endingLog = reversed.find(e => e.logType === 'ending');
+      // Stats — inline line, color-coded by relative standing within this run
+      // (top 2 of the 7 → tier-hi, bottom 2 → tier-lo, rest → tier-mid)
+      {
+        const keys = ['SOC', 'INT', 'MNY', 'HAP', 'HLT', 'PER', 'APP'];
+        const values = keys.map(k => ({ k, v: state[k] ?? 0 }));
+        const ranked = [...values].sort((a, b) => b.v - a.v);
+        const tierOf = {};
+        ranked.forEach((item, i) => {
+          tierOf[item.k] = i < 2 ? 'tier-hi' : i >= ranked.length - 2 ? 'tier-lo' : 'tier-mid';
+        });
+        const statsHTML = values.map(({ k, v }) =>
+          `${STAT_LABELS[k]}<span class="stat-v ${tierOf[k]}">${v}</span>`
+        ).join('<span class="dot">·</span>');
+        $('poster-stats').innerHTML = `<span class="lbl">终值</span>${statsHTML}`;
+      }
+
+      // Ending — tag + full narrative (kept complete, not truncated)
       if (endingLog) {
-        $('poster-ending').innerHTML = `<div class="poster-ending-tag">结局</div><div class="poster-ending-text">${endingLog.text}</div>`;
+        $('poster-ending').innerHTML = `<span class="ending-tag">结局${endingLog.tag ? ` · ${endingLog.tag}` : ''}</span><p class="ending-text">${endingText}</p>`;
       } else {
-        $('poster-ending').innerHTML = `<div class="poster-ending-text">这一生平淡如水。</div>`;
+        $('poster-ending').innerHTML = `<p class="ending-text">${endingText}</p>`;
       }
 
       // Footer rank
       const pFooterRank = $('poster-footer-rank');
-      pFooterRank.textContent = rankLetter;
+      pFooterRank.textContent = pctKey;
 
       // Small delay to ensure any CSS/DOM updates are applied
       await new Promise(r => setTimeout(r, 150));

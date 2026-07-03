@@ -13,7 +13,8 @@ import { renderAvatar } from './avatar.js';
 
 const LS_KEY = 'sasr_memory_v1';
 
-const CARD_SCHEDULE = [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57];
+const CARD_INTERVAL = 3;
+function _cardThreshold(idx) { return (idx + 1) * CARD_INTERVAL; }
 
 const STORYLINE_HINTS = {
   spy: {
@@ -236,15 +237,14 @@ function _load() {
     data.cardsAvailable = Number(data.cardsAvailable) || 0;
     if (!data.revealed || typeof data.revealed !== 'object') data.revealed = {};
     // Repair: recalculate cardsEarned from totalPlays if out of sync
-    let expected = 0;
-    for (let i = 0; i < CARD_SCHEDULE.length; i++) {
-      if (data.totalPlays >= CARD_SCHEDULE[i]) expected = i + 1;
-      else break;
-    }
+    let expected = Math.floor(data.totalPlays / CARD_INTERVAL);
     if (data.cardsEarned > expected) {
       const excess = data.cardsEarned - expected;
       data.cardsEarned = expected;
       data.cardsAvailable = Math.max(0, data.cardsAvailable - excess);
+      _save(data);
+    } else if (data.cardsEarned < expected) {
+      data.cardsEarned = expected;
       _save(data);
     }
     return data;
@@ -289,7 +289,7 @@ export function recordPlaythrough(finalState = null) {
   const avatarState = _snapshotAvatarState(finalState);
   if (avatarState) data.lastAvatar = avatarState;
 
-  const nextThreshold = CARD_SCHEDULE[data.cardsEarned] || Infinity;
+  const nextThreshold = _cardThreshold(data.cardsEarned);
   if (data.totalPlays >= nextThreshold) {
     data.cardsEarned++;
     data.cardsAvailable++;
@@ -315,17 +315,35 @@ export function useCard(storylineKey) {
 
 export function getMemoryState() { return _load(); }
 
+/** Call after account import to realign totalPlays with cardsEarned schedule. */
+export function onDataImported() {
+  const data = _load();
+  const earned = data.cardsEarned;
+  if (earned > 0) {
+    const expectedPlays = _cardThreshold(earned - 1);
+    if (data.totalPlays < expectedPlays) {
+      data.totalPlays = expectedPlays;
+      _save(data);
+    }
+  }
+}
+
 export function getNextCardInfo() {
   const data = _load();
   const nextIdx = data.cardsEarned;
-  const nextThreshold = CARD_SCHEDULE[nextIdx] || null;
+  const nextThreshold = _cardThreshold(nextIdx);
+  const prevThreshold = nextIdx > 0 ? _cardThreshold(nextIdx - 1) : 0;
+  const cycleSize = CARD_INTERVAL;
+  const playsInCycle = data.totalPlays - prevThreshold;
   return {
     totalPlays: data.totalPlays,
     cardsEarned: data.cardsEarned,
     cardsAvailable: data.cardsAvailable,
     nextAt: nextThreshold,
-    playsUntilNext: nextThreshold ? nextThreshold - data.totalPlays : null,
+    playsUntilNext: nextThreshold - data.totalPlays,
     revealed: data.revealed,
+    progressCurrent: Math.min(playsInCycle, cycleSize),
+    progressTotal: cycleSize,
   };
 }
 
@@ -347,12 +365,28 @@ export function getStorylineCards() {
 // ── UI: Top-right button ──
 
 export function renderMemoryPanel() {
-  const countEl = document.getElementById('memory-btn-count');
-  if (!countEl) return;
   const info = getNextCardInfo();
-  countEl.textContent = info.cardsAvailable;
+
+  const countEl = document.getElementById('memory-btn-count');
+  if (countEl) countEl.textContent = info.cardsAvailable;
   const btn = document.getElementById('memory-btn');
   if (btn) btn.classList.toggle('mm-has-cards', info.cardsAvailable > 0);
+
+  // Start screen panel
+  const cardCount = document.querySelector('.memory-card-count');
+  if (cardCount) cardCount.textContent = info.cardsAvailable;
+
+  const progressEl = document.querySelector('.memory-progress');
+  if (progressEl) {
+    progressEl.textContent = `下一张记忆卡：${info.progressCurrent}/${info.progressTotal} 局`;
+  }
+
+  const statsEl = document.querySelector('.memory-stats');
+  if (statsEl) {
+    const revealedCount = Object.values(info.revealed).reduce((a, b) => a + b, 0);
+    const totalHints = STORYLINE_ORDER.length * 2;
+    statsEl.textContent = `${info.totalPlays}次重开 · ${revealedCount}/${totalHints}条线索`;
+  }
 }
 
 // ── UI: Grid Collection Modal ──
@@ -366,6 +400,10 @@ export function openCarousel() {
   const info = getNextCardInfo();
   const countEl = modal.querySelector('.mm-available-count');
   if (countEl) countEl.textContent = info.cardsAvailable;
+  const progEl = modal.querySelector('.mm-progress-label');
+  if (progEl) {
+    progEl.textContent = `下一张：${info.progressCurrent}/${info.progressTotal} 局`;
+  }
 }
 
 export function closeCarousel() {

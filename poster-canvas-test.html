@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Canvas poster renderer — test harness (for future WeChat Mini Game port)</title>
+<style>
+  body { margin: 0; padding: 40px; background: #08090a; display: flex; flex-direction: column; align-items: center; gap: 20px; font-family: sans-serif; }
+  .switcher { display: flex; gap: 10px; }
+  .switcher button { padding: 8px 18px; border-radius: 8px; border: 1px solid #33322d; background: #17140f; color: #b7b0a0; font-size: 13px; cursor: pointer; }
+  .switcher button.active { background: #e8c15a; color: #100e0b; font-weight: 700; }
+  canvas { box-shadow: 0 40px 90px -30px rgba(0,0,0,.7); border-radius: 6px; }
+  .note { color: #888; font-size: 13px; max-width: 700px; line-height: 1.7; }
+</style>
+</head>
+<body>
+<div class="switcher">
+  <button class="active" id="btn-s">示例A · S+传奇结局</button>
+  <button id="btn-c">示例B · 普通/惨淡结局</button>
+</div>
+<canvas id="poster-canvas"></canvas>
+<div class="note">
+  这是 <code>js/posterCanvas.js</code> 的纯 Canvas 2D 渲染测试（不用DOM/CSS/html2canvas），为以后微信小游戏移植做准备。
+  头像/二维码用占位图代替；真实实现时会传入游戏内 canvas 头像和真实二维码图片。
+</div>
+
+<script type="module">
+import { measurePosterHeight, drawPoster } from './js/posterCanvas.js';
+
+function makePlaceholderImage(w, h, bg, fg, label) {
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  const cx = c.getContext('2d');
+  cx.fillStyle = bg; cx.fillRect(0, 0, w, h);
+  cx.fillStyle = fg; cx.font = `${Math.floor(w / 4)}px sans-serif`;
+  cx.textAlign = 'center'; cx.textBaseline = 'middle';
+  cx.fillText(label, w / 2, h / 2);
+  return c;
+}
+
+const avatarImg = makePlaceholderImage(150, 150, '#2a2620', '#c9b98a', '🧑‍🎓');
+const qrImg = makePlaceholderImage(132, 132, '#f6f0e2', '#333', 'QR');
+
+const DATA_S = {
+  rankKey: 'S', rankLetter: 'S+', score: 31190,
+  percentileText: '超过 99% 的留子',
+  title: '羽化撕碎虚空',
+  avatarImage: avatarImg, qrImage: qrImg,
+  metaParts: [
+    { text: '31岁7个月', bold: false },
+    { text: '🌏 美国', bold: true },
+    { text: '📚 CS', bold: false },
+    { text: '⚡ 修真求道', bold: true },
+    { text: '💕 恋爱中', bold: false },
+    { text: '📌 A股开户练手', bold: false },
+  ],
+  stats: [
+    { label: '社交', value: 12, tier: 'lo' },
+    { label: '智力', value: 56, tier: 'hi' },
+    { label: '家境', value: 7, tier: 'lo' },
+    { label: '快乐', value: 6, tier: 'mid' },
+    { label: '健康', value: 15, tier: 'mid' },
+    { label: '毅力', value: 34, tier: 'hi' },
+    { label: '颜值', value: 1, tier: 'lo' },
+  ],
+  endingTag: '结局 · 真结局·羽化撕碎虚空',
+  endingText: '你悟透全部本源大道，踏入羽化境，撕碎一方虚空而去，再无人见过你的踪迹。',
+  footerRankText: 'S+',
+};
+
+const DATA_C = {
+  rankKey: 'C', rankLetter: 'C', score: 6627,
+  percentileText: '超过 35% 的留子',
+  title: '崩溃',
+  avatarImage: makePlaceholderImage(150, 150, '#2a2620', '#c9b98a', '🧑'), qrImage: qrImg,
+  metaParts: [
+    { text: '18岁5个月', bold: false },
+    { text: '🚶 单身', bold: false },
+    { text: '📌 A股开户练手', bold: false },
+  ],
+  stats: [
+    { label: '社交', value: 15, tier: 'mid' },
+    { label: '智力', value: 26, tier: 'hi' },
+    { label: '家境', value: 7, tier: 'lo' },
+    { label: '快乐', value: 2, tier: 'lo' },
+    { label: '健康', value: -7, tier: 'lo' },
+    { label: '毅力', value: 23, tier: 'hi' },
+    { label: '颜值', value: 12, tier: 'mid' },
+  ],
+  endingTag: '结局 · 18岁5月',
+  endingText: '崩溃结局：连续三个月每天工作十八小时，你终于在一次直播中晕倒在了镜头前。送到医院后诊断为急性心肌炎，医生说你的身体已经严重透支。ICU的白色天花板上，你好像看到了那些未完成的商务合作在一条条地取消。',
+  footerRankText: 'C',
+};
+
+const canvas = document.getElementById('poster-canvas');
+const ctx = canvas.getContext('2d');
+
+function render(data) {
+  const dpr = window.devicePixelRatio || 1;
+  const height = measurePosterHeight(ctx, data);
+  canvas.width = 720 * dpr;
+  canvas.height = height * dpr;
+  canvas.style.width = '720px';
+  canvas.style.height = height + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  drawPoster(ctx, height, data);
+}
+
+document.getElementById('btn-s').addEventListener('click', (e) => {
+  render(DATA_S);
+  document.querySelectorAll('.switcher button').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+});
+document.getElementById('btn-c').addEventListener('click', (e) => {
+  render(DATA_C);
+  document.querySelectorAll('.switcher button').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+});
+
+render(DATA_S);
+</script>
+</body>
+</html>

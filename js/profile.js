@@ -2,6 +2,8 @@
 // Manages player profile (nickname, UUID, stats display) and
 // cross-device data import/export (JSON file + base64 text string).
 
+import { onDataImported } from './memory.js';
+
 const PROFILE_KEY = 'sasr_profile_v1';
 
 const ALL_DATA_KEYS = [
@@ -126,6 +128,7 @@ function _applyBundle(bundle) {
       try { localStorage.removeItem(key); } catch {}
     }
   }
+  onDataImported();
 }
 
 function importFromJSON(file) {

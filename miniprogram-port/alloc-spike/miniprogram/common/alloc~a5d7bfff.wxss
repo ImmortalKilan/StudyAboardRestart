@@ -1,0 +1,146 @@
+page {
+  --ink: #e5ecf6;
+  --ink-faint: #8895ab;
+  --line: #2b3648;
+  --sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.h5-body { margin: 0; background: #0f1420; color: var(--ink); font-family: var(--sans); }
+
+.screen-head .h5-h1 {
+  font-size: 32px;
+  letter-spacing: 0.04em;
+  margin: 0 0 8px;
+  font-weight: 400;
+  color: #e8d5b8; /* flattened from the real gradient-text treatment — background-clip:text is not reliable in WXSS */
+}
+.screen-head .sub {
+  color: var(--ink-faint);
+  margin: 0 0 24px;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+
+.creation-step {
+  height: 100%;
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.alloc-split {
+  display: flex;
+  gap: 28px;
+  flex: 1;
+  min-height: 0;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.alloc-left {
+  flex: 0 0 38%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #1a2230;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px 12px 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.alloc-avatar-wrap-lg {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+}
+.alloc-avatar-wrap-lg .h5-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.avatar-ov-hint {
+  position: absolute;
+  bottom: 6px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 10px;
+  color: var(--ink-faint);
+}
+
+.avatar-overlay-controls {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+.avatar-ov-group { display: flex; gap: 4px; }
+.avatar-ov-btn {
+  width: 28px; height: 28px; border-radius: 8px;
+  border: 1px solid var(--line); background: rgba(20,26,38,.8); color: var(--ink);
+  font-size: 14px;
+}
+.avatar-ov-btn.active { border-color: #e6c650; color: #e6c650; }
+
+.alloc-right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.alloc-banner {
+  font-size: 14px;
+  color: var(--ink-faint);
+  margin-bottom: 10px;
+}
+.alloc-banner .h5-span { color: #e6c650; font-weight: 700; }
+
+.alloc-list { display: flex; flex-direction: column; gap: 10px; }
+
+.alloc-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #171e2c;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 14px;
+}
+.alloc-row .h5-span:first-child { width: 48px; color: var(--ink-faint); font-size: 13px; }
+.alloc-val { width: 28px; text-align: center; font-weight: 700; }
+.alloc-bonus { color: #7fd88a; font-size: 12px; }
+
+.step {
+  width: 30px; height: 30px; border-radius: 8px;
+  border: 1px solid var(--line); background: #1a2230; color: var(--ink);
+  font-size: 16px; line-height: 1;
+}
+.step:active { background: #2b3648; }
+
+.alloc-actions { display: flex; gap: 10px; margin-top: 16px; }
+.ghost {
+  padding: 8px 16px; border-radius: 8px; border: 1px solid var(--line);
+  background: transparent; color: var(--ink); font-size: 13px;
+}
+.primary {
+  padding: 8px 20px; border-radius: 8px; border: none;
+  background: #e6c650; color: #1a1608; font-weight: 700; font-size: 13px;
+}
+
